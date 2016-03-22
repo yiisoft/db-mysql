@@ -1,12 +1,12 @@
 <?php
-namespace yiiunit\framework\db\oci;
+namespace yiiunit\framework\db\cubrid;
 
-use yii\db\oci\ColumnSchemaBuilder;
+use yii\db\cubrid\ColumnSchemaBuilder;
 use yii\db\Schema;
 use \yiiunit\framework\db\ColumnSchemaBuilderTest as BaseColumnSchemaBuilderTest;
 
 /**
- * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for Oracle
+ * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for Cubrid
  */
 class ColumnSchemaBuilderTest extends BaseColumnSchemaBuilderTest
 {
