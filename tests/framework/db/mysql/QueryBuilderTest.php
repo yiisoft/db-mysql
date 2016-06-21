@@ -3,14 +3,15 @@
 namespace yiiunit\framework\db\mysql;
 
 use yii\db\Schema;
-use yiiunit\framework\db\QueryBuilderTest;
 
 /**
  * @group db
  * @group mysql
  */
-class MysqlQueryBuilderTest extends QueryBuilderTest
+class QueryBuilderTest extends \yiiunit\framework\db\QueryBuilderTest
 {
+	protected $driverName = 'mysql';
+
     /**
      * this is not used as a dataprovider for testGetColumnType to speed up the test
      * when used as dataprovider every single line will cause a reconnect with the database which is not needed here
