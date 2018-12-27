@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 /**
  * @group db
  * @group mysql
  * @group data
  */
-class ActiveDataProviderTest extends \yiiunit\framework\data\ActiveDataProviderTest
+class ActiveDataProviderTest extends \yii\activerecord\tests\unit\ActiveDataProviderTest
 {
     public $driverName = 'mysql';
 }

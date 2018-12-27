@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql\connection;
+namespace yii\db\mysql\tests\connection;
 
 use yii\db\Connection;
 use yii\db\Exception;
@@ -15,7 +15,7 @@ use yii\db\Transaction;
  * @group db
  * @group mysql
  */
-class DeadLockTest extends \yiiunit\framework\db\mysql\ConnectionTest
+class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
 {
     /** @var string Shared log filename for children */
     private $logFile;

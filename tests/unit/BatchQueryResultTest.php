@@ -5,13 +5,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 /**
  * @group db
  * @group mysql
  */
-class BatchQueryResultTest extends \yiiunit\framework\db\BatchQueryResultTest
+class BatchQueryResultTest extends \yii\db\tests\unit\BatchQueryResultTest
 {
     public $driverName = 'mysql';
 }

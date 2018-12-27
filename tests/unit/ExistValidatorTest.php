@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 /**
  * @group db
  * @group mysql
  * @group validators
  */
-class ExistValidatorTest extends \yiiunit\framework\validators\ExistValidatorTest
+class ExistValidatorTest extends \yii\db\tests\unit\validators\ExistValidatorTest
 {
     public $driverName = 'mysql';
 }

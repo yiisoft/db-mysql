@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 use yiiunit\data\ar\Storage;
 
@@ -13,7 +13,7 @@ use yiiunit\data\ar\Storage;
  * @group db
  * @group mysql
  */
-class ActiveRecordTest extends \yiiunit\framework\db\ActiveRecordTest
+class ActiveRecordTest extends \yii\activerecord\tests\unit\ActiveRecordTest
 {
     public $driverName = 'mysql';
 
