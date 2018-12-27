@@ -97,12 +97,5 @@
             "common": "config/common.php",
             "tests": "config/tests.php"
         }
-    },
-    "repositories" : [
-        {
-            "type" : "github",
-            "url" : "https://github.com/FabrizioCaldarelli/db"
-        }
-    ]
-
+    }
 }
