@@ -7,7 +7,7 @@
 
 namespace yii\db\mysql\tests;
 
-use yiiunit\data\ar\Storage;
+use yii\activerecord\tests\data\Storage;
 
 /**
  * @group db
@@ -31,7 +31,8 @@ class ActiveRecordTest extends \yii\activerecord\tests\unit\ActiveRecordTest
             'last_update_time' => '2018-02-21',
         ];
 
-        $storage = new Storage(['data' => $data]);
+        $storage = new Storage();
+        $storage->data = $data;
         $this->assertTrue($storage->save(), 'Storage can be saved');
         $this->assertNotNull($storage->id);
 
