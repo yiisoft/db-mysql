@@ -7,8 +7,8 @@
 
 namespace yii\db\mysql;
 
-use yii\base\InvalidArgumentException;
-use yii\base\NotSupportedException;
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\NotSupportedException;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\db\Query;

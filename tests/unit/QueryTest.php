@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 use yii\db\Expression;
 use yii\db\Query;
@@ -14,7 +14,7 @@ use yii\db\Query;
  * @group db
  * @group mysql
  */
-class QueryTest extends \yiiunit\framework\db\QueryTest
+class QueryTest extends \yii\db\tests\unit\QueryTest
 {
     protected $driverName = 'mysql';
 

@@ -5,13 +5,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 /**
  * @group db
  * @group mysql
  */
-class CommandTest extends \yiiunit\framework\db\CommandTest
+class CommandTest extends \yii\db\tests\unit\CommandTest
 {
     public $driverName = 'mysql';
 

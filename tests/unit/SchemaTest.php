@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 use yii\db\Expression;
 
 use yiiunit\framework\db\AnyCaseValue;
@@ -14,7 +14,7 @@ use yiiunit\framework\db\AnyCaseValue;
  * @group db
  * @group mysql
  */
-class SchemaTest extends \yiiunit\framework\db\SchemaTest
+class SchemaTest extends \yii\db\tests\unit\SchemaTest
 {
     public $driverName = 'mysql';
 

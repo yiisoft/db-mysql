@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\db\mysql;
+namespace yii\db\mysql\tests;
 
 use yii\base\DynamicModel;
 use yii\db\Expression;
@@ -18,7 +18,7 @@ use yii\helpers\Json;
  * @group db
  * @group mysql
  */
-class QueryBuilderTest extends \yiiunit\framework\db\QueryBuilderTest
+class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
 {
     protected $driverName = 'mysql';
 
