@@ -172,7 +172,7 @@ SQL;
         $indexes = ArrayHelper::index($indexes, null, 'name');
         $result = [];
         foreach ($indexes as $name => $index) {
-            $result[] = new IndexConstraint([
+            $result[] = Yii::createObject(['__class' => IndexConstraint::class,
                 'isPrimary' => (bool) $index[0]['index_is_primary'],
                 'isUnique' => (bool) $index[0]['index_is_unique'],
                 'name' => $name !== 'PRIMARY' ? $name : null,
