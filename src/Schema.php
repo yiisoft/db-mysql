@@ -18,6 +18,7 @@ use yii\db\ForeignKeyConstraint;
 use yii\db\IndexConstraint;
 use yii\db\TableSchema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Yii;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
@@ -544,12 +545,12 @@ SQL;
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $result['primaryKey'] = new Constraint([
+                        $result['primaryKey'] = Yii::createObject(['__class' => Constraint::class, 
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                         ]);
                         break;
                     case 'FOREIGN KEY':
-                        $result['foreignKeys'][] = new ForeignKeyConstraint([
+                        $result['foreignKeys'][] = Yii::createObject(['__class' => ForeignKeyConstraint::class, 
                             'name' => $name,
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                             'foreignSchemaName' => $constraint[0]['foreign_table_schema'],
@@ -560,7 +561,7 @@ SQL;
                         ]);
                         break;
                     case 'UNIQUE':
-                        $result['uniques'][] = new Constraint([
+                        $result['uniques'][] = Yii::createObject(['__class' => Constraint::class, 
                             'name' => $name,
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                         ]);
