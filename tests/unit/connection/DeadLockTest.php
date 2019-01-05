@@ -22,6 +22,8 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
 
     const CHILD_EXIT_CODE_DEADLOCK = 15;
 
+    public $driverName = 'mysql';
+
     /**
      * Test deadlock exception.
      *
