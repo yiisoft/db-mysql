@@ -172,12 +172,12 @@ SQL;
         $indexes = ArrayHelper::index($indexes, null, 'name');
         $result = [];
         foreach ($indexes as $name => $index) {
-            $result[] = Yii::createObject(['__class' => IndexConstraint::class,
-                'isPrimary' => (bool) $index[0]['index_is_primary'],
-                'isUnique' => (bool) $index[0]['index_is_unique'],
-                'name' => $name !== 'PRIMARY' ? $name : null,
-                'columnNames' => ArrayHelper::getColumn($index, 'column_name'),
-            ]);
+            $result[] = new IndexConstraint(
+                (bool) $index[0]['index_is_primary'],
+                (bool) $index[0]['index_is_unique'],
+                $name !== 'PRIMARY' ? $name : null,
+                ArrayHelper::getColumn($index, 'column_name')
+            );
         }
 
         return $result;
@@ -545,26 +545,27 @@ SQL;
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $result['primaryKey'] = Yii::createObject(['__class' => Constraint::class, 
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                        ]);
+                        $result['primaryKey'] = new Constraint(
+                            null,
+                            ArrayHelper::getColumn($constraint, 'column_name')
+                        );
                         break;
                     case 'FOREIGN KEY':
-                        $result['foreignKeys'][] = Yii::createObject(['__class' => ForeignKeyConstraint::class, 
-                            'name' => $name,
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                            'foreignSchemaName' => $constraint[0]['foreign_table_schema'],
-                            'foreignTableName' => $constraint[0]['foreign_table_name'],
-                            'foreignColumnNames' => ArrayHelper::getColumn($constraint, 'foreign_column_name'),
-                            'onDelete' => $constraint[0]['on_delete'],
-                            'onUpdate' => $constraint[0]['on_update'],
-                        ]);
+                        $result['foreignKeys'][] = new ForeignKeyConstraint(
+                            $name,
+                            ArrayHelper::getColumn($constraint, 'column_name'),
+                            $constraint[0]['foreign_table_schema'],
+                            $constraint[0]['foreign_table_name'],
+                            ArrayHelper::getColumn($constraint, 'foreign_column_name'),
+                            $constraint[0]['on_delete'],
+                            $constraint[0]['on_update']
+                        );
                         break;
                     case 'UNIQUE':
-                        $result['uniques'][] = Yii::createObject(['__class' => Constraint::class, 
-                            'name' => $name,
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                        ]);
+                        $result['uniques'][] = new Constraint(
+                            $name,
+                            ArrayHelper::getColumn($constraint, 'column_name')
+                        );
                         break;
                 }
             }
