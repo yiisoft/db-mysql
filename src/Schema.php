@@ -7,8 +7,8 @@
 
 namespace yii\db\mysql;
 
-use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
+use yii\exceptions\InvalidConfigException;
+use yii\exceptions\NotSupportedException;
 use yii\db\Constraint;
 use yii\db\ConstraintFinderInterface;
 use yii\db\ConstraintFinderTrait;
@@ -18,6 +18,7 @@ use yii\db\ForeignKeyConstraint;
 use yii\db\IndexConstraint;
 use yii\db\TableSchema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Yii;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
@@ -37,7 +38,6 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      * @var bool whether MySQL used is older than 5.1.
      */
     private $_oldMysql;
-
 
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
@@ -171,7 +171,7 @@ SQL;
         $indexes = ArrayHelper::index($indexes, null, 'name');
         $result = [];
         foreach ($indexes as $name => $index) {
-            $result[] = new IndexConstraint([
+            $result[] = Yii::createObject(['__class' => IndexConstraint::class,
                 'isPrimary' => (bool) $index[0]['index_is_primary'],
                 'isUnique' => (bool) $index[0]['index_is_unique'],
                 'name' => $name !== 'PRIMARY' ? $name : null,
@@ -544,12 +544,12 @@ SQL;
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $result['primaryKey'] = new Constraint([
+                        $result['primaryKey'] = Yii::createObject(['__class' => Constraint::class, 
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                         ]);
                         break;
                     case 'FOREIGN KEY':
-                        $result['foreignKeys'][] = new ForeignKeyConstraint([
+                        $result['foreignKeys'][] = Yii::createObject(['__class' => ForeignKeyConstraint::class, 
                             'name' => $name,
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                             'foreignSchemaName' => $constraint[0]['foreign_table_schema'],
@@ -560,7 +560,7 @@ SQL;
                         ]);
                         break;
                     case 'UNIQUE':
-                        $result['uniques'][] = new Constraint([
+                        $result['uniques'][] = Yii::createObject(['__class' => Constraint::class, 
                             'name' => $name,
                             'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
                         ]);

@@ -8,7 +8,7 @@
 namespace yii\db\mysql\tests;
 use yii\db\Expression;
 
-use yiiunit\framework\db\AnyCaseValue;
+use yii\db\tests\unit\AnyCaseValue;
 
 /**
  * @group db
