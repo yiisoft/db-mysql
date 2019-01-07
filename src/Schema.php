@@ -39,7 +39,6 @@ class Schema extends \yii\db\Schema implements ConstraintFinderInterface
      */
     private $_oldMysql;
 
-
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
