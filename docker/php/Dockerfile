@@ -4,7 +4,7 @@ RUN export DEBIAN_FRONTEND=noninteractive
 
 RUN apt update
 RUN apt install -y curl gnupg2
-RUN docker-php-ext-install pdo_mysql mysqli
+RUN docker-php-ext-install pdo_mysql mysqli pcntl
 
 WORKDIR /var/www/html/
 
