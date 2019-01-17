@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  db:
+    image: mysql
+    container_name: yiisoft_db_mysql_db
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql/setup:/docker-entrypoint-initdb.d
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: yii
+
+  web:
+    build: ./php
+    container_name: yiisoft_db_mysql_php
+    depends_on:
+      - db
+    volumes:
+      - ./../:/var/www/html/
+    ports:
+      - "8100:80"
+    stdin_open: true
+    tty: true
