@@ -10,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: yii
 
   web:
-    build: ./php
+    image: yiisoftware/yii-php:7.1-fpm
     depends_on:
       - db
     volumes:
