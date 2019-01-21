@@ -9,7 +9,7 @@ $ docker-compose up --build -d
 Recreating docker_db_1 ... done
 Recreating docker_web_1 ... done
 
-$ docker exec -it docker_web_1 bash
+$ docker-compose exec web bash
 ```
 
 In the container, create the `vendor/yiisoft/yii-core/config/tests/config.local.php` file
