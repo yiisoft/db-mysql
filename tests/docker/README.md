@@ -26,3 +26,16 @@ then install the composer dependencies and run tests:
 $ composer install
 $ ./vendor/bin/phpunit
 ```
+
+<br />
+
+Docker and Composer packages 
+======================
+
+If you want to have a full testing environment with composer packages installed:
+
+```shell
+$ ./start.sh
+```
+
+that will prepare the environment will all needed packages.
