@@ -4,10 +4,11 @@ services:
   db:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
-    volumes:
-      - ./mysql/setup:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: yii
+      - MYSQL_DATABASE=yiitest
+      - MYSQL_ROOT_PASSWORD=yii
+      - MYSQL_USER=travis
+      - MYSQL_PASSWORD=travis
 
   web:
     image: yiisoftware/yii-php:7.1-fpm
