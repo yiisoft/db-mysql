@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -13,6 +14,7 @@ use yii\db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
  * ColumnSchemaBuilder is the schema builder for MySQL databases.
  *
  * @author Chris Harris <chris@buckshotsoftware.com>
+ *
  * @since 2.0.8
  */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
@@ -31,7 +33,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     protected function buildAfterString()
     {
         return $this->after !== null ?
-            ' AFTER ' . $this->db->quoteColumnName($this->after) :
+            ' AFTER '.$this->db->quoteColumnName($this->after) :
             '';
     }
 
@@ -48,7 +50,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildCommentString()
     {
-        return $this->comment !== null ? ' COMMENT ' . $this->db->quoteValue($this->comment) : '';
+        return $this->comment !== null ? ' COMMENT '.$this->db->quoteValue($this->comment) : '';
     }
 
     /**

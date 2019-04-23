@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -12,6 +13,7 @@ use yii\db\Schema;
 
 /**
  * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for MySQL.
+ *
  * @group db
  * @group mysql
  */
@@ -21,7 +23,8 @@ class ColumnSchemaBuilderTest extends \yii\db\tests\unit\ColumnSchemaBuilderTest
 
     /**
      * @param string $type
-     * @param int $length
+     * @param int    $length
+     *
      * @return ColumnSchemaBuilder
      */
     public function getColumnSchemaBuilder($type, $length = null)
