@@ -1,6 +1,7 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
@@ -28,6 +29,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
      * Test deadlock exception.
      *
      * Accident deadlock exception lost while rolling back a transaction or savepoint
+     *
      * @link https://github.com/yiisoft/yii2/issues/12715
      * @link https://github.com/yiisoft/yii2/pull/13346
      */
@@ -43,7 +45,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
             $this->markTestSkipped('pcntl_sigtimedwait() is not available');
         }
 
-        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . posix_getpid());
+        $this->setLogFile(sys_get_temp_dir().'/deadlock_'.posix_getpid());
         $this->deleteLog();
 
         try {
@@ -84,6 +86,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
                 // nothing to do
             }
             $this->deleteLog();
+
             throw $e;
         } catch (\Throwable $e) {
             // wait all children
@@ -91,6 +94,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
                 // nothing to do
             }
             $this->deleteLog();
+
             throw $e;
         }
 
@@ -104,7 +108,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
             } else {
                 $exitStatus = pcntl_wexitstatus($status);
                 if (self::CHILD_EXIT_CODE_DEADLOCK === $exitStatus) {
-                    ++$deadlockHitCount;
+                    $deadlockHitCount++;
                 } elseif (0 !== $exitStatus) {
                     $errors[] = 'child exited with error status';
                 }
@@ -114,10 +118,10 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
         if ($errors) {
             $this->fail(
                 implode('; ', $errors)
-                . ($logContent ? ". Shared children log:\n$logContent" : '')
+                .($logContent ? ". Shared children log:\n$logContent" : '')
             );
         }
-        $this->assertEquals(1, $deadlockHitCount, "exactly one child must hit deadlock; shared children log:\n" . $logContent);
+        $this->assertEquals(1, $deadlockHitCount, "exactly one child must hit deadlock; shared children log:\n".$logContent);
     }
 
     /**
@@ -128,9 +132,11 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
      * 2. Send signal to SECOND child identified by PID [[$pidSecond]].
      * 3. Waits few seconds.
      * 4. `UPDATE` the test row.
+     *
      * @param int $pidSecond
+     *
      * @return int Exit code. In case of deadlock exit code is [[CHILD_EXIT_CODE_DEADLOCK]].
-     * In case of success exit code is 0. Other codes means an error.
+     *             In case of success exit code is 0. Other codes means an error.
      */
     private function childrenSelectAndAccidentUpdate($pidSecond)
     {
@@ -148,9 +154,9 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
             // insert test row
             $first->createCommand()
                 ->insert('{{customer}}', [
-                    'id' => 97,
-                    'email' => 'deadlock@example.com',
-                    'name' => 'test',
+                    'id'      => 97,
+                    'email'   => 'deadlock@example.com',
+                    'name'    => 'test',
                     'address' => 'test address',
                 ])
                 ->execute();
@@ -189,15 +195,19 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
+
             return 1;
         } catch (\Exception $e) {
-            $this->log('child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
+            $this->log('child 1: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+
             return 1;
         } catch (\Throwable $e) {
-            $this->log('child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
+            $this->log('child 1: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+
             return 1;
         }
         $this->log('child 1: exit');
+
         return 0;
     }
 
@@ -206,14 +216,17 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
      * Second child at first will wait the signal from the first child in some seconds.
      * After receiving the signal it runs two nested [[Connection::transaction()]]
      * to perform `UPDATE` with the test row.
+     *
      * @return int Exit code. In case of deadlock exit code is [[CHILD_EXIT_CODE_DEADLOCK]].
-     * In case of success exit code is 0. Other codes means an error.
+     *             In case of success exit code is 0. Other codes means an error.
      */
     private function childrenUpdateLocked()
     {
         // install no-op signal handler to prevent termination
-        if (!pcntl_signal(SIGUSR1, function () {}, false)) {
+        if (!pcntl_signal(SIGUSR1, function () {
+        }, false)) {
             $this->log('child 2: cannot install signal handler');
+
             return 1;
         }
 
@@ -222,6 +235,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
             $this->log('child 2: wait signal from child 1');
             if (pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
                 $this->log('child 2: wait timeout exceeded');
+
                 return 1;
             }
 
@@ -249,15 +263,19 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
+
             return 1;
         } catch (\Exception $e) {
-            $this->log('child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
+            $this->log('child 2: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+
             return 1;
         } catch (\Throwable $e) {
-            $this->log('child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
+            $this->log('child 2: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+
             return 1;
         }
         $this->log('child 2: exit');
+
         return 0;
     }
 
@@ -276,6 +294,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
 
     /**
      * Sets filename for log file shared between children processes.
+     *
      * @param string $filename
      */
     private function setLogFile($filename)
@@ -297,25 +316,26 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
     /**
      * Reads shared log content and deletes the log file.
      * Reads content of log file [[logFile]] and returns it deleting the file.
+     *
      * @return string|null String content of the file [[logFile]]. `false` is returned
-     * when file cannot be read. `null` is returned when file does not exist
-     * or [[logFile]] is not set.
+     *                     when file cannot be read. `null` is returned when file does not exist
+     *                     or [[logFile]] is not set.
      */
     private function getLogContentAndDelete()
     {
         if (null !== $this->logFile && is_file($this->logFile)) {
             $content = file_get_contents($this->logFile);
             unlink($this->logFile);
+
             return $content;
         }
-
-        return null;
     }
 
     /**
      * Append message to shared log.
+     *
      * @param string $message Message to append to the log. The message will be prepended
-     * with timestamp and appended with new line.
+     *                        with timestamp and appended with new line.
      */
     private function log($message)
     {
@@ -323,7 +343,7 @@ class DeadLockTest extends \yii\db\tests\unit\ConnectionTest
             $time = microtime(true);
             $timeInt = floor($time);
             $timeFrac = $time - $timeInt;
-            $timestamp = date('Y-m-d H:i:s', $timeInt) . '.' . round($timeFrac * 1000);
+            $timestamp = date('Y-m-d H:i:s', $timeInt).'.'.round($timeFrac * 1000);
             file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
         }
     }

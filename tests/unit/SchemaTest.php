@@ -1,13 +1,14 @@
 <?php
 /**
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
 namespace yii\db\mysql\tests;
-use yii\db\Expression;
 
+use yii\db\Expression;
 use yii\db\tests\unit\AnyCaseValue;
 
 /**
@@ -23,7 +24,7 @@ class SchemaTest extends \yii\db\tests\unit\SchemaTest
         if (!version_compare($this->getConnection()->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6', '>=')) {
             $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
         }
-        $sql = <<<SQL
+        $sql = <<<'SQL'
 CREATE TABLE  IF NOT EXISTS `datetime_test`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -59,6 +60,7 @@ SQL;
         $result['3: check'][2] = false;
 
         $result['4: check'][2] = false;
+
         return $result;
     }
 }
