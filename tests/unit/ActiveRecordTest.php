@@ -6,7 +6,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\ActiveRecord\Tests\Data\Storage;
 

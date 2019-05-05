@@ -6,13 +6,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
 /**
  * @group db
  * @group mysql
  */
-class ConnectionTest extends \yii\db\tests\unit\ConnectionTest
+class ConnectionTest extends \Yiisoft\Db\Tests\ConnectionTest
 {
     protected $driverName = 'mysql';
 }

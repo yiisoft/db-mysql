@@ -6,13 +6,13 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql;
+namespace Yiisoft\Db\Mysql;
 
-use yii\db\ExpressionBuilderInterface;
-use yii\db\ExpressionBuilderTrait;
-use yii\db\ExpressionInterface;
-use yii\db\JsonExpression;
-use yii\db\Query;
+use Yiisoft\Db\ExpressionBuilderInterface;
+use Yiisoft\Db\ExpressionBuilderTrait;
+use Yiisoft\Db\ExpressionInterface;
+use Yiisoft\Db\JsonExpression;
+use Yiisoft\Db\Query;
 use yii\helpers\Json;
 
 /**

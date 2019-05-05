@@ -6,20 +6,20 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use yii\base\DynamicModel;
-use yii\db\Expression;
-use yii\db\JsonExpression;
-use yii\db\Query;
-use yii\db\Schema;
+use Yiisoft\Db\Expression;
+use Yiisoft\Db\JsonExpression;
+use Yiisoft\Db\Query;
+use Yiisoft\Db\Schema;
 use yii\helpers\Json;
 
 /**
  * @group db
  * @group mysql
  */
-class QueryBuilderTest extends \yii\db\tests\unit\QueryBuilderTest
+class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
 {
     protected $driverName = 'mysql';
 

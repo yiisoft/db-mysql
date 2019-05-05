@@ -6,14 +6,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
 /**
  * @group db
  * @group mysql
  * @group validators
  */
-class UniqueValidatorTest extends \yii\db\tests\unit\validators\UniqueValidatorTest
+class UniqueValidatorTest extends \Yiisoft\Db\Tests\Validators\UniqueValidatorTest
 {
     public $driverName = 'mysql';
 }

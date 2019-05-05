@@ -6,16 +6,16 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql;
+namespace Yiisoft\Db\Mysql;
 
-use yii\db\Constraint;
-use yii\db\ConstraintFinderInterface;
-use yii\db\ConstraintFinderTrait;
-use yii\db\Exception;
-use yii\db\Expression;
-use yii\db\ForeignKeyConstraint;
-use yii\db\IndexConstraint;
-use yii\db\TableSchema;
+use Yiisoft\Db\Constraint;
+use Yiisoft\Db\ConstraintFinderInterface;
+use Yiisoft\Db\ConstraintFinderTrait;
+use Yiisoft\Db\Exception;
+use Yiisoft\Db\Expression;
+use Yiisoft\Db\ForeignKeyConstraint;
+use Yiisoft\Db\IndexConstraint;
+use Yiisoft\Db\TableSchema;
 use yii\exceptions\InvalidConfigException;
 use yii\exceptions\NotSupportedException;
 use yii\helpers\Yii;
@@ -28,14 +28,14 @@ use Yiisoft\Arrays\ArrayHelper;
  *
  * @since 2.0
  */
-class Schema extends \yii\db\Schema implements ConstraintFinderInterface
+class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
     /**
      * {@inheritdoc}
      */
-    public $columnSchemaClass = 'yii\db\mysql\ColumnSchema';
+    public $columnSchemaClass = 'Yiisoft\Db\Mysql\ColumnSchema';
     /**
      * @var bool whether MySQL used is older than 5.1.
      */
