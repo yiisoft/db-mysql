@@ -8,6 +8,10 @@
 
 namespace Yiisoft\Db\Mysql;
 
+use yii\exceptions\InvalidConfigException;
+use yii\exceptions\NotSupportedException;
+use yii\helpers\Yii;
+use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint;
 use Yiisoft\Db\ConstraintFinderInterface;
 use Yiisoft\Db\ConstraintFinderTrait;
@@ -16,10 +20,6 @@ use Yiisoft\Db\Expression;
 use Yiisoft\Db\ForeignKeyConstraint;
 use Yiisoft\Db\IndexConstraint;
 use Yiisoft\Db\TableSchema;
-use yii\exceptions\InvalidConfigException;
-use yii\exceptions\NotSupportedException;
-use yii\helpers\Yii;
-use Yiisoft\Arrays\ArrayHelper;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
