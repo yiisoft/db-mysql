@@ -82,12 +82,12 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\db\\mysql\\": "src"
+            "Yiisoft\\Db\\Mysql\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "yii\\db\\mysql\\tests\\": "tests"
+            "Yiisoft\\Db\\Mysql\\Tests\\": "tests"
         }
     },
     "extra": {
