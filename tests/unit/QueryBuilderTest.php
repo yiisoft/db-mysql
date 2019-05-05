@@ -9,11 +9,11 @@
 namespace Yiisoft\Db\Mysql\Tests;
 
 use yii\base\DynamicModel;
+use yii\helpers\Json;
 use Yiisoft\Db\Expression;
 use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
 use Yiisoft\Db\Schema;
-use yii\helpers\Json;
 
 /**
  * @group db
