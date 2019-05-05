@@ -8,12 +8,12 @@
 
 namespace Yiisoft\Db\Mysql;
 
+use yii\helpers\Json;
 use Yiisoft\Db\ExpressionBuilderInterface;
 use Yiisoft\Db\ExpressionBuilderTrait;
 use Yiisoft\Db\ExpressionInterface;
 use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
-use yii\helpers\Json;
 
 /**
  * Class JsonExpressionBuilder builds [[JsonExpression]] for MySQL DBMS.

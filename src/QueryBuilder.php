@@ -8,11 +8,11 @@
 
 namespace Yiisoft\Db\Mysql;
 
+use yii\exceptions\InvalidArgumentException;
+use yii\exceptions\NotSupportedException;
 use Yiisoft\Db\Exception;
 use Yiisoft\Db\Expression;
 use Yiisoft\Db\Query;
-use yii\exceptions\InvalidArgumentException;
-use yii\exceptions\NotSupportedException;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
