@@ -8,13 +8,13 @@
 
 namespace yii\db\mysql\tests;
 
-use yii\activerecord\tests\data\Storage;
+use Yiisoft\ActiveRecord\Tests\Data\Storage;
 
 /**
  * @group db
  * @group mysql
  */
-class ActiveRecordTest extends \yii\activerecord\tests\unit\ActiveRecordTest
+class ActiveRecordTest extends \Yiisoft\ActiveRecord\Tests\Unit\ActiveRecordTest
 {
     public $driverName = 'mysql';
 
