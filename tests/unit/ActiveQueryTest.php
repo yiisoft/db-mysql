@@ -12,7 +12,7 @@ namespace yii\db\mysql\tests;
  * @group db
  * @group mysql
  */
-class ActiveQueryTest extends \yii\activerecord\tests\unit\ActiveQueryTest
+class ActiveQueryTest extends \Yiisoft\ActiveRecord\Tests\Unit\ActiveQueryTest
 {
     public $driverName = 'mysql';
 }
