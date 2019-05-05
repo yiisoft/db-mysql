@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql;
+namespace Yiisoft\Db\Mysql;
 
-use yii\db\ExpressionInterface;
-use yii\db\JsonExpression;
+use Yiisoft\Db\ExpressionInterface;
+use Yiisoft\Db\JsonExpression;
 
 /**
  * Class ColumnSchema for MySQL database.
@@ -18,7 +18,7 @@ use yii\db\JsonExpression;
  *
  * @since 2.0.14.1
  */
-class ColumnSchema extends \yii\db\ColumnSchema
+class ColumnSchema extends \Yiisoft\Db\ColumnSchema
 {
     /**
      * {@inheritdoc}

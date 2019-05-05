@@ -6,10 +6,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
-use yii\db\mysql\ColumnSchemaBuilder;
-use yii\db\Schema;
+use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
+use Yiisoft\Db\Schema;
 
 /**
  * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for MySQL.
@@ -17,7 +17,7 @@ use yii\db\Schema;
  * @group db
  * @group mysql
  */
-class ColumnSchemaBuilderTest extends \yii\db\tests\unit\ColumnSchemaBuilderTest
+class ColumnSchemaBuilderTest extends \Yiisoft\Db\Tests\ColumnSchemaBuilderTest
 {
     protected $driverName = 'mysql';
 

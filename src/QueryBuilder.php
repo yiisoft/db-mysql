@@ -6,11 +6,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql;
+namespace Yiisoft\Db\Mysql;
 
-use yii\db\Exception;
-use yii\db\Expression;
-use yii\db\Query;
+use Yiisoft\Db\Exception;
+use Yiisoft\Db\Expression;
+use Yiisoft\Db\Query;
 use yii\exceptions\InvalidArgumentException;
 use yii\exceptions\NotSupportedException;
 
@@ -21,7 +21,7 @@ use yii\exceptions\NotSupportedException;
  *
  * @since 2.0
  */
-class QueryBuilder extends \yii\db\QueryBuilder
+class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
@@ -57,7 +57,7 @@ class QueryBuilder extends \yii\db\QueryBuilder
     protected function defaultExpressionBuilders()
     {
         return array_merge(parent::defaultExpressionBuilders(), [
-            \yii\db\JsonExpression::class => JsonExpressionBuilder::class,
+            \Yiisoft\Db\JsonExpression::class => JsonExpressionBuilder::class,
         ]);
     }
 

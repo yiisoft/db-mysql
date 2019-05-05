@@ -6,16 +6,16 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\db\mysql\tests;
+namespace Yiisoft\Db\Mysql\Tests;
 
-use yii\db\Expression;
-use yii\db\tests\unit\AnyCaseValue;
+use Yiisoft\Db\Expression;
+use Yiisoft\Db\Tests\AnyCaseValue;
 
 /**
  * @group db
  * @group mysql
  */
-class SchemaTest extends \yii\db\tests\unit\SchemaTest
+class SchemaTest extends \Yiisoft\Db\Tests\SchemaTest
 {
     public $driverName = 'mysql';
 
