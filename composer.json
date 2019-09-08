@@ -70,7 +70,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^7.3",
-        "yiisoft/yii-core": "^3.0@dev",
         "yiisoft/view": "^3.0@dev",
         "yiisoft/cache": "^3.0@dev",
         "yiisoft/active-record": "^3.0@dev",
