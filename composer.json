@@ -28,8 +28,8 @@
         "yiisoft/active-record": "^3.0@dev",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/log": "^3.0@dev",
-        "yiisoft/yii-console" : "^3.0@dev",
-        "yiisoft/yii-web" : "^3.0@dev",
+        "yiisoft/yii-console": "^3.0@dev",
+        "yiisoft/yii-web": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev"
     },
     "autoload": {
@@ -51,5 +51,8 @@
             "common": "config/common.php",
             "tests": "config/tests.php"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
