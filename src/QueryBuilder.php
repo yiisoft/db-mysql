@@ -1,25 +1,15 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use yii\exceptions\InvalidArgumentException;
-use yii\exceptions\NotSupportedException;
 use Yiisoft\Db\Exception;
 use Yiisoft\Db\Expression;
 use Yiisoft\Db\Query;
+use Yiisoft\Db\Exception\NotSupportedException;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- *
- * @since 2.0
  */
 class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 {
@@ -179,7 +169,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
      * @param mixed  $value     the value for the primary key of the next new row inserted. If this is not set,
      *                          the next new row's primary key will have a value 1.
      *
-     * @throws InvalidArgumentException if the table does not exist or there is no sequence associated with the table.
+     * @throws \InvalidArgumentException if the table does not exist or there is no sequence associated with the table.
      *
      * @return string the SQL statement for resetting sequence
      */
@@ -197,10 +187,10 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 
             return "ALTER TABLE $tableName AUTO_INCREMENT=$value";
         } elseif ($table === null) {
-            throw new InvalidArgumentException("Table not found: $tableName");
+            throw new \InvalidArgumentException("Table not found: $tableName");
         }
 
-        throw new InvalidArgumentException("There is no sequence associated with table '$tableName'.");
+        throw new \InvalidArgumentException("There is no sequence associated with table '$tableName'.");
     }
 
     /**
@@ -307,8 +297,6 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 
     /**
      * {@inheritdoc}
-     *
-     * @since 2.0.8
      */
     public function addCommentOnColumn($table, $column, $comment)
     {
@@ -325,8 +313,6 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 
     /**
      * {@inheritdoc}
-     *
-     * @since 2.0.8
      */
     public function addCommentOnTable($table, $comment)
     {
@@ -335,8 +321,6 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 
     /**
      * {@inheritdoc}
-     *
-     * @since 2.0.8
      */
     public function dropCommentFromColumn($table, $column)
     {
@@ -345,8 +329,6 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
 
     /**
      * {@inheritdoc}
-     *
-     * @since 2.0.8
      */
     public function dropCommentFromTable($table)
     {

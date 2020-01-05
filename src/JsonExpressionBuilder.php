@@ -1,26 +1,17 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use yii\helpers\Json;
 use Yiisoft\Db\ExpressionBuilderInterface;
 use Yiisoft\Db\ExpressionBuilderTrait;
 use Yiisoft\Db\ExpressionInterface;
 use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
+use Yiisoft\Json\Json;
 
 /**
- * Class JsonExpressionBuilder builds [[JsonExpression]] for MySQL DBMS.
- *
- * @author Dmytro Naumenko <d.naumenko.a@gmail.com>
- *
- * @since 2.0.14
+ * Class JsonExpressionBuilder builds {@see JsonExpression} for MySQL DBMS.
  */
 class JsonExpressionBuilder implements ExpressionBuilderInterface
 {

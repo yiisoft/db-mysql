@@ -1,10 +1,5 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
@@ -13,7 +8,7 @@ namespace Yiisoft\Db\Mysql\Tests;
  * @group mysql
  * @group validators
  */
-class ExistValidatorTest extends \Yiisoft\Db\Tests\Validators\ExistValidatorTest
+class ExistValidatorTest
 {
     public $driverName = 'mysql';
 }

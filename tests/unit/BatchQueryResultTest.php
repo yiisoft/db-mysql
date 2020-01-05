@@ -1,10 +1,5 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
@@ -12,7 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
  * @group db
  * @group mysql
  */
-class BatchQueryResultTest extends \Yiisoft\Db\Tests\BatchQueryResultTest
+class BatchQueryResultTest
 {
     public $driverName = 'mysql';
 }

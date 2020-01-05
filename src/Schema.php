@@ -1,16 +1,8 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use yii\exceptions\InvalidConfigException;
-use yii\exceptions\NotSupportedException;
-use yii\helpers\Yii;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint;
 use Yiisoft\Db\ConstraintFinderInterface;
@@ -20,13 +12,11 @@ use Yiisoft\Db\Expression;
 use Yiisoft\Db\ForeignKeyConstraint;
 use Yiisoft\Db\IndexConstraint;
 use Yiisoft\Db\TableSchema;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- *
- * @since 2.0
  */
 class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
 {
@@ -39,7 +29,7 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
     /**
      * @var bool whether MySQL used is older than 5.1.
      */
-    private $_oldMysql;
+    private $oldMysql;
 
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
@@ -80,6 +70,7 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
      * {@inheritdoc}
      */
     protected $tableQuoteCharacter = '`';
+
     /**
      * {@inheritdoc}
      */
@@ -92,6 +83,7 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
     {
         $resolvedName = new TableSchema();
         $parts = explode('.', str_replace('`', '', $name));
+
         if (isset($parts[1])) {
             $resolvedName->schemaName = $parts[0];
             $resolvedName->name = $parts[1];
@@ -99,7 +91,9 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
             $resolvedName->schemaName = $this->defaultSchema;
             $resolvedName->name = $name;
         }
-        $resolvedName->fullName = ($resolvedName->schemaName !== $this->defaultSchema ? $resolvedName->schemaName.'.' : '').$resolvedName->name;
+
+        $resolvedName->fullName = ($resolvedName->schemaName !== $this->defaultSchema ? $resolvedName->schemaName.'.' : '') .
+            $resolvedName->name;
 
         return $resolvedName;
     }
@@ -110,6 +104,7 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
     protected function findTableNames($schema = '')
     {
         $sql = 'SHOW TABLES';
+
         if ($schema !== '') {
             $sql .= ' FROM '.$this->quoteSimpleTableName($schema);
         }
@@ -123,6 +118,7 @@ class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
     protected function loadTableSchema($name)
     {
         $table = new TableSchema();
+
         $this->resolveTableNames($table, $name);
 
         if ($this->findColumns($table)) {
@@ -165,13 +161,18 @@ ORDER BY `s`.`SEQ_IN_INDEX` ASC
 SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
+
         $indexes = $this->db->createCommand($sql, [
             ':schemaName' => $resolvedName->schemaName,
             ':tableName'  => $resolvedName->name,
         ])->queryAll();
+
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
+
         $indexes = ArrayHelper::index($indexes, null, 'name');
+
         $result = [];
+
         foreach ($indexes as $name => $index) {
             $result[] = Yii::createObject(['__class' => IndexConstraint::class,
                 'isPrimary'                          => (bool) $index[0]['index_is_primary'],
@@ -231,6 +232,7 @@ SQL;
     protected function resolveTableNames($table, $name)
     {
         $parts = explode('.', str_replace('`', '', $name));
+
         if (isset($parts[1])) {
             $table->schemaName = $parts[0];
             $table->name = $parts[1];
@@ -261,6 +263,7 @@ SQL;
         $column->unsigned = stripos($column->dbType, 'unsigned') !== false;
 
         $column->type = self::TYPE_STRING;
+
         if (preg_match('/^(\w+)(?:\(([^\)]+)\))?/', $column->dbType, $matches)) {
             $type = strtolower($matches[1]);
             if (isset($this->typeMap[$type])) {
@@ -324,6 +327,7 @@ SQL;
             $columns = $this->db->createCommand($sql)->queryAll();
         } catch (\Exception $e) {
             $previous = $e->getPrevious();
+
             if ($previous instanceof \PDOException && strpos($previous->getMessage(), 'SQLSTATE[42S02') !== false) {
                 // table does not exist
                 // https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
@@ -332,8 +336,9 @@ SQL;
 
             throw $e;
         }
+
         foreach ($columns as $info) {
-            if ($this->db->slavePdo->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
+            if ($this->db->getSlavePdo()->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
                 $info = array_change_key_case($info, CASE_LOWER);
             }
             $column = $this->loadColumnSchema($info);
@@ -406,6 +411,7 @@ SQL;
             }
 
             $table->foreignKeys = [];
+
             foreach ($constraints as $name => $constraint) {
                 $table->foreignKeys[$name] = array_merge(
                     [$constraint['referenced_table_name']],
@@ -414,6 +420,7 @@ SQL;
             }
         } catch (\Exception $e) {
             $previous = $e->getPrevious();
+
             if (!$previous instanceof \PDOException || strpos($previous->getMessage(), 'SQLSTATE[42S02') === false) {
                 throw $e;
             }
@@ -458,6 +465,7 @@ SQL;
         $uniqueIndexes = [];
 
         $regexp = '/UNIQUE KEY\s+\`(.+)\`\s*\((\`.+\`)+\)/mi';
+
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
@@ -487,12 +495,12 @@ SQL;
      */
     protected function isOldMysql()
     {
-        if ($this->_oldMysql === null) {
+        if ($this->oldMysql === null) {
             $version = $this->db->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
-            $this->_oldMysql = version_compare($version, '5.1', '<=');
+            $this->oldMysql = version_compare($version, '5.1', '<=');
         }
 
-        return $this->_oldMysql;
+        return $this->oldMysql;
     }
 
     /**
@@ -555,6 +563,7 @@ SQL;
             ':schemaName' => $resolvedName->schemaName,
             ':tableName'  => $resolvedName->name,
         ])->queryAll();
+
         $constraints = $this->normalizePdoRowKeyCase($constraints, true);
         $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
         $result = [
@@ -562,6 +571,7 @@ SQL;
             'foreignKeys' => [],
             'uniques'     => [],
         ];
+
         foreach ($constraints as $type => $names) {
             foreach ($names as $name => $constraint) {
                 switch ($type) {
