@@ -1,10 +1,5 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
@@ -12,10 +7,6 @@ use Yiisoft\Db\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
 /**
  * ColumnSchemaBuilder is the schema builder for MySQL databases.
- *
- * @author Chris Harris <chris@buckshotsoftware.com>
- *
- * @since 2.0.8
  */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
