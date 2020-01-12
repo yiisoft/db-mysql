@@ -606,26 +606,29 @@ SQL;
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $result['primaryKey'] = new Constraint([
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                        ]);
+                        $ct = new Constraint();
+                        $ct->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $result['primaryKey'] = $ct;
+
                         break;
                     case 'FOREIGN KEY':
-                        $result['foreignKeys'][] = new ForeignKeyConstraint([
-                            'name' => $name,
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                            'foreignSchemaName' => $constraint[0]['foreign_table_schema'],
-                            'foreignTableName' => $constraint[0]['foreign_table_name'],
-                            'foreignColumnNames' => ArrayHelper::getColumn($constraint, 'foreign_column_name'),
-                            'onDelete' => $constraint[0]['on_delete'],
-                            'onUpdate' => $constraint[0]['on_update'],
-                        ]);
+                        $fk = new ForeignKeyConstraint();
+                        $fk->setName($name);
+                        $fk->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $fk->setForeignSchemaName($constraint[0]['foreign_table_schema']);
+                        $fk->setForeignTableName($constraint[0]['foreign_table_name']);
+                        $fk->setForeignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'));
+                        $fk->setOnDelete($constraint[0]['on_delete']);
+                        $fk->setOnUpdate($constraint[0]['on_update']);
+                        $result['foreignKeys'][] = $fk;
+
                         break;
                     case 'UNIQUE':
-                        $result['uniques'][] = new Constraint([
-                            'name' => $name,
-                            'columnNames' => ArrayHelper::getColumn($constraint, 'column_name'),
-                        ]);
+                        $ct = new Constraint();
+                        $ct->setName($name);
+                        $ct->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $result['uniques'][] = $ct;
+
                         break;
                 }
             }
