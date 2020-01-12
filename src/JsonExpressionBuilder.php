@@ -34,7 +34,7 @@ class JsonExpressionBuilder implements ExpressionBuilderInterface
             return "($sql)";
         }
 
-        $placeholder = static::PARAM_PREFIX.count($params);
+        $placeholder = static::PARAM_PREFIX . count($params);
         $params[$placeholder] = Json::encode($value);
 
         return "CAST($placeholder AS JSON)";

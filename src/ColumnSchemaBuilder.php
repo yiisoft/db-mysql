@@ -23,9 +23,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildAfterString()
     {
-        return $this->after !== null ?
-            ' AFTER '.$this->db->quoteColumnName($this->after) :
-            '';
+        return $this->after !== null ? ' AFTER ' . $this->db->quoteColumnName($this->after) : '';
     }
 
     /**
@@ -41,7 +39,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildCommentString()
     {
-        return $this->comment !== null ? ' COMMENT '.$this->db->quoteValue($this->comment) : '';
+        return $this->comment !== null ? ' COMMENT ' . $this->db->quoteValue($this->comment) : '';
     }
 
     /**
@@ -51,13 +49,13 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     {
         switch ($this->getTypeCategory()) {
             case self::CATEGORY_PK:
-                $format = '{type}{length}{check}{comment}{append}{pos}';
+                $format = '{type}{length}{comment}{check}{append}{pos}';
                 break;
             case self::CATEGORY_NUMERIC:
-                $format = '{type}{length}{unsigned}{notnull}{unique}{default}{check}{comment}{append}{pos}';
+                $format = '{type}{length}{unsigned}{notnull}{unique}{default}{comment}{check}{append}{pos}';
                 break;
             default:
-                $format = '{type}{length}{notnull}{unique}{default}{check}{comment}{append}{pos}';
+                $format = '{type}{length}{notnull}{unique}{default}{comment}{check}{append}{pos}';
         }
 
         return $this->buildCompleteString($format);
