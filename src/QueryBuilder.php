@@ -66,15 +66,18 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     {
         $quotedTable = $this->db->quoteTableName($table);
         $row = $this->db->createCommand('SHOW CREATE TABLE '.$quotedTable)->queryOne();
+
         if ($row === false) {
             throw new Exception("Unable to find column '$oldName' in table '$table'.");
         }
+
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
             $row = array_values($row);
             $sql = $row[1];
         }
+
         if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
             foreach ($matches[1] as $i => $c) {
                 if ($c === $oldName) {
@@ -85,6 +88,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
                 }
             }
         }
+
         // try to give back a SQL anyway
         return "ALTER TABLE $quotedTable CHANGE "
             .$this->db->quoteColumnName($oldName).' '
@@ -99,16 +103,17 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     public function createIndex($name, $table, $columns, $unique = false)
     {
         return 'ALTER TABLE '
-        .$this->db->quoteTableName($table)
-        .($unique ? ' ADD UNIQUE INDEX ' : ' ADD INDEX ')
-        .$this->db->quoteTableName($name)
-        .' ('.$this->buildColumns($columns).')';
+        . $this->db->quoteTableName($table)
+        . ($unique ? ' ADD UNIQUE INDEX ' : ' ADD INDEX ')
+        . $this->db->quoteTableName($name)
+        . ' ('.$this->buildColumns($columns).')';
     }
 
     /**
      * Builds a SQL statement for dropping a foreign key constraint.
      *
-     * @param string $name  the name of the foreign key constraint to be dropped. The name will be properly quoted by the method.
+     * @param string $name  the name of the foreign key constraint to be dropped. The name will be properly quoted by
+     * the method.
      * @param string $table the table whose foreign is to be dropped. The name will be properly quoted by the method.
      *
      * @return string the SQL statement for dropping a foreign key constraint.
@@ -116,7 +121,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     public function dropForeignKey($name, $table)
     {
         return 'ALTER TABLE '.$this->db->quoteTableName($table)
-            .' DROP FOREIGN KEY '.$this->db->quoteColumnName($name);
+            . ' DROP FOREIGN KEY '.$this->db->quoteColumnName($name);
     }
 
     /**
@@ -214,9 +219,9 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     {
         $sql = '';
         if ($this->hasLimit($limit)) {
-            $sql = 'LIMIT '.$limit;
+            $sql = 'LIMIT ' . $limit;
             if ($this->hasOffset($offset)) {
-                $sql .= ' OFFSET '.$offset;
+                $sql .= ' OFFSET ' . $offset;
             }
         } elseif ($this->hasOffset($offset)) {
             // limit is not optional in MySQL
@@ -276,7 +281,9 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     public function upsert($table, $insertColumns, $updateColumns, &$params)
     {
         $insertSql = $this->insert($table, $insertColumns, $params);
-        [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
+
+        list($uniqueNames, , $updateNames) = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
+
         if (empty($uniqueNames)) {
             return $insertSql;
         }
@@ -284,15 +291,16 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
         if ($updateColumns === true) {
             $updateColumns = [];
             foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression('VALUES('.$this->db->quoteColumnName($name).')');
+                $updateColumns[$name] = new Expression('VALUES(' . $this->db->quoteColumnName($name) . ')');
             }
         } elseif ($updateColumns === false) {
             $name = $this->db->quoteColumnName(reset($uniqueNames));
-            $updateColumns = [$name => new Expression($this->db->quoteTableName($table).'.'.$name)];
+            $updateColumns = [$name => new Expression($this->db->quoteTableName($table) . '.' . $name)];
         }
+
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
 
-        return $insertSql.' ON DUPLICATE KEY UPDATE '.implode(', ', $updates);
+        return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
 
     /**
@@ -301,14 +309,33 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     public function addCommentOnColumn($table, $column, $comment)
     {
         // Strip existing comment which may include escaped quotes
-        $definition = trim(preg_replace("/COMMENT '(?:''|[^'])*'/i", '',
-            $this->getColumnDefinition($table, $column)));
+        $definition = trim(
+            preg_replace(
+                "/COMMENT '(?:''|[^'])*'/i",
+                '',
+                $this->getColumnDefinition($table, $column)
+            )
+        );
 
-        return 'ALTER TABLE '.$this->db->quoteTableName($table)
-            .' CHANGE '.$this->db->quoteColumnName($column)
-            .' '.$this->db->quoteColumnName($column)
-            .(empty($definition) ? '' : ' '.$definition)
-            .' COMMENT '.$this->db->quoteValue($comment);
+        $checkRegex = '/CHECK *(\(([^()]|(?-2))*\))/';
+
+        $check = preg_match($checkRegex, $definition, $checkMatches);
+
+        if ($check === 1) {
+            $definition = preg_replace($checkRegex, '', $definition);
+        }
+
+        $alterSql = 'ALTER TABLE ' . $this->db->quoteTableName($table)
+            . ' CHANGE ' . $this->db->quoteColumnName($column)
+            . ' ' . $this->db->quoteColumnName($column)
+            . (empty($definition) ? '' : ' ' . $definition)
+            . ' COMMENT ' . $this->db->quoteValue($comment);
+
+        if ($check === 1) {
+            $alterSql .= ' ' . $checkMatches[0];
+        }
+
+        return $alterSql;
     }
 
     /**
@@ -316,7 +343,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
      */
     public function addCommentOnTable($table, $comment)
     {
-        return 'ALTER TABLE '.$this->db->quoteTableName($table).' COMMENT '.$this->db->quoteValue($comment);
+        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' COMMENT ' . $this->db->quoteValue($comment);
     }
 
     /**
@@ -348,7 +375,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     private function getColumnDefinition($table, $column)
     {
         $quotedTable = $this->db->quoteTableName($table);
-        $row = $this->db->createCommand('SHOW CREATE TABLE '.$quotedTable)->queryOne();
+        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
         if ($row === false) {
             throw new Exception("Unable to find column '$column' in table '$table'.");
         }
