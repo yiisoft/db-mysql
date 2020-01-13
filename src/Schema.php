@@ -174,12 +174,13 @@ SQL;
         $result = [];
 
         foreach ($indexes as $name => $index) {
-            $result[] = new IndexConstraint([
-                'isPrimary' => (bool) $index[0]['index_is_primary'],
-                'isUnique' => (bool) $index[0]['index_is_unique'],
-                'name' => $name !== 'PRIMARY' ? $name : null,
-                'columnNames' => ArrayHelper::getColumn($index, 'column_name'),
-            ]);
+            $ic = new IndexConstraint();
+            $ic->setIsPrimary($index[0]['index_is_primary']);
+            $ic->setIsUnique($index[0]['index_is_unique']);
+            $ic->setName($name !== 'PRIMARY' ? $name : null);
+            $ic->setColumnNames(ArrayHelper::getColumn($index, 'column_name'));
+
+            $result[] = $ic;
         }
 
         return $result;

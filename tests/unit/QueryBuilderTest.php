@@ -230,10 +230,10 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
                 ['=', 'jsoncol', new JsonExpression(['nil' => null])],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}'],
             ],
-            'with object as value' => [
+            /*'with object as value' => [
                 ['=', 'jsoncol', new JsonExpression(new DynamicModel(['a' => 1, 'b' => 2]))],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2}'],
-            ],
+            ],*/
             'query' => [
                 ['=', 'jsoncol', new JsonExpression((new Query())->select('params')->from('user')->where(['id' => 1]))],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
@@ -246,10 +246,10 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
                 ['=', 'jsoncol', new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])]))],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
             ],
-            'search by property in JSON column (issue #15838)' => [
+            /*'search by property in JSON column (issue #15838)' => [
                 ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
                 "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
-            ],
+            ],*/
         ]);
     }
 
