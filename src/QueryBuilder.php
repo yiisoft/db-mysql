@@ -5,6 +5,7 @@ namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Exception;
 use Yiisoft\Db\Expression;
+use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
 use Yiisoft\Db\Exception\NotSupportedException;
 
@@ -47,7 +48,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
     protected function defaultExpressionBuilders()
     {
         return array_merge(parent::defaultExpressionBuilders(), [
-            \Yiisoft\Db\JsonExpression::class => JsonExpressionBuilder::class,
+            JsonExpression::class => JsonExpressionBuilder::class,
         ]);
     }
 

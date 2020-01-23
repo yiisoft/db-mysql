@@ -17,7 +17,6 @@ env:
 services:
   - memcached
   - mysql
-  - postgresql
 
 # cache vendor dirs
 cache:
@@ -26,9 +25,7 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-# try running against postgres 9.6
 addons:
-  postgresql: "9.6"
   apt:
     sources:
       - mysql-5.7-trusty

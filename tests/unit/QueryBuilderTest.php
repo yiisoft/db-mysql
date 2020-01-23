@@ -190,6 +190,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, [[time]]) SELECT :phEmail AS `email`, now() AS [[time]] ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1',
             ],
         ];
+
         $newData = parent::upsertProvider();
         foreach ($concreteData as $testName => $data) {
             $newData[$testName] = array_replace($newData[$testName], $data);
