@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\ExpressionBuilderInterface;
 use Yiisoft\Db\ExpressionBuilderTrait;
-use Yiisoft\Db\ExpressionInterface;
 use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
+use Yiisoft\Db\Contracts\ExpressionInterface;
+use Yiisoft\Db\Contracts\ExpressionBuilderInterface;
 use Yiisoft\Json\Json;
 
 /**

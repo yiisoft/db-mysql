@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\ExpressionInterface;
+use Yiisoft\Db\Contracts\ExpressionInterface;
 use Yiisoft\Db\JsonExpression;
 
 /**
