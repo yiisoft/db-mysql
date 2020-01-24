@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Arrays\ArrayHelper;
@@ -175,8 +177,9 @@ SQL;
 
         foreach ($indexes as $name => $index) {
             $ic = new IndexConstraint();
-            $ic->setIsPrimary($index[0]['index_is_primary']);
-            $ic->setIsUnique($index[0]['index_is_unique']);
+
+            $ic->setIsPrimary((bool) $index[0]['index_is_primary']);
+            $ic->setIsUnique((bool) $index[0]['index_is_unique']);
             $ic->setName($name !== 'PRIMARY' ? $name : null);
             $ic->setColumnNames(ArrayHelper::getColumn($index, 'column_name'));
 
@@ -250,7 +253,7 @@ SQL;
      *
      * @return ColumnSchema the column schema object
      */
-    protected function loadColumnSchema($info)
+    protected function loadColumnSchema(array $info)
     {
         $column = $this->createColumnSchema();
 
@@ -259,17 +262,17 @@ SQL;
         $column->isPrimaryKey = strpos($info['key'], 'PRI') !== false;
         $column->autoIncrement = stripos($info['extra'], 'auto_increment') !== false;
         $column->comment = $info['comment'];
+
         $column->dbType = $info['type'];
         $column->unsigned = stripos($column->dbType, 'unsigned') !== false;
+
         $column->type = self::TYPE_STRING;
 
         if (preg_match('/^(\w+)(?:\(([^\)]+)\))?/', $column->dbType, $matches)) {
             $type = strtolower($matches[1]);
-
             if (isset($this->typeMap[$type])) {
                 $column->type = $this->typeMap[$type];
             }
-
             if (!empty($matches[2])) {
                 if ($type === 'enum') {
                     preg_match_all("/'[^']*'/", $matches[2], $values);
@@ -280,11 +283,9 @@ SQL;
                 } else {
                     $values = explode(',', $matches[2]);
                     $column->size = $column->precision = (int) $values[0];
-
                     if (isset($values[1])) {
                         $column->scale = (int) $values[1];
                     }
-
                     if ($column->size === 1 && $type === 'bit') {
                         $column->type = 'boolean';
                     } elseif ($type === 'bit') {
@@ -309,11 +310,9 @@ SQL;
              */
             if (($column->type === 'timestamp' || $column->type === 'datetime')
                 && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', $info['default'], $matches)) {
-                $column->defaultValue = new Expression(
-                    'CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')
-                );
+                $column->defaultValue = new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
             } elseif (isset($type) && $type === 'bit') {
-                $column->defaultValue = bindec(trim($info['default'], 'b\''));
+                $column->defaultValue = bindec(trim((string) $info['default'], 'b\''));
             } else {
                 $column->defaultValue = $column->phpTypecast($info['default']);
             }

@@ -22,7 +22,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
      * This is not used as a dataprovider for testGetColumnType to speed up the test
      * when used as dataprovider every single line will cause a reconnect with the database which is not needed here.
      */
-    public function columnTypes()
+    public function columnTypes(): array
     {
         $columns = [
             [
@@ -93,7 +93,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         return array_merge(parent::columnTypes(), $columns);
     }
 
-    public function primaryKeysProvider()
+    public function primaryKeysProvider(): array
     {
         $result = parent::primaryKeysProvider();
         $result['drop'][0] = 'ALTER TABLE {{T_constraints_1}} DROP PRIMARY KEY';
@@ -103,7 +103,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         return $result;
     }
 
-    public function foreignKeysProvider()
+    public function foreignKeysProvider(): array
     {
         $result = parent::foreignKeysProvider();
         $result['drop'][0] = 'ALTER TABLE {{T_constraints_3}} DROP FOREIGN KEY [[CN_constraints_3]]';
@@ -111,7 +111,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         return $result;
     }
 
-    public function indexesProvider()
+    public function indexesProvider(): array
     {
         $result = parent::indexesProvider();
         $result['create'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_single]] ([[C_index_1]])';
@@ -122,7 +122,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         return $result;
     }
 
-    public function uniquesProvider()
+    public function uniquesProvider(): array
     {
         $result = parent::uniquesProvider();
         $result['drop'][0] = 'DROP INDEX [[CN_unique]] ON {{T_constraints_1}}';
@@ -140,7 +140,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         $this->markTestSkipped('Adding/dropping default constraints is not supported in MySQL.');
     }
 
-    public function testResetSequence()
+    public function testResetSequence(): void
     {
         $qb = $this->getQueryBuilder();
 
@@ -153,7 +153,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         $this->assertEquals($expected, $sql);
     }
 
-    public function upsertProvider()
+    public function upsertProvider(): array
     {
         $concreteData = [
             'regular values' => [
@@ -189,9 +189,13 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
             'query, values and expressions without update part' => [
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, [[time]]) SELECT :phEmail AS `email`, now() AS [[time]] ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1',
             ],
+            'no columns to update' => [
+                3 => 'INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON DUPLICATE KEY UPDATE `a`=`T_upsert_1`.`a`',
+            ],
         ];
 
         $newData = parent::upsertProvider();
+
         foreach ($concreteData as $testName => $data) {
             $newData[$testName] = array_replace($newData[$testName], $data);
         }
@@ -199,7 +203,7 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
         return $newData;
     }
 
-    public function conditionProvider()
+    public function conditionProvider(): array
     {
         return array_merge(parent::conditionProvider(), [
             // json conditions
@@ -247,14 +251,14 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
                 ['=', 'jsoncol', new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])]))],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
             ],
-            /*'search by property in JSON column (issue #15838)' => [
+            'search by property in JSON column (issue #15838)' => [
                 ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
                 "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
-            ],*/
+            ],
         ]);
     }
 
-    public function updateProvider()
+    public function updateProvider(): array
     {
         $items = parent::updateProvider();
 
