@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\Constraint;
 use Yiisoft\Db\ConstraintFinderTrait;
 use Yiisoft\Db\Exception;
 use Yiisoft\Db\Expression;
-use Yiisoft\Db\ForeignKeyConstraint;
-use Yiisoft\Db\IndexConstraint;
 use Yiisoft\Db\TableSchema;
 use Yiisoft\Db\Contracts\ConstraintFinderInterface;
+use Yiisoft\Db\Constraints\Constraint;
+use Yiisoft\Db\Constraints\ForeignKeyConstraint;
+use Yiisoft\Db\Constraints\IndexConstraint;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 
