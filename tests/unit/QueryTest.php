@@ -1,18 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Expression;
+use Yiisoft\Db\Expressions\Expression;
 use Yiisoft\Db\Query;
 
-/**
- * @group db
- * @group mysql
- */
 class QueryTest extends \Yiisoft\Db\Tests\QueryTest
 {
-    protected $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     /**
      * Tests MySQL specific syntax for index hints.

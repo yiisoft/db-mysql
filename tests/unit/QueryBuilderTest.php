@@ -1,22 +1,18 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use yii\base\DynamicModel;
-use yii\helpers\Json;
-use Yiisoft\Db\Expression;
-use Yiisoft\Db\JsonExpression;
+use Yiisoft\Json\Json;
 use Yiisoft\Db\Query;
 use Yiisoft\Db\Schema;
+use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Expressions\JsonExpression;
 
-/**
- * @group db
- * @group mysql
- */
 class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
 {
-    protected $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     /**
      * This is not used as a dataprovider for testGetColumnType to speed up the test
@@ -205,6 +201,8 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
 
     public function conditionProvider(): array
     {
+        $db = $this->createConnection();
+
         return array_merge(parent::conditionProvider(), [
             // json conditions
             [
@@ -240,11 +238,11 @@ class QueryBuilderTest extends \Yiisoft\Db\Tests\QueryBuilderTest
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2}'],
             ],*/
             'query' => [
-                ['=', 'jsoncol', new JsonExpression((new Query())->select('params')->from('user')->where(['id' => 1]))],
+                ['=', 'jsoncol', new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1]))],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
             ],
             'query with type, that is ignored in MySQL' => [
-                ['=', 'jsoncol', new JsonExpression((new Query())->select('params')->from('user')->where(['id' => 1]), 'jsonb')],
+                ['=', 'jsoncol', new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1]), 'jsonb')],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
             ],
             'nested and combined json expression' => [

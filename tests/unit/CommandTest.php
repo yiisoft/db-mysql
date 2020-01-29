@@ -1,15 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-/**
- * @group db
- * @group mysql
- */
 class CommandTest extends \Yiisoft\Db\Tests\CommandTest
 {
-    public $driverName = 'mysql';
+    public ?string $driverName = 'mysql';
 
     protected $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 

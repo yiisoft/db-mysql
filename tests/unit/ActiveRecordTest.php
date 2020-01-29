@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
@@ -11,7 +12,7 @@ use Yiisoft\ActiveRecord\Tests\Data\Storage;
  */
 class ActiveRecordTest
 {
-    public $driverName = 'mysql';
+    public ?string $driverName = 'mysql';
 
     public function testJsonColumn()
     {
@@ -27,7 +28,7 @@ class ActiveRecordTest
             'last_update_time' => '2018-02-21',
         ];
 
-        $storage = new Storage();
+        $storage = new Storage($this->getConnection());
         $storage->data = $data;
         $this->assertTrue($storage->save(), 'Storage can be saved');
         $this->assertNotNull($storage->id);
