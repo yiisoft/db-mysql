@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\ConstraintFinderTrait;
 use Yiisoft\Db\Exception;
-use Yiisoft\Db\Expression;
 use Yiisoft\Db\TableSchema;
 use Yiisoft\Db\Contracts\ConstraintFinderInterface;
 use Yiisoft\Db\Constraints\Constraint;
@@ -15,6 +14,7 @@ use Yiisoft\Db\Constraints\ForeignKeyConstraint;
 use Yiisoft\Db\Constraints\IndexConstraint;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expressions\Expression;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
@@ -176,6 +176,7 @@ SQL;
         $result = [];
 
         foreach ($indexes as $name => $index) {
+
             $ic = new IndexConstraint();
 
             $ic->setIsPrimary((bool) $index[0]['index_is_primary']);
@@ -309,7 +310,7 @@ SQL;
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
             if (($column->type === 'timestamp' || $column->type === 'datetime')
-                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', $info['default'], $matches)) {
+                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)) {
                 $column->defaultValue = new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
             } elseif (isset($type) && $type === 'bit') {
                 $column->defaultValue = bindec(trim((string) $info['default'], 'b\''));

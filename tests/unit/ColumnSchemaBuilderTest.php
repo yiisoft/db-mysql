@@ -7,15 +7,9 @@ namespace Yiisoft\Db\Mysql\Tests;
 use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema;
 
-/**
- * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for MySQL.
- *
- * @group db
- * @group mysql
- */
 class ColumnSchemaBuilderTest extends \Yiisoft\Db\Tests\ColumnSchemaBuilderTest
 {
-    protected $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     /**
      * @param string $type

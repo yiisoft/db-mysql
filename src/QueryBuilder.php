@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Exception;
-use Yiisoft\Db\Expression;
-use Yiisoft\Db\JsonExpression;
 use Yiisoft\Db\Query;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Expressions\JsonExpression;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
@@ -264,7 +264,7 @@ class QueryBuilder extends \Yiisoft\Db\QueryBuilder
         if (!$columns instanceof Query && empty($names)) {
             $tableSchema = $this->db->getSchema()->getTableSchema($table);
             if ($tableSchema !== null) {
-                $columns = !empty($tableSchema->primaryKey) ? $tableSchema->primaryKey : [reset($tableSchema->columns)->name];
+                $columns = !empty($tableSchema->primaryKey) ? $tableSchema->primaryKey : [reset($tableSchema->columns)->getName()];
                 foreach ($columns as $name) {
                     $names[] = $this->db->quoteColumnName($name);
                     $placeholders[] = 'DEFAULT';
