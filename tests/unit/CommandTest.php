@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Tests;
+namespace Yiisoft\Db\Tests\Mysql;
 
-class CommandTest extends \Yiisoft\Db\Tests\CommandTest
+use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
+
+final class CommandTest extends AbstractCommandTest
 {
     public ?string $driverName = 'mysql';
 
-    protected $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+    protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 
     public function testAddDropCheck(): void
     {

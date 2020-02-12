@@ -4,78 +4,77 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\ConstraintFinderTrait;
-use Yiisoft\Db\Exception;
-use Yiisoft\Db\TableSchema;
-use Yiisoft\Db\Contracts\ConstraintFinderInterface;
 use Yiisoft\Db\Constraints\Constraint;
+use Yiisoft\Db\Constraints\ConstraintFinderInterface;
+use Yiisoft\Db\Constraints\ConstraintFinderTrait;
 use Yiisoft\Db\Constraints\ForeignKeyConstraint;
 use Yiisoft\Db\Constraints\IndexConstraint;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Exceptions\InvalidConfigException;
+use Yiisoft\Db\Exceptions\NotSupportedException;
 use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Schemas\TableSchema;
+use Yiisoft\Arrays\ArrayHelper;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
  */
-class Schema extends \Yiisoft\Db\Schema implements ConstraintFinderInterface
+class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
     /**
      * {@inheritdoc}
      */
-    public $columnSchemaClass = 'Yiisoft\Db\Mysql\ColumnSchema';
+    public string $columnSchemaClass = ColumnSchema::class;
     /**
      * @var bool whether MySQL used is older than 5.1.
      */
-    private $oldMysql;
+    private bool $oldMysql;
 
     /**
      * @var array mapping from physical column types (keys) to abstract column types (values)
      */
-    public $typeMap = [
-        'tinyint'    => self::TYPE_TINYINT,
-        'bit'        => self::TYPE_INTEGER,
-        'smallint'   => self::TYPE_SMALLINT,
-        'mediumint'  => self::TYPE_INTEGER,
-        'int'        => self::TYPE_INTEGER,
-        'integer'    => self::TYPE_INTEGER,
-        'bigint'     => self::TYPE_BIGINT,
-        'float'      => self::TYPE_FLOAT,
-        'double'     => self::TYPE_DOUBLE,
-        'real'       => self::TYPE_FLOAT,
-        'decimal'    => self::TYPE_DECIMAL,
-        'numeric'    => self::TYPE_DECIMAL,
-        'tinytext'   => self::TYPE_TEXT,
+    public array $typeMap = [
+        'tinyint' => self::TYPE_TINYINT,
+        'bit' => self::TYPE_INTEGER,
+        'smallint' => self::TYPE_SMALLINT,
+        'mediumint' => self::TYPE_INTEGER,
+        'int' => self::TYPE_INTEGER,
+        'integer' => self::TYPE_INTEGER,
+        'bigint' => self::TYPE_BIGINT,
+        'float' => self::TYPE_FLOAT,
+        'double' => self::TYPE_DOUBLE,
+        'real' => self::TYPE_FLOAT,
+        'decimal' => self::TYPE_DECIMAL,
+        'numeric' => self::TYPE_DECIMAL,
+        'tinytext' => self::TYPE_TEXT,
         'mediumtext' => self::TYPE_TEXT,
-        'longtext'   => self::TYPE_TEXT,
-        'longblob'   => self::TYPE_BINARY,
-        'blob'       => self::TYPE_BINARY,
-        'text'       => self::TYPE_TEXT,
-        'varchar'    => self::TYPE_STRING,
-        'string'     => self::TYPE_STRING,
-        'char'       => self::TYPE_CHAR,
-        'datetime'   => self::TYPE_DATETIME,
-        'year'       => self::TYPE_DATE,
-        'date'       => self::TYPE_DATE,
-        'time'       => self::TYPE_TIME,
-        'timestamp'  => self::TYPE_TIMESTAMP,
-        'enum'       => self::TYPE_STRING,
-        'varbinary'  => self::TYPE_BINARY,
-        'json'       => self::TYPE_JSON,
+        'longtext' => self::TYPE_TEXT,
+        'longblob' => self::TYPE_BINARY,
+        'blob' => self::TYPE_BINARY,
+        'text' => self::TYPE_TEXT,
+        'varchar' => self::TYPE_STRING,
+        'string' => self::TYPE_STRING,
+        'char' => self::TYPE_CHAR,
+        'datetime' => self::TYPE_DATETIME,
+        'year' => self::TYPE_DATE,
+        'date' => self::TYPE_DATE,
+        'time' => self::TYPE_TIME,
+        'timestamp' => self::TYPE_TIMESTAMP,
+        'enum' => self::TYPE_STRING,
+        'varbinary' => self::TYPE_BINARY,
+        'json' => self::TYPE_JSON,
     ];
 
     /**
      * {@inheritdoc}
      */
-    protected $tableQuoteCharacter = '`';
+    protected string $tableQuoteCharacter = '`';
 
     /**
      * {@inheritdoc}
      */
-    protected $columnQuoteCharacter = '`';
+    protected string $columnQuoteCharacter = '`';
 
     /**
      * {@inheritdoc}
@@ -176,7 +175,6 @@ SQL;
         $result = [];
 
         foreach ($indexes as $name => $index) {
-
             $ic = new IndexConstraint();
 
             $ic->setIsPrimary((bool) $index[0]['index_is_primary']);
@@ -254,7 +252,7 @@ SQL;
      *
      * @return ColumnSchema the column schema object
      */
-    protected function loadColumnSchema(array $info)
+    protected function loadColumnSchema(array $info): ColumnSchema
     {
         $column = $this->createColumnSchema();
 
@@ -269,7 +267,7 @@ SQL;
 
         $column->type = self::TYPE_STRING;
 
-        if (preg_match('/^(\w+)(?:\(([^\)]+)\))?/', $column->dbType, $matches)) {
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->dbType, $matches)) {
             $type = strtolower($matches[1]);
             if (isset($this->typeMap[$type])) {
                 $column->type = $this->typeMap[$type];
@@ -309,9 +307,12 @@ SQL;
              *
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
-            if (($column->type === 'timestamp' || $column->type === 'datetime')
-                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)) {
-                $column->defaultValue = new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
+            if (
+                ($column->type === 'timestamp' || $column->type === 'datetime')
+                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
+            ) {
+                $column->defaultValue = new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
+                    ? '(' . $matches[1] . ')' : ''));
             } elseif (isset($type) && $type === 'bit') {
                 $column->defaultValue = bindec(trim((string) $info['default'], 'b\''));
             } else {
@@ -375,7 +376,7 @@ SQL;
      *
      * @return string $sql the result of 'SHOW CREATE TABLE'
      */
-    protected function getCreateTableSql($table)
+    protected function getCreateTableSql($table): string
     {
         $row = $this->db->createCommand(
             'SHOW CREATE TABLE ' . $this->quoteTableName($table->fullName)

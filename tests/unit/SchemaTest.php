@@ -2,22 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Tests;
+namespace Yiisoft\Db\Tests\Mysql;
 
 use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Tests\AnyCaseValue;
+use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 
-class SchemaTest extends \Yiisoft\Db\Tests\SchemaTest
+final class SchemaTest extends AbstractSchemaTest
 {
-    public ?string $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     public function testLoadDefaultDatetimeColumn()
     {
         if (!version_compare($this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6', '>=')) {
             $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
         }
-
-        $sql = <<<'SQL'
+        $sql = <<<SQL
 CREATE TABLE  IF NOT EXISTS `datetime_test`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -33,6 +32,32 @@ SQL;
         $dt = $schema->columns['dt'];
 
         $this->assertInstanceOf(Expression::class, $dt->defaultValue);
+        $this->assertEquals('CURRENT_TIMESTAMP', (string)$dt->defaultValue);
+    }
+
+    public function testDefaultDatetimeColumnWithMicrosecs(): void
+    {
+        if (!version_compare($this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6.4', '>=')) {
+            $this->markTestSkipped('CURRENT_TIMESTAMP with microseconds as default column value is supported since MySQL 5.6.4.');
+        }
+        $sql = <<<SQL
+CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
+  `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
+  `ts` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+SQL;
+
+        $this->getConnection()->createCommand($sql)->execute();
+
+        $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
+
+        $dt = $schema->columns['dt'];
+        $this->assertInstanceOf(Expression::class, $dt->defaultValue);
+        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string)$dt->defaultValue);
+
+        $ts = $schema->columns['ts'];
+        $this->assertInstanceOf(Expression::class, $ts->defaultValue);
+        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string)$ts->defaultValue);
     }
 
     public function testGetSchemaNames()
@@ -57,5 +82,37 @@ SQL;
         $result['4: check'][2] = false;
 
         return $result;
+    }
+
+    /**
+     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
+     * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
+     *
+     * @see https://mariadb.com/kb/en/library/now/#description
+     * @see https://github.com/yiisoft/yii2/issues/15167
+     */
+    public function testAlternativeDisplayOfDefaultCurrentTimestampInMariaDB(): void
+    {
+        /**
+         * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
+         * returns in response to the query `SHOW FULL COLUMNS FROM ...`
+         */
+        $schema = new \Yiisoft\Db\Mysql\Schema($this->getConnection());
+
+        $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
+            'field' => 'emulated_MariaDB_field',
+            'type' => 'timestamp',
+            'collation' => null,
+            'null' => 'NO',
+            'key' => '',
+            'default' => 'current_timestamp()',
+            'extra' => '',
+            'privileges' => 'select,insert,update,references',
+            'comment' => '',
+        ]]);
+
+        $this->assertInstanceOf(\Yiisoft\Db\Mysql\ColumnSchema::class, $column);
+        $this->assertInstanceOf(Expression::class, $column->defaultValue);
+        $this->assertEquals('CURRENT_TIMESTAMP', $column->defaultValue);
     }
 }

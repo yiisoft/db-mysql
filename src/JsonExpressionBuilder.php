@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\ExpressionBuilderTrait;
-use Yiisoft\Db\JsonExpression;
-use Yiisoft\Db\Query;
-use Yiisoft\Db\Contracts\ExpressionInterface;
-use Yiisoft\Db\Contracts\ExpressionBuilderInterface;
+use Yiisoft\Db\Expressions\ExpressionBuilderInterface;
+use Yiisoft\Db\Expressions\ExpressionBuilderTrait;
+use Yiisoft\Db\Expressions\ExpressionInterface;
+use Yiisoft\Db\Expressions\JsonExpression;
+use Yiisoft\Db\Querys\Query;
 use Yiisoft\Json\Json;
 
 /**
@@ -18,7 +18,7 @@ class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;
 
-    const PARAM_PREFIX = ':qp';
+    public const PARAM_PREFIX = ':qp';
 
     /**
      * {@inheritdoc}
