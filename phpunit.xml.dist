@@ -12,7 +12,7 @@
 
     <testsuites>
         <testsuite name="Yii db-mysql tests">
-            <directory>./tests</directory>
+            <directory>./tests/unit</directory>
         </testsuite>
     </testsuites>
 

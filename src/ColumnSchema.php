@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Contracts\ExpressionInterface;
+use Yiisoft\Db\Expressions\ExpressionInterface;
 use Yiisoft\Db\Expressions\JsonExpression;
 
 /**
  * Class ColumnSchema for MySQL database.
  */
-class ColumnSchema extends \Yiisoft\Db\ColumnSchema
+class ColumnSchema extends \Yiisoft\Db\Schemas\ColumnSchema
 {
     /**
      * {@inheritdoc}
@@ -42,7 +42,7 @@ class ColumnSchema extends \Yiisoft\Db\ColumnSchema
         }
 
         if ($this->type === Schema::TYPE_JSON) {
-            return json_decode($value, true);
+            return \json_decode($value, true);
         }
 
         return parent::phpTypecast($value);

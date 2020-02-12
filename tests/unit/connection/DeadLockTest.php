@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Db\Mysql\Tests\Connection;
 
 use Yiisoft\Db\Connection;
