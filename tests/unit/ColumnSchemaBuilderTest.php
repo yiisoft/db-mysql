@@ -1,30 +1,20 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Mysql\Tests;
+declare(strict_types=1);
+
+namespace Yiisoft\Db\Tests\Mysql;
 
 use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
-use Yiisoft\Db\Schema;
+use Yiisoft\Db\Schemas\Schema;
+use Yiisoft\Db\Tests\ColumnSchemaBuilderTest as AbstractColumnSchemaBuilderTest;
 
-/**
- * ColumnSchemaBuilderTest tests ColumnSchemaBuilder for MySQL.
- *
- * @group db
- * @group mysql
- */
-class ColumnSchemaBuilderTest extends \Yiisoft\Db\Tests\ColumnSchemaBuilderTest
+final class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
 {
-    protected $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     /**
      * @param string $type
-     * @param int    $length
-     *
+     * @param int $length
      * @return ColumnSchemaBuilder
      */
     public function getColumnSchemaBuilder($type, $length = null)

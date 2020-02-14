@@ -1,18 +1,12 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Mysql\Tests;
+declare(strict_types=1);
 
-/**
- * @group db
- * @group mysql
- */
-class ConnectionTest extends \Yiisoft\Db\Tests\ConnectionTest
+namespace Yiisoft\Db\Tests\Mysql;
+
+use Yiisoft\Db\Tests\ConnectionTest as AbstractConnectionTest;
+
+final class ConnectionTest extends AbstractConnectionTest
 {
-    protected $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 }

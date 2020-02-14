@@ -1,32 +1,24 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use yii\helpers\Json;
-use Yiisoft\Db\ExpressionBuilderInterface;
-use Yiisoft\Db\ExpressionBuilderTrait;
-use Yiisoft\Db\ExpressionInterface;
-use Yiisoft\Db\JsonExpression;
-use Yiisoft\Db\Query;
+use Yiisoft\Db\Expressions\ExpressionBuilderInterface;
+use Yiisoft\Db\Expressions\ExpressionBuilderTrait;
+use Yiisoft\Db\Expressions\ExpressionInterface;
+use Yiisoft\Db\Expressions\JsonExpression;
+use Yiisoft\Db\Querys\Query;
+use Yiisoft\Json\Json;
 
 /**
- * Class JsonExpressionBuilder builds [[JsonExpression]] for MySQL DBMS.
- *
- * @author Dmytro Naumenko <d.naumenko.a@gmail.com>
- *
- * @since 2.0.14
+ * Class JsonExpressionBuilder builds {@see JsonExpression} for MySQL DBMS.
  */
 class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;
 
-    const PARAM_PREFIX = ':qp';
+    public const PARAM_PREFIX = ':qp';
 
     /**
      * {@inheritdoc}
@@ -43,7 +35,7 @@ class JsonExpressionBuilder implements ExpressionBuilderInterface
             return "($sql)";
         }
 
-        $placeholder = static::PARAM_PREFIX.count($params);
+        $placeholder = static::PARAM_PREFIX . count($params);
         $params[$placeholder] = Json::encode($value);
 
         return "CAST($placeholder AS JSON)";

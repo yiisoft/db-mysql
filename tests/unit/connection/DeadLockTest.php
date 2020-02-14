@@ -1,10 +1,6 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Connection;
 
@@ -16,7 +12,7 @@ use Yiisoft\Db\Transaction;
  * @group db
  * @group mysql
  */
-class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
+class DeadLockTest
 {
     /** @var string Shared log filename for children */
     private $logFile;
@@ -45,7 +41,7 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
             $this->markTestSkipped('pcntl_sigtimedwait() is not available');
         }
 
-        $this->setLogFile(sys_get_temp_dir().'/deadlock_'.posix_getpid());
+        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . posix_getpid());
         $this->deleteLog();
 
         try {
@@ -59,9 +55,11 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
             // So, SECOND child should be forked at first to obtain its PID.
 
             $pidSecond = pcntl_fork();
+
             if (-1 === $pidSecond) {
                 $this->markTestIncomplete('cannot fork');
             }
+
             if (0 === $pidSecond) {
                 // SECOND child
                 $this->setErrorHandler();
@@ -69,9 +67,11 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
             }
 
             $pidFirst = pcntl_fork();
+
             if (-1 === $pidFirst) {
                 $this->markTestIncomplete('cannot fork second child');
             }
+
             if (0 === $pidFirst) {
                 // FIRST child
                 $this->setErrorHandler();
@@ -102,6 +102,7 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
         // all must exit with success
         $errors = [];
         $deadlockHitCount = 0;
+
         while (-1 !== pcntl_wait($status)) {
             if (!pcntl_wifexited($status)) {
                 $errors[] = 'child did not exit itself';
@@ -114,7 +115,9 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
                 }
             }
         }
+
         $logContent = $this->getLogContentAndDelete();
+
         if ($errors) {
             $this->fail(
                 implode('; ', $errors)
@@ -142,15 +145,18 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
     {
         try {
             $this->log('child 1: connect');
+
             /** @var Connection $first */
             $first = $this->getConnection(false, false);
 
             $this->log('child 1: delete');
+
             $first->createCommand()
                 ->delete('{{customer}}', ['id' => 97])
                 ->execute();
 
             $this->log('child 1: insert');
+
             // insert test row
             $first->createCommand()
                 ->insert('{{customer}}', [
@@ -162,6 +168,7 @@ class DeadLockTest extends \Yiisoft\Db\Tests\ConnectionTest
                 ->execute();
 
             $this->log('child 1: transaction');
+
             $first->transaction(function (Connection $first) use ($pidSecond) {
                 $first->transaction(function (Connection $first) use ($pidSecond) {
                     $this->log('child 1: select');

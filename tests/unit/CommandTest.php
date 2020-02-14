@@ -1,24 +1,18 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace Yiisoft\Db\Mysql\Tests;
+declare(strict_types=1);
 
-/**
- * @group db
- * @group mysql
- */
-class CommandTest extends \Yiisoft\Db\Tests\CommandTest
+namespace Yiisoft\Db\Tests\Mysql;
+
+use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
+
+final class CommandTest extends AbstractCommandTest
 {
-    public $driverName = 'mysql';
+    public ?string $driverName = 'mysql';
 
-    protected $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+    protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 
-    public function testAddDropCheck()
+    public function testAddDropCheck(): void
     {
         $this->markTestSkipped('MySQL does not support adding/dropping check constraints.');
     }

@@ -1,24 +1,16 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+
+declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\ExpressionInterface;
-use Yiisoft\Db\JsonExpression;
+use Yiisoft\Db\Expressions\ExpressionInterface;
+use Yiisoft\Db\Expressions\JsonExpression;
 
 /**
  * Class ColumnSchema for MySQL database.
- *
- * @author Dmytro Naumenko <d.naumenko.a@gmail.com>
- *
- * @since 2.0.14.1
  */
-class ColumnSchema extends \Yiisoft\Db\ColumnSchema
+class ColumnSchema extends \Yiisoft\Db\Schemas\ColumnSchema
 {
     /**
      * {@inheritdoc}
@@ -50,7 +42,7 @@ class ColumnSchema extends \Yiisoft\Db\ColumnSchema
         }
 
         if ($this->type === Schema::TYPE_JSON) {
-            return json_decode($value, true);
+            return \json_decode($value, true);
         }
 
         return parent::phpTypecast($value);
