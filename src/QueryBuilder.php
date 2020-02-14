@@ -216,7 +216,7 @@ class QueryBuilder extends \Yiisoft\Db\Querys\QueryBuilder
      *
      * @return string the SQL statement for checking integrity
      */
-    public function checkIntegrity(bool $check = true, string $schema = '', string $table = ''): string
+    public function checkIntegrity(string $schema = '', string $table = '', bool $check = true): string
     {
         return 'SET FOREIGN_KEY_CHECKS = ' . ($check ? 1 : 0);
     }
