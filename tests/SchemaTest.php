@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Mysql;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 
-final class SchemaTest extends AbstractSchemaTest
+class SchemaTest extends AbstractSchemaTest
 {
     protected ?string $driverName = 'mysql';
 
@@ -97,7 +99,7 @@ SQL;
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new \Yiisoft\Db\Mysql\Schema($this->getConnection());
+        $schema = new Schema($this->getConnection());
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -111,7 +113,7 @@ SQL;
             'comment' => '',
         ]]);
 
-        $this->assertInstanceOf(\Yiisoft\Db\Mysql\ColumnSchema::class, $column);
+        $this->assertInstanceOf(ColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->defaultValue);
         $this->assertEquals('CURRENT_TIMESTAMP', $column->defaultValue);
     }
