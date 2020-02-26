@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Mysql;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Tests\BatchQueryResultTest as AbstractBatchQueryResultTest;
 

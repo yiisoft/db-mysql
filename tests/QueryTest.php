@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Tests\Mysql;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Querys\Query;
 use Yiisoft\Db\Expressions\Expression;
 use Yiisoft\Db\Tests\QueryTest as AbstractQueryTest;
 
-final class QueryTest extends AbstractQueryTest
+class QueryTest extends AbstractQueryTest
 {
     protected ?string $driverName = 'mysql';
 

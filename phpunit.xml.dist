@@ -11,8 +11,8 @@
     </php>
 
     <testsuites>
-        <testsuite name="Yii db-mysql tests">
-            <directory>./tests/unit</directory>
+        <testsuite name="Yii Db Mysql Tests">
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
 
