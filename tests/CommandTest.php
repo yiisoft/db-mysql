@@ -8,7 +8,7 @@ use Yiisoft\Db\Tests\CommandTest as AbstractCommandTest;
 
 class CommandTest extends AbstractCommandTest
 {
-    public ?string $driverName = 'mysql';
+    protected ?string $driverName = 'mysql';
 
     protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 
