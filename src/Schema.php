@@ -26,6 +26,7 @@ class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInter
      * {@inheritdoc}
      */
     public string $columnSchemaClass = ColumnSchema::class;
+
     /**
      * @var bool whether MySQL used is older than 5.1.
      */
@@ -116,7 +117,7 @@ class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInter
     /**
      * {@inheritdoc}
      */
-    protected function loadTableSchema($name)
+    protected function loadTableSchema(string $name): ?TableSchema
     {
         $table = new TableSchema();
 
@@ -134,7 +135,7 @@ class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInter
     /**
      * {@inheritdoc}
      */
-    protected function loadTablePrimaryKey($tableName)
+    protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
         return $this->loadTableConstraints($tableName, 'primaryKey');
     }
@@ -142,7 +143,7 @@ class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInter
     /**
      * {@inheritdoc}
      */
-    protected function loadTableForeignKeys($tableName)
+    protected function loadTableForeignKeys(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'foreignKeys');
     }
@@ -150,7 +151,7 @@ class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInter
     /**
      * {@inheritdoc}
      */
-    protected function loadTableIndexes($tableName)
+    protected function loadTableIndexes(string $tableName): array
     {
         static $sql = <<<'SQL'
 SELECT
@@ -191,7 +192,7 @@ SQL;
     /**
      * {@inheritdoc}
      */
-    protected function loadTableUniques($tableName)
+    protected function loadTableUniques(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'uniques');
     }
@@ -201,7 +202,7 @@ SQL;
      *
      * @throws NotSupportedException if this method is called.
      */
-    protected function loadTableChecks($tableName)
+    protected function loadTableChecks(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support check constraints.');
     }
@@ -211,7 +212,7 @@ SQL;
      *
      * @throws NotSupportedException if this method is called.
      */
-    protected function loadTableDefaultValues($tableName)
+    protected function loadTableDefaultValues(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support default value constraints.');
     }
@@ -420,8 +421,6 @@ AND rc.table_name = :tableName AND kcu.table_name = :tableName1
 SQL;
 
         try {
-            //\Yiisoft\VarDumper\VarDumper::dump($table->name);
-
             $rows = $this->db->createCommand(
                 $sql,
                 [':tableName' => $table->name, ':tableName1' => $table->name]
@@ -541,7 +540,7 @@ SQL;
      *
      * @return mixed constraints.
      */
-    private function loadTableConstraints($tableName, $returnType)
+    private function loadTableConstraints(string $tableName, string $returnType)
     {
         static $sql = <<<'SQL'
 SELECT
