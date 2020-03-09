@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Querys\Query;
-use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Tests\QueryTest as AbstractQueryTest;
 
 class QueryTest extends AbstractQueryTest

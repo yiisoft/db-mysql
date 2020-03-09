@@ -14,10 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install PHP
-        uses: shivammathur/setup-php@v1
+        uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
-          extensions: apc, curl, mbstring, dom, intl, mysql, pdo, imagick
+          extensions: apc, curl, mbstring, dom, intl, pdo, imagick
           ini-values: date.timezone='UTC'
       - name: Create mysql db
         run: mysql -uroot -proot -e 'CREATE DATABASE `yiitest`;'

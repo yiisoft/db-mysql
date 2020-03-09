@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Expressions\JsonExpression;
-use Yiisoft\Db\Querys\Query;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
 
