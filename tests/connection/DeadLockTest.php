@@ -121,10 +121,10 @@ class DeadLockTest
         if ($errors) {
             $this->fail(
                 implode('; ', $errors)
-                .($logContent ? ". Shared children log:\n$logContent" : '')
+                . ($logContent ? ". Shared children log:\n$logContent" : '')
             );
         }
-        $this->assertEquals(1, $deadlockHitCount, "exactly one child must hit deadlock; shared children log:\n".$logContent);
+        $this->assertEquals(1, $deadlockHitCount, "exactly one child must hit deadlock; shared children log:\n" . $logContent);
     }
 
     /**
@@ -205,11 +205,11 @@ class DeadLockTest
 
             return 1;
         } catch (\Exception $e) {
-            $this->log('child 1: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+            $this->log('child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
 
             return 1;
         } catch (\Throwable $e) {
-            $this->log('child 1: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+            $this->log('child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
 
             return 1;
         }
@@ -273,11 +273,11 @@ class DeadLockTest
 
             return 1;
         } catch (\Exception $e) {
-            $this->log('child 2: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+            $this->log('child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
 
             return 1;
         } catch (\Throwable $e) {
-            $this->log('child 2: ! exit <<'.\get_class($e).' #'.$e->getCode().': '.$e->getMessage()."\n".$e->getTraceAsString().'>>');
+            $this->log('child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString() . '>>');
 
             return 1;
         }
@@ -350,7 +350,7 @@ class DeadLockTest
             $time = microtime(true);
             $timeInt = floor($time);
             $timeFrac = $time - $timeInt;
-            $timestamp = date('Y-m-d H:i:s', $timeInt).'.'.round($timeFrac * 1000);
+            $timestamp = date('Y-m-d H:i:s', $timeInt) . '.' . round($timeFrac * 1000);
             file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
         }
     }
