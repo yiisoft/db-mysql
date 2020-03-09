@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Expressions\Expression;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;

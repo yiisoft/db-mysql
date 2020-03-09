@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Constraints\Constraint;
-use Yiisoft\Db\Constraints\ConstraintFinderInterface;
-use Yiisoft\Db\Constraints\ConstraintFinderTrait;
-use Yiisoft\Db\Constraints\ForeignKeyConstraint;
-use Yiisoft\Db\Constraints\IndexConstraint;
-use Yiisoft\Db\Exceptions\InvalidConfigException;
-use Yiisoft\Db\Exceptions\NotSupportedException;
-use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Schemas\TableSchema;
 use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Constraint\ConstraintFinderInterface;
+use Yiisoft\Db\Constraint\ConstraintFinderTrait;
+use Yiisoft\Db\Constraint\ForeignKeyConstraint;
+use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Schema\TableSchema;
 
 /**
  * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
  */
-class Schema extends \Yiisoft\Db\Schemas\Schema implements ConstraintFinderInterface
+class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 

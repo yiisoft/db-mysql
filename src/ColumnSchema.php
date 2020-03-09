@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Expressions\ExpressionInterface;
-use Yiisoft\Db\Expressions\JsonExpression;
+use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\JsonExpression;
 
 /**
  * Class ColumnSchema for MySQL database.
  */
-class ColumnSchema extends \Yiisoft\Db\Schemas\ColumnSchema
+class ColumnSchema extends \Yiisoft\Db\Schema\ColumnSchema
 {
     /**
      * {@inheritdoc}

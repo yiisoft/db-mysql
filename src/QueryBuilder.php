@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Exceptions\Exception;
-use Yiisoft\Db\Exceptions\NotSupportedException;
-use Yiisoft\Db\Expressions\Expression;
-use Yiisoft\Db\Expressions\JsonExpression;
-use Yiisoft\Db\Querys\Query;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Query\Query;
 
 /**
  * QueryBuilder is the query builder for MySQL databases.
  */
-class QueryBuilder extends \Yiisoft\Db\Querys\QueryBuilder
+class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
      */
-    public array $typeMap = [
+    protected array $typeMap = [
         Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
         Schema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
         Schema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
