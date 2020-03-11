@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Tests\Connection;
+namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Exception\Exception;
