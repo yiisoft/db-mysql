@@ -372,7 +372,7 @@ class DeadLockTest extends \Yiisoft\Db\Mysql\Tests\ConnectionTest
             $time = microtime(true);
             $timeInt = floor($time);
             $timeFrac = $time - $timeInt;
-            $timestamp = date('Y-m-d H:i:s', $timeInt) . '.' . round($timeFrac * 1000);
+            $timestamp = date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
             file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
         }
     }
