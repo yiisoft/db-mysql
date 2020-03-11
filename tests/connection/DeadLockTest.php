@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Connection;
 
-use Yiisoft\Db\Connection;
-use Yiisoft\Db\Exception;
-use Yiisoft\Db\Transaction;
+use Yiisoft\Db\Connection\Connection;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Transaction\Transaction;
 
 class DeadLockTest extends \Yiisoft\Db\Mysql\Tests\ConnectionTest
 {
