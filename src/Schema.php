@@ -257,21 +257,19 @@ SQL;
     {
         $column = $this->createColumnSchema();
 
-        $column->name = $info['field'];
-        $column->allowNull = $info['null'] === 'YES';
-        $column->isPrimaryKey = strpos($info['key'], 'PRI') !== false;
-        $column->autoIncrement = stripos($info['extra'], 'auto_increment') !== false;
-        $column->comment = $info['comment'];
+        $column->name($info['field']);
+        $column->allowNull($info['null'] === 'YES');
+        $column->isPrimaryKey(strpos($info['key'], 'PRI') !== false);
+        $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
+        $column->comment($info['comment']);
+        $column->dbType($info['type']);
+        $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
+        $column->type(self::TYPE_STRING);
 
-        $column->dbType = $info['type'];
-        $column->unsigned = stripos($column->dbType, 'unsigned') !== false;
-
-        $column->type = self::TYPE_STRING;
-
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->dbType, $matches)) {
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
             $type = strtolower($matches[1]);
             if (isset($this->typeMap[$type])) {
-                $column->type = $this->typeMap[$type];
+                $column->type($this->typeMap[$type]);
             }
             if (!empty($matches[2])) {
                 if ($type === 'enum') {
@@ -279,29 +277,29 @@ SQL;
                     foreach ($values[0] as $i => $value) {
                         $values[$i] = trim($value, "'");
                     }
-                    $column->enumValues = $values;
+                    $column->enumValues($values);
                 } else {
                     $values = explode(',', $matches[2]);
-                    $column->size = $column->precision = (int) $values[0];
+                    $column->size($column->precision = (int) $values[0]);
                     if (isset($values[1])) {
-                        $column->scale = (int) $values[1];
+                        $column->scale((int) $values[1]);
                     }
-                    if ($column->size === 1 && $type === 'bit') {
-                        $column->type = 'boolean';
+                    if ($column->getSize() === 1 && $type === 'bit') {
+                        $column->type('boolean');
                     } elseif ($type === 'bit') {
-                        if ($column->size > 32) {
-                            $column->type = 'bigint';
-                        } elseif ($column->size === 32) {
-                            $column->type = 'integer';
+                        if ($column->getSize() > 32) {
+                            $column->type('bigint');
+                        } elseif ($column->getSize() === 32) {
+                            $column->type('integer');
                         }
                     }
                 }
             }
         }
 
-        $column->phpType = $this->getColumnPhpType($column);
+        $column->phpType($this->getColumnPhpType($column));
 
-        if (!$column->isPrimaryKey) {
+        if (!$column->getIsPrimaryKey()) {
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
              * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
@@ -309,15 +307,15 @@ SQL;
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
             if (
-                ($column->type === 'timestamp' || $column->type === 'datetime')
+                ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
                 && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
             ) {
-                $column->defaultValue = new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
-                    ? '(' . $matches[1] . ')' : ''));
+                $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
+                    ? '(' . $matches[1] . ')' : '')));
             } elseif (isset($type) && $type === 'bit') {
-                $column->defaultValue = bindec(trim((string) $info['default'], 'b\''));
+                $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
-                $column->defaultValue = $column->phpTypecast($info['default']);
+                $column->defaultValue($column->phpTypecast($info['default']));
             }
         }
 
@@ -357,11 +355,11 @@ SQL;
             }
 
             $column = $this->loadColumnSchema($info);
-            $table->columns[$column->name] = $column;
+            $table->columns[$column->getName()] = $column;
 
-            if ($column->isPrimaryKey) {
-                $table->primaryKey[] = $column->name;
-                if ($column->autoIncrement) {
+            if ($column->getIsPrimaryKey()) {
+                $table->primaryKey[] = $column->getName();
+                if ($column->getAutoIncrement()) {
                     $table->sequenceName = '';
                 }
             }
