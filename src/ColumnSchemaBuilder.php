@@ -11,41 +11,26 @@ use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
  */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function buildUnsignedString(): string
     {
         return $this->isUnsigned ? ' UNSIGNED' : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildAfterString(): string
     {
         return $this->after !== null ? ' AFTER ' . $this->db->quoteColumnName($this->after) : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildFirstString(): string
     {
         return $this->isFirst ? ' FIRST' : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function buildCommentString(): string
     {
         return $this->comment !== null ? ' COMMENT ' . $this->db->quoteValue($this->comment) : '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString(): string
     {
         switch ($this->getTypeCategory()) {

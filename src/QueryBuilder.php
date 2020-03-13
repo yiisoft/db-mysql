@@ -43,9 +43,6 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         Schema::TYPE_JSON => 'json',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function defaultExpressionBuilders(): array
     {
         return array_merge(parent::defaultExpressionBuilders(), [
@@ -142,9 +139,6 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
             . $this->db->quoteTableName($table) . ' DROP PRIMARY KEY';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropUnique(string $name, string $table): string
     {
         return $this->dropIndex($name, $table);
@@ -221,9 +215,6 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         return 'SET FOREIGN_KEY_CHECKS = ' . ($check ? 1 : 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildLimit($limit, $offset): string
     {
         $sql = '';
@@ -246,18 +237,12 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         return $sql;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function hasLimit($limit): bool
     {
         // In MySQL limit argument must be nonnegative integer constant
         return ctype_digit((string) $limit);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function hasOffset($offset): bool
     {
         // In MySQL offset argument must be nonnegative integer constant
@@ -266,9 +251,6 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         return ctype_digit($offset) && $offset !== '0';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareInsertValues(string $table, $columns, array $params = []): array
     {
         [$names, $placeholders, $values, $params] = parent::prepareInsertValues($table, $columns, $params);
@@ -317,9 +299,6 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
         // Strip existing comment which may include escaped quotes
@@ -352,25 +331,16 @@ class QueryBuilder extends \Yiisoft\Db\Query\QueryBuilder
         return $alterSql;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addCommentOnTable(string $table, string $comment): string
     {
         return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' COMMENT ' . $this->db->quoteValue($comment);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropCommentFromColumn(string $table, string $column): string
     {
         return $this->addCommentOnColumn($table, $column, '');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropCommentFromTable(string $table): string
     {
         return $this->addCommentOnTable($table, '');
