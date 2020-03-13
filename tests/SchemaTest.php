@@ -33,8 +33,8 @@ SQL;
 
         $dt = $schema->columns['dt'];
 
-        $this->assertInstanceOf(Expression::class, $dt->defaultValue);
-        $this->assertEquals('CURRENT_TIMESTAMP', (string)$dt->defaultValue);
+        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
     }
 
     public function testDefaultDatetimeColumnWithMicrosecs(): void
@@ -54,12 +54,12 @@ SQL;
         $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
 
         $dt = $schema->columns['dt'];
-        $this->assertInstanceOf(Expression::class, $dt->defaultValue);
-        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string)$dt->defaultValue);
+        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
         $ts = $schema->columns['ts'];
-        $this->assertInstanceOf(Expression::class, $ts->defaultValue);
-        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string)$ts->defaultValue);
+        $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
     }
 
     public function testGetSchemaNames()
