@@ -280,7 +280,8 @@ SQL;
                     $column->enumValues($values);
                 } else {
                     $values = explode(',', $matches[2]);
-                    $column->size($column->precision = (int) $values[0]);
+                    $column->precision((int) $values[0]);
+                    $column->size((int) $values[0]);
                     if (isset($values[1])) {
                         $column->scale((int) $values[1]);
                     }
