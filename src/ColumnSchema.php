@@ -25,8 +25,8 @@ class ColumnSchema extends \Yiisoft\Db\Schema\ColumnSchema
             return $value;
         }
 
-        if ($this->dbType === Schema::TYPE_JSON) {
-            return new JsonExpression($value, $this->type);
+        if ($this->getDbType() === Schema::TYPE_JSON) {
+            return new JsonExpression($value, $this->getType());
         }
 
         return $this->typecast($value);
@@ -41,7 +41,7 @@ class ColumnSchema extends \Yiisoft\Db\Schema\ColumnSchema
             return;
         }
 
-        if ($this->type === Schema::TYPE_JSON) {
+        if ($this->getType() === Schema::TYPE_JSON) {
             return \json_decode($value, true);
         }
 
