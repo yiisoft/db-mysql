@@ -22,9 +22,6 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
 {
     use ConstraintFinderTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public string $columnSchemaClass = ColumnSchema::class;
 
     /**
@@ -67,19 +64,10 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         'json' => self::TYPE_JSON,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected string $tableQuoteCharacter = '`';
 
-    /**
-     * {@inheritdoc}
-     */
     protected string $columnQuoteCharacter = '`';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function resolveTableName($name)
     {
         $resolvedName = new TableSchema();
@@ -100,9 +88,6 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         return $resolvedName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function findTableNames($schema = '')
     {
         $sql = 'SHOW TABLES';
@@ -114,9 +99,6 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         return $this->db->createCommand($sql)->queryColumn();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableSchema(string $name): ?TableSchema
     {
         $table = new TableSchema();
@@ -132,25 +114,16 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
         return $this->loadTableConstraints($tableName, 'primaryKey');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableForeignKeys(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'foreignKeys');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableIndexes(string $tableName): array
     {
         static $sql = <<<'SQL'
@@ -189,9 +162,6 @@ SQL;
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function loadTableUniques(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'uniques');
@@ -503,9 +473,6 @@ SQL;
         return $uniqueIndexes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createColumnSchemaBuilder($type, $length = null)
     {
         return new ColumnSchemaBuilder($type, $length, $this->db);
