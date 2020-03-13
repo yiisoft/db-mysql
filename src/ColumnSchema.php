@@ -12,9 +12,6 @@ use Yiisoft\Db\Expression\JsonExpression;
  */
 class ColumnSchema extends \Yiisoft\Db\Schema\ColumnSchema
 {
-    /**
-     * {@inheritdoc}
-     */
     public function dbTypecast($value)
     {
         if ($value === null) {
