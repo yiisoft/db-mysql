@@ -53,7 +53,7 @@ SQL;
 
         $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
 
-        $dt = $schema->getColumns('dt');
+        $dt = $schema->getColumn('dt');
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
