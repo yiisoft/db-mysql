@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql;
+namespace Yiisoft\Db\Mysql\Schema;
 
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint\Constraint;
@@ -13,26 +13,21 @@ use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Schema\TableSchema;
+use Yiisoft\Db\Mysql\Query\QueryBuilder;
+use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
 /**
- * Schema is the class for retrieving metadata from a MySQL database (version 4.1.x and 5.x).
+ * Schema is the class for retrieving metadata from a MySQL database.
  */
-class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterface
+class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
-    public string $columnSchemaClass = ColumnSchema::class;
-
-    /**
-     * @var bool whether MySQL used is older than 5.1.
-     */
+    protected string $columnSchemaClass = ColumnSchema::class;
+    protected string $tableQuoteCharacter = '`';
+    protected string $columnQuoteCharacter = '`';
     private bool $oldMysql;
-
-    /**
-     * @var array mapping from physical column types (keys) to abstract column types (values)
-     */
-    public array $typeMap = [
+    private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_INTEGER,
         'smallint' => self::TYPE_SMALLINT,
@@ -64,10 +59,6 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         'json' => self::TYPE_JSON,
     ];
 
-    protected string $tableQuoteCharacter = '`';
-
-    protected string $columnQuoteCharacter = '`';
-
     protected function resolveTableName($name)
     {
         $resolvedName = new TableSchema();
@@ -75,15 +66,15 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
         $parts = explode('.', str_replace('`', '', $name));
 
         if (isset($parts[1])) {
-            $resolvedName->schemaName = $parts[0];
-            $resolvedName->name = $parts[1];
+            $resolvedName->schemaName($parts[0]);
+            $resolvedName->name($parts[1]);
         } else {
-            $resolvedName->schemaName = $this->defaultSchema;
-            $resolvedName->name = $name;
+            $resolvedName->schemaName($this->defaultSchema);
+            $resolvedName->name($name);
         }
 
-        $resolvedName->fullName = ($resolvedName->schemaName !== $this->defaultSchema ?
-            $resolvedName->schemaName . '.' : '') . $resolvedName->name;
+        $resolvedName->fullName(($resolvedName->getSchemaName() !== $this->defaultSchema ?
+            $resolvedName->getSchemaName() . '.' : '') . $resolvedName->getName());
 
         return $resolvedName;
     }
@@ -96,7 +87,7 @@ class Schema extends \Yiisoft\Db\Schema\Schema implements ConstraintFinderInterf
             $sql .= ' FROM ' . $this->quoteSimpleTableName($schema);
         }
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->getDb()->createCommand($sql)->queryColumn();
     }
 
     protected function loadTableSchema(string $name): ?TableSchema
@@ -139,9 +130,9 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $indexes = $this->db->createCommand($sql, [
-            ':schemaName' => $resolvedName->schemaName,
-            ':tableName' => $resolvedName->name,
+        $indexes = $this->getDb()->createCommand($sql, [
+            ':schemaName' => $resolvedName->getSchemaName(),
+            ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
@@ -167,21 +158,11 @@ SQL;
         return $this->loadTableConstraints($tableName, 'uniques');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NotSupportedException if this method is called.
-     */
     protected function loadTableChecks(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support check constraints.');
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NotSupportedException if this method is called.
-     */
     protected function loadTableDefaultValues(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support default value constraints.');
@@ -194,34 +175,35 @@ SQL;
      */
     public function createQueryBuilder()
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->getDb());
     }
 
     /**
      * Resolves the table name and schema name (if any).
      *
-     * @param TableSchema $table the table metadata object
-     * @param string      $name  the table name
+     * @param TableSchema $table the table metadata object.
+     * @param string $name the table name.
      */
     protected function resolveTableNames($table, $name)
     {
         $parts = explode('.', str_replace('`', '', $name));
 
         if (isset($parts[1])) {
-            $table->schemaName = $parts[0];
-            $table->name = $parts[1];
-            $table->fullName = $table->schemaName . '.' . $table->name;
+            $table->schemaName($parts[0]);
+            $table->name($parts[1]);
+            $table->fullName($table->getSchemaName() . '.' . $table->getName());
         } else {
-            $table->fullName = $table->name = $parts[0];
+            $table->name($parts[0]);
+            $table->fullName($parts[0]);
         }
     }
 
     /**
      * Loads the column information into a {@see ColumnSchema} object.
      *
-     * @param array $info column information
+     * @param array $info column information.
      *
-     * @return ColumnSchema the column schema object
+     * @return ColumnSchema the column schema object.
      */
     protected function loadColumnSchema(array $info): ColumnSchema
     {
@@ -296,24 +278,26 @@ SQL;
     /**
      * Collects the metadata of table columns.
      *
-     * @param TableSchema $table the table metadata
+     * @param TableSchema $table the table metadata.
      *
-     * @throws \Exception if DB query fails
+     * @throws \Exception if DB query fails.
      *
-     * @return bool whether the table exists in the database
+     * @return bool whether the table exists in the database.
      */
     protected function findColumns($table)
     {
-        $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->fullName);
+        $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->getFullName());
 
         try {
-            $columns = $this->db->createCommand($sql)->queryAll();
+            $columns = $this->getDb()->createCommand($sql)->queryAll();
         } catch (\Exception $e) {
             $previous = $e->getPrevious();
 
             if ($previous instanceof \PDOException && strpos($previous->getMessage(), 'SQLSTATE[42S02') !== false) {
-                // table does not exist
-                // https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
+                /**
+                 * table does not exist
+                 * https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
+                 */
                 return false;
             }
 
@@ -321,17 +305,17 @@ SQL;
         }
 
         foreach ($columns as $info) {
-            if ($this->db->getSlavePdo()->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
+            if ($this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
                 $info = array_change_key_case($info, CASE_LOWER);
             }
 
             $column = $this->loadColumnSchema($info);
-            $table->columns[$column->getName()] = $column;
+            $table->columns($column->getName(), $column);
 
             if ($column->getIsPrimaryKey()) {
-                $table->primaryKey[] = $column->getName();
+                $table->primaryKey($column->getName());
                 if ($column->getAutoIncrement()) {
-                    $table->sequenceName = '';
+                    $table->sequenceName('');
                 }
             }
         }
@@ -342,14 +326,14 @@ SQL;
     /**
      * Gets the CREATE TABLE sql string.
      *
-     * @param TableSchema $table the table metadata
+     * @param TableSchema $table the table metadata.
      *
-     * @return string $sql the result of 'SHOW CREATE TABLE'
+     * @return string $sql the result of 'SHOW CREATE TABLE'.
      */
     protected function getCreateTableSql($table): string
     {
-        $row = $this->db->createCommand(
-            'SHOW CREATE TABLE ' . $this->quoteTableName($table->fullName)
+        $row = $this->getDb()->createCommand(
+            'SHOW CREATE TABLE ' . $this->quoteTableName($table->getFullName())
         )->queryOne();
 
         if (isset($row['Create Table'])) {
@@ -365,7 +349,7 @@ SQL;
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchema $table the table metadata
+     * @param TableSchema $table the table metadata.
      *
      * @throws \Exception
      */
@@ -390,9 +374,9 @@ AND rc.table_name = :tableName AND kcu.table_name = :tableName1
 SQL;
 
         try {
-            $rows = $this->db->createCommand(
+            $rows = $this->getDb()->createCommand(
                 $sql,
-                [':tableName' => $table->name, ':tableName1' => $table->name]
+                [':tableName' => $table->getName(), ':tableName1' => $table->getName()]
             )->queryAll();
 
             $constraints = [];
@@ -402,13 +386,13 @@ SQL;
                 $constraints[$row['constraint_name']]['columns'][$row['column_name']] = $row['referenced_column_name'];
             }
 
-            $table->foreignKeys = [];
+            $table->foreignKeys([]);
 
             foreach ($constraints as $name => $constraint) {
-                $table->foreignKeys[$name] = array_merge(
+                $table->foreignKey($name, array_merge(
                     [$constraint['referenced_table_name']],
                     $constraint['columns']
-                );
+                ));
             }
         } catch (\Exception $e) {
             $previous = $e->getPrevious();
@@ -431,9 +415,9 @@ SQL;
                         $constraint[$name] = $pks[$k];
                     }
 
-                    $table->foreignKeys[md5(serialize($constraint))] = $constraint;
+                    $table->foreignKey(md5(serialize($constraint)), $constraint);
                 }
-                $table->foreignKeys = array_values($table->foreignKeys);
+                $table->foreignKeys(\array_values($table->getForeignKeys()));
             }
         }
     }
@@ -450,7 +434,7 @@ SQL;
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata
+     * @param TableSchema $table the table metadata.
      *
      * @return array all unique indexes for the given table.
      */
@@ -475,7 +459,7 @@ SQL;
 
     public function createColumnSchemaBuilder($type, $length = null)
     {
-        return new ColumnSchemaBuilder($type, $length, $this->db);
+        return new ColumnSchemaBuilder($type, $length, $this->getDb());
     }
 
     /**
@@ -487,7 +471,7 @@ SQL;
     protected function isOldMysql()
     {
         if ($this->oldMysql === null) {
-            $version = $this->db->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            $version = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
             $this->oldMysql = version_compare($version, '5.1', '<=');
         }
@@ -552,11 +536,11 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $constraints = $this->db->createCommand(
+        $constraints = $this->getDb()->createCommand(
             $sql,
             [
-                ':schemaName' => $resolvedName->schemaName,
-                ':tableName' => $resolvedName->name,
+                ':schemaName' => $resolvedName->getSchemaName(),
+                ':tableName' => $resolvedName->getName(),
             ]
         )->queryAll();
 
@@ -606,5 +590,17 @@ SQL;
         }
 
         return $result[$returnType];
+    }
+
+    /**
+     * Creates a column schema for the database.
+     *
+     * This method may be overridden by child classes to create a DBMS-specific column schema.
+     *
+     * @return ColumnSchema column schema instance.
+     */
+    protected function createColumnSchema(): ColumnSchema
+    {
+        return new ColumnSchema();
     }
 }

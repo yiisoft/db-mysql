@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\Schema\Schema;
 use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
 
 class QueryBuilderTest extends AbstractQueryBuilderTest
