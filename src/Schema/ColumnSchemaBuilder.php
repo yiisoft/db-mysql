@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql;
+namespace Yiisoft\Db\Mysql\Schema;
 
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
@@ -11,26 +11,41 @@ use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
  */
 class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function buildUnsignedString(): string
     {
-        return $this->isUnsigned ? ' UNSIGNED' : '';
+        return $this->getIsUnsigned() ? ' UNSIGNED' : '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function buildAfterString(): string
     {
-        return $this->after !== null ? ' AFTER ' . $this->db->quoteColumnName($this->after) : '';
+        return $this->getAfter() !== null ? ' AFTER ' . $this->getDb()->quoteColumnName($this->getAfter()) : '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function buildFirstString(): string
     {
-        return $this->isFirst ? ' FIRST' : '';
+        return $this->getIsFirst() ? ' FIRST' : '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function buildCommentString(): string
     {
-        return $this->comment !== null ? ' COMMENT ' . $this->db->quoteValue($this->comment) : '';
+        return $this->getComment() !== null ? ' COMMENT ' . $this->getDb()->quoteValue($this->getComment()) : '';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __toString(): string
     {
         switch ($this->getTypeCategory()) {

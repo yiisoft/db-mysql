@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\ColumnSchema;
-use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\Schema\ColumnSchema;
+use Yiisoft\Db\Mysql\Schema\Schema;
 use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
 
 class SchemaTest extends AbstractSchemaTest
@@ -31,7 +31,7 @@ SQL;
 
         $schema = $this->getConnection()->getTableSchema('datetime_test');
 
-        $dt = $schema->columns['dt'];
+        $dt = $schema->getColumn('dt');
 
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
@@ -53,11 +53,11 @@ SQL;
 
         $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
 
-        $dt = $schema->columns['dt'];
+        $dt = $schema->getColumn('dt');
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
-        $ts = $schema->columns['ts'];
+        $ts = $schema->getColumn('ts');
         $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
     }
