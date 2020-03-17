@@ -2,16 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql;
+namespace Yiisoft\Db\Mysql\Schema;
 
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
 
 /**
  * Class ColumnSchema for MySQL database.
  */
-class ColumnSchema extends \Yiisoft\Db\Schema\ColumnSchema
+class ColumnSchema extends AbstractColumnSchema
 {
+    /**
+     * {@inheritdoc}
+     */
     public function dbTypecast($value)
     {
         if ($value === null) {
