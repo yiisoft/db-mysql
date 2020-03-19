@@ -16,7 +16,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildUnsignedString(): string
     {
-        return $this->getIsUnsigned() ? ' UNSIGNED' : '';
+        return $this->isUnsigned() ? ' UNSIGNED' : '';
     }
 
     /**
@@ -32,7 +32,7 @@ class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildFirstString(): string
     {
-        return $this->getIsFirst() ? ' FIRST' : '';
+        return $this->isFirst() ? ' FIRST' : '';
     }
 
     /**

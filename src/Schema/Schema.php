@@ -211,7 +211,7 @@ SQL;
 
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
-        $column->isPrimaryKey(strpos($info['key'], 'PRI') !== false);
+        $column->primaryKey(strpos($info['key'], 'PRI') !== false);
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
         $column->dbType($info['type']);
@@ -252,7 +252,7 @@ SQL;
 
         $column->phpType($this->getColumnPhpType($column));
 
-        if (!$column->getIsPrimaryKey()) {
+        if (!$column->isPrimaryKey()) {
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
              * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
@@ -306,15 +306,15 @@ SQL;
 
         foreach ($columns as $info) {
             if ($this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
-                $info = array_change_key_case($info, CASE_LOWER);
+                $info = \array_change_key_case($info, CASE_LOWER);
             }
 
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
 
-            if ($column->getIsPrimaryKey()) {
+            if ($column->isPrimaryKey()) {
                 $table->primaryKey($column->getName());
-                if ($column->getAutoIncrement()) {
+                if ($column->isAutoIncrement()) {
                     $table->sequenceName('');
                 }
             }
