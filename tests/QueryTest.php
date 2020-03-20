@@ -12,9 +12,6 @@ class QueryTest extends AbstractQueryTest
 {
     protected ?string $driverName = 'mysql';
 
-    /**
-     * Tests MySQL specific syntax for index hints.
-     */
     public function testQueryIndexHint(): void
     {
         $query = (new Query($this->getConnection()))->from([new Expression('{{%customer}} USE INDEX (primary)')]);
