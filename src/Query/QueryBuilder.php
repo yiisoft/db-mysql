@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Query;
 
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
 use Yiisoft\Db\Mysql\Expression\JsonExpressionBuilder;
 use Yiisoft\Db\Mysql\Schema\Schema;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
 
-/**
- * QueryBuilder is the query builder for MySQL databases.
- */
 class QueryBuilder extends AbstractQueryBuilder
 {
     /**
@@ -47,11 +46,16 @@ class QueryBuilder extends AbstractQueryBuilder
     ];
 
     /**
-     * {@inheritdoc}
+     * Contains array of default expression builders. Extend this method and override it, if you want to change default
+     * expression builders for this query builder.
+     *
+     * @return array
+     *
+     * See {@see \Yiisoft\Db\Expression\ExpressionBuilder} docs for details.
      */
     protected function defaultExpressionBuilders(): array
     {
-        return array_merge(parent::defaultExpressionBuilders(), [
+        return \array_merge(parent::defaultExpressionBuilders(), [
             JsonExpression::class => JsonExpressionBuilder::class,
         ]);
     }
@@ -80,11 +84,11 @@ class QueryBuilder extends AbstractQueryBuilder
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
-            $row = array_values($row);
+            $row = \array_values($row);
             $sql = $row[1];
         }
 
-        if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
+        if (\preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
             foreach ($matches[1] as $i => $c) {
                 if ($c === $oldName) {
                     return "ALTER TABLE $quotedTable CHANGE "
@@ -102,9 +106,24 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Builds a SQL statement for creating a new index.
      *
-     * @see https://bugs.mysql.com/bug.php?id=48875
+     * @param string $name the name of the index. The name will be properly quoted by the method.
+     * @param string $table the table that the new index will be created for. The table name will be properly quoted by
+     * the method.
+     * @param string|array $columns the column(s) that should be included in the index. If there are multiple columns,
+     * separate them with commas or use an array to represent them. Each column name will be properly quoted by the
+     * method, unless a parenthesis is found in the name.
+     * @param bool $unique whether to add UNIQUE constraint on the created index.
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for creating a new index.
+     *
+     * {@see https://bugs.mysql.com/bug.php?id=48875}
      */
     public function createIndex(string $name, string $table, $columns, bool $unique = false): string
     {
@@ -118,9 +137,13 @@ class QueryBuilder extends AbstractQueryBuilder
     /**
      * Builds a SQL statement for dropping a foreign key constraint.
      *
-     * @param string $name  the name of the foreign key constraint to be dropped. The name will be properly quoted by
-     * the method.
+     * @param string $name the name of the foreign key constraint to be dropped. The name will be properly quoted by the
+     * method.
      * @param string $table the table whose foreign is to be dropped. The name will be properly quoted by the method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      *
      * @return string the SQL statement for dropping a foreign key constraint.
      */
@@ -134,8 +157,12 @@ class QueryBuilder extends AbstractQueryBuilder
     /**
      * Builds a SQL statement for removing a primary key constraint to an existing table.
      *
-     * @param string $name  the name of the primary key constraint to be removed.
+     * @param string $name the name of the primary key constraint to be removed.
      * @param string $table the table that the primary key constraint will be removed from.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      *
      * @return string the SQL statement for removing a primary key constraint from an existing table.
      */
@@ -146,7 +173,18 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Creates a SQL command for dropping an unique constraint.
+     *
+     * @param string $name the name of the unique constraint to be dropped. The name will be properly quoted by the
+     * method.
+     * @param string $table the table whose unique constraint is to be dropped. The name will be properly quoted by the
+     * method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for dropping an unique constraint.
      */
     public function dropUnique(string $name, string $table): string
     {
@@ -154,9 +192,13 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     * @param string $table
+     * @param string $expression
      *
-     * @throws NotSupportedException this is not supported by MySQL.
+     * @throws NotSupportedException Method not supported by Mysql.
+     *
+     * @return string the SQL statement for adding a check constraint to an existing table.
      */
     public function addCheck(string $name, string $table, string $expression): string
     {
@@ -164,9 +206,12 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     * @param string $table
      *
-     * @throws NotSupportedException this is not supported by MySQL.
+     * @throws NotSupportedException Method not supported by Mysql.
+     *
+     * @return string the SQL statement for adding a check constraint to an existing table.
      */
     public function dropCheck(string $name, string $table): string
     {
@@ -175,16 +220,20 @@ class QueryBuilder extends AbstractQueryBuilder
 
     /**
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
-     * The sequence will be reset such that the primary key of the next new row inserted
-     * will have the specified value or 1.
      *
-     * @param string $tableName the name of the table whose primary key sequence will be reset
-     * @param mixed  $value     the value for the primary key of the next new row inserted. If this is not set,
-     *                          the next new row's primary key will have a value 1.
+     * The sequence will be reset such that the primary key of the next new row inserted will have the specified value
+     * or 1.
      *
-     * @throws \InvalidArgumentException if the table does not exist or there is no sequence associated with the table.
+     * @param string $tableName the name of the table whose primary key sequence will be reset.
+     * @param mixed $value the value for the primary key of the next new row inserted. If this is not set, the next new
+     * row's primary key will have a value 1.
      *
-     * @return string the SQL statement for resetting sequence
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for resetting sequence.
      */
     public function resetSequence(string $tableName, $value = null): string
     {
@@ -195,7 +244,7 @@ class QueryBuilder extends AbstractQueryBuilder
 
             if ($value === null) {
                 $pk = $table->getPrimaryKey();
-                $key = reset($pk);
+                $key = \reset($pk);
                 $value = $this->db->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
             } else {
                 $value = (int) $value;
@@ -218,7 +267,7 @@ class QueryBuilder extends AbstractQueryBuilder
      * @param string $schema the schema of the tables. Meaningless for MySQL.
      * @param string $table  the table name. Meaningless for MySQL.
      *
-     * @return string the SQL statement for checking integrity
+     * @return string the SQL statement for checking integrity.
      */
     public function checkIntegrity(string $schema = '', string $table = '', bool $check = true): string
     {
@@ -226,7 +275,10 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * @param int|object|null $limit
+     * @param int|object|null $offset
+     *
+     * @return string the LIMIT and OFFSET clauses.
      */
     public function buildLimit($limit, $offset): string
     {
@@ -240,7 +292,8 @@ class QueryBuilder extends AbstractQueryBuilder
             }
         } elseif ($this->hasOffset($offset)) {
             /**
-             * limit is not optional in MySQL
+             * limit is not optional in MySQL.
+             *
              * http://stackoverflow.com/a/271650/1106908
              * http://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
@@ -251,36 +304,58 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Checks to see if the given limit is effective.
+     *
+     * @param mixed $limit the given limit.
+     *
+     * @return bool whether the limit is effective.
      */
     protected function hasLimit($limit): bool
     {
-        // In MySQL limit argument must be nonnegative integer constant
-        return ctype_digit((string) $limit);
+        /** In MySQL limit argument must be non negative integer constant */
+        return \ctype_digit((string) $limit);
     }
 
     /**
-     * {@inheritdoc}
+     * Checks to see if the given offset is effective.
+     *
+     * @param mixed $offset the given offset.
+     *
+     * @return bool whether the offset is effective.
      */
     protected function hasOffset($offset): bool
     {
-        // In MySQL offset argument must be nonnegative integer constant
+        /** In MySQL offset argument must be non negative integer constant */
         $offset = (string) $offset;
 
-        return ctype_digit($offset) && $offset !== '0';
+        return \ctype_digit($offset) && $offset !== '0';
     }
 
     /**
-     * {@inheritdoc}
+     * Prepares a `VALUES` part for an `INSERT` SQL statement.
+     *
+     * @param string $table the table that new rows will be inserted into.
+     * @param array|Query $columns the column data (name => value) to be inserted into the table or instance of
+     * {@see \Yiisoft\Db\Query\Query|Query} to perform INSERT INTO ... SELECT SQL statement.
+     * @param array $params the binding parameters that will be generated by this method. They should be bound to the DB
+     * command later.
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return array array of column names, placeholders, values and params.
      */
     protected function prepareInsertValues(string $table, $columns, array $params = []): array
     {
         [$names, $placeholders, $values, $params] = parent::prepareInsertValues($table, $columns, $params);
         if (!$columns instanceof Query && empty($names)) {
             $tableSchema = $this->db->getSchema()->getTableSchema($table);
+            $columns = $tableSchema->getColumns();
             if ($tableSchema !== null) {
                 $columns = !empty($tableSchema->getPrimaryKey())
-                    ? $tableSchema->getPrimaryKey() : [reset($tableSchema->columns)->getName()];
+                    ? $tableSchema->getPrimaryKey() : [\reset($columns)->getName()];
                 foreach ($columns as $name) {
                     $names[] = $this->db->quoteColumnName($name);
                     $placeholders[] = 'DEFAULT';
@@ -292,15 +367,43 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Creates an SQL statement to insert rows into a database table if they do not already exist (matching unique
+     * constraints), or update them if they do.
      *
-     * @see https://downloads.mysql.com/docs/refman-5.1-en.pdf
+     * For example,
+     *
+     * ```php
+     * $sql = $queryBuilder->upsert('pages', [
+     *     'name' => 'Front page',
+     *     'url' => 'http://example.com/', // url is unique
+     *     'visits' => 0,
+     * ], [
+     *     'visits' => new \Yiisoft\Db\Expression('visits + 1'),
+     * ], $params);
+     * ```
+     *
+     * The method will properly escape the table and column names.
+     *
+     * @param string $table the table that new rows will be inserted into/updated in.
+     * @param array|Query $insertColumns the column data (name => value) to be inserted into the table or instance of
+     * {@see Query} to perform `INSERT INTO ... SELECT` SQL statement.
+     * @param array|bool $updateColumns the column data (name => value) to be updated if they already exist. If `true`
+     * is passed, the column data will be updated to match the insert column data. If `false` is passed, no update will
+     * be performed if the column data already exists.
+     * @param array $params the binding parameters that will be generated by this method. They should be bound to the DB
+     * command later.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException if this is not supported by the underlying DBMS.
+     *
+     * @return string the resulting SQL.
      */
     public function upsert(string $table, $insertColumns, $updateColumns, array &$params): string
     {
         $insertSql = $this->insert($table, $insertColumns, $params);
 
-        list($uniqueNames, , $updateNames) = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
+        [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
 
         if (empty($uniqueNames)) {
             return $insertSql;
@@ -312,23 +415,35 @@ class QueryBuilder extends AbstractQueryBuilder
                 $updateColumns[$name] = new Expression('VALUES(' . $this->db->quoteColumnName($name) . ')');
             }
         } elseif ($updateColumns === false) {
-            $name = $this->db->quoteColumnName(reset($uniqueNames));
+            $name = $this->db->quoteColumnName(\reset($uniqueNames));
             $updateColumns = [$name => new Expression($this->db->quoteTableName($table) . '.' . $name)];
         }
 
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
 
-        return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
+        return $insertSql . ' ON DUPLICATE KEY UPDATE ' . \implode(', ', $updates);
     }
 
     /**
-     * {@inheritdoc}
+     * Builds a SQL command for adding comment to column.
+     *
+     * @param string $table the table whose column is to be commented. The table name will be properly quoted by the
+     * method.
+     * @param string $column the name of the column to be commented. The column name will be properly quoted by the
+     * method.
+     * @param string $comment the text of the comment to be added. The comment will be properly quoted by the method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for adding comment on column.
      */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
-        // Strip existing comment which may include escaped quotes
-        $definition = trim(
-            preg_replace(
+        /** Strip existing comment which may include escaped quotes */
+        $definition = \trim(
+            \preg_replace(
                 "/COMMENT '(?:''|[^'])*'/i",
                 '',
                 $this->getColumnDefinition($table, $column)
@@ -337,10 +452,10 @@ class QueryBuilder extends AbstractQueryBuilder
 
         $checkRegex = '/CHECK *(\(([^()]|(?-2))*\))/';
 
-        $check = preg_match($checkRegex, $definition, $checkMatches);
+        $check = \preg_match($checkRegex, $definition, $checkMatches);
 
         if ($check === 1) {
-            $definition = preg_replace($checkRegex, '', $definition);
+            $definition = \preg_replace($checkRegex, '', $definition);
         }
 
         $alterSql = 'ALTER TABLE ' . $this->db->quoteTableName($table)
@@ -357,7 +472,17 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Builds a SQL command for adding comment to table.
+     *
+     * @param string $table the table whose column is to be commented. The table name will be properly quoted by the
+     * method.
+     * @param string $comment the text of the comment to be added. The comment will be properly quoted by the method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for adding comment on table.
      */
     public function addCommentOnTable(string $table, string $comment): string
     {
@@ -365,7 +490,18 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Builds a SQL command for adding comment to column.
+     *
+     * @param string $table the table whose column is to be commented. The table name will be properly quoted by the
+     * method.
+     * @param string $column the name of the column to be commented. The column name will be properly quoted by the
+     * method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for adding comment on column.
      */
     public function dropCommentFromColumn(string $table, string $column): string
     {
@@ -373,7 +509,16 @@ class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * {@inheritdoc}
+     * Builds a SQL command for adding comment to table.
+     *
+     * @param string $table the table whose column is to be commented. The table name will be properly quoted by the
+     * method.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * @return string the SQL statement for adding comment on column.
      */
     public function dropCommentFromTable(string $table): string
     {
@@ -383,12 +528,12 @@ class QueryBuilder extends AbstractQueryBuilder
     /**
      * Gets column definition.
      *
-     * @param string $table  table name
-     * @param string $column column name
+     * @param string $table table name.
+     * @param string $column column name.
      *
-     * @throws Exception in case when table does not contain column
+     * @throws Exception in case when table does not contain column.
      *
-     * @return string|null the column definition
+     * @return string|null the column definition.
      */
     private function getColumnDefinition(string $table, string $column): ?string
     {
@@ -401,13 +546,13 @@ class QueryBuilder extends AbstractQueryBuilder
         }
 
         if (!isset($row['Create Table'])) {
-            $row = array_values($row);
+            $row = \array_values($row);
             $sql = $row[1];
         } else {
             $sql = $row['Create Table'];
         }
 
-        if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
+        if (\preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
             foreach ($matches[1] as $i => $c) {
                 if ($c === $column) {
                     return $matches[2][$i];

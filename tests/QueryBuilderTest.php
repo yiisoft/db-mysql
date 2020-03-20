@@ -63,7 +63,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
             ],
         ];
 
-        return array_merge(parent::columnTypes(), $this->columnTimeTypes(), $columns);
+        return \array_merge(parent::columnTypes(), $this->columnTimeTypes(), $columns);
     }
 
     public function columnTimeTypes(): array
@@ -102,10 +102,10 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         ];
 
         /**
-         * @link https://github.com/yiisoft/yii2/issues/14367
+         * {@link https://github.com/yiisoft/yii2/issues/14367}
          */
         $mysqlVersion = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
-        $supportsFractionalSeconds = version_compare($mysqlVersion, '5.6.4', '>=');
+        $supportsFractionalSeconds = \version_compare($mysqlVersion, '5.6.4', '>=');
 
         if ($supportsFractionalSeconds) {
             $expectedValues = [
@@ -123,11 +123,11 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         }
 
         /**
-         * @link https://github.com/yiisoft/yii2/issues/14834
+         * {@link https://github.com/yiisoft/yii2/issues/14834}
          */
         $sqlModes = $this->getConnection(false)->createCommand('SELECT @@sql_mode')->queryScalar();
-        $sqlModes = explode(',', $sqlModes);
-        if (in_array('NO_ZERO_DATE', $sqlModes, true)) {
+        $sqlModes = \explode(',', $sqlModes);
+        if (\in_array('NO_ZERO_DATE', $sqlModes, true)) {
             $this->markTestIncomplete(
                 "MySQL doesn't allow the 'TIMESTAMP' column definition when the NO_ZERO_DATE mode enabled. " .
                 "This definition test was skipped."
@@ -247,7 +247,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         $newData = parent::upsertProvider();
 
         foreach ($concreteData as $testName => $data) {
-            $newData[$testName] = array_replace($newData[$testName], $data);
+            $newData[$testName] = \array_replace($newData[$testName], $data);
         }
 
         return $newData;
@@ -257,8 +257,8 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
     {
         $db = $this->createConnection();
 
-        return array_merge(parent::conditionProvider(), [
-            // json conditions
+        return \array_merge(parent::conditionProvider(), [
+            /** json conditions */
             [
                 ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"lang":"uk","country":"UA"}'],
@@ -287,10 +287,6 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
                 ['=', 'jsoncol', new JsonExpression(['nil' => null])],
                 '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}']
             ],
-            /*'with object as value' => [
-                ['=', 'jsoncol', new JsonExpression(new DynamicModel(['a' => 1, 'b' => 2]))],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2}']
-            ],*/
             'query' => [
                 ['=', 'jsoncol', new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1]))],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1]

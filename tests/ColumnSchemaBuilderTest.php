@@ -12,20 +12,11 @@ class ColumnSchemaBuilderTest extends AbstractColumnSchemaBuilderTest
 {
     protected ?string $driverName = 'mysql';
 
-    /**
-     * @param string $type
-     * @param int $length
-     *
-     * @return ColumnSchemaBuilder
-     */
     public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
         return new ColumnSchemaBuilder($type, $length, $this->getConnection());
     }
 
-    /**
-     * @return array
-     */
     public function typesProvider(): array
     {
         return [
