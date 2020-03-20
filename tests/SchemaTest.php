@@ -13,7 +13,7 @@ class SchemaTest extends AbstractSchemaTest
 {
     protected ?string $driverName = 'mysql';
 
-    public function testLoadDefaultDatetimeColumn()
+    public function testLoadDefaultDatetimeColumn(): void
     {
         if (!version_compare($this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6', '>=')) {
             $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
@@ -87,11 +87,11 @@ SQL;
     }
 
     /**
-     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
-     * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
+     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed as
+     * CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
      *
-     * @see https://mariadb.com/kb/en/library/now/#description
-     * @see https://github.com/yiisoft/yii2/issues/15167
+     * {@see https://mariadb.com/kb/en/library/now/#description}
+     * {@see https://github.com/yiisoft/yii2/issues/15167}
      */
     public function testAlternativeDisplayOfDefaultCurrentTimestampInMariaDB(): void
     {

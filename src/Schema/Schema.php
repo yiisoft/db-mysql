@@ -10,20 +10,18 @@ use Yiisoft\Db\Constraint\ConstraintFinderInterface;
 use Yiisoft\Db\Constraint\ConstraintFinderTrait;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Query\QueryBuilder;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
-/**
- * Schema is the class for retrieving metadata from a MySQL database.
- */
 class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
-    protected string $columnSchemaClass = ColumnSchema::class;
     protected string $tableQuoteCharacter = '`';
     protected string $columnQuoteCharacter = '`';
     private bool $oldMysql;
@@ -59,11 +57,20 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         'json' => self::TYPE_JSON,
     ];
 
-    protected function resolveTableName($name)
+    /**
+     * Resolves the table name and schema name (if any).
+     *
+     * @param string $name the table name.
+     *
+     * @return TableSchema
+     *
+     * {@see \Yiisoft\Db\Schema\TableSchema}
+     */
+    protected function resolveTableName(string $name): TableSchema
     {
         $resolvedName = new TableSchema();
 
-        $parts = explode('.', str_replace('`', '', $name));
+        $parts = \explode('.', \str_replace('`', '', $name));
 
         if (isset($parts[1])) {
             $resolvedName->schemaName($parts[0]);
@@ -79,7 +86,21 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return $resolvedName;
     }
 
-    protected function findTableNames($schema = '')
+    /**
+     * Returns all table names in the database.
+     *
+     * This method should be overridden by child classes in order to support this feature because the default
+     * implementation simply throws an exception.
+     *
+     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     *
+     * @return array all table names in the database. The names have NO schema name prefix.
+     */
+    protected function findTableNames(string $schema = ''): array
     {
         $sql = 'SHOW TABLES';
 
@@ -90,6 +111,15 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return $this->getDb()->createCommand($sql)->queryColumn();
     }
 
+    /**
+     * Loads the metadata for the specified table.
+     *
+     * @param string $name table name.
+     *
+     * @throws \Exception
+     *
+     * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
+     */
     protected function loadTableSchema(string $name): ?TableSchema
     {
         $table = new TableSchema();
@@ -173,7 +203,7 @@ SQL;
      *
      * @return QueryBuilder query builder instance
      */
-    public function createQueryBuilder()
+    public function createQueryBuilder(): QueryBuilder
     {
         return new QueryBuilder($this->getDb());
     }
@@ -184,9 +214,9 @@ SQL;
      * @param TableSchema $table the table metadata object.
      * @param string $name the table name.
      */
-    protected function resolveTableNames($table, $name)
+    protected function resolveTableNames($table, $name): void
     {
-        $parts = explode('.', str_replace('`', '', $name));
+        $parts = \explode('.', \str_replace('`', '', $name));
 
         if (isset($parts[1])) {
             $table->schemaName($parts[0]);
@@ -211,27 +241,27 @@ SQL;
 
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
-        $column->primaryKey(strpos($info['key'], 'PRI') !== false);
-        $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
+        $column->primaryKey(\strpos($info['key'], 'PRI') !== false);
+        $column->autoIncrement(\stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
         $column->dbType($info['type']);
-        $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
+        $column->unsigned(\stripos($column->getDbType(), 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
-            $type = strtolower($matches[1]);
+        if (\preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
+            $type = \strtolower($matches[1]);
             if (isset($this->typeMap[$type])) {
                 $column->type($this->typeMap[$type]);
             }
             if (!empty($matches[2])) {
                 if ($type === 'enum') {
-                    preg_match_all("/'[^']*'/", $matches[2], $values);
+                    \preg_match_all("/'[^']*'/", $matches[2], $values);
                     foreach ($values[0] as $i => $value) {
-                        $values[$i] = trim($value, "'");
+                        $values[$i] = \trim($value, "'");
                     }
                     $column->enumValues($values);
                 } else {
-                    $values = explode(',', $matches[2]);
+                    $values = \explode(',', $matches[2]);
                     $column->precision((int) $values[0]);
                     $column->size((int) $values[0]);
                     if (isset($values[1])) {
@@ -261,12 +291,12 @@ SQL;
              */
             if (
                 ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
-                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
+                && \preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
             } elseif (isset($type) && $type === 'bit') {
-                $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
+                $column->defaultValue(\bindec(\trim((string) $info['default'], 'b\'')));
             } else {
                 $column->defaultValue($column->phpTypecast($info['default']));
             }
@@ -284,7 +314,7 @@ SQL;
      *
      * @return bool whether the table exists in the database.
      */
-    protected function findColumns($table)
+    protected function findColumns($table): bool
     {
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->getFullName());
 
@@ -295,7 +325,8 @@ SQL;
 
             if ($previous instanceof \PDOException && strpos($previous->getMessage(), 'SQLSTATE[42S02') !== false) {
                 /**
-                 * table does not exist
+                 * table does not exist.
+                 *
                  * https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
                  */
                 return false;
@@ -328,6 +359,10 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     *
      * @return string $sql the result of 'SHOW CREATE TABLE'.
      */
     protected function getCreateTableSql($table): string
@@ -339,7 +374,7 @@ SQL;
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
-            $row = array_values($row);
+            $row = \array_values($row);
             $sql = $row[1];
         }
 
@@ -389,7 +424,7 @@ SQL;
             $table->foreignKeys([]);
 
             foreach ($constraints as $name => $constraint) {
-                $table->foreignKey($name, array_merge(
+                $table->foreignKey($name, \array_merge(
                     [$constraint['referenced_table_name']],
                     $constraint['columns']
                 ));
@@ -397,7 +432,7 @@ SQL;
         } catch (\Exception $e) {
             $previous = $e->getPrevious();
 
-            if (!$previous instanceof \PDOException || strpos($previous->getMessage(), 'SQLSTATE[42S02') === false) {
+            if (!$previous instanceof \PDOException || \strpos($previous->getMessage(), 'SQLSTATE[42S02') === false) {
                 throw $e;
             }
 
@@ -405,17 +440,17 @@ SQL;
             $sql = $this->getCreateTableSql($table);
             $regexp = '/FOREIGN KEY\s+\(([^\)]+)\)\s+REFERENCES\s+([^\(^\s]+)\s*\(([^\)]+)\)/mi';
 
-            if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+            if (\preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
-                    $fks = array_map('trim', explode(',', str_replace('`', '', $match[1])));
-                    $pks = array_map('trim', explode(',', str_replace('`', '', $match[3])));
-                    $constraint = [str_replace('`', '', $match[2])];
+                    $fks = array_map('trim', \explode(',', \str_replace('`', '', $match[1])));
+                    $pks = array_map('trim', \explode(',', \str_replace('`', '', $match[3])));
+                    $constraint = [\str_replace('`', '', $match[2])];
 
                     foreach ($fks as $k => $name) {
                         $constraint[$name] = $pks[$k];
                     }
 
-                    $table->foreignKey(md5(serialize($constraint)), $constraint);
+                    $table->foreignKey(\md5(\serialize($constraint)), $constraint);
                 }
                 $table->foreignKeys(\array_values($table->getForeignKeys()));
             }
@@ -438,7 +473,7 @@ SQL;
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes($table)
+    public function findUniqueIndexes($table): array
     {
         $sql = $this->getCreateTableSql($table);
 
@@ -446,10 +481,10 @@ SQL;
 
         $regexp = '/UNIQUE KEY\s+\`(.+)\`\s*\((\`.+\`)+\)/mi';
 
-        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (\preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
-                $indexColumns = array_map('trim', explode('`,`', trim($match[2], '`')));
+                $indexColumns = \array_map('trim', \explode('`,`', \trim($match[2], '`')));
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }
@@ -468,12 +503,12 @@ SQL;
      *
      * @return bool whether the version of the MySQL being used is older than 5.1.
      */
-    protected function isOldMysql()
+    protected function isOldMysql(): bool
     {
         if ($this->oldMysql === null) {
             $version = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
 
-            $this->oldMysql = version_compare($version, '5.1', '<=');
+            $this->oldMysql = \version_compare($version, '5.1', '<=');
         }
 
         return $this->oldMysql;
@@ -487,6 +522,10 @@ SQL;
      * - primaryKey
      * - foreignKeys
      * - uniques
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
      *
      * @return mixed constraints.
      */
