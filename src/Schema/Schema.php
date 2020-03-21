@@ -135,16 +135,37 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         return null;
     }
 
+    /**
+     * Loads a primary key for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return Constraint|null primary key for the given table, `null` if the table has no primary key.
+     */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
         return $this->loadTableConstraints($tableName, 'primaryKey');
     }
 
+    /**
+     * Loads all foreign keys for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return ForeignKeyConstraint[] foreign keys for the given table.
+     */
     protected function loadTableForeignKeys(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'foreignKeys');
     }
 
+    /**
+     * Loads all indexes for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return IndexConstraint[] indexes for the given table.
+     */
     protected function loadTableIndexes(string $tableName): array
     {
         static $sql = <<<'SQL'
@@ -183,16 +204,37 @@ SQL;
         return $result;
     }
 
+    /**
+     * Loads all unique constraints for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return Constraint[] unique constraints for the given table.
+     */
     protected function loadTableUniques(string $tableName): array
     {
         return $this->loadTableConstraints($tableName, 'uniques');
     }
 
+    /**
+     * Loads all check constraints for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return CheckConstraint[] check constraints for the given table.
+     */
     protected function loadTableChecks(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support check constraints.');
     }
 
+    /**
+     * Loads all default value constraints for the given table.
+     *
+     * @param string $tableName table name.
+     *
+     * @return DefaultValueConstraint[] default value constraints for the given table.
+     */
     protected function loadTableDefaultValues(string $tableName): array
     {
         throw new NotSupportedException('MySQL does not support default value constraints.');
