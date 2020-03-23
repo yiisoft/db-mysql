@@ -638,27 +638,30 @@ SQL;
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $ct = new Constraint();
-                        $ct->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $ct = (new Constraint())
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+
                         $result['primaryKey'] = $ct;
 
                         break;
                     case 'FOREIGN KEY':
-                        $fk = new ForeignKeyConstraint();
-                        $fk->name($name);
-                        $fk->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
-                        $fk->foreignSchemaName($constraint[0]['foreign_table_schema']);
-                        $fk->foreignTableName($constraint[0]['foreign_table_name']);
-                        $fk->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'));
-                        $fk->onDelete($constraint[0]['on_delete']);
-                        $fk->onUpdate($constraint[0]['on_update']);
+                        $fk = (new ForeignKeyConstraint())
+                            ->name($name)
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
+                            ->foreignSchemaName($constraint[0]['foreign_table_schema'])
+                            ->foreignTableName($constraint[0]['foreign_table_name'])
+                            ->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'))
+                            ->onDelete($constraint[0]['on_delete'])
+                            ->onUpdate($constraint[0]['on_update']);
+
                         $result['foreignKeys'][] = $fk;
 
                         break;
                     case 'UNIQUE':
-                        $ct = new Constraint();
-                        $ct->name($name);
-                        $ct->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $ct = (new Constraint())
+                            ->name($name)
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+
                         $result['uniques'][] = $ct;
 
                         break;
