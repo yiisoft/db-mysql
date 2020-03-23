@@ -193,10 +193,10 @@ SQL;
         foreach ($indexes as $name => $index) {
             $ic = new IndexConstraint();
 
-            $ic->setIsPrimary((bool) $index[0]['index_is_primary']);
-            $ic->setIsUnique((bool) $index[0]['index_is_unique']);
-            $ic->setName($name !== 'PRIMARY' ? $name : null);
-            $ic->setColumnNames(ArrayHelper::getColumn($index, 'column_name'));
+            $ic->primary((bool) $index[0]['index_is_primary']);
+            $ic->unique((bool) $index[0]['index_is_unique']);
+            $ic->name($name !== 'PRIMARY' ? $name : null);
+            $ic->columnNames(ArrayHelper::getColumn($index, 'column_name'));
 
             $result[] = $ic;
         }
@@ -639,26 +639,26 @@ SQL;
                 switch ($type) {
                     case 'PRIMARY KEY':
                         $ct = new Constraint();
-                        $ct->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $ct->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
                         $result['primaryKey'] = $ct;
 
                         break;
                     case 'FOREIGN KEY':
                         $fk = new ForeignKeyConstraint();
-                        $fk->setName($name);
-                        $fk->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
-                        $fk->setForeignSchemaName($constraint[0]['foreign_table_schema']);
-                        $fk->setForeignTableName($constraint[0]['foreign_table_name']);
-                        $fk->setForeignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'));
-                        $fk->setOnDelete($constraint[0]['on_delete']);
-                        $fk->setOnUpdate($constraint[0]['on_update']);
+                        $fk->name($name);
+                        $fk->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $fk->foreignSchemaName($constraint[0]['foreign_table_schema']);
+                        $fk->foreignTableName($constraint[0]['foreign_table_name']);
+                        $fk->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'));
+                        $fk->onDelete($constraint[0]['on_delete']);
+                        $fk->onUpdate($constraint[0]['on_update']);
                         $result['foreignKeys'][] = $fk;
 
                         break;
                     case 'UNIQUE':
                         $ct = new Constraint();
-                        $ct->setName($name);
-                        $ct->setColumnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                        $ct->name($name);
+                        $ct->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
                         $result['uniques'][] = $ct;
 
                         break;
