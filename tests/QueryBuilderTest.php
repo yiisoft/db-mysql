@@ -102,11 +102,10 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         ];
 
         /**
-         * {@link https://github.com/yiisoft/yii2/issues/14367}
+         * {@see https://github.com/yiisoft/yii2/issues/14367}
          */
         $mysqlVersion = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
         $supportsFractionalSeconds = \version_compare($mysqlVersion, '5.6.4', '>=');
-
         if ($supportsFractionalSeconds) {
             $expectedValues = [
                 'datetime(0) NOT NULL',
@@ -123,7 +122,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         }
 
         /**
-         * {@link https://github.com/yiisoft/yii2/issues/14834}
+         * {@see https://github.com/yiisoft/yii2/issues/14834}
          */
         $sqlModes = $this->getConnection(false)->createCommand('SELECT @@sql_mode')->queryScalar();
         $sqlModes = \explode(',', $sqlModes);
@@ -136,7 +135,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
             $columns[] = [
                 Schema::TYPE_TIMESTAMP,
                 $this->timestamp(),
-                'timestamp',
+                $supportsFractionalSeconds ? 'timestamp(0)' : 'timestamp',
             ];
         }
 
