@@ -9,7 +9,15 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: yiitest
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -19,10 +27,6 @@ jobs:
           php-version: 7.4
           extensions: apc, curl, mbstring, dom, intl, pdo, imagick, mysql, pdo_mysql
           ini-values: date.timezone='UTC'
-      - name: Create mysql db
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -uroot -proot -e 'CREATE DATABASE `yiitest`;'
       - name: Get composer cache directory
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
