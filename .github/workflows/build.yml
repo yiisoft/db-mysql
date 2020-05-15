@@ -56,9 +56,8 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: ${{ env.extensions }}
-          key: ${{ env.key }}
           ini-values: date.timezone='UTC'
-          coverage: pcov         
+          coverage: pcov
 
       - name: Determine composer cache directory on Linux
         if: matrix.os == 'ubuntu-latest'
