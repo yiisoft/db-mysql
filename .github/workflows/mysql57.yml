@@ -2,7 +2,7 @@ on:
   - pull_request
   - push
 
-name: build
+name: mysql57
 
 jobs:
   tests:
