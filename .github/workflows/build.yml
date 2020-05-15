@@ -6,7 +6,7 @@ name: build
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
+    name: PHP ${{ matrix.php-version }}-${{ matrix.os }}-mysql-57
     env:
       extensions: curl, mbstring, dom, intl, pdo, mysql, pdo_mysql
       key: cache-v1
