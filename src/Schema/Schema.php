@@ -309,7 +309,7 @@ SQL;
                     if (isset($values[1])) {
                         $column->scale((int) $values[1]);
                     }
-                    if ($column->getSize() === 1 && $type === 'bit') {
+                    if ($column->getSize() === 1 && $type === 'tinyint') {
                         $column->type('boolean');
                     } elseif ($type === 'bit') {
                         if ($column->getSize() > 32) {
