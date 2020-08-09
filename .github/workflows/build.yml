@@ -2,11 +2,11 @@ on:
   - pull_request
   - push
 
-name: mysql57
+name: build
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php-version }}-mysql-57
+    name: PHP ${{ matrix.php-version }}-mysql-${{ matrix.mysql-version }}
     env:
       extensions: curl, mbstring, dom, intl, pdo, mysql, pdo_mysql
       key: cache-v1
@@ -22,9 +22,13 @@ jobs:
           - "7.4"
           - "8.0"
 
+        mysql-version:
+          - "5.7"
+          - "latest"
+
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: yiitest
@@ -84,10 +88,4 @@ jobs:
         run: composer update --ignore-platform-reqs --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
       - name: Run tests with phpunit
-        run: vendor/bin/phpunit --coverage-clover=coverage.clover
-
-      - name: Code coverage
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+        run: vendor/bin/phpunit
