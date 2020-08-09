@@ -243,7 +243,8 @@ class DeadLockTest extends ConnectionTest
     private function childrenUpdateLocked(): int
     {
         /** install no-op signal handler to prevent termination */
-        if (!\pcntl_signal(SIGUSR1, static function () {}, false)) {
+        if (!\pcntl_signal(SIGUSR1, static function () {
+        }, false)) {
             $this->log('child 2: cannot install signal handler');
 
             return 1;
