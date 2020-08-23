@@ -22,8 +22,6 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
-    protected string $tableQuoteCharacter = '`';
-    protected string $columnQuoteCharacter = '`';
     private bool $oldMysql;
     private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
@@ -56,6 +54,18 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
         'varbinary' => self::TYPE_BINARY,
         'json' => self::TYPE_JSON,
     ];
+
+    /**
+     * @var string|string[] character used to quote schema, table, etc. names. An array of 2 characters can be used in
+     * case starting and ending characters are different.
+     */
+    protected $tableQuoteCharacter = '`';
+
+    /**
+     * @var string|string[] character used to quote column names. An array of 2 characters can be used in case starting
+     * and ending characters are different.
+     */
+    protected $columnQuoteCharacter = '`';
 
     /**
      * Resolves the table name and schema name (if any).
