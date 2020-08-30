@@ -9,38 +9,39 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Expression\JsonExpressionBuilder;
-use Yiisoft\Db\Mysql\Schema\ColumnSchemaBuilder;
-use Yiisoft\Db\Mysql\Schema\Schema;
+use Yiisoft\Db\Mysql\Schema\MysqlColumnSchemaBuilder;
+use Yiisoft\Db\Mysql\Schema\MysqlSchema;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
+use Yiisoft\Db\Query\QueryBuilder;
 
-class QueryBuilder extends AbstractQueryBuilder
+final class MysqlQueryBuilder extends QueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
-        Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_CHAR => 'char(1)',
-        Schema::TYPE_STRING => 'varchar(255)',
-        Schema::TYPE_TEXT => 'text',
-        Schema::TYPE_TINYINT => 'tinyint(3)',
-        Schema::TYPE_SMALLINT => 'smallint(6)',
-        Schema::TYPE_INTEGER => 'int(11)',
-        Schema::TYPE_BIGINT => 'bigint(20)',
-        Schema::TYPE_FLOAT => 'float',
-        Schema::TYPE_DOUBLE => 'double',
-        Schema::TYPE_DECIMAL => 'decimal(10,0)',
-        Schema::TYPE_DATE => 'date',
-        Schema::TYPE_BINARY => 'blob',
-        Schema::TYPE_BOOLEAN => 'tinyint(1)',
-        Schema::TYPE_MONEY => 'decimal(19,4)',
-        Schema::TYPE_JSON => 'json'
+        MysqlSchema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        MysqlSchema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        MysqlSchema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        MysqlSchema::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        MysqlSchema::TYPE_CHAR => 'char(1)',
+        MysqlSchema::TYPE_STRING => 'varchar(255)',
+        MysqlSchema::TYPE_TEXT => 'text',
+        MysqlSchema::TYPE_TINYINT => 'tinyint(3)',
+        MysqlSchema::TYPE_SMALLINT => 'smallint(6)',
+        MysqlSchema::TYPE_INTEGER => 'int(11)',
+        MysqlSchema::TYPE_BIGINT => 'bigint(20)',
+        MysqlSchema::TYPE_FLOAT => 'float',
+        MysqlSchema::TYPE_DOUBLE => 'double',
+        MysqlSchema::TYPE_DECIMAL => 'decimal(10,0)',
+        MysqlSchema::TYPE_DATE => 'date',
+        MysqlSchema::TYPE_BINARY => 'blob',
+        MysqlSchema::TYPE_BOOLEAN => 'tinyint(1)',
+        MysqlSchema::TYPE_MONEY => 'decimal(19,4)',
+        MysqlSchema::TYPE_JSON => 'json'
     ];
 
     /**
@@ -49,7 +50,7 @@ class QueryBuilder extends AbstractQueryBuilder
      *
      * @return array
      *
-     * See {@see \Yiisoft\Db\Expression\ExpressionBuilder} docs for details.
+     * See {@see ExpressionBuilder} docs for details.
      */
     protected function defaultExpressionBuilders(): array
     {
@@ -97,7 +98,7 @@ class QueryBuilder extends AbstractQueryBuilder
             }
         }
 
-        // try to give back a SQL anyway
+        /* try to give back a SQL anyway */
         return "ALTER TABLE $quotedTable CHANGE "
             . $this->db->quoteColumnName($oldName) . ' '
             . $this->db->quoteColumnName($newName);
@@ -629,16 +630,16 @@ class QueryBuilder extends AbstractQueryBuilder
     private function defaultTimeTypeMap(): array
     {
         $map = [
-            Schema::TYPE_DATETIME => 'datetime',
-            Schema::TYPE_TIMESTAMP => 'timestamp',
-            Schema::TYPE_TIME => 'time',
+            MysqlSchema::TYPE_DATETIME => 'datetime',
+            MysqlSchema::TYPE_TIMESTAMP => 'timestamp',
+            MysqlSchema::TYPE_TIME => 'time',
         ];
 
         if ($this->supportsFractionalSeconds()) {
             $map = [
-                Schema::TYPE_DATETIME => 'datetime(0)',
-                Schema::TYPE_TIMESTAMP => 'timestamp(0)',
-                Schema::TYPE_TIME => 'time(0)',
+                MysqlSchema::TYPE_DATETIME => 'datetime(0)',
+                MysqlSchema::TYPE_TIMESTAMP => 'timestamp(0)',
+                MysqlSchema::TYPE_TIME => 'time(0)',
             ];
         }
 

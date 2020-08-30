@@ -6,9 +6,9 @@ namespace Yiisoft\Db\Mysql\Schema;
 
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
+use Yiisoft\Db\Schema\ColumnSchema;
 
-class ColumnSchema extends AbstractColumnSchema
+final class MysqlColumnSchema extends ColumnSchema
 {
     /**
      * Converts the input value according to {@see phpType} after retrieval from the database.
@@ -25,7 +25,7 @@ class ColumnSchema extends AbstractColumnSchema
             return;
         }
 
-        if ($this->getType() === Schema::TYPE_JSON) {
+        if ($this->getType() === MysqlSchema::TYPE_JSON) {
             return \json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
@@ -52,7 +52,7 @@ class ColumnSchema extends AbstractColumnSchema
             return $value;
         }
 
-        if ($this->getDbType() === Schema::TYPE_JSON) {
+        if ($this->getDbType() === MysqlSchema::TYPE_JSON) {
             return new JsonExpression($value, $this->getType());
         }
 

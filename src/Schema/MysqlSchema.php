@@ -15,10 +15,10 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Query\QueryBuilder;
-use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Mysql\Query\MysqlQueryBuilder;
+use Yiisoft\Db\Schema\Schema;
 
-class Schema extends AbstractSchema implements ConstraintFinderInterface
+final class MysqlSchema extends Schema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
@@ -72,13 +72,13 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $name the table name.
      *
-     * @return TableSchema
+     * @return MysqlTableSchema
      *
-     * {@see \Yiisoft\Db\Schema\TableSchema}
+     * {@see MysqlTableSchema}
      */
-    protected function resolveTableName(string $name): TableSchema
+    protected function resolveTableName(string $name): MysqlTableSchema
     {
-        $resolvedName = new TableSchema();
+        $resolvedName = new MysqlTableSchema();
 
         $parts = \explode('.', \str_replace('`', '', $name));
 
@@ -128,11 +128,11 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @throws \Exception
      *
-     * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
+     * @return MysqlTableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchema
+    protected function loadTableSchema(string $name): ?MysqlTableSchema
     {
-        $table = new TableSchema();
+        $table = new MysqlTableSchema();
 
         $this->resolveTableNames($table, $name);
 
@@ -253,17 +253,17 @@ SQL;
     /**
      * Creates a query builder for the MySQL database.
      *
-     * @return QueryBuilder query builder instance
+     * @return MysqlQueryBuilder query builder instance
      */
-    public function createQueryBuilder(): QueryBuilder
+    public function createQueryBuilder(): MysqlQueryBuilder
     {
-        return new QueryBuilder($this->getDb());
+        return new MysqlQueryBuilder($this->getDb());
     }
 
     /**
      * Resolves the table name and schema name (if any).
      *
-     * @param TableSchema $table the table metadata object.
+     * @param MysqlTableSchema $table the table metadata object.
      * @param string $name the table name.
      */
     protected function resolveTableNames($table, $name): void
@@ -287,7 +287,7 @@ SQL;
      *
      * @return ColumnSchema the column schema object.
      */
-    protected function loadColumnSchema(array $info): ColumnSchema
+    protected function loadColumnSchema(array $info): MysqlColumnSchema
     {
         $column = $this->createColumnSchema();
 
@@ -360,7 +360,7 @@ SQL;
     /**
      * Collects the metadata of table columns.
      *
-     * @param TableSchema $table the table metadata.
+     * @param MysqlTableSchema $table the table metadata.
      *
      * @throws \Exception if DB query fails.
      *
@@ -409,7 +409,7 @@ SQL;
     /**
      * Gets the CREATE TABLE sql string.
      *
-     * @param TableSchema $table the table metadata.
+     * @param MysqlTableSchema $table the table metadata.
      *
      * @throws Exception
      * @throws InvalidArgumentException
@@ -436,7 +436,7 @@ SQL;
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchema $table the table metadata.
+     * @param MysqlTableSchema $table the table metadata.
      *
      * @throws \Exception
      */
@@ -521,7 +521,7 @@ SQL;
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata.
+     * @param MysqlTableSchema $table the table metadata.
      *
      * @return array all unique indexes for the given table.
      */
@@ -544,9 +544,9 @@ SQL;
         return $uniqueIndexes;
     }
 
-    public function createColumnSchemaBuilder($type, $length = null)
+    public function createColumnSchemaBuilder(string $type, $length = null): MysqlColumnSchemaBuilder
     {
-        return new ColumnSchemaBuilder($type, $length, $this->getDb());
+        return new MysqlColumnSchemaBuilder($type, $length, $this->getDb());
     }
 
     /**
@@ -691,10 +691,10 @@ SQL;
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
      *
-     * @return ColumnSchema column schema instance.
+     * @return MysqlColumnSchema column schema instance.
      */
-    protected function createColumnSchema(): ColumnSchema
+    protected function createColumnSchema(): MysqlColumnSchema
     {
-        return new ColumnSchema();
+        return new MysqlColumnSchema();
     }
 }

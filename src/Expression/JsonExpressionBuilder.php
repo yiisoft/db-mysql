@@ -15,7 +15,7 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Json\Json;
 
-class JsonExpressionBuilder implements ExpressionBuilderInterface
+final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;
 

@@ -1,0 +1,148 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\Db\Mysql\Tests;
+
+use yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\TestUtility\TestCommandTrait;
+
+/**
+ * @group mysql
+ */
+final class MysqlCommandTest extends TestCase
+{
+    use TestCommandTrait;
+
+    protected $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+
+    /**
+     * Make sure that `{{something}}` in values will not be encoded.
+     *
+     * @dataProvider batchInsertSqlProviderTrait
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $values
+     * @param string $expected
+     * @param array $expectedParams
+     *
+     * {@see https://github.com/yiisoft/yii2/issues/11242}
+     */
+    public function testBatchInsertSQL(
+        string $table,
+        array $columns,
+        array $values,
+        string $expected,
+        array $expectedParams = []
+    ): void {
+        $db = $this->getConnection(true);
+
+        $command = $db->createCommand();
+
+        $command->batchInsert($table, $columns, $values);
+
+        $command->prepare(false);
+
+        $this->assertSame($expected, $command->getSql());
+        $this->assertSame($expectedParams, $command->getParams());
+    }
+
+    /**
+     * Test whether param binding works in other places than WHERE.
+     *
+     * @dataProvider bindParamsNonWhereProviderTrait
+     *
+     * @param string $sql
+     */
+    public function testBindParamsNonWhere(string $sql): void
+    {
+        $db = $this->getConnection();
+
+        $db->createCommand()->insert(
+            'customer',
+            [
+                'name' => 'testParams',
+                'email' => 'testParams@example.com',
+                'address' => '1'
+            ]
+        )->execute();
+
+        $params = [
+            ':email' => 'testParams@example.com',
+            ':len'   => 5,
+        ];
+
+        $command = $db->createCommand($sql, $params);
+
+        $this->assertEquals('Params', $command->queryScalar());
+    }
+
+    /**
+     * Test command getRawSql.
+     *
+     * @dataProvider getRawSqlProviderTrait
+     *
+     * @param string $sql
+     * @param array  $params
+     * @param string $expectedRawSql
+     *
+     * {@see https://github.com/yiisoft/yii2/issues/8592}
+     */
+    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand($sql, $params);
+
+        $this->assertEquals($expectedRawSql, $command->getRawSql());
+    }
+
+    /**
+     * Test INSERT INTO ... SELECT SQL statement with wrong query object.
+     *
+     * @dataProvider invalidSelectColumnsProviderTrait
+     *
+     * @param mixed $invalidSelectColumns
+     */
+    public function testInsertSelectFailed($invalidSelectColumns): void
+    {
+        $db = $this->getConnection();
+
+        $query = new Query($db);
+
+        $query->select($invalidSelectColumns)->from('{{customer}}');
+
+        $command = $db->createCommand();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
+
+        $command->insert(
+            '{{customer}}',
+            $query
+        )->execute();
+    }
+
+    /**
+     * Test command upsert.
+     *
+     * @dataProvider upsertProviderTrait
+     *
+     * @param array $firstData
+     * @param array $secondData
+     */
+    public function testUpsert(array $firstData, array $secondData): void
+    {
+        $db = $this->getConnection(true);
+
+        $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+
+        $this->performAndCompareUpsertResult($db, $firstData);
+
+        $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
+
+        $this->performAndCompareUpsertResult($db, $secondData);
+    }
+}

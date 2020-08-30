@@ -7,9 +7,9 @@ namespace Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 
-class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
+final class MysqlColumnSchemaBuilder extends ColumnSchemaBuilder
 {
     /**
      * Builds the unsigned string for column. Defaults to unsupported.

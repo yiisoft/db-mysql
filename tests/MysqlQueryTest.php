@@ -6,15 +6,20 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Tests\QueryTest as AbstractQueryTest;
+use Yiisoft\Db\TestUtility\TestQueryTrait;
 
-class QueryTest extends AbstractQueryTest
+/**
+ * @group mysql
+ */
+final class MysqlQueryTest extends TestCase
 {
-    protected ?string $driverName = 'mysql';
+    use TestQueryTrait;
 
     public function testQueryIndexHint(): void
     {
-        $query = (new Query($this->getConnection()))->from([new Expression('{{%customer}} USE INDEX (primary)')]);
+        $db = $this->getConnection();
+
+        $query = (new Query($db))->from([new Expression('{{%customer}} USE INDEX (primary)')]);
 
         $row = $query->one();
 
@@ -25,9 +30,11 @@ class QueryTest extends AbstractQueryTest
 
     public function testLimitOffsetWithExpression(): void
     {
-        $query = (new Query($this->getConnection()))->from('customer')->select('id')->orderBy('id');
+        $db = $this->getConnection();
 
-        // In MySQL limit and offset arguments must both be non negative integer constant
+        $query = (new Query($db))->from('customer')->select('id')->orderBy('id');
+
+        /* In MySQL limit and offset arguments must both be non negative integer constant */
         $query->limit(new Expression('2'))->offset(new Expression('1'));
 
         $result = $query->column();
