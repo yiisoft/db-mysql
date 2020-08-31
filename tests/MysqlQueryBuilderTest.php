@@ -6,12 +6,19 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Closure;
 use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Mysql\Schema\MysqlColumnSchema;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Mysql\Query\MysqlQueryBuilder;
-use Yiisoft\Db\Mysql\Schema\MysqlSchema;
 use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
+
+use function array_merge;
+use function is_string;
 
 /**
  * @group mysql
@@ -21,6 +28,8 @@ final class MysqlQueryBuilderTest extends TestCase
     use TestQueryBuilderTrait;
 
     /**
+     * @param bool $reset
+     *
      * @return MysqlQueryBuilder
      */
     protected function getQueryBuilder(bool $reset = false): MysqlQueryBuilder
@@ -113,6 +122,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param array $columns
      * @param array $value
      * @param string|null $expected
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testBatchInsert(string $table, array $columns, array $value, ?string $expected): void
     {
@@ -202,6 +216,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param ExpressionInterface|array $condition
      * @param string|null $expected
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testBuildCondition($condition, ?string $expected, array $expectedParams): void
     {
@@ -221,6 +240,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param array $condition
      * @param string|null $expected
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testBuildFilterCondition(array $condition, ?string $expected, array $expectedParams): void
     {
@@ -255,6 +279,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param object|array $condition
      * @param string|null $expected
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testBuildLikeCondition($condition, ?string $expected, array $expectedParams): void
     {
@@ -273,6 +302,11 @@ final class MysqlQueryBuilderTest extends TestCase
      *
      * @param string $cond
      * @param string|null $expectedQuerySql
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testBuildWhereExists(string $cond, ?string $expectedQuerySql): void
     {
@@ -332,6 +366,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param array|string $condition
      * @param string|null $expectedSQL
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testDelete(string $table, $condition, ?string $expectedSQL, array $expectedParams): void
     {
@@ -351,6 +390,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param array $params
      * @param string|null $expectedSQL
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testInsert(string $table, $columns, array $params, ?string $expectedSQL, array $expectedParams): void
     {
@@ -392,6 +436,11 @@ final class MysqlQueryBuilderTest extends TestCase
      * @param array|string $condition
      * @param string|null $expectedSQL
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testUpdate(
         string $table,
@@ -464,7 +513,7 @@ final class MysqlQueryBuilderTest extends TestCase
      * @dataProvider upsertProvider
      *
      * @param string $table
-     * @param ColumnSchema|array $insertColumns
+     * @param MysqlColumnSchema|array $insertColumns
      * @param array|bool|null $updateColumns
      * @param string|string[] $expectedSQL
      * @param array $expectedParams

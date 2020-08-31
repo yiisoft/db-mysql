@@ -4,15 +4,39 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use ErrorException;
+use RuntimeException;
+use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Connection\MysqlConnection;
-use Yiisoft\Db\Mysql\Tests\MysqlConnectionTest;
 use Yiisoft\Db\Transaction\Transaction;
+
+use function date;
+use function file_get_contents;
+use function file_put_contents;
+use function floor;
+use function function_exists;
+use function get_class;
+use function implode;
+use function is_file;
+use function microtime;
+use function pcntl_fork;
+use function pcntl_signal;
+use function pcntl_sigtimedwait;
+use function pcntl_wait;
+use function pcntl_wexitstatus;
+use function pcntl_wifexited;
+use function posix_kill;
+use function round;
+use function set_error_handler;
+use function sleep;
+use function sys_get_temp_dir;
+use function unlink;
 
 /**
  * @group mysql
  */
-final class MysqlDeadLockTest
+final class MysqlDeadLockTest extends TestCase
 {
     public const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
@@ -27,19 +51,19 @@ final class MysqlDeadLockTest
      */
     public function testDeadlockException(): void
     {
-        if (!\function_exists('pcntl_fork')) {
+        if (!function_exists('pcntl_fork')) {
             $this->markTestSkipped('pcntl_fork() is not available');
         }
 
-        if (!\function_exists('posix_kill')) {
+        if (!function_exists('posix_kill')) {
             $this->markTestSkipped('posix_kill() is not available');
         }
 
-        if (!\function_exists('pcntl_sigtimedwait')) {
+        if (!function_exists('pcntl_sigtimedwait')) {
             $this->markTestSkipped('pcntl_sigtimedwait() is not available');
         }
 
-        $this->setLogFile(\sys_get_temp_dir() . '/deadlock_' . \posix_getpid());
+        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . \posix_getpid());
 
         $this->deleteLog();
 
@@ -53,7 +77,7 @@ final class MysqlDeadLockTest
              * FIRST child will send the signal to the SECOND child.
              * So, SECOND child should be forked at first to obtain its PID.
              */
-            $pidSecond = \pcntl_fork();
+            $pidSecond = pcntl_fork();
 
             if (-1 === $pidSecond) {
                 $this->markTestIncomplete('cannot fork');
@@ -66,7 +90,7 @@ final class MysqlDeadLockTest
                 exit($this->childrenUpdateLocked());
             }
 
-            $pidFirst = \pcntl_fork();
+            $pidFirst = pcntl_fork();
 
             if (-1 === $pidFirst) {
                 $this->markTestIncomplete('cannot fork second child');
@@ -83,18 +107,18 @@ final class MysqlDeadLockTest
              * PARENT
              * nothing to do
              */
-        } catch (\Exception $e) {
-            /** wait all children */
-            while (-1 !== \pcntl_wait($status)) {
+        } catch (Exception $e) {
+            /* wait all children */
+            while (-1 !== pcntl_wait($status)) {
                 /** nothing to do */
             }
 
             $this->deleteLog();
 
             throw $e;
-        } catch (\Throwable $e) {
-            /** wait all children */
-            while (-1 !== \pcntl_wait($status)) {
+        } catch (Throwable $e) {
+            /* wait all children */
+            while (-1 !== pcntl_wait($status)) {
                 /** nothing to do */
             }
 
@@ -109,11 +133,11 @@ final class MysqlDeadLockTest
         $errors = [];
         $deadlockHitCount = 0;
 
-        while (-1 !== \pcntl_wait($status)) {
-            if (!\pcntl_wifexited($status)) {
+        while (-1 !== pcntl_wait($status)) {
+            if (!pcntl_wifexited($status)) {
                 $errors[] = 'child did not exit itself';
             } else {
-                $exitStatus = \pcntl_wexitstatus($status);
+                $exitStatus = pcntl_wexitstatus($status);
                 if (self::CHILD_EXIT_CODE_DEADLOCK === $exitStatus) {
                     $deadlockHitCount++;
                 } elseif (0 !== $exitStatus) {
@@ -126,7 +150,7 @@ final class MysqlDeadLockTest
 
         if ($errors) {
             $this->fail(
-                \implode('; ', $errors)
+                implode('; ', $errors)
                 . ($logContent ? ". Shared children log:\n$logContent" : '')
             );
         }
@@ -168,7 +192,7 @@ final class MysqlDeadLockTest
 
             $this->log('child 1: insert');
 
-            /** insert test row */
+            /* insert test row */
             $first->createCommand()
                 ->insert('{{customer}}', [
                     'id'      => 97,
@@ -191,8 +215,8 @@ final class MysqlDeadLockTest
                     $this->log('child 1: send signal to child 2');
 
                     // let child to continue
-                    if (!\posix_kill($pidSecond, SIGUSR1)) {
-                        throw new \RuntimeException('Cannot send signal');
+                    if (!posix_kill($pidSecond, SIGUSR1)) {
+                        throw new RuntimeException('Cannot send signal');
                     }
 
                     /**
@@ -200,7 +224,7 @@ final class MysqlDeadLockTest
                      * lock.
                      */
 
-                    \sleep(2);
+                    sleep(2);
 
                     $this->log('child 1: update');
 
@@ -215,7 +239,7 @@ final class MysqlDeadLockTest
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
-            /** Deadlock found when trying to get lock; try restarting transaction */
+            /* Deadlock found when trying to get lock; try restarting transaction */
             if ('40001' === $sqlError && 1213 === $driverError) {
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
@@ -225,14 +249,14 @@ final class MysqlDeadLockTest
             return 1;
         } catch (\Exception $e) {
             $this->log(
-                'child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log(
-                'child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
@@ -257,18 +281,19 @@ final class MysqlDeadLockTest
      */
     private function childrenUpdateLocked(): int
     {
-        /** install no-op signal handler to prevent termination */
-        if (!\pcntl_signal(SIGUSR1, static function () {}, false)) {
+        /* install no-op signal handler to prevent termination */
+        if (!pcntl_signal(SIGUSR1, static function () {
+        }, false)) {
             $this->log('child 2: cannot install signal handler');
 
             return 1;
         }
 
         try {
-            /** at first, parent should do 1st select */
+            /* at first, parent should do 1st select */
             $this->log('child 2: wait signal from child 1');
 
-            if (\pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
+            if (pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
                 $this->log('child 2: wait timeout exceeded');
 
                 return 1;
@@ -276,12 +301,12 @@ final class MysqlDeadLockTest
 
             $this->log('child 2: connect');
 
-            /** @var MysqlConnection $second */
+            /* @var MysqlConnection $second */
 
             $second = $this->getConnection(true, false);
             $second->open();
 
-            /** sleep(1); */
+            /* sleep(1); */
             $this->log('child 2: transaction');
 
             $second->transaction(function (MysqlConnection $second) {
@@ -298,7 +323,7 @@ final class MysqlDeadLockTest
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
-            /** Deadlock found when trying to get lock; try restarting transaction */
+            /* Deadlock found when trying to get lock; try restarting transaction */
             if ('40001' === $sqlError && 1213 === $driverError) {
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
@@ -306,16 +331,16 @@ final class MysqlDeadLockTest
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log(
-                'child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log(
-                'child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
@@ -336,8 +361,8 @@ final class MysqlDeadLockTest
      */
     private function setErrorHandler(): void
     {
-        \set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
-            throw new \ErrorException($errstr, $errno, $errno, $errfile, $errline);
+        set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
+            throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
         });
     }
 
@@ -358,8 +383,8 @@ final class MysqlDeadLockTest
      */
     private function deleteLog(): void
     {
-        if (null !== $this->logFile && \is_file($this->logFile)) {
-            \unlink($this->logFile);
+        if (null !== $this->logFile && is_file($this->logFile)) {
+            unlink($this->logFile);
         }
     }
 
@@ -373,10 +398,10 @@ final class MysqlDeadLockTest
      */
     private function getLogContentAndDelete(): ?string
     {
-        if (null !== $this->logFile && \is_file($this->logFile)) {
-            $content = \file_get_contents($this->logFile);
+        if (null !== $this->logFile && is_file($this->logFile)) {
+            $content = file_get_contents($this->logFile);
 
-            \unlink($this->logFile);
+            unlink($this->logFile);
 
             return $content;
         }
@@ -391,15 +416,15 @@ final class MysqlDeadLockTest
     private function log(string $message): void
     {
         if (null !== $this->logFile) {
-            $time = \microtime(true);
+            $time = microtime(true);
 
-            $timeInt = \floor($time);
+            $timeInt = floor($time);
 
             $timeFrac = $time - $timeInt;
 
-            $timestamp = \date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
+            $timestamp = date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
 
-            \file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
+            file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
         }
     }
 }

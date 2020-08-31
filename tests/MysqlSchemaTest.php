@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Schema\MysqlColumnSchema;
@@ -12,6 +14,9 @@ use Yiisoft\Db\Mysql\Schema\MysqlSchema;
 use Yiisoft\Db\Mysql\Schema\MysqlTableSchema;
 use Yiisoft\Db\TestUtility\AnyCaseValue;
 use Yiisoft\Db\TestUtility\TestSchemaTrait;
+use function array_map;
+use function trim;
+use function version_compare;
 
 /**
  * @group mysql
@@ -20,7 +25,7 @@ final class MysqlSchemaTest extends TestCase
 {
     use TestSchemaTrait;
 
-    public function getExpectedColumns()
+    public function getExpectedColumns(): array
     {
         $version = $this->getConnection()->getServerVersion();
 
@@ -335,6 +340,9 @@ SQL;
      * @dataProvider pdoAttributesProviderTrait
      *
      * @param array $pdoAttributes
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
     public function testGetTableNames(array $pdoAttributes): void
     {
@@ -405,6 +413,9 @@ SQL;
      * @param string $tableName
      * @param string $type
      * @param mixed $expected
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
     public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, $expected): void
     {
@@ -427,6 +438,9 @@ SQL;
      * @param string $tableName
      * @param string $type
      * @param mixed $expected
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
      */
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, $expected): void
     {

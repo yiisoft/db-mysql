@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Yiisoft\Db\Exception\Exception;
 use yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\TestUtility\TestCommandTrait;
 
@@ -15,7 +18,7 @@ final class MysqlCommandTest extends TestCase
 {
     use TestCommandTrait;
 
-    protected $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+    protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 
     /**
      * Make sure that `{{something}}` in values will not be encoded.
@@ -27,6 +30,10 @@ final class MysqlCommandTest extends TestCase
      * @param array $values
      * @param string $expected
      * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      *
      * {@see https://github.com/yiisoft/yii2/issues/11242}
      */
@@ -53,6 +60,11 @@ final class MysqlCommandTest extends TestCase
      * Test whether param binding works in other places than WHERE.
      *
      * @dataProvider bindParamsNonWhereProviderTrait
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      *
      * @param string $sql
      */
@@ -85,8 +97,12 @@ final class MysqlCommandTest extends TestCase
      * @dataProvider getRawSqlProviderTrait
      *
      * @param string $sql
-     * @param array  $params
+     * @param array $params
      * @param string $expectedRawSql
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      *
      * {@see https://github.com/yiisoft/yii2/issues/8592}
      */
@@ -105,6 +121,10 @@ final class MysqlCommandTest extends TestCase
      * @dataProvider invalidSelectColumnsProviderTrait
      *
      * @param mixed $invalidSelectColumns
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testInsertSelectFailed($invalidSelectColumns): void
     {
@@ -132,6 +152,11 @@ final class MysqlCommandTest extends TestCase
      *
      * @param array $firstData
      * @param array $secondData
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
     public function testUpsert(array $firstData, array $secondData): void
     {

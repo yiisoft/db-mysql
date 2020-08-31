@@ -8,7 +8,6 @@ use PDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Mysql\Connection\MysqlConnection;
-use Yiisoft\Db\Helper\Dsn;
 use Yiisoft\Db\TestUtility\TestConnectionTrait;
 
 /**
