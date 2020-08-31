@@ -28,36 +28,6 @@ final class MysqlQueryBuilderTest extends TestCase
         return new MysqlQueryBuilder($this->getConnection($reset));
     }
 
-    public function testIssue17449(): void
-    {
-        $db = $this->getConnection(true);
-
-        $pdo = $db->getPDO();
-
-        $pdo->exec('DROP TABLE IF EXISTS `issue_17449`');
-
-        $tableQuery = <<<MySqlStatement
-CREATE TABLE `issue_17449` (
-  `test_column` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'some comment' CHECK (json_valid(`test_column`))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
-MySqlStatement;
-
-        $db->createCommand($tableQuery)->execute();
-
-        $actual = $db->createCommand()->addCommentOnColumn('issue_17449', 'test_column', 'Some comment')->getRawSql();
-
-        $checkPos = stripos($actual, 'check');
-
-        if ($checkPos === false) {
-            $this->markTestSkipped("The used MySql-Server removed or moved the CHECK from the column line, so the original bug doesn't affect it");
-        }
-
-        $commentPos = stripos($actual, 'comment');
-
-        $this->assertNotFalse($commentPos);
-        $this->assertLessThan($checkPos, $commentPos);
-    }
-
     public function testResetSequence(): void
     {
         $qb = $this->getQueryBuilder(true, true);
