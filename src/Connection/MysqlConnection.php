@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Connection;
 
 use PDO;
-use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Command\Command;
+use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Mysql\Schema\MysqlSchema;
+
+use function constant;
 
 /**
  * Database connection class prefilled for MYSQL Server.
@@ -25,13 +27,12 @@ final class MysqlConnection extends Connection
      * @param string|null $sql the SQL statement to be executed
      * @param array $params the parameters to be bound to the SQL statement
      *
-     * @throws InvalidConfigException
-     * @throws Exception
-     * @throws NotSupportedException
-     *
      * @return Command the DB command
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function createCommand(?string $sql = null, $params = []): Command
+    public function createCommand(?string $sql = null, array $params = []): Command
     {
         if ($sql !== null) {
             $sql = $this->quoteSql($sql);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Expression;
 
+use JsonException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -15,6 +16,8 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Json\Json;
 
+use function count;
+
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;
@@ -25,7 +28,7 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      * @param JsonExpression|ExpressionInterface $expression the expression to be built
      * @param array $params
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws InvalidConfigException
@@ -43,7 +46,7 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
             return "($sql)";
         }
 
-        $placeholder = static::PARAM_PREFIX . \count($params);
+        $placeholder = static::PARAM_PREFIX . count($params);
         $params[$placeholder] = Json::encode($value);
 
         return "CAST($placeholder AS JSON)";

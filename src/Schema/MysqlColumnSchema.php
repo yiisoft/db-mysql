@@ -8,6 +8,8 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\ColumnSchema;
 
+use function json_decode;
+
 final class MysqlColumnSchema extends ColumnSchema
 {
     /**
@@ -26,7 +28,7 @@ final class MysqlColumnSchema extends ColumnSchema
         }
 
         if ($this->getType() === MysqlSchema::TYPE_JSON) {
-            return \json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
         return parent::phpTypecast($value);
