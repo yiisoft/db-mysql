@@ -33,7 +33,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\Db\\Mysql\\": "src",
+            "Yiisoft\\Db\\Mysql\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Yiisoft\\Db\\Mysql\\Tests\\": "tests"
         }
     },
