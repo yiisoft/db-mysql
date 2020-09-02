@@ -12,9 +12,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Mysql\Schema\MysqlColumnSchema;
+use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\QueryBuilder;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Mysql\Query\MysqlQueryBuilder;
 use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
 
 use function array_merge;
@@ -23,18 +23,18 @@ use function is_string;
 /**
  * @group mysql
  */
-final class MysqlQueryBuilderTest extends TestCase
+final class QueryBuilderTest extends TestCase
 {
     use TestQueryBuilderTrait;
 
     /**
      * @param bool $reset
      *
-     * @return MysqlQueryBuilder
+     * @return QueryBuilder
      */
-    protected function getQueryBuilder(bool $reset = false): MysqlQueryBuilder
+    protected function getQueryBuilder(bool $reset = false): QueryBuilder
     {
-        return new MysqlQueryBuilder($this->getConnection($reset));
+        return new QueryBuilder($this->getConnection($reset));
     }
 
     public function testResetSequence(): void
@@ -513,7 +513,7 @@ final class MysqlQueryBuilderTest extends TestCase
      * @dataProvider upsertProvider
      *
      * @param string $table
-     * @param MysqlColumnSchema|array $insertColumns
+     * @param ColumnSchema|array $insertColumns
      * @param array|bool|null $updateColumns
      * @param string|string[] $expectedSQL
      * @param array $expectedParams

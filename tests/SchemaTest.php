@@ -9,11 +9,12 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Schema\MysqlColumnSchema;
-use Yiisoft\Db\Mysql\Schema\MysqlSchema;
-use Yiisoft\Db\Mysql\Schema\MysqlTableSchema;
+use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\TableSchema;
 use Yiisoft\Db\TestUtility\AnyCaseValue;
 use Yiisoft\Db\TestUtility\TestSchemaTrait;
+
 use function array_map;
 use function trim;
 use function version_compare;
@@ -21,7 +22,7 @@ use function version_compare;
 /**
  * @group mysql
  */
-final class MysqlSchemaTest extends TestCase
+final class SchemaTest extends TestCase
 {
     use TestSchemaTrait;
 
@@ -317,7 +318,7 @@ SQL;
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new MysqlSchema($this->getConnection());
+        $schema = new Schema($this->getConnection());
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -331,7 +332,7 @@ SQL;
             'comment' => '',
         ]]);
 
-        $this->assertInstanceOf(MysqlColumnSchema::class, $column);
+        $this->assertInstanceOf(ColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
     }
@@ -483,7 +484,7 @@ SQL;
 
         $noCacheTable = $schema->getTableSchema($tableName, true);
 
-        $this->assertInstanceOf(MysqlTableSchema::class, $noCacheTable);
+        $this->assertInstanceOf(TableSchema::class, $noCacheTable);
 
         /* Compare */
         $schema->getDb()->setTablePrefix($testTablePrefix);
@@ -498,7 +499,7 @@ SQL;
 
         $refreshedTable = $schema->getTableSchema($tableName, false);
 
-        $this->assertInstanceOf(MysqlTableSchema::class, $refreshedTable);
+        $this->assertInstanceOf(TableSchema::class, $refreshedTable);
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
@@ -508,7 +509,7 @@ SQL;
 
         $testRefreshedTable = $schema->getTableSchema($testTableName, false);
 
-        $this->assertInstanceOf(MysqlTableSchema::class, $testRefreshedTable);
+        $this->assertInstanceOf(TableSchema::class, $testRefreshedTable);
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }

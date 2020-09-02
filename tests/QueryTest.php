@@ -11,7 +11,7 @@ use Yiisoft\Db\TestUtility\TestQueryTrait;
 /**
  * @group mysql
  */
-final class MysqlQueryTest extends TestCase
+final class QueryTest extends TestCase
 {
     use TestQueryTrait;
 

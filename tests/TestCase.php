@@ -18,7 +18,7 @@ use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Helper\Dsn;
-use Yiisoft\Db\Mysql\Connection\MysqlConnection;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
 use Yiisoft\Log\Logger;
@@ -33,13 +33,13 @@ class TestCase extends AbstractTestCase
 {
     protected Aliases $aliases;
     protected CacheInterface $cache;
+    protected Connection $connection;
     protected ContainerInterface $container;
     protected array $dataProvider;
     protected Dsn $dsn;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected LoggerInterface $logger;
-    protected MysqlConnection $mysqlConnection;
     protected Profiler $profiler;
 
     protected function setUp(): void
@@ -58,11 +58,11 @@ class TestCase extends AbstractTestCase
         unset(
             $this->aliases,
             $this->cache,
+            $this->connection,
             $this->container,
             $this->dataProvider,
             $this->dsn,
             $this->logger,
-            $this->mysqlConnection,
             $this->profiler
         );
     }
@@ -105,7 +105,7 @@ class TestCase extends AbstractTestCase
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
         $this->dsn = $this->container->get(Dsn::class);
-        $this->mysqlConnection = $this->container->get(ConnectionInterface::class);
+        $this->connection = $this->container->get(ConnectionInterface::class);
 
         DatabaseFactory::initialize($this->container, []);
     }
@@ -141,17 +141,17 @@ class TestCase extends AbstractTestCase
     /**
      * @param bool $reset whether to clean up the test database.
      *
-     * @return MysqlConnection
+     * @return Connection
      */
-    protected function getConnection($reset = false): MysqlConnection
+    protected function getConnection($reset = false): Connection
     {
-        if ($reset === false && isset($this->mysqlConnection)) {
-            return $this->mysqlConnection;
+        if ($reset === false && isset($this->connection)) {
+            return $this->connection;
         }
 
         if ($reset === false) {
             $this->configContainer();
-            return $this->mysqlConnection;
+            return $this->connection;
         }
 
         try {
@@ -160,7 +160,7 @@ class TestCase extends AbstractTestCase
             $this->markTestSkipped('Something wrong when preparing database: ' . $e->getMessage());
         }
 
-        return $this->mysqlConnection;
+        return $this->connection;
     }
 
     protected function prepareDatabase(?string $fixture = null): void
@@ -169,14 +169,14 @@ class TestCase extends AbstractTestCase
             $fixture = $this->params()['yiisoft/db-mysql']['fixture'];
         }
 
-        $this->mysqlConnection->open();
+        $this->connection->open();
 
         if ($fixture !== null) {
             $lines = explode(';', file_get_contents($this->aliases->get($fixture)));
 
             foreach ($lines as $line) {
                 if (trim($line) !== '') {
-                    $this->mysqlConnection->getPDO()->exec($line);
+                    $this->connection->getPDO()->exec($line);
                 }
             }
         }
@@ -290,7 +290,7 @@ class TestCase extends AbstractTestCase
             },
 
             ConnectionInterface::class  => static function (ContainerInterface $container) use ($params) {
-                $connection = new MysqlConnection(
+                $connection = new Connection(
                     $container->get(CacheInterface::class),
                     $container->get(LoggerInterface::class),
                     $container->get(Profiler::class),

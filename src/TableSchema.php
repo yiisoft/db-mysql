@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Schema;
+namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Schema\TableSchema;
+use Yiisoft\Db\Schema\TableSchema as AbstractTableSchema;
 
-final class MysqlTableSchema extends TableSchema
+final class TableSchema extends AbstractTableSchema
 {
     private array $foreignKeys = [];
 

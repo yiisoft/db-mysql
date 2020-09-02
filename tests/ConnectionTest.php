@@ -7,13 +7,13 @@ namespace Yiisoft\Db\Mysql\Tests;
 use PDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Mysql\Connection\MysqlConnection;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\TestConnectionTrait;
 
 /**
  * @group mysql
  */
-final class MysqlConnectionTest extends TestCase
+final class ConnectionTest extends TestCase
 {
     use TestConnectionTrait;
 
@@ -56,7 +56,7 @@ final class MysqlConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new MysqlConnection($this->cache, $this->logger, $this->profiler, 'unknown::memory:');
+        $db = new Connection($this->cache, $this->logger, $this->profiler, 'unknown::memory:');
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');
@@ -136,7 +136,7 @@ final class MysqlConnectionTest extends TestCase
         $db->setSlaves(
             '1',
             [
-                '__class' => MysqlConnection::class,
+                '__class' => Connection::class,
                 '__construct()' => [
                     $this->cache,
                     $this->logger,
@@ -171,7 +171,7 @@ final class MysqlConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => MysqlConnection::class,
+                '__class' => Connection::class,
                 '__construct()' => [
                     $this->cache,
                     $this->logger,
@@ -205,7 +205,7 @@ final class MysqlConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => MysqlConnection::class,
+                '__class' => Connection::class,
                 '__construct()' => [
                     $this->cache,
                     $this->logger,
@@ -241,7 +241,7 @@ final class MysqlConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => MysqlConnection::class,
+                '__class' => Connection::class,
                 '__construct()' => [
                     $this->cache,
                     $this->logger,
@@ -272,7 +272,7 @@ final class MysqlConnectionTest extends TestCase
         $db->setMasters(
             '1',
             [
-                '__class' => MysqlConnection::class,
+                '__class' => Connection::class,
                 '__construct()' => [
                     $this->cache,
                     $this->logger,

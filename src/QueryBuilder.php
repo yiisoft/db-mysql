@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Query;
+namespace Yiisoft\Db\Mysql;
 
 use PDO;
 use Yiisoft\Db\Exception\Exception;
@@ -12,11 +12,11 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Mysql\Expression\JsonExpressionBuilder;
-use Yiisoft\Db\Mysql\Schema\MysqlColumnSchemaBuilder;
-use Yiisoft\Db\Mysql\Schema\MysqlSchema;
+use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
+use Yiisoft\Db\Mysql\JsonExpressionBuilder;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilder;
+use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
 
 use function array_merge;
 use function array_values;
@@ -29,31 +29,31 @@ use function reset;
 use function trim;
 use function version_compare;
 
-final class MysqlQueryBuilder extends QueryBuilder
+final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
      * @var array mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
-        MysqlSchema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        MysqlSchema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        MysqlSchema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        MysqlSchema::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        MysqlSchema::TYPE_CHAR => 'char(1)',
-        MysqlSchema::TYPE_STRING => 'varchar(255)',
-        MysqlSchema::TYPE_TEXT => 'text',
-        MysqlSchema::TYPE_TINYINT => 'tinyint(3)',
-        MysqlSchema::TYPE_SMALLINT => 'smallint(6)',
-        MysqlSchema::TYPE_INTEGER => 'int(11)',
-        MysqlSchema::TYPE_BIGINT => 'bigint(20)',
-        MysqlSchema::TYPE_FLOAT => 'float',
-        MysqlSchema::TYPE_DOUBLE => 'double',
-        MysqlSchema::TYPE_DECIMAL => 'decimal(10,0)',
-        MysqlSchema::TYPE_DATE => 'date',
-        MysqlSchema::TYPE_BINARY => 'blob',
-        MysqlSchema::TYPE_BOOLEAN => 'tinyint(1)',
-        MysqlSchema::TYPE_MONEY => 'decimal(19,4)',
-        MysqlSchema::TYPE_JSON => 'json'
+        Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        Schema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        Schema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        Schema::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        Schema::TYPE_CHAR => 'char(1)',
+        Schema::TYPE_STRING => 'varchar(255)',
+        Schema::TYPE_TEXT => 'text',
+        Schema::TYPE_TINYINT => 'tinyint(3)',
+        Schema::TYPE_SMALLINT => 'smallint(6)',
+        Schema::TYPE_INTEGER => 'int(11)',
+        Schema::TYPE_BIGINT => 'bigint(20)',
+        Schema::TYPE_FLOAT => 'float',
+        Schema::TYPE_DOUBLE => 'double',
+        Schema::TYPE_DECIMAL => 'decimal(10,0)',
+        Schema::TYPE_DATE => 'date',
+        Schema::TYPE_BINARY => 'blob',
+        Schema::TYPE_BOOLEAN => 'tinyint(1)',
+        Schema::TYPE_MONEY => 'decimal(19,4)',
+        Schema::TYPE_JSON => 'json'
     ];
 
     /**
@@ -455,7 +455,7 @@ final class MysqlQueryBuilder extends QueryBuilder
      */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
-        /** Strip existing comment which may include escaped quotes */
+        /* Strip existing comment which may include escaped quotes */
         $definition = trim(
             preg_replace(
                 "/COMMENT '(?:''|[^'])*'/i",
@@ -617,7 +617,7 @@ final class MysqlQueryBuilder extends QueryBuilder
      *
      * If a type cannot be found in {@see typeMap}, it will be returned without any change.
      *
-     * @param string|MysqlColumnSchemaBuilder $type abstract column type
+     * @param string|ColumnSchemaBuilder $type abstract column type
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -645,16 +645,16 @@ final class MysqlQueryBuilder extends QueryBuilder
     private function defaultTimeTypeMap(): array
     {
         $map = [
-            MysqlSchema::TYPE_DATETIME => 'datetime',
-            MysqlSchema::TYPE_TIMESTAMP => 'timestamp',
-            MysqlSchema::TYPE_TIME => 'time',
+            Schema::TYPE_DATETIME => 'datetime',
+            Schema::TYPE_TIMESTAMP => 'timestamp',
+            Schema::TYPE_TIME => 'time',
         ];
 
         if ($this->supportsFractionalSeconds()) {
             $map = [
-                MysqlSchema::TYPE_DATETIME => 'datetime(0)',
-                MysqlSchema::TYPE_TIMESTAMP => 'timestamp(0)',
-                MysqlSchema::TYPE_TIME => 'time(0)',
+                Schema::TYPE_DATETIME => 'datetime(0)',
+                Schema::TYPE_TIMESTAMP => 'timestamp(0)',
+                Schema::TYPE_TIME => 'time(0)',
             ];
         }
 

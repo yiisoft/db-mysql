@@ -8,7 +8,7 @@ use ErrorException;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Connection\MysqlConnection;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Transaction\Transaction;
 
 use function date;
@@ -36,7 +36,7 @@ use function unlink;
 /**
  * @group mysql
  */
-final class MysqlDeadLockTest extends TestCase
+final class DeadLockTest extends TestCase
 {
     public const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
@@ -110,7 +110,7 @@ final class MysqlDeadLockTest extends TestCase
         } catch (Exception $e) {
             /* wait all children */
             while (-1 !== pcntl_wait($status)) {
-                /** nothing to do */
+                /* nothing to do */
             }
 
             $this->deleteLog();
@@ -119,7 +119,7 @@ final class MysqlDeadLockTest extends TestCase
         } catch (Throwable $e) {
             /* wait all children */
             while (-1 !== pcntl_wait($status)) {
-                /** nothing to do */
+                /* nothing to do */
             }
 
             $this->deleteLog();
@@ -165,7 +165,7 @@ final class MysqlDeadLockTest extends TestCase
     /**
      * Main body of first child process.
      *
-     * First child initializes test row and runs two nested {@see MysqlConnection::transaction()} to perform following
+     * First child initializes test row and runs two nested {@see Connection::transaction()} to perform following
      * operations:
      * 1. `SELECT ... LOCK IN SHARE MODE` the test row with shared lock instead of needed exclusive lock.
      * 2. Send signal to SECOND child identified by PID {@see $pidSecond}.
@@ -204,17 +204,17 @@ final class MysqlDeadLockTest extends TestCase
 
             $this->log('child 1: transaction');
 
-            $first->transaction(function (MysqlConnection $first) use ($pidSecond) {
-                $first->transaction(function (MysqlConnection $first) use ($pidSecond) {
+            $first->transaction(function (Connection $first) use ($pidSecond) {
+                $first->transaction(function (Connection $first) use ($pidSecond) {
                     $this->log('child 1: select');
 
-                    /** SELECT with shared lock */
+                    /* SELECT with shared lock */
                     $first->createCommand('SELECT id FROM {{customer}} WHERE id = 97 LOCK IN SHARE MODE')
                         ->execute();
 
                     $this->log('child 1: send signal to child 2');
 
-                    // let child to continue
+                    /* let child to continue */
                     if (!posix_kill($pidSecond, SIGUSR1)) {
                         throw new RuntimeException('Cannot send signal');
                     }
@@ -228,7 +228,7 @@ final class MysqlDeadLockTest extends TestCase
 
                     $this->log('child 1: update');
 
-                    /** now do the 3rd update for deadlock */
+                    /* now do the 3rd update for deadlock */
                     $first->createCommand()
                         ->update('{{customer}}', ['name' => 'first'], ['id' => 97])
                         ->execute();
@@ -247,7 +247,7 @@ final class MysqlDeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log(
                 'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -273,7 +273,7 @@ final class MysqlDeadLockTest extends TestCase
      *
      * Second child at first will wait the signal from the first child in some seconds.
      *
-     * After receiving the signal it runs two nested {@see MysqlConnection::transaction()} to perform `UPDATE` with the
+     * After receiving the signal it runs two nested {@see Connection::transaction()} to perform `UPDATE` with the
      * test row.
      *
      * @return int Exit code. In case of deadlock exit code is {@see CHILD_EXIT_CODE_DEADLOCK}. In case of success exit
@@ -282,8 +282,10 @@ final class MysqlDeadLockTest extends TestCase
     private function childrenUpdateLocked(): int
     {
         /* install no-op signal handler to prevent termination */
-        if (!pcntl_signal(SIGUSR1, static function () {
-        }, false)) {
+        if (
+            !pcntl_signal(SIGUSR1, static function () {
+            }, false)
+        ) {
             $this->log('child 2: cannot install signal handler');
 
             return 1;
@@ -301,7 +303,7 @@ final class MysqlDeadLockTest extends TestCase
 
             $this->log('child 2: connect');
 
-            /* @var MysqlConnection $second */
+            /* @var Connection $second */
 
             $second = $this->getConnection(true, false);
             $second->open();
@@ -309,10 +311,10 @@ final class MysqlDeadLockTest extends TestCase
             /* sleep(1); */
             $this->log('child 2: transaction');
 
-            $second->transaction(function (MysqlConnection $second) {
-                $second->transaction(function (MysqlConnection $second) {
+            $second->transaction(function (Connection $second) {
+                $second->transaction(function (Connection $second) {
                     $this->log('child 2: update');
-                    // do the 2nd update
+                    /* do the 2nd update */
                     $second->createCommand()
                         ->update('{{customer}}', ['name' => 'second'], ['id' => 97])
                         ->execute();

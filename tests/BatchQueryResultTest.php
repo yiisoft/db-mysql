@@ -9,7 +9,7 @@ use Yiisoft\Db\TestUtility\TestBatchQueryResultTrait;
 /**
  * @group mysql
  */
-final class MysqlBatchQueryResultTest extends TestCase
+final class BatchQueryResultTest extends TestCase
 {
     use TestBatchQueryResultTrait;
 }

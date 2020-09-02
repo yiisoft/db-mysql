@@ -14,7 +14,7 @@ use Yiisoft\Db\TestUtility\TestCommandTrait;
 /**
  * @group mysql
  */
-final class MysqlCommandTest extends TestCase
+final class CommandTest extends TestCase
 {
     use TestCommandTrait;
 

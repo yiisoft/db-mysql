@@ -4,39 +4,39 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Mysql\Schema\MysqlColumnSchemaBuilder;
-use Yiisoft\Db\Mysql\Schema\MysqlSchema;
+use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\TestUtility\TestColumnSchemaBuilderTrait;
 
 /**
  * @group mysql
  */
-final class MysqlColumnSchemaBuilderTest extends TestCase
+final class ColumnSchemaBuilderTest extends TestCase
 {
     use TestColumnSchemaBuilderTrait;
 
-    public function getColumnSchemaBuilder($type, $length = null): MysqlColumnSchemaBuilder
+    public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
-        return new MysqlColumnSchemaBuilder($type, $length, $this->getConnection());
+        return new ColumnSchemaBuilder($type, $length, $this->getConnection());
     }
 
     public function typesProvider(): array
     {
         return [
-            ['integer UNSIGNED', MysqlSchema::TYPE_INTEGER, null, [
+            ['integer UNSIGNED', Schema::TYPE_INTEGER, null, [
                 ['unsigned'],
             ]],
-            ['integer(10) UNSIGNED', MysqlSchema::TYPE_INTEGER, 10, [
+            ['integer(10) UNSIGNED', Schema::TYPE_INTEGER, 10, [
                 ['unsigned'],
             ]],
-            ['integer(10) COMMENT \'test\'', MysqlSchema::TYPE_INTEGER, 10, [
+            ['integer(10) COMMENT \'test\'', Schema::TYPE_INTEGER, 10, [
                 ['comment', 'test'],
             ]],
 
             /**
              * {@see https://github.com/yiisoft/yii2/issues/11945}, real test against database.
              */
-            ['string(50) NOT NULL COMMENT \'Property name\' COLLATE ascii_general_ci', MysqlSchema::TYPE_STRING, 50, [
+            ['string(50) NOT NULL COMMENT \'Property name\' COLLATE ascii_general_ci', Schema::TYPE_STRING, 50, [
                 ['comment', 'Property name'],
                 ['append', 'COLLATE ascii_general_ci'],
                 ['notNull']
