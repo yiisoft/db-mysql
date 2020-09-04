@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Schema;
+namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
-class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
+final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
      * Builds the unsigned string for column. Defaults to unsupported.

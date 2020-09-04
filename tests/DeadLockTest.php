@@ -4,15 +4,41 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Connection\Connection;
+use ErrorException;
+use RuntimeException;
+use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Tests\ConnectionTest as ConnectionTest;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Transaction\Transaction;
 
-class DeadLockTest extends ConnectionTest
+use function date;
+use function file_get_contents;
+use function file_put_contents;
+use function floor;
+use function function_exists;
+use function get_class;
+use function implode;
+use function is_file;
+use function microtime;
+use function pcntl_fork;
+use function pcntl_signal;
+use function pcntl_sigtimedwait;
+use function pcntl_wait;
+use function pcntl_wexitstatus;
+use function pcntl_wifexited;
+use function posix_kill;
+use function round;
+use function set_error_handler;
+use function sleep;
+use function sys_get_temp_dir;
+use function unlink;
+
+/**
+ * @group mysql
+ */
+final class DeadLockTest extends TestCase
 {
     public const CHILD_EXIT_CODE_DEADLOCK = 15;
-    protected ?string $driverName = 'mysql';
     private string $logFile = '';
 
     /**
@@ -25,19 +51,20 @@ class DeadLockTest extends ConnectionTest
      */
     public function testDeadlockException(): void
     {
-        if (!\function_exists('pcntl_fork')) {
+        if (!function_exists('pcntl_fork')) {
             $this->markTestSkipped('pcntl_fork() is not available');
         }
 
-        if (!\function_exists('posix_kill')) {
+        if (!function_exists('posix_kill')) {
             $this->markTestSkipped('posix_kill() is not available');
         }
 
-        if (!\function_exists('pcntl_sigtimedwait')) {
+        if (!function_exists('pcntl_sigtimedwait')) {
             $this->markTestSkipped('pcntl_sigtimedwait() is not available');
         }
 
-        $this->setLogFile(\sys_get_temp_dir() . '/deadlock_' . \posix_getpid());
+        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . \posix_getpid());
+
         $this->deleteLog();
 
         try {
@@ -50,28 +77,29 @@ class DeadLockTest extends ConnectionTest
              * FIRST child will send the signal to the SECOND child.
              * So, SECOND child should be forked at first to obtain its PID.
              */
-
-            $pidSecond = \pcntl_fork();
+            $pidSecond = pcntl_fork();
 
             if (-1 === $pidSecond) {
                 $this->markTestIncomplete('cannot fork');
             }
 
             if (0 === $pidSecond) {
-                /** SECOND child */
+                /* SECOND child */
                 $this->setErrorHandler();
+
                 exit($this->childrenUpdateLocked());
             }
 
-            $pidFirst = \pcntl_fork();
+            $pidFirst = pcntl_fork();
 
             if (-1 === $pidFirst) {
                 $this->markTestIncomplete('cannot fork second child');
             }
 
             if (0 === $pidFirst) {
-                /** FIRST child */
+                /* FIRST child */
                 $this->setErrorHandler();
+
                 exit($this->childrenSelectAndAccidentUpdate($pidSecond));
             }
 
@@ -79,19 +107,21 @@ class DeadLockTest extends ConnectionTest
              * PARENT
              * nothing to do
              */
-        } catch (\Exception $e) {
-            /** wait all children */
-            while (-1 !== \pcntl_wait($status)) {
-                /** nothing to do */
+        } catch (Exception $e) {
+            /* wait all children */
+            while (-1 !== pcntl_wait($status)) {
+                /* nothing to do */
             }
+
             $this->deleteLog();
 
             throw $e;
-        } catch (\Throwable $e) {
-            /** wait all children */
-            while (-1 !== \pcntl_wait($status)) {
-                /** nothing to do */
+        } catch (Throwable $e) {
+            /* wait all children */
+            while (-1 !== pcntl_wait($status)) {
+                /* nothing to do */
             }
+
             $this->deleteLog();
 
             throw $e;
@@ -103,11 +133,11 @@ class DeadLockTest extends ConnectionTest
         $errors = [];
         $deadlockHitCount = 0;
 
-        while (-1 !== \pcntl_wait($status)) {
-            if (!\pcntl_wifexited($status)) {
+        while (-1 !== pcntl_wait($status)) {
+            if (!pcntl_wifexited($status)) {
                 $errors[] = 'child did not exit itself';
             } else {
-                $exitStatus = \pcntl_wexitstatus($status);
+                $exitStatus = pcntl_wexitstatus($status);
                 if (self::CHILD_EXIT_CODE_DEADLOCK === $exitStatus) {
                     $deadlockHitCount++;
                 } elseif (0 !== $exitStatus) {
@@ -120,10 +150,11 @@ class DeadLockTest extends ConnectionTest
 
         if ($errors) {
             $this->fail(
-                \implode('; ', $errors)
+                implode('; ', $errors)
                 . ($logContent ? ". Shared children log:\n$logContent" : '')
             );
         }
+
         $this->assertEquals(
             1,
             $deadlockHitCount,
@@ -151,8 +182,7 @@ class DeadLockTest extends ConnectionTest
         try {
             $this->log('child 1: connect');
 
-            /** @var Connection $first */
-            $first = $this->getConnection(false, false);
+            $first = $this->getConnection();
 
             $this->log('child 1: delete');
 
@@ -162,7 +192,7 @@ class DeadLockTest extends ConnectionTest
 
             $this->log('child 1: insert');
 
-            /** insert test row */
+            /* insert test row */
             $first->createCommand()
                 ->insert('{{customer}}', [
                     'id'      => 97,
@@ -177,53 +207,62 @@ class DeadLockTest extends ConnectionTest
             $first->transaction(function (Connection $first) use ($pidSecond) {
                 $first->transaction(function (Connection $first) use ($pidSecond) {
                     $this->log('child 1: select');
-                    /** SELECT with shared lock */
+
+                    /* SELECT with shared lock */
                     $first->createCommand('SELECT id FROM {{customer}} WHERE id = 97 LOCK IN SHARE MODE')
                         ->execute();
 
                     $this->log('child 1: send signal to child 2');
-                    // let child to continue
-                    if (!\posix_kill($pidSecond, SIGUSR1)) {
-                        throw new \RuntimeException('Cannot send signal');
+
+                    /* let child to continue */
+                    if (!posix_kill($pidSecond, SIGUSR1)) {
+                        throw new RuntimeException('Cannot send signal');
                     }
 
-                    /** now child 2 tries to do the 2nd update, and hits the lock and waits */
+                    /**
+                     * Now child 2 tries to do the 2nd update, and hits the lock and waits delay to let child hit the
+                     * lock.
+                     */
 
-                    /** delay to let child hit the lock */
-                    \sleep(2);
+                    sleep(2);
 
                     $this->log('child 1: update');
-                    /** now do the 3rd update for deadlock */
+
+                    /* now do the 3rd update for deadlock */
                     $first->createCommand()
                         ->update('{{customer}}', ['name' => 'first'], ['id' => 97])
                         ->execute();
+
                     $this->log('child 1: commit');
                 });
             }, Transaction::REPEATABLE_READ);
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
-            /** Deadlock found when trying to get lock; try restarting transaction */
+
+            /* Deadlock found when trying to get lock; try restarting transaction */
             if ('40001' === $sqlError && 1213 === $driverError) {
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
+
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log(
-                'child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log(
-                'child 1: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
         }
+
         $this->log('child 1: exit');
 
         return 0;
@@ -234,41 +273,48 @@ class DeadLockTest extends ConnectionTest
      *
      * Second child at first will wait the signal from the first child in some seconds.
      *
-     * After receiving the signal it runs two nested {@see Connection::transaction()} to perform `UPDATE` with the test
-     * row.
+     * After receiving the signal it runs two nested {@see Connection::transaction()} to perform `UPDATE` with the
+     * test row.
      *
      * @return int Exit code. In case of deadlock exit code is {@see CHILD_EXIT_CODE_DEADLOCK}. In case of success exit
      * code is 0. Other codes means an error.
      */
     private function childrenUpdateLocked(): int
     {
-        /** install no-op signal handler to prevent termination */
-        if (!\pcntl_signal(SIGUSR1, static function () {
-        }, false)) {
+        /* install no-op signal handler to prevent termination */
+        if (
+            !pcntl_signal(SIGUSR1, static function () {
+            }, false)
+        ) {
             $this->log('child 2: cannot install signal handler');
 
             return 1;
         }
 
         try {
-            /** at first, parent should do 1st select */
+            /* at first, parent should do 1st select */
             $this->log('child 2: wait signal from child 1');
-            if (\pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
+
+            if (pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
                 $this->log('child 2: wait timeout exceeded');
 
                 return 1;
             }
 
             $this->log('child 2: connect');
-            /** @var Connection $second */
+
+            /* @var Connection $second */
+
             $second = $this->getConnection(true, false);
             $second->open();
-            /** sleep(1); */
+
+            /* sleep(1); */
             $this->log('child 2: transaction');
+
             $second->transaction(function (Connection $second) {
                 $second->transaction(function (Connection $second) {
                     $this->log('child 2: update');
-                    // do the 2nd update
+                    /* do the 2nd update */
                     $second->createCommand()
                         ->update('{{customer}}', ['name' => 'second'], ['id' => 97])
                         ->execute();
@@ -278,28 +324,31 @@ class DeadLockTest extends ConnectionTest
             }, Transaction::REPEATABLE_READ);
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
-            /** Deadlock found when trying to get lock; try restarting transaction */
+
+            /* Deadlock found when trying to get lock; try restarting transaction */
             if ('40001' === $sqlError && 1213 === $driverError) {
                 return self::CHILD_EXIT_CODE_DEADLOCK;
             }
+
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log(
-                'child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log(
-                'child 2: ! exit <<' . \get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
             return 1;
         }
+
         $this->log('child 2: exit');
 
         return 0;
@@ -314,8 +363,8 @@ class DeadLockTest extends ConnectionTest
      */
     private function setErrorHandler(): void
     {
-        \set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
-            throw new \ErrorException($errstr, $errno, $errno, $errfile, $errline);
+        set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
+            throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
         });
     }
 
@@ -336,8 +385,8 @@ class DeadLockTest extends ConnectionTest
      */
     private function deleteLog(): void
     {
-        if (null !== $this->logFile && \is_file($this->logFile)) {
-            \unlink($this->logFile);
+        if (null !== $this->logFile && is_file($this->logFile)) {
+            unlink($this->logFile);
         }
     }
 
@@ -351,9 +400,10 @@ class DeadLockTest extends ConnectionTest
      */
     private function getLogContentAndDelete(): ?string
     {
-        if (null !== $this->logFile && \is_file($this->logFile)) {
-            $content = \file_get_contents($this->logFile);
-            \unlink($this->logFile);
+        if (null !== $this->logFile && is_file($this->logFile)) {
+            $content = file_get_contents($this->logFile);
+
+            unlink($this->logFile);
 
             return $content;
         }
@@ -368,11 +418,15 @@ class DeadLockTest extends ConnectionTest
     private function log(string $message): void
     {
         if (null !== $this->logFile) {
-            $time = \microtime(true);
-            $timeInt = \floor($time);
+            $time = microtime(true);
+
+            $timeInt = floor($time);
+
             $timeFrac = $time - $timeInt;
-            $timestamp = \date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
-            \file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
+
+            $timestamp = date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
+
+            file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
         }
     }
 }

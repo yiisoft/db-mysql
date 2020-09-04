@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Tests\BatchQueryResultTest as AbstractBatchQueryResultTest;
+use Yiisoft\Db\TestUtility\TestBatchQueryResultTrait;
 
-final class BatchQueryResultTest extends AbstractBatchQueryResultTest
+/**
+ * @group mysql
+ */
+final class BatchQueryResultTest extends TestCase
 {
-    protected ?string $driverName = 'mysql';
+    use TestBatchQueryResultTrait;
 }

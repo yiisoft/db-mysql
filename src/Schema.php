@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Schema;
+namespace Yiisoft\Db\Mysql;
 
+use PDO;
+use PDOException;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
@@ -15,10 +17,24 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Query\QueryBuilder;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
-class Schema extends AbstractSchema implements ConstraintFinderInterface
+use function array_change_key_case;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function bindec;
+use function explode;
+use function preg_match;
+use function preg_match_all;
+use function str_replace;
+use function stripos;
+use function strpos;
+use function strtolower;
+use function trim;
+use function version_compare;
+
+final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
@@ -74,13 +90,13 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @return TableSchema
      *
-     * {@see \Yiisoft\Db\Schema\TableSchema}
+     * {@see TableSchema}
      */
     protected function resolveTableName(string $name): TableSchema
     {
         $resolvedName = new TableSchema();
 
-        $parts = \explode('.', \str_replace('`', '', $name));
+        $parts = explode('.', str_replace('`', '', $name));
 
         if (isset($parts[1])) {
             $resolvedName->schemaName($parts[0]);
@@ -126,7 +142,7 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $name table name.
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
@@ -150,6 +166,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $tableName table name.
      *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     *
      * @return Constraint|null primary key for the given table, `null` if the table has no primary key.
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
@@ -162,6 +182,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $tableName table name.
      *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     *
      * @return ForeignKeyConstraint[] foreign keys for the given table.
      */
     protected function loadTableForeignKeys(string $tableName): array
@@ -173,6 +197,10 @@ class Schema extends AbstractSchema implements ConstraintFinderInterface
      * Loads all indexes for the given table.
      *
      * @param string $tableName table name.
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
      *
      * @return IndexConstraint[] indexes for the given table.
      */
@@ -219,6 +247,10 @@ SQL;
      *
      * @param string $tableName table name.
      *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     *
      * @return Constraint[] unique constraints for the given table.
      */
     protected function loadTableUniques(string $tableName): array
@@ -231,6 +263,8 @@ SQL;
      *
      * @param string $tableName table name.
      *
+     * @throws NotSupportedException
+     *
      * @return CheckConstraint[] check constraints for the given table.
      */
     protected function loadTableChecks(string $tableName): array
@@ -242,6 +276,8 @@ SQL;
      * Loads all default value constraints for the given table.
      *
      * @param string $tableName table name.
+     *
+     * @throws NotSupportedException
      *
      * @return DefaultValueConstraint[] default value constraints for the given table.
      */
@@ -268,7 +304,7 @@ SQL;
      */
     protected function resolveTableNames($table, $name): void
     {
-        $parts = \explode('.', \str_replace('`', '', $name));
+        $parts = explode('.', str_replace('`', '', $name));
 
         if (isset($parts[1])) {
             $table->schemaName($parts[0]);
@@ -293,32 +329,38 @@ SQL;
 
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
-        $column->primaryKey(\strpos($info['key'], 'PRI') !== false);
-        $column->autoIncrement(\stripos($info['extra'], 'auto_increment') !== false);
+        $column->primaryKey(strpos($info['key'], 'PRI') !== false);
+        $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
         $column->dbType($info['type']);
-        $column->unsigned(\stripos($column->getDbType(), 'unsigned') !== false);
+        $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
-        if (\preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
-            $type = \strtolower($matches[1]);
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
+            $type = strtolower($matches[1]);
+
             if (isset($this->typeMap[$type])) {
                 $column->type($this->typeMap[$type]);
             }
+
             if (!empty($matches[2])) {
                 if ($type === 'enum') {
-                    \preg_match_all("/'[^']*'/", $matches[2], $values);
+                    preg_match_all("/'[^']*'/", $matches[2], $values);
+
                     foreach ($values[0] as $i => $value) {
-                        $values[$i] = \trim($value, "'");
+                        $values[$i] = trim($value, "'");
                     }
+
                     $column->enumValues($values);
                 } else {
-                    $values = \explode(',', $matches[2]);
+                    $values = explode(',', $matches[2]);
                     $column->precision((int) $values[0]);
                     $column->size((int) $values[0]);
+
                     if (isset($values[1])) {
                         $column->scale((int) $values[1]);
                     }
+
                     if ($column->getSize() === 1 && $type === 'tinyint') {
                         $column->type('boolean');
                     } elseif ($type === 'bit') {
@@ -343,12 +385,12 @@ SQL;
              */
             if (
                 ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
-                && \preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
+                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
             } elseif (isset($type) && $type === 'bit') {
-                $column->defaultValue(\bindec(\trim((string) $info['default'], 'b\'')));
+                $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
                 $column->defaultValue($column->phpTypecast($info['default']));
             }
@@ -362,7 +404,7 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws \Exception if DB query fails.
+     * @throws Exception if DB query fails.
      *
      * @return bool whether the table exists in the database.
      */
@@ -372,10 +414,10 @@ SQL;
 
         try {
             $columns = $this->getDb()->createCommand($sql)->queryAll();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $previous = $e->getPrevious();
 
-            if ($previous instanceof \PDOException && strpos($previous->getMessage(), 'SQLSTATE[42S02') !== false) {
+            if ($previous instanceof PDOException && strpos($previous->getMessage(), 'SQLSTATE[42S02') !== false) {
                 /**
                  * table does not exist.
                  *
@@ -388,8 +430,8 @@ SQL;
         }
 
         foreach ($columns as $info) {
-            if ($this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_CASE) !== \PDO::CASE_LOWER) {
-                $info = \array_change_key_case($info, CASE_LOWER);
+            if ($this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
+                $info = array_change_key_case($info, CASE_LOWER);
             }
 
             $column = $this->loadColumnSchema($info);
@@ -426,7 +468,7 @@ SQL;
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
         } else {
-            $row = \array_values($row);
+            $row = array_values($row);
             $sql = $row[1];
         }
 
@@ -438,7 +480,7 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function findConstraints($table)
     {
@@ -476,15 +518,15 @@ SQL;
             $table->foreignKeys([]);
 
             foreach ($constraints as $name => $constraint) {
-                $table->foreignKey($name, \array_merge(
+                $table->foreignKey($name, array_merge(
                     [$constraint['referenced_table_name']],
                     $constraint['columns']
                 ));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $previous = $e->getPrevious();
 
-            if (!$previous instanceof \PDOException || \strpos($previous->getMessage(), 'SQLSTATE[42S02') === false) {
+            if (!$previous instanceof PDOException || strpos($previous->getMessage(), 'SQLSTATE[42S02') === false) {
                 throw $e;
             }
 
@@ -492,11 +534,11 @@ SQL;
             $sql = $this->getCreateTableSql($table);
             $regexp = '/FOREIGN KEY\s+\(([^\)]+)\)\s+REFERENCES\s+([^\(^\s]+)\s*\(([^\)]+)\)/mi';
 
-            if (\preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+            if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
-                    $fks = array_map('trim', \explode(',', \str_replace('`', '', $match[1])));
-                    $pks = array_map('trim', \explode(',', \str_replace('`', '', $match[3])));
-                    $constraint = [\str_replace('`', '', $match[2])];
+                    $fks = array_map('trim', explode(',', str_replace('`', '', $match[1])));
+                    $pks = array_map('trim', explode(',', str_replace('`', '', $match[3])));
+                    $constraint = [str_replace('`', '', $match[2])];
 
                     foreach ($fks as $k => $name) {
                         $constraint[$name] = $pks[$k];
@@ -504,7 +546,7 @@ SQL;
 
                     $table->foreignKey(\md5(\serialize($constraint)), $constraint);
                 }
-                $table->foreignKeys(\array_values($table->getForeignKeys()));
+                $table->foreignKeys(array_values($table->getForeignKeys()));
             }
         }
     }
@@ -523,6 +565,10 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     *
      * @return array all unique indexes for the given table.
      */
     public function findUniqueIndexes($table): array
@@ -533,10 +579,10 @@ SQL;
 
         $regexp = '/UNIQUE KEY\s+\`(.+)\`\s*\((\`.+\`)+\)/mi';
 
-        if (\preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
-                $indexColumns = \array_map('trim', \explode('`,`', \trim($match[2], '`')));
+                $indexColumns = array_map('trim', explode('`,`', trim($match[2], '`')));
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }
@@ -544,7 +590,17 @@ SQL;
         return $uniqueIndexes;
     }
 
-    public function createColumnSchemaBuilder($type, $length = null)
+    /**
+     * Create a column schema builder instance giving the type and value precision.
+     *
+     * This method may be overridden by child classes to create a DBMS-specific column schema builder.
+     *
+     * @param string $type type of the column. See {@see ColumnSchemaBuilder::$type}.
+     * @param int|string|array $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
+     *
+     * @return ColumnSchemaBuilder column schema builder instance
+     */
+    public function createColumnSchemaBuilder(string $type, $length = null): ColumnSchemaBuilder
     {
         return new ColumnSchemaBuilder($type, $length, $this->getDb());
     }
@@ -558,9 +614,9 @@ SQL;
     protected function isOldMysql(): bool
     {
         if ($this->oldMysql === null) {
-            $version = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+            $version = $this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
-            $this->oldMysql = \version_compare($version, '5.1', '<=');
+            $this->oldMysql = version_compare($version, '5.1', '<=');
         }
 
         return $this->oldMysql;
@@ -693,7 +749,7 @@ SQL;
      *
      * @return ColumnSchema column schema instance.
      */
-    protected function createColumnSchema(): ColumnSchema
+    private function createColumnSchema(): ColumnSchema
     {
         return new ColumnSchema();
     }

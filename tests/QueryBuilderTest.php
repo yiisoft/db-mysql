@@ -4,189 +4,37 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Closure;
+use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\QueryBuilder;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Mysql\Schema\Schema;
-use Yiisoft\Db\Tests\QueryBuilderTest as AbstractQueryBuilderTest;
+use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
 
-class QueryBuilderTest extends AbstractQueryBuilderTest
+use function array_merge;
+use function is_string;
+
+/**
+ * @group mysql
+ */
+final class QueryBuilderTest extends TestCase
 {
-    protected ?string $driverName = 'mysql';
+    use TestQueryBuilderTrait;
 
     /**
-     * This is not used as a dataprovider for testGetColumnType to speed up the test when used as dataprovider every
-     * single line will cause a reconnect with the database which is not needed here.
+     * @param bool $reset
+     *
+     * @return QueryBuilder
      */
-    public function columnTypes(): array
+    protected function getQueryBuilder(bool $reset = false): QueryBuilder
     {
-        $columns = [
-            [
-                Schema::TYPE_PK . ' AFTER `col_before`',
-                $this->primaryKey()->after('col_before'),
-                'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY AFTER `col_before`',
-            ],
-            [
-                Schema::TYPE_PK . ' FIRST',
-                $this->primaryKey()->first(),
-                'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST',
-            ],
-            [
-                Schema::TYPE_PK . ' FIRST',
-                $this->primaryKey()->first()->after('col_before'),
-                'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST',
-            ],
-            [
-                Schema::TYPE_PK . '(8) AFTER `col_before`',
-                $this->primaryKey(8)->after('col_before'),
-                'int(8) NOT NULL AUTO_INCREMENT PRIMARY KEY AFTER `col_before`',
-            ],
-            [
-                Schema::TYPE_PK . '(8) FIRST',
-                $this->primaryKey(8)->first(),
-                'int(8) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST',
-            ],
-            [
-                Schema::TYPE_PK . '(8) FIRST',
-                $this->primaryKey(8)->first()->after('col_before'),
-                'int(8) NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST',
-            ],
-            [
-                Schema::TYPE_PK . " COMMENT 'test' AFTER `col_before`",
-                $this->primaryKey()->comment('test')->after('col_before'),
-                "int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'test' AFTER `col_before`",
-            ],
-            [
-                Schema::TYPE_PK . " COMMENT 'testing \'quote\'' AFTER `col_before`",
-                $this->primaryKey()->comment('testing \'quote\'')->after('col_before'),
-                "int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'testing \'quote\'' AFTER `col_before`",
-            ],
-        ];
-
-        return \array_merge(parent::columnTypes(), $this->columnTimeTypes(), $columns);
-    }
-
-    public function columnTimeTypes(): array
-    {
-        $columns = [
-            [
-                Schema::TYPE_DATETIME . ' NOT NULL',
-                $this->dateTime()->notNull(),
-                'datetime NOT NULL',
-            ],
-            [
-                Schema::TYPE_DATETIME,
-                $this->dateTime(),
-                'datetime',
-            ],
-            [
-                Schema::TYPE_TIME . ' NOT NULL',
-                $this->time()->notNull(),
-                'time NOT NULL',
-            ],
-            [
-                Schema::TYPE_TIME,
-                $this->time(),
-                'time',
-            ],
-            [
-                Schema::TYPE_TIMESTAMP . ' NOT NULL',
-                $this->timestamp()->notNull(),
-                'timestamp NOT NULL',
-            ],
-            [
-                Schema::TYPE_TIMESTAMP . ' NULL DEFAULT NULL',
-                $this->timestamp()->defaultValue(null),
-                'timestamp NULL DEFAULT NULL',
-            ],
-        ];
-
-        /**
-         * {@see https://github.com/yiisoft/yii2/issues/14367}
-         */
-        $mysqlVersion = $this->getDb()->getSlavePdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
-        $supportsFractionalSeconds = \version_compare($mysqlVersion, '5.6.4', '>=');
-        if ($supportsFractionalSeconds) {
-            $expectedValues = [
-                'datetime(0) NOT NULL',
-                'datetime(0)',
-                'time(0) NOT NULL',
-                'time(0)',
-                'timestamp(0) NOT NULL',
-                'timestamp(0) NULL DEFAULT NULL',
-            ];
-
-            foreach ($expectedValues as $index => $expected) {
-                $columns[$index][2] = $expected;
-            }
-        }
-
-        /**
-         * {@see https://github.com/yiisoft/yii2/issues/14834}
-         */
-        $sqlModes = $this->getConnection(false)->createCommand('SELECT @@sql_mode')->queryScalar();
-        $sqlModes = \explode(',', $sqlModes);
-        if (\in_array('NO_ZERO_DATE', $sqlModes, true)) {
-            $this->markTestIncomplete(
-                "MySQL doesn't allow the 'TIMESTAMP' column definition when the NO_ZERO_DATE mode enabled. " .
-                "This definition test was skipped."
-            );
-        } else {
-            $columns[] = [
-                Schema::TYPE_TIMESTAMP,
-                $this->timestamp(),
-                $supportsFractionalSeconds ? 'timestamp(0)' : 'timestamp',
-            ];
-        }
-
-        return $columns;
-    }
-
-    public function primaryKeysProvider(): array
-    {
-        $result = parent::primaryKeysProvider();
-        $result['drop'][0] = 'ALTER TABLE {{T_constraints_1}} DROP PRIMARY KEY';
-        $result['add'][0] = 'ALTER TABLE {{T_constraints_1}} ADD CONSTRAINT [[CN_pk]] PRIMARY KEY ([[C_id_1]])';
-        $result['add (2 columns)'][0] = 'ALTER TABLE {{T_constraints_1}} ADD CONSTRAINT [[CN_pk]] PRIMARY KEY ([[C_id_1]], [[C_id_2]])';
-
-        return $result;
-    }
-
-    public function foreignKeysProvider(): array
-    {
-        $result = parent::foreignKeysProvider();
-        $result['drop'][0] = 'ALTER TABLE {{T_constraints_3}} DROP FOREIGN KEY [[CN_constraints_3]]';
-
-        return $result;
-    }
-
-    public function indexesProvider(): array
-    {
-        $result = parent::indexesProvider();
-        $result['create'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_single]] ([[C_index_1]])';
-        $result['create (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_multi]] ([[C_index_2_1]], [[C_index_2_2]])';
-        $result['create unique'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE INDEX [[CN_constraints_2_single]] ([[C_index_1]])';
-        $result['create unique (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE INDEX [[CN_constraints_2_multi]] ([[C_index_2_1]], [[C_index_2_2]])';
-
-        return $result;
-    }
-
-    public function uniquesProvider(): array
-    {
-        $result = parent::uniquesProvider();
-        $result['drop'][0] = 'DROP INDEX [[CN_unique]] ON {{T_constraints_1}}';
-
-        return $result;
-    }
-
-    public function checksProvider(): void
-    {
-        $this->markTestSkipped('Adding/dropping check constraints is not supported in MySQL.');
-    }
-
-    public function defaultValuesProvider()
-    {
-        $this->markTestSkipped('Adding/dropping default constraints is not supported in MySQL.');
+        return new QueryBuilder($this->getConnection($reset));
     }
 
     public function testResetSequence(): void
@@ -200,6 +48,413 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         $expected = 'ALTER TABLE `item` AUTO_INCREMENT=4';
         $sql = $qb->resetSequence('item', 4);
         $this->assertEquals($expected, $sql);
+    }
+
+    public function addDropForeignKeysProvider(): array
+    {
+        $result = $this->addDropforeignKeysProviderTrait();
+
+        $result['drop'][0] = 'ALTER TABLE {{T_constraints_3}} DROP FOREIGN KEY [[CN_constraints_3]]';
+
+        return $result;
+    }
+
+    /**
+     * @dataProvider addDropForeignKeysProvider
+     *
+     * @param string $sql
+     * @param Closure $builder
+     */
+    public function testAddDropForeignKey(string $sql, Closure $builder): void
+    {
+        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+    }
+
+    public function addDropPrimaryKeysProvider(): array
+    {
+        $result = $this->addDropPrimaryKeysProviderTrait();
+
+        $result['drop'][0] = 'ALTER TABLE {{T_constraints_1}} DROP PRIMARY KEY';
+
+        $result['add'][0] = 'ALTER TABLE {{T_constraints_1}} ADD CONSTRAINT [[CN_pk]] PRIMARY KEY ([[C_id_1]])';
+
+        $result['add (2 columns)'][0] = 'ALTER TABLE {{T_constraints_1}} ADD CONSTRAINT [[CN_pk]]'
+            . ' PRIMARY KEY ([[C_id_1]], [[C_id_2]])';
+
+        return $result;
+    }
+
+    /**
+     * @dataProvider addDropPrimaryKeysProvider
+     *
+     * @param string $sql
+     * @param Closure $builder
+     */
+    public function testAddDropPrimaryKey(string $sql, Closure $builder): void
+    {
+        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+    }
+
+    public function addDropUniquesProvider(): array
+    {
+        $result = $this->addDropUniquesProviderTrait();
+
+        $result['drop'][0] = 'DROP INDEX [[CN_unique]] ON {{T_constraints_1}}';
+
+        return $result;
+    }
+
+    /**
+     * @dataProvider addDropUniquesProvider
+     *
+     * @param string $sql
+     * @param Closure $builder
+     */
+    public function testAddDropUnique(string $sql, Closure $builder): void
+    {
+        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+    }
+
+    /**
+     * @dataProvider batchInsertProviderTrait
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array $value
+     * @param string|null $expected
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testBatchInsert(string $table, array $columns, array $value, ?string $expected): void
+    {
+        $queryBuilder = $this->getQueryBuilder();
+
+        $sql = $queryBuilder->batchInsert($table, $columns, $value);
+
+        $this->assertEquals($expected, $sql);
+    }
+
+    public function buildConditionsProvider(): array
+    {
+        return array_merge($this->buildConditionsProviderTrait(), [
+            [
+                ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"lang":"uk","country":"UA"}'],
+            ],
+            [
+                ['=', 'jsoncol', new JsonExpression([false])],
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[false]']
+            ],
+            'object with type. Type is ignored for MySQL' => [
+                ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
+                '[[prices]] = CAST(:qp0 AS JSON)', [':qp0' => '{"seeds":15,"apples":25}'],
+            ],
+            'nested json' => [
+                [
+                    '=',
+                    'data',
+                    new JsonExpression(
+                        [
+                            'user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'],
+                            'props' => ['mood' => 'good']
+                        ]
+                    )
+                ],
+                '[[data]] = CAST(:qp0 AS JSON)',
+                [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}']
+            ],
+            'null value' => [
+                ['=', 'jsoncol', new JsonExpression(null)],
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => 'null']
+            ],
+            'null as array value' => [
+                ['=', 'jsoncol', new JsonExpression([null])],
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[null]']
+            ],
+            'null as object value' => [
+                ['=', 'jsoncol', new JsonExpression(['nil' => null])],
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}']
+            ],
+            'query' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]))
+                ],
+                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
+                [':qp0' => 1]
+            ],
+            'query with type, that is ignored in MySQL' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]), 'jsonb')
+                ],
+                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1]
+            ],
+            'nested and combined json expression' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])]))
+                ],
+                "[[jsoncol]] = CAST(:qp0 AS JSON)", [':qp0' => '{"a":1,"b":2,"d":{"e":3}}']
+            ],
+            'search by property in JSON column (issue #15838)' => [
+                ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
+                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42]
+            ]
+        ]);
+    }
+
+    /**
+     * @dataProvider buildConditionsProvider
+     *
+     * @param ExpressionInterface|array $condition
+     * @param string|null $expected
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testBuildCondition($condition, ?string $expected, array $expectedParams): void
+    {
+        $db = $this->getConnection();
+
+        $query = (new Query($db))->where($condition);
+
+        [$sql, $params] = $this->getQueryBuilder()->build($query);
+
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $this->assertEquals($expectedParams, $params);
+    }
+
+    /**
+     * @dataProvider buildFilterConditionProviderTrait
+     *
+     * @param array $condition
+     * @param string|null $expected
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testBuildFilterCondition(array $condition, ?string $expected, array $expectedParams): void
+    {
+        $query = (new Query($this->getConnection()))->filterWhere($condition);
+
+        [$sql, $params] = $this->getQueryBuilder()->build($query);
+
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $this->assertEquals($expectedParams, $params);
+    }
+
+    /**
+     * @dataProvider buildFromDataProviderTrait
+     *
+     * @param string $table
+     * @param string $expected
+     *
+     * @throws Exception
+     */
+    public function testBuildFrom(string $table, string $expected): void
+    {
+        $params = [];
+
+        $sql = $this->getQueryBuilder()->buildFrom([$table], $params);
+
+        $this->assertEquals('FROM ' . $this->replaceQuotes($expected), $sql);
+    }
+
+    /**
+     * @dataProvider buildLikeConditionsProviderTrait
+     *
+     * @param object|array $condition
+     * @param string|null $expected
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testBuildLikeCondition($condition, ?string $expected, array $expectedParams): void
+    {
+        $db = $this->getConnection();
+
+        $query = (new Query($db))->where($condition);
+
+        [$sql, $params] = $this->getQueryBuilder()->build($query);
+
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $this->assertEquals($expectedParams, $params);
+    }
+
+    /**
+     * @dataProvider buildExistsParamsProviderTrait
+     *
+     * @param string $cond
+     * @param string|null $expectedQuerySql
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testBuildWhereExists(string $cond, ?string $expectedQuerySql): void
+    {
+        $db = $this->getConnection();
+
+        $expectedQueryParams = [];
+
+        $subQuery = new Query($db);
+
+        $subQuery->select('1')
+            ->from('Website w');
+
+        $query = new Query($db);
+
+        $query->select('id')
+            ->from('TotalExample t')
+            ->where([$cond, $subQuery]);
+
+        [$actualQuerySql, $actualQueryParams] = $this->getQueryBuilder()->build($query);
+
+        $this->assertEquals($expectedQuerySql, $actualQuerySql);
+        $this->assertEquals($expectedQueryParams, $actualQueryParams);
+    }
+
+    public function createDropIndexesProvider(): array
+    {
+        $result = $this->createDropIndexesProviderTrait();
+
+        $result['create'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_single]] ([[C_index_1]])';
+
+        $result['create (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_multi]]'
+            . ' ([[C_index_2_1]], [[C_index_2_2]])';
+
+        $result['create unique'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE INDEX [[CN_constraints_2_single]]'
+            . ' ([[C_index_1]])';
+
+        $result['create unique (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE'
+            . ' INDEX [[CN_constraints_2_multi]] ([[C_index_2_1]], [[C_index_2_2]])';
+
+        return $result;
+    }
+
+    /**
+     * @dataProvider createDropIndexesProvider
+     *
+     * @param string $sql
+     */
+    public function testCreateDropIndex(string $sql, Closure $builder): void
+    {
+        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+    }
+
+    /**
+     * @dataProvider deleteProviderTrait
+     *
+     * @param string $table
+     * @param array|string $condition
+     * @param string|null $expectedSQL
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testDelete(string $table, $condition, ?string $expectedSQL, array $expectedParams): void
+    {
+        $actualParams = [];
+
+        $actualSQL = $this->getQueryBuilder()->delete($table, $condition, $actualParams);
+
+        $this->assertSame($expectedSQL, $actualSQL);
+        $this->assertSame($expectedParams, $actualParams);
+    }
+
+    /**
+     * @dataProvider insertProviderTrait
+     *
+     * @param string $table
+     * @param ColumnSchema|array $columns
+     * @param array $params
+     * @param string|null $expectedSQL
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testInsert(string $table, $columns, array $params, ?string $expectedSQL, array $expectedParams): void
+    {
+        $actualParams = $params;
+
+        $actualSQL = $this->getQueryBuilder()->insert($table, $columns, $actualParams);
+
+        $this->assertSame($expectedSQL, $actualSQL);
+        $this->assertSame($expectedParams, $actualParams);
+    }
+
+    public function updateProvider(): array
+    {
+        $items = $this->updateProviderTrait();
+
+        $items[] = [
+            'profile',
+            [
+                'description' => new JsonExpression(['abc' => 'def', 123, null]),
+            ],
+            [
+                'id' => 1,
+            ],
+            $this->replaceQuotes('UPDATE [[profile]] SET [[description]]=CAST(:qp0 AS JSON) WHERE [[id]]=:qp1'),
+            [
+                ':qp0' => '{"abc":"def","0":123,"1":null}',
+                ':qp1' => 1,
+            ],
+        ];
+
+        return $items;
+    }
+
+    /**
+     * @dataProvider updateProvider
+     *
+     * @param string $table
+     * @param array $columns
+     * @param array|string $condition
+     * @param string|null $expectedSQL
+     * @param array $expectedParams
+     *
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function testUpdate(
+        string $table,
+        array $columns,
+        $condition,
+        ?string $expectedSQL,
+        array $expectedParams
+    ): void {
+        $actualParams = [];
+
+        $actualSQL = $this->getQueryBuilder()->update($table, $columns, $condition, $actualParams);
+
+        $this->assertSame($expectedSQL, $actualSQL);
+        $this->assertSame($expectedParams, $actualParams);
     }
 
     public function upsertProvider(): array
@@ -243,7 +498,7 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
             ],
         ];
 
-        $newData = parent::upsertProvider();
+        $newData = $this->upsertProviderTrait();
 
         foreach ($concreteData as $testName => $data) {
             $newData[$testName] = \array_replace($newData[$testName], $data);
@@ -252,102 +507,37 @@ class QueryBuilderTest extends AbstractQueryBuilderTest
         return $newData;
     }
 
-    public function conditionProvider(): array
+    /**
+     * @depends testInitFixtures
+     *
+     * @dataProvider upsertProvider
+     *
+     * @param string $table
+     * @param ColumnSchema|array $insertColumns
+     * @param array|bool|null $updateColumns
+     * @param string|string[] $expectedSQL
+     * @param array $expectedParams
+     *
+     * @throws NotSupportedException
+     * @throws Exception
+     */
+    public function testUpsert(string $table, $insertColumns, $updateColumns, $expectedSQL, array $expectedParams): void
     {
-        $db = $this->createConnection();
+        $actualParams = [];
 
-        return \array_merge(parent::conditionProvider(), [
-            /** json conditions */
-            [
-                ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"lang":"uk","country":"UA"}'],
-            ],
-            [
-                ['=', 'jsoncol', new JsonExpression([false])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[false]']
-            ],
-            'object with type. Type is ignored for MySQL' => [
-                ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
-                '[[prices]] = CAST(:qp0 AS JSON)', [':qp0' => '{"seeds":15,"apples":25}'],
-            ],
-            'nested json' => [
-                ['=', 'data', new JsonExpression(['user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'], 'props' => ['mood' => 'good']])],
-                '[[data]] = CAST(:qp0 AS JSON)', [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}']
-            ],
-            'null value' => [
-                ['=', 'jsoncol', new JsonExpression(null)],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => 'null']
-            ],
-            'null as array value' => [
-                ['=', 'jsoncol', new JsonExpression([null])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[null]']
-            ],
-            'null as object value' => [
-                ['=', 'jsoncol', new JsonExpression(['nil' => null])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}']
-            ],
-            'query' => [
-                ['=', 'jsoncol', new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1]))],
-                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1]
-            ],
-            'query with type, that is ignored in MySQL' => [
-                ['=', 'jsoncol', new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1]), 'jsonb')],
-                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1]
-            ],
-            'nested and combined json expression' => [
-                ['=', 'jsoncol', new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])]))],
-                "[[jsoncol]] = CAST(:qp0 AS JSON)", [':qp0' => '{"a":1,"b":2,"d":{"e":3}}']
-            ],
-            'search by property in JSON column (issue #15838)' => [
-                ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
-                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42]
-            ]
-        ]);
-    }
+        $actualSQL = $this->getQueryBuilder()
+            ->upsert($table, $insertColumns, $updateColumns, $actualParams);
 
-    public function updateProvider(): array
-    {
-        $items = parent::updateProvider();
-
-        $items[] = [
-            'profile',
-            [
-                'description' => new JsonExpression(['abc' => 'def', 123, null]),
-            ],
-            [
-                'id' => 1,
-            ],
-            $this->replaceQuotes('UPDATE [[profile]] SET [[description]]=CAST(:qp0 AS JSON) WHERE [[id]]=:qp1'),
-            [
-                ':qp0' => '{"abc":"def","0":123,"1":null}',
-                ':qp1' => 1,
-            ],
-        ];
-
-        return $items;
-    }
-
-    public function testIssue17449(): void
-    {
-        $db = $this->getConnection();
-        $pdo = $db->getPDO();
-        $pdo->exec('DROP TABLE IF EXISTS `issue_17449`');
-
-        $tableQuery = <<<MySqlStatement
-CREATE TABLE `issue_17449` (
-  `test_column` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'some comment' CHECK (json_valid(`test_column`))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
-MySqlStatement;
-        $db->createCommand($tableQuery)->execute();
-
-        $actual = $db->createCommand()->addCommentOnColumn('issue_17449', 'test_column', 'Some comment')->getRawSql();
-
-        $checkPos = stripos($actual, 'check');
-        if ($checkPos === false) {
-            $this->markTestSkipped("The used MySql-Server removed or moved the CHECK from the column line, so the original bug doesn't affect it");
+        if (is_string($expectedSQL)) {
+            $this->assertSame($expectedSQL, $actualSQL);
+        } else {
+            $this->assertContains($actualSQL, $expectedSQL);
         }
-        $commentPos = stripos($actual, 'comment');
-        $this->assertNotFalse($commentPos);
-        $this->assertLessThan($checkPos, $commentPos);
+
+        if (ArrayHelper::isAssociative($expectedParams)) {
+            $this->assertSame($expectedParams, $actualParams);
+        } else {
+            $this->assertIsOneOf($actualParams, $expectedParams);
+        }
     }
 }
