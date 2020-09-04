@@ -50,6 +50,7 @@ use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Helper\Dsn;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target\File\FileRotator;
