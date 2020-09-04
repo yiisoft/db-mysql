@@ -17,7 +17,6 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\QueryBuilder;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
 use function array_change_key_case;

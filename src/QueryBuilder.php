@@ -12,9 +12,6 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
-use Yiisoft\Db\Mysql\JsonExpressionBuilder;
-use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
 
