@@ -20,14 +20,13 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/db-mysql/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-mysql/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/db-mysql/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-mysql/?branch=master)
-[![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
 
 ## Support version
 
-|  PHP | Mysql Version            | SO | CI-Actions
-|:----:|:------------------------:|:--:|:---:|
-|![PHP-7](https://img.shields.io/badge/7:latest-blue) ![PHP-8](https://img.shields.io/badge/8:latest-blue)| ![Mysql-5.7](https://img.shields.io/badge/5:latest-blue) ![Mysql-8.0](https://img.shields.io/badge/8:latest-blue)|![Linux](https://img.shields.io/badge/ubuntu-blue)|[![Build status](https://github.com/yiisoft/db-mssql/workflows/build/badge.svg)](https://github.com/yiisoft/db-mysql/actions/runs/239488310) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3A%22static+analysis%22)
+|  PHP | Mysql Version            |  CI-Actions
+|:----:|:------------------------:|:---:|
+|**7.4 - 8.0**| **5-7 - 8.0**|[![Build status](https://github.com/yiisoft/db-mysql/workflows/build/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3Abuild) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3A%22static+analysis%22) [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
 
 ## Installation
@@ -64,9 +63,8 @@ return [
     },
 
     Aliases::class => [
-        '@root' => dirname(__DIR__, 1),
-        '@data' =>  '@root/tests/Data',
-        '@runtime' => '@data/runtime',
+        '@root' => dirname(__DIR__, 1), // directory / packages.
+        '@runtime' => '@root/runtime' 
     ],
 
     CacheInterface::class => static function () {
@@ -153,7 +151,7 @@ The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
 ./vendor/bin/phpunit
 ```
 
-Note: You must have MSSQL installed to run the tests, it supports all MSSQL versions.
+Note: You must have MYSQL installed to run the tests, it supports all MYSQL versions.
 
 ## Mutation testing
 
@@ -165,8 +163,8 @@ The package tests are checked with [Infection](https://infection.github.io/) mut
 
 ## Static analysis
 
-The code is statically analyzed with [Phan](https://github.com/phan/phan/wiki). To run static analysis:
+The code is statically analyzed with [Psalm](https://psalm.dev/docs/). To run static analysis:
 
 ```php
-./vendor/bin/phan
+./vendor/bin/psalm
 ```
