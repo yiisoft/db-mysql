@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\Schema;
+namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
 
-class ColumnSchema extends AbstractColumnSchema
+use function json_decode;
+
+final class ColumnSchema extends AbstractColumnSchema
 {
     /**
      * Converts the input value according to {@see phpType} after retrieval from the database.
@@ -26,7 +28,7 @@ class ColumnSchema extends AbstractColumnSchema
         }
 
         if ($this->getType() === Schema::TYPE_JSON) {
-            return \json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         }
 
         return parent::phpTypecast($value);

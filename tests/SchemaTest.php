@@ -4,20 +4,258 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PDO;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Schema\ColumnSchema;
-use Yiisoft\Db\Mysql\Schema\Schema;
-use Yiisoft\Db\Tests\SchemaTest as AbstractSchemaTest;
+use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\TableSchema;
+use Yiisoft\Db\TestUtility\AnyCaseValue;
+use Yiisoft\Db\TestUtility\TestSchemaTrait;
 
-class SchemaTest extends AbstractSchemaTest
+use function array_map;
+use function trim;
+use function version_compare;
+
+/**
+ * @group mysql
+ */
+final class SchemaTest extends TestCase
 {
-    protected ?string $driverName = 'mysql';
+    use TestSchemaTrait;
+
+    public function getExpectedColumns(): array
+    {
+        $version = $this->getConnection()->getServerVersion();
+
+        return [
+            'int_col' => [
+                'type' => 'integer',
+                'dbType' => version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
+                'phpType' => 'integer',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => version_compare($version, '8.0.17', '>') ? null : 11,
+                'precision' => version_compare($version, '8.0.17', '>') ? null : 11,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'int_col2' => [
+                'type' => 'integer',
+                'dbType' => version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
+                'phpType' => 'integer',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => version_compare($version, '8.0.17', '>') ? null : 11,
+                'precision' => version_compare($version, '8.0.17', '>') ? null : 11,
+                'scale' => null,
+                'defaultValue' => 1,
+            ],
+            'tinyint_col' => [
+                'type' => 'tinyint',
+                'dbType' => version_compare($version, '8.0.17', '>') ? 'tinyint' : 'tinyint(3)',
+                'phpType' => 'integer',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => version_compare($version, '8.0.17', '>') ? null : 3,
+                'precision' => version_compare($version, '8.0.17', '>') ? null : 3,
+                'scale' => null,
+                'defaultValue' => 1,
+            ],
+            'smallint_col' => [
+                'type' => 'smallint',
+                'dbType' =>  version_compare($version, '8.0.17', '>') ? 'smallint' : 'smallint(1)',
+                'phpType' => 'integer',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => version_compare($version, '8.0.17', '>') ? null : 1,
+                'precision' => version_compare($version, '8.0.17', '>') ? null : 1,
+                'scale' => null,
+                'defaultValue' => 1,
+            ],
+            'char_col' => [
+                'type' => 'char',
+                'dbType' => 'char(100)',
+                'phpType' => 'string',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 100,
+                'precision' => 100,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'char_col2' => [
+                'type' => 'string',
+                'dbType' => 'varchar(100)',
+                'phpType' => 'string',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 100,
+                'precision' => 100,
+                'scale' => null,
+                'defaultValue' => 'something',
+            ],
+            'char_col3' => [
+                'type' => 'text',
+                'dbType' => 'text',
+                'phpType' => 'string',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'enum_col' => [
+                'type' => 'string',
+                'dbType' => "enum('a','B','c,D')",
+                'phpType' => 'string',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => ['a', 'B', 'c,D'],
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'float_col' => [
+                'type' => 'double',
+                'dbType' => 'double(4,3)',
+                'phpType' => 'double',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 4,
+                'precision' => 4,
+                'scale' => 3,
+                'defaultValue' => null,
+            ],
+            'float_col2' => [
+                'type' => 'double',
+                'dbType' => 'double',
+                'phpType' => 'double',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => 1.23,
+            ],
+            'blob_col' => [
+                'type' => 'binary',
+                'dbType' => 'blob',
+                'phpType' => 'resource',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'numeric_col' => [
+                'type' => 'decimal',
+                'dbType' => 'decimal(5,2)',
+                'phpType' => 'string',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 5,
+                'precision' => 5,
+                'scale' => 2,
+                'defaultValue' => '33.22',
+            ],
+            'time' => [
+                'type' => 'timestamp',
+                'dbType' => 'timestamp',
+                'phpType' => 'string',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => '2002-01-01 00:00:00',
+            ],
+            'bool_col' => [
+                'type' => 'boolean',
+                'dbType' => 'tinyint(1)',
+                'phpType' => 'boolean',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 1,
+                'precision' => 1,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+            'bool_col2' => [
+                'type' => 'boolean',
+                'dbType' => 'tinyint(1)',
+                'phpType' => 'boolean',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 1,
+                'precision' => 1,
+                'scale' => null,
+                'defaultValue' => 1,
+            ],
+            'ts_default' => [
+                'type' => 'timestamp',
+                'dbType' => 'timestamp',
+                'phpType' => 'string',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => new Expression('CURRENT_TIMESTAMP'),
+            ],
+            'bit_col' => [
+                'type' => 'integer',
+                'dbType' => 'bit(8)',
+                'phpType' => 'integer',
+                'allowNull' => false,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => 8,
+                'precision' => 8,
+                'scale' => null,
+                'defaultValue' => 130, // b'10000010'
+            ],
+            'json_col' => [
+                'type' => 'json',
+                'dbType' => 'json',
+                'phpType' => 'array',
+                'allowNull' => true,
+                'autoIncrement' => false,
+                'enumValues' => null,
+                'size' => null,
+                'precision' => null,
+                'scale' => null,
+                'defaultValue' => null,
+            ],
+        ];
+    }
 
     public function testLoadDefaultDatetimeColumn(): void
     {
-        if (!version_compare($this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6', '>=')) {
+        if (!version_compare($this->getConnection()->getServerVersion(), '5.6', '>=')) {
             $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
         }
+
         $sql = <<<SQL
 CREATE TABLE  IF NOT EXISTS `datetime_test`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -39,9 +277,12 @@ SQL;
 
     public function testDefaultDatetimeColumnWithMicrosecs(): void
     {
-        if (!version_compare($this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION), '5.6.4', '>=')) {
-            $this->markTestSkipped('CURRENT_TIMESTAMP with microseconds as default column value is supported since MySQL 5.6.4.');
+        if (!version_compare($this->getConnection()->getServerVersion(), '5.6.4', '>=')) {
+            $this->markTestSkipped(
+                'CURRENT_TIMESTAMP with microseconds as default column value is supported since MySQL 5.6.4.'
+            );
         }
+
         $sql = <<<SQL
 CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
   `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
@@ -54,36 +295,14 @@ SQL;
         $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
 
         $dt = $schema->getColumn('dt');
+
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
         $ts = $schema->getColumn('ts');
+
         $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
-    }
-
-    public function testGetSchemaNames()
-    {
-        $this->markTestSkipped('Schemas are not supported in MySQL.');
-    }
-
-    public function constraintsProvider()
-    {
-        $result = parent::constraintsProvider();
-
-        $result['1: check'][2] = false;
-
-        $result['2: primary key'][2]->name(null);
-        $result['2: check'][2] = false;
-
-        // Work aroung bug in MySQL 5.1 - it creates only this table in lowercase. O_o
-        //$result['3: foreign key'][2][0]->setForeignTableName(new AnyCaseValue('T_constraints_2'));
-
-        $result['3: check'][2] = false;
-
-        $result['4: check'][2] = false;
-
-        return $result;
     }
 
     /**
@@ -118,62 +337,180 @@ SQL;
         $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
     }
 
-    public function getExpectedColumns()
+    /**
+     * @dataProvider pdoAttributesProviderTrait
+     *
+     * @param array $pdoAttributes
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testGetTableNames(array $pdoAttributes): void
     {
-        $version = $this->getConnection()->getPDO()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        $connection = $this->getConnection(true);
 
-        return array_merge(
-            parent::getExpectedColumns(),
-            [
-                'int_col' => [
-                    'type' => 'integer',
-                    'dbType' => \version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
-                    'phpType' => 'integer',
-                    'allowNull' => false,
-                    'autoIncrement' => false,
-                    'enumValues' => null,
-                    'size' => \version_compare($version, '8.0.17', '>') ? null : 11,
-                    'precision' => \version_compare($version, '8.0.17', '>') ? null : 11,
-                    'scale' => null,
-                    'defaultValue' => null,
-                ],
-                'int_col2' => [
-                    'type' => 'integer',
-                    'dbType' => \version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
-                    'phpType' => 'integer',
-                    'allowNull' => true,
-                    'autoIncrement' => false,
-                    'enumValues' => null,
-                    'size' => \version_compare($version, '8.0.17', '>') ? null : 11,
-                    'precision' => \version_compare($version, '8.0.17', '>') ? null : 11,
-                    'scale' => null,
-                    'defaultValue' => 1,
-                ],
-                'tinyint_col' => [
-                    'type' => 'tinyint',
-                    'dbType' => \version_compare($version, '8.0.17', '>') ? 'tinyint' : 'tinyint(3)',
-                    'phpType' => 'integer',
-                    'allowNull' => true,
-                    'autoIncrement' => false,
-                    'enumValues' => null,
-                    'size' => \version_compare($version, '8.0.17', '>') ? null : 3,
-                    'precision' => \version_compare($version, '8.0.17', '>') ? null : 3,
-                    'scale' => null,
-                    'defaultValue' => 1,
-                ],
-                'smallint_col' => [
-                    'type' => 'smallint',
-                    'dbType' =>  \version_compare($version, '8.0.17', '>') ? 'smallint' : 'smallint(1)',
-                    'phpType' => 'integer',
-                    'allowNull' => true,
-                    'autoIncrement' => false,
-                    'enumValues' => null,
-                    'size' => \version_compare($version, '8.0.17', '>') ? null : 1,
-                    'precision' => \version_compare($version, '8.0.17', '>') ? null : 1,
-                    'scale' => null,
-                    'defaultValue' => 1,
-                ],
-            ]
-        );
+        foreach ($pdoAttributes as $name => $value) {
+            $connection->getPDO()->setAttribute($name, $value);
+        }
+
+        $schema = $connection->getSchema();
+
+        $tables = $schema->getTableNames();
+
+        if ($connection->getDriverName() === 'sqlsrv') {
+            $tables = array_map(static function ($item) {
+                return trim($item, '[]');
+            }, $tables);
+        }
+
+        $this->assertContains('customer', $tables);
+        $this->assertContains('category', $tables);
+        $this->assertContains('item', $tables);
+        $this->assertContains('order', $tables);
+        $this->assertContains('order_item', $tables);
+        $this->assertContains('type', $tables);
+        $this->assertContains('animal', $tables);
+        $this->assertContains('animal_view', $tables);
+    }
+
+    public function constraintsProvider()
+    {
+        $result = $this->constraintsProviderTrait();
+
+        $result['1: check'][2] = false;
+
+        $result['2: primary key'][2]->name(null);
+
+        $result['2: check'][2] = false;
+
+        $result['3: check'][2] = false;
+
+        $result['4: check'][2] = false;
+
+        return $result;
+    }
+
+    /**
+     * @dataProvider constraintsProvider
+     *
+     * @param string $tableName
+     * @param string $type
+     * @param mixed $expected
+     */
+    public function testTableSchemaConstraints(string $tableName, string $type, $expected): void
+    {
+        if ($expected === false) {
+            $this->expectException(NotSupportedException::class);
+        }
+
+        $constraints = $this->getConnection()->getSchema()->{'getTable' . ucfirst($type)}($tableName);
+
+        $this->assertMetadataEquals($expected, $constraints);
+    }
+
+    /**
+     * @dataProvider lowercaseConstraintsProviderTrait
+     *
+     * @param string $tableName
+     * @param string $type
+     * @param mixed $expected
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, $expected): void
+    {
+        if ($expected === false) {
+            $this->expectException(NotSupportedException::class);
+        }
+
+        $connection = $this->getConnection();
+
+        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+
+        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
+
+        $this->assertMetadataEquals($expected, $constraints);
+    }
+
+    /**
+     * @dataProvider uppercaseConstraintsProviderTrait
+     *
+     * @param string $tableName
+     * @param string $type
+     * @param mixed $expected
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, $expected): void
+    {
+        if ($expected === false) {
+            $this->expectException(NotSupportedException::class);
+        }
+
+        $connection = $this->getConnection();
+
+        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+
+        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
+
+        $this->assertMetadataEquals($expected, $constraints);
+    }
+
+    /**
+     * @depends testSchemaCache
+     *
+     * @dataProvider tableSchemaCachePrefixesProviderTrait
+     *
+     * @param string $tablePrefix
+     * @param string $tableName
+     * @param string $testTablePrefix
+     * @param string $testTableName
+     */
+    public function testTableSchemaCacheWithTablePrefixes(
+        string $tablePrefix,
+        string $tableName,
+        string $testTablePrefix,
+        string $testTableName
+    ): void {
+        $schema = $this->getConnection()->getSchema();
+
+        $schema->getDb()->setEnableSchemaCache(true);
+
+        $schema->getDb()->setSchemaCache($this->cache);
+
+        $schema->getDb()->setTablePrefix($tablePrefix);
+
+        $noCacheTable = $schema->getTableSchema($tableName, true);
+
+        $this->assertInstanceOf(TableSchema::class, $noCacheTable);
+
+        /* Compare */
+        $schema->getDb()->setTablePrefix($testTablePrefix);
+
+        $testNoCacheTable = $schema->getTableSchema($testTableName);
+
+        $this->assertSame($noCacheTable, $testNoCacheTable);
+
+        $schema->getDb()->setTablePrefix($tablePrefix);
+
+        $schema->refreshTableSchema($tableName);
+
+        $refreshedTable = $schema->getTableSchema($tableName, false);
+
+        $this->assertInstanceOf(TableSchema::class, $refreshedTable);
+        $this->assertNotSame($noCacheTable, $refreshedTable);
+
+        /* Compare */
+        $schema->getDb()->setTablePrefix($testTablePrefix);
+
+        $schema->refreshTableSchema($testTablePrefix);
+
+        $testRefreshedTable = $schema->getTableSchema($testTableName, false);
+
+        $this->assertInstanceOf(TableSchema::class, $testRefreshedTable);
+        $this->assertEquals($refreshedTable, $testRefreshedTable);
+        $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
     }
 }
