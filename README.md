@@ -26,7 +26,7 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 ## Support version
 
-|  PHP | Version                  | Test   | SO  |
+|  PHP | Mysql Version            | Test   | SO  |
 |:----:|:------------------------:|:------:|:---:|
 |![PHP-7](https://img.shields.io/badge/7:latest-blue) ![PHP-8](https://img.shields.io/badge/8:latest-blue)| ![Mysql-5.7](https://img.shields.io/badge/5:latest-blue) ![Mysql-8.0](https://img.shields.io/badge/8:latest-blue)|[![Build status](https://github.com/yiisoft/db-mssql/workflows/build/badge.svg)](https://github.com/yiisoft/db-mysql/actions/runs/239488310)| ![Linux](https://img.shields.io/badge/ubuntu-blue)|
 
