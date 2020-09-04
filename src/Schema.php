@@ -265,7 +265,7 @@ SQL;
      *
      * @throws NotSupportedException
      *
-     * @return CheckConstraint[] check constraints for the given table.
+     * @return array check constraints for the given table.
      */
     protected function loadTableChecks(string $tableName): array
     {
@@ -279,7 +279,7 @@ SQL;
      *
      * @throws NotSupportedException
      *
-     * @return DefaultValueConstraint[] default value constraints for the given table.
+     * @return array default value constraints for the given table.
      */
     protected function loadTableDefaultValues(string $tableName): array
     {
@@ -712,13 +712,13 @@ SQL;
                         break;
                     case 'FOREIGN KEY':
                         $fk = (new ForeignKeyConstraint())
-                            ->name($name)
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
                             ->foreignSchemaName($constraint[0]['foreign_table_schema'])
                             ->foreignTableName($constraint[0]['foreign_table_name'])
                             ->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'))
                             ->onDelete($constraint[0]['on_delete'])
-                            ->onUpdate($constraint[0]['on_update']);
+                            ->onUpdate($constraint[0]['on_update'])
+                            ->name($name)
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
 
                         $result['foreignKeys'][] = $fk;
 

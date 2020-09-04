@@ -548,6 +548,8 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     private function getColumnDefinition(string $table, string $column): ?string
     {
+        $result = null;
+
         $quotedTable = $this->db->quoteTableName($table);
 
         $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
@@ -566,10 +568,12 @@ final class QueryBuilder extends AbstractQueryBuilder
         if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
             foreach ($matches[1] as $i => $c) {
                 if ($c === $column) {
-                    return $matches[2][$i];
+                    $result = $matches[2][$i];
                 }
             }
         }
+
+        return $result;
     }
 
     /**
