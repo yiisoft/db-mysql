@@ -94,4 +94,14 @@ final class Connection extends AbstractConnection
             }
         }
     }
+
+    /**
+     * Returns the name of the DB driver.
+     *
+     * @return string name of the DB driver
+     */
+     public function getDriverName(): string
+    {
+        return 'mysql';
+    }
 }
