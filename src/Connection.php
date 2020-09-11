@@ -100,7 +100,7 @@ final class Connection extends AbstractConnection
      *
      * @return string name of the DB driver
      */
-     public function getDriverName(): string
+    public function getDriverName(): string
     {
         return 'mysql';
     }
