@@ -260,10 +260,6 @@ class TestCase extends AbstractTestCase
         $params = $this->params();
 
         return [
-            ContainerInterface::class => static function (ContainerInterface $container) {
-                return $container;
-            },
-
             Aliases::class => [
                 '@root' => dirname(__DIR__, 1),
                 '@data' =>  '@root/tests/Data',

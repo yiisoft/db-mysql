@@ -58,10 +58,6 @@ use Yiisoft\Log\Target\File\FileTarget;
 use Yiisoft\Profiler\Profiler;
 
 return [
-    ContainerInterface::class => static function (ContainerInterface $container) {
-        return $container;
-    },
-
     Aliases::class => [
         '@root' => dirname(__DIR__, 1), // directory / packages.
         '@runtime' => '@root/runtime' 
