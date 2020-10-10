@@ -84,7 +84,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected $columnQuoteCharacter = '`';
 
-    /** @var Connection $db */
+    /** @psalm-var Connection $db */
     private ConnectionInterface $db;
 
     public function __construct(ConnectionInterface $db)

@@ -55,7 +55,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         Schema::TYPE_JSON => 'json'
     ];
 
-    /** @var Connection $db */
+    /** @psalm-var Connection $db */
     private ConnectionInterface $db;
 
     public function __construct(ConnectionInterface $db)
