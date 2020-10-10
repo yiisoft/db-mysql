@@ -11,7 +11,7 @@ jobs:
     name: PHP ${{ matrix.php }}-${{ matrix.os }}
 
     env:
-      extensions: dom, json, libxml, pdo, mysql, pdo_mysql
+      extensions: dom, json, libxml, pdo, pdo_mysql
 
     runs-on: ${{ matrix.os }}
 
