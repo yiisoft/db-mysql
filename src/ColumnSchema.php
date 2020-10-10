@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use JsonException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
@@ -19,12 +20,14 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * @param mixed $value input value.
      *
+     * @throws JsonException
+     *
      * @return mixed converted value.
      */
     public function phpTypecast($value)
     {
         if ($value === null) {
-            return;
+            return null;
         }
 
         if ($this->getType() === Schema::TYPE_JSON) {
@@ -47,7 +50,7 @@ final class ColumnSchema extends AbstractColumnSchema
     public function dbTypecast($value)
     {
         if ($value === null) {
-            return $value;
+            return null;
         }
 
         if ($value instanceof ExpressionInterface) {

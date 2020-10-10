@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use PDO;
+use Throwable;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -53,6 +55,16 @@ final class QueryBuilder extends AbstractQueryBuilder
         Schema::TYPE_JSON => 'json'
     ];
 
+    /** @var Connection $db */
+    private ConnectionInterface $db;
+
+    public function __construct(ConnectionInterface $db)
+    {
+        $this->db = $db;
+
+        parent::__construct($db);
+    }
+
     /**
      * Contains array of default expression builders. Extend this method and override it, if you want to change default
      * expression builders for this query builder.
@@ -74,11 +86,11 @@ final class QueryBuilder extends AbstractQueryBuilder
     /**
      * Builds a SQL statement for renaming a column.
      *
-     * @param string $table   the table whose column is to be renamed. The name will be properly quoted by the method.
+     * @param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
      * @param string $oldName the old name of the column. The name will be properly quoted by the method.
      * @param string $newName the new name of the column. The name will be properly quoted by the method.
      *
-     * @throws Exception
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return string the SQL statement for renaming a DB column.
      */
