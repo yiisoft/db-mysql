@@ -6,9 +6,10 @@ name: build
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php-version }}-mysql-${{ matrix.mysql-version }}
+    name: PHP ${{ matrix.php }}-mysql-${{ matrix.mysql-version }}
+
     env:
-      extensions: curl, mbstring, dom, intl, pdo, mysql, pdo_mysql
+      extensions: dom, json, pdo, pdo_mysql
       key: cache-v1
 
     runs-on: ${{ matrix.os }}
@@ -18,7 +19,7 @@ jobs:
         os:
           - ubuntu-latest
 
-        php-version:
+        php:
           - "7.4"
           - "8.0"
 
@@ -44,7 +45,7 @@ jobs:
         id: cache-env
         uses: shivammathur/cache-extensions@v1
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           extensions: ${{ env.extensions }}
           key: ${{ env.key }}
 
@@ -58,7 +59,7 @@ jobs:
       - name: Install PHP with extensions
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           extensions: ${{ env.extensions }}
           ini-values: date.timezone='UTC'
           coverage: pcov
@@ -75,23 +76,23 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ env.COMPOSER_CACHE_DIR }}
-          key: php${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
+          key: php${{ matrix.php }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            php${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-
+            php${{ matrix.php }}-composer-${{ matrix.dependencies }}-
 
       - name: Install dependencies with composer php 7.4
-        if: matrix.php-version == '7.4'
+        if: matrix.php == '7.4'
         run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
       - name: Install dependencies with composer php 8.0
-        if: matrix.php-version == '8.0'
+        if: matrix.php == '8.0'
         run: composer update --ignore-platform-reqs --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
       - name: Run tests with phpunit
         run: vendor/bin/phpunit --coverage-clover=coverage.clover
 
       - name: Code coverage
-        if: matrix.php-version == '7.4'
+        if: matrix.php == '7.4'
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
           php ocular.phar code-coverage:upload --format=php-clover coverage.clover
