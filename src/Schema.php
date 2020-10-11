@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Mysql;
 use PDO;
 use PDOException;
 use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
 use Yiisoft\Db\Constraint\ConstraintFinderTrait;
@@ -717,16 +718,16 @@ SQL;
                             ->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'))
                             ->onDelete($constraint[0]['on_delete'])
                             ->onUpdate($constraint[0]['on_update'])
-                            ->name($name)
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
+                            ->name($name);
 
                         $result['foreignKeys'][] = $fk;
 
                         break;
                     case 'UNIQUE':
                         $ct = (new Constraint())
-                            ->name($name)
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
+                            ->name($name);
 
                         $result['uniques'][] = $ct;
 

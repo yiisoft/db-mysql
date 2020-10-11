@@ -7,9 +7,6 @@ namespace Yiisoft\Db\Mysql;
 use PDO;
 use Yiisoft\Db\Command\Command;
 use Yiisoft\Db\Connection\Connection as AbstractConnection;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
 
 use function constant;
 
@@ -27,9 +24,6 @@ final class Connection extends AbstractConnection
      * @param array $params the parameters to be bound to the SQL statement
      *
      * @return Command the DB command
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
      */
     public function createCommand(?string $sql = null, array $params = []): Command
     {
@@ -49,11 +43,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        if ($this->schema !== null) {
-            return $this->schema;
-        }
-
-        return $this->schema = new Schema($this);
+        return $this->schema ?? ($this->schema = new Schema($this));
     }
 
     /**

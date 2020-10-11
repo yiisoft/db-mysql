@@ -28,11 +28,7 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      * @param JsonExpression|ExpressionInterface $expression the expression to be built
      * @param array $params
      *
-     * @throws JsonException
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @throws JsonException|Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      *
      * @return string
      */
