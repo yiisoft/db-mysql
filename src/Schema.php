@@ -84,16 +84,6 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected $columnQuoteCharacter = '`';
 
-    /** @psalm-var Connection $db */
-    private ConnectionInterface $db;
-
-    public function __construct(ConnectionInterface $db)
-    {
-        $this->db = $db;
-
-        parent::__construct($db);
-    }
-
     /**
      * Resolves the table name and schema name (if any).
      *
@@ -145,7 +135,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
             $sql .= ' FROM ' . $this->quoteSimpleTableName($schema);
         }
 
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->getDb()->createCommand($sql)->queryColumn();
     }
 
     /**
@@ -230,7 +220,7 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $indexes = $this->db->createCommand($sql, [
+        $indexes = $this->getDb()->createCommand($sql, [
             ':schemaName' => $resolvedName->getSchemaName(),
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
@@ -304,7 +294,7 @@ SQL;
      */
     public function createQueryBuilder(): QueryBuilder
     {
-        return new QueryBuilder($this->db);
+        return new QueryBuilder($this->getDb());
     }
 
     /**
@@ -424,7 +414,7 @@ SQL;
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->getFullName());
 
         try {
-            $columns = $this->db->createCommand($sql)->queryAll();
+            $columns = $this->getDb()->createCommand($sql)->queryAll();
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -441,7 +431,7 @@ SQL;
         }
 
         foreach ($columns as $info) {
-            if ($this->db->getSlavePdo()->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
+            if ($this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
                 $info = array_change_key_case($info, CASE_LOWER);
             }
 
@@ -472,7 +462,7 @@ SQL;
      */
     protected function getCreateTableSql($table): string
     {
-        $row = $this->db->createCommand(
+        $row = $this->getDb()->createCommand(
             'SHOW CREATE TABLE ' . $this->quoteTableName($table->getFullName())
         )->queryOne();
 
@@ -514,7 +504,7 @@ AND `rc`.`TABLE_NAME` = :tableName AND `kcu`.`TABLE_NAME` = :tableName1
 SQL;
 
         try {
-            $rows = $this->db->createCommand(
+            $rows = $this->getDb()->createCommand(
                 $sql,
                 [':tableName' => $table->getName(), ':tableName1' => $table->getName()]
             )->queryAll();
@@ -613,7 +603,7 @@ SQL;
      */
     public function createColumnSchemaBuilder(string $type, $length = null): ColumnSchemaBuilder
     {
-        return new ColumnSchemaBuilder($type, $length, $this->db);
+        return new ColumnSchemaBuilder($type, $length, $this->getDb());
     }
 
     /**
@@ -625,7 +615,7 @@ SQL;
     protected function isOldMysql(): bool
     {
         if ($this->oldMysql === null) {
-            $version = $this->db->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+            $version = $this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
             $this->oldMysql = version_compare($version, '5.1', '<=');
         }
@@ -694,7 +684,7 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $constraints = $this->db->createCommand(
+        $constraints = $this->getDb()->createCommand(
             $sql,
             [
                 ':schemaName' => $resolvedName->getSchemaName(),

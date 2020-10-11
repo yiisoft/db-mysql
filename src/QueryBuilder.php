@@ -55,16 +55,6 @@ final class QueryBuilder extends AbstractQueryBuilder
         Schema::TYPE_JSON => 'json'
     ];
 
-    /** @psalm-var Connection $db */
-    private ConnectionInterface $db;
-
-    public function __construct(ConnectionInterface $db)
-    {
-        $this->db = $db;
-
-        parent::__construct($db);
-    }
-
     /**
      * Contains array of default expression builders. Extend this method and override it, if you want to change default
      * expression builders for this query builder.
@@ -96,9 +86,9 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
-        $quotedTable = $this->db->quoteTableName($table);
+        $quotedTable = $this->getDb()->quoteTableName($table);
 
-        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
+        $row = $this->getDb()->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
 
         if ($row === false) {
             throw new Exception("Unable to find column '$oldName' in table '$table'.");
@@ -115,8 +105,8 @@ final class QueryBuilder extends AbstractQueryBuilder
             foreach ($matches[1] as $i => $c) {
                 if ($c === $oldName) {
                     return "ALTER TABLE $quotedTable CHANGE "
-                        . $this->db->quoteColumnName($oldName) . ' '
-                        . $this->db->quoteColumnName($newName) . ' '
+                        . $this->getDb()->quoteColumnName($oldName) . ' '
+                        . $this->getDb()->quoteColumnName($newName) . ' '
                         . $matches[2][$i];
                 }
             }
@@ -124,8 +114,8 @@ final class QueryBuilder extends AbstractQueryBuilder
 
         /* try to give back a SQL anyway */
         return "ALTER TABLE $quotedTable CHANGE "
-            . $this->db->quoteColumnName($oldName) . ' '
-            . $this->db->quoteColumnName($newName);
+            . $this->getDb()->quoteColumnName($oldName) . ' '
+            . $this->getDb()->quoteColumnName($newName);
     }
 
     /**
@@ -151,9 +141,9 @@ final class QueryBuilder extends AbstractQueryBuilder
     public function createIndex(string $name, string $table, $columns, bool $unique = false): string
     {
         return 'ALTER TABLE '
-            . $this->db->quoteTableName($table)
+            . $this->getDb()->quoteTableName($table)
             . ($unique ? ' ADD UNIQUE INDEX ' : ' ADD INDEX ')
-            . $this->db->quoteTableName($name)
+            . $this->getDb()->quoteTableName($name)
             . ' (' . $this->buildColumns($columns) . ')';
     }
 
@@ -173,8 +163,8 @@ final class QueryBuilder extends AbstractQueryBuilder
     public function dropForeignKey(string $name, string $table): string
     {
         return 'ALTER TABLE '
-            . $this->db->quoteTableName($table)
-            . ' DROP FOREIGN KEY ' . $this->db->quoteColumnName($name);
+            . $this->getDb()->quoteTableName($table)
+            . ' DROP FOREIGN KEY ' . $this->getDb()->quoteColumnName($name);
     }
 
     /**
@@ -192,7 +182,7 @@ final class QueryBuilder extends AbstractQueryBuilder
     public function dropPrimaryKey(string $name, string $table): string
     {
         return 'ALTER TABLE '
-            . $this->db->quoteTableName($table) . ' DROP PRIMARY KEY';
+            . $this->getDb()->quoteTableName($table) . ' DROP PRIMARY KEY';
     }
 
     /**
@@ -260,15 +250,15 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     public function resetSequence(string $tableName, $value = null): string
     {
-        $table = $this->db->getTableSchema($tableName);
+        $table = $this->getDb()->getTableSchema($tableName);
 
         if ($table !== null && $table->getSequenceName() !== null) {
-            $tableName = $this->db->quoteTableName($tableName);
+            $tableName = $this->getDb()->quoteTableName($tableName);
 
             if ($value === null) {
                 $pk = $table->getPrimaryKey();
                 $key = reset($pk);
-                $value = $this->db->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
+                $value = $this->getDb()->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
             } else {
                 $value = (int) $value;
             }
@@ -374,13 +364,13 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         [$names, $placeholders, $values, $params] = parent::prepareInsertValues($table, $columns, $params);
         if (!$columns instanceof Query && empty($names)) {
-            $tableSchema = $this->db->getSchema()->getTableSchema($table);
+            $tableSchema = $this->getDb()->getSchema()->getTableSchema($table);
             $columns = $tableSchema->getColumns();
             if ($tableSchema !== null) {
                 $columns = !empty($tableSchema->getPrimaryKey())
                     ? $tableSchema->getPrimaryKey() : [reset($columns)->getName()];
                 foreach ($columns as $name) {
-                    $names[] = $this->db->quoteColumnName($name);
+                    $names[] = $this->getDb()->quoteColumnName($name);
                     $placeholders[] = 'DEFAULT';
                 }
             }
@@ -435,11 +425,11 @@ final class QueryBuilder extends AbstractQueryBuilder
         if ($updateColumns === true) {
             $updateColumns = [];
             foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression('VALUES(' . $this->db->quoteColumnName($name) . ')');
+                $updateColumns[$name] = new Expression('VALUES(' . $this->getDb()->quoteColumnName($name) . ')');
             }
         } elseif ($updateColumns === false) {
-            $name = $this->db->quoteColumnName(reset($uniqueNames));
-            $updateColumns = [$name => new Expression($this->db->quoteTableName($table) . '.' . $name)];
+            $name = $this->getDb()->quoteColumnName(reset($uniqueNames));
+            $updateColumns = [$name => new Expression($this->getDb()->quoteTableName($table) . '.' . $name)];
         }
 
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
@@ -481,11 +471,11 @@ final class QueryBuilder extends AbstractQueryBuilder
             $definition = preg_replace($checkRegex, '', $definition);
         }
 
-        $alterSql = 'ALTER TABLE ' . $this->db->quoteTableName($table)
-            . ' CHANGE ' . $this->db->quoteColumnName($column)
-            . ' ' . $this->db->quoteColumnName($column)
+        $alterSql = 'ALTER TABLE ' . $this->getDb()->quoteTableName($table)
+            . ' CHANGE ' . $this->getDb()->quoteColumnName($column)
+            . ' ' . $this->getDb()->quoteColumnName($column)
             . (empty($definition) ? '' : ' ' . $definition)
-            . ' COMMENT ' . $this->db->quoteValue($comment);
+            . ' COMMENT ' . $this->getDb()->quoteValue($comment);
 
         if ($check === 1) {
             $alterSql .= ' ' . $checkMatches[0];
@@ -509,7 +499,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     public function addCommentOnTable(string $table, string $comment): string
     {
-        return 'ALTER TABLE ' . $this->db->quoteTableName($table) . ' COMMENT ' . $this->db->quoteValue($comment);
+        return 'ALTER TABLE ' . $this->getDb()->quoteTableName($table) . ' COMMENT ' . $this->getDb()->quoteValue($comment);
     }
 
     /**
@@ -562,9 +552,9 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $result = null;
 
-        $quotedTable = $this->db->quoteTableName($table);
+        $quotedTable = $this->getDb()->quoteTableName($table);
 
-        $row = $this->db->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
+        $row = $this->getDb()->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
 
         if ($row === false) {
             throw new Exception("Unable to find column '$column' in table '$table'.");
@@ -686,7 +676,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     private function supportsFractionalSeconds(): bool
     {
-        $version = $this->db->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+        $version = $this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
 
         return version_compare($version, '5.6.4', '>=');
     }
