@@ -67,6 +67,11 @@ class TestCase extends AbstractTestCase
         );
     }
 
+    protected function buildKeyCache($key): string
+    {
+        return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
+    }
+
     /**
      * Asserting two strings equality ignoring line endings.
      *
