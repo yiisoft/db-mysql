@@ -67,9 +67,11 @@ class TestCase extends AbstractTestCase
         );
     }
 
-    protected function buildKeyCache($key): string
+    protected function buildKeyCache(array $key): string
     {
-        return ctype_alnum($key) && mb_strlen($key, '8bit') <= 32 ? $key : md5($key);
+        $jsonKey = json_encode($key);
+
+        return ctype_alnum($jsonKey) && mb_strlen($jsonKey, '8bit') <= 32 ? $jsonKey : md5($jsonKey);
     }
 
     /**
