@@ -67,6 +67,13 @@ class TestCase extends AbstractTestCase
         );
     }
 
+    protected function buildKeyCache(array $key): string
+    {
+        $jsonKey = json_encode($key);
+
+        return md5($jsonKey);
+    }
+
     /**
      * Asserting two strings equality ignoring line endings.
      *
