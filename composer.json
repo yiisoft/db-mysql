@@ -25,9 +25,9 @@
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
-        "infection/infection": "^0.18.0 || ^0.20.0",
-        "phpunit/phpunit": "^9.3",
-        "vimeo/psalm": "^4.0",
+        "infection/infection": "^0.20.0",
+        "phpunit/phpunit": "^9.4",
+        "vimeo/psalm": "^4.1",
         "yiisoft/aliases": "^1.0",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/log-target-file": "^3.0@dev"
