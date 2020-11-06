@@ -17,7 +17,7 @@ use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
-use Yiisoft\Db\Helper\Dsn;
+use Yiisoft\Db\Connection\Dsn;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;

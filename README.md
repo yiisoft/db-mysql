@@ -68,7 +68,7 @@ return [
 Params.php
 
 ```php
-use Yiisoft\Db\Helper\Dsn;
+use Yiisoft\Db\Connection\Dsn;
 
 return [
     'yiisoft/db-mysql' => [
