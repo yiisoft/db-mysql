@@ -29,14 +29,14 @@ final class ConnectionTest extends TestCase
         $this->assertEquals($this->cache, $db->getSchemaCache());
         $this->assertEquals($this->logger, $db->getLogger());
         $this->assertEquals($this->profiler, $db->getProfiler());
-        $this->assertEquals($this->dsn->getDsn(), $db->getDsn());
+        $this->assertEquals($this->params()['yiisoft/db-mysql']['dsn'], $db->getDsn());
     }
 
     public function testGetDriverName(): void
     {
         $db = $this->getConnection();
 
-        $this->assertEquals($this->dsn->getDriver(), $db->getDriverName());
+        $this->assertEquals('mysql', $db->getDriverName());
     }
 
     public function testOpenClose(): void
@@ -141,7 +141,7 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->dsn->getDsn()
+                    $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
@@ -176,7 +176,7 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->dsn->getDsn()
+                    $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
@@ -250,7 +250,7 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->dsn->getDsn()
+                    $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
