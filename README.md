@@ -44,20 +44,13 @@ Using yiisoft/composer-config-plugin automatically get the settings of `CacheInt
 Di-Container:
 
 ```php
-use Psr\Log\LoggerInterface;
-use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
-use Yiisoft\Factory\Definitions\Reference;
-use Yiisoft\Profiler\Profiler;
 
 return [
     MysqlConnection::class => [
         '__class' => MysqlConnection::class,
         '__construct()' => [
-            Reference::to(CacheInterface::class),
-            Reference::to(LoggerInterface::class),
-            Reference::to(Profiler::class),
-            $params['yiisoft/db-mysql']['dsn']
+            'dsn' => $params['yiisoft/db-mysql']['dsn']
         ],
         'setUsername()' => [$params['yiisoft/db-mysql']['username']],
         'setPassword()' => [$params['yiisoft/db-mysql']['password']]
@@ -72,7 +65,7 @@ use Yiisoft\Db\Connection\Dsn;
 
 return [
     'yiisoft/db-mysql' => [
-        'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306'))->getDsn(),
+        'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306'))->asString(),
         'username' => 'root',
         'password' => 'root'
     ]
