@@ -21,6 +21,7 @@ use Yiisoft\Db\Connection\Dsn;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
+use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
 
@@ -36,7 +37,6 @@ class TestCase extends AbstractTestCase
     protected Connection $connection;
     protected ContainerInterface $container;
     protected array $dataProvider;
-    protected Dsn $dsn;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected LoggerInterface $logger;
@@ -61,7 +61,6 @@ class TestCase extends AbstractTestCase
             $this->connection,
             $this->container,
             $this->dataProvider,
-            $this->dsn,
             $this->logger,
             $this->profiler
         );
@@ -111,7 +110,6 @@ class TestCase extends AbstractTestCase
         $this->cache = $this->container->get(CacheInterface::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
-        $this->dsn = $this->container->get(Dsn::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
 
         DatabaseFactory::initialize($this->container, []);
@@ -262,6 +260,18 @@ class TestCase extends AbstractTestCase
         }
     }
 
+    protected function params(): array
+    {
+        return [
+            'yiisoft/db-mysql' => [
+                'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306'))->asString(),
+                'username' => 'root',
+                'password' => 'root',
+                'fixture' => __DIR__ . '/Data/mysql.sql',
+            ]
+        ];
+    }
+
     private function config(): array
     {
         $params = $this->params();
@@ -273,54 +283,22 @@ class TestCase extends AbstractTestCase
                 '@runtime' => '@data/runtime',
             ],
 
-            CacheInterface::class => static function () {
-                return new Cache(new ArrayCache());
-            },
+            CacheInterface::class => [
+                '__class' => Cache::class,
+                '__construct()' => [
+                    Reference::to(ArrayCache::class)
+                ]
+            ],
 
             LoggerInterface::class => Logger::class,
 
-            Profiler::class => static function (ContainerInterface $container) {
-                return new Profiler($container->get(LoggerInterface::class));
-            },
-
-            Dsn::class => static function () use ($params) {
-                return new Dsn(
-                    $params['yiisoft/db-mysql']['dsn']['driver'],
-                    $params['yiisoft/db-mysql']['dsn']['host'],
-                    $params['yiisoft/db-mysql']['dsn']['dbname'],
-                    $params['yiisoft/db-mysql']['dsn']['port'],
-                );
-            },
-
-            ConnectionInterface::class  => static function (ContainerInterface $container) use ($params) {
-                $connection = new Connection(
-                    $container->get(CacheInterface::class),
-                    $container->get(LoggerInterface::class),
-                    $container->get(Profiler::class),
-                    $container->get(Dsn::class)->getDsn(),
-                );
-
-                $connection->setUsername($params['yiisoft/db-mysql']['username']);
-                $connection->setPassword($params['yiisoft/db-mysql']['password']);
-
-                return $connection;
-            }
-        ];
-    }
-
-    private function params(): array
-    {
-        return [
-            'yiisoft/db-mysql' => [
-                'dsn' => [
-                    'driver' => 'mysql',
-                    'host' => '127.0.0.1',
-                    'dbname' => 'yiitest',
-                    'port' => '3306'
+            ConnectionInterface::class  => [
+                '__class' => Connection::class,
+                '__construct()' => [
+                    'dsn' => $params['yiisoft/db-mysql']['dsn']
                 ],
-                'username' => 'root',
-                'password' => 'root',
-                'fixture' => __DIR__ . '/Data/mysql.sql',
+                'setUsername()' => [$params['yiisoft/db-mysql']['username']],
+                'setPassword()' => [$params['yiisoft/db-mysql']['password']]
             ]
         ];
     }
