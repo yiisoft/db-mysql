@@ -474,26 +474,24 @@ SQL;
         string $testTablePrefix,
         string $testTableName
     ): void {
+        $db = $this->getConnection();
         $schema = $this->getConnection()->getSchema();
 
-        $schema->getDb()->setEnableSchemaCache(true);
-
-        $schema->getDb()->setSchemaCache($this->cache);
-
-        $schema->getDb()->setTablePrefix($tablePrefix);
+        $db->getConnectionCache()->setEnableSchemaCache(true);
+        $db->setTablePrefix($tablePrefix);
 
         $noCacheTable = $schema->getTableSchema($tableName, true);
 
         $this->assertInstanceOf(TableSchema::class, $noCacheTable);
 
         /* Compare */
-        $schema->getDb()->setTablePrefix($testTablePrefix);
+        $db->setTablePrefix($testTablePrefix);
 
         $testNoCacheTable = $schema->getTableSchema($testTableName);
 
         $this->assertSame($noCacheTable, $testNoCacheTable);
 
-        $schema->getDb()->setTablePrefix($tablePrefix);
+        $db->setTablePrefix($tablePrefix);
 
         $schema->refreshTableSchema($tableName);
 
@@ -503,7 +501,7 @@ SQL;
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
-        $schema->getDb()->setTablePrefix($testTablePrefix);
+        $db->setTablePrefix($testTablePrefix);
 
         $schema->refreshTableSchema($testTablePrefix);
 

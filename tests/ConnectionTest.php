@@ -26,7 +26,7 @@ final class ConnectionTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $this->assertEquals($this->cache, $db->getSchemaCache());
+        $this->assertEquals($this->connectionCache, $db->getConnectionCache());
         $this->assertEquals($this->logger, $db->getLogger());
         $this->assertEquals($this->profiler, $db->getProfiler());
         $this->assertEquals($this->params()['yiisoft/db-mysql']['dsn'], $db->getDsn());
@@ -56,7 +56,7 @@ final class ConnectionTest extends TestCase
         $this->assertFalse($db->isActive());
         $this->assertNull($db->getPDO());
 
-        $db = new Connection($this->cache, $this->logger, $this->profiler, 'unknown::memory:');
+        $db = new Connection($this->connectionCache, $this->logger, $this->profiler, 'unknown::memory:');
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('could not find driver');
@@ -138,10 +138,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    $this->cache,
-                    $this->logger,
-                    $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
@@ -173,10 +170,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    $this->cache,
-                    $this->logger,
-                    $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
@@ -211,10 +205,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    $this->cache,
-                    $this->logger,
-                    $this->profiler,
-                    'host:invalid'
+                    'dsn' => 'host:invalid'
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
@@ -247,17 +238,14 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    $this->cache,
-                    $this->logger,
-                    $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
             ]
         );
 
-        $db->setSchemaCache(null);
+        $db->getConnectionCache()->setEnableSchemaCache(false);
 
         $db->setShuffleMasters(false);
 
@@ -282,10 +270,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    $this->cache,
-                    $this->logger,
-                    $this->profiler,
-                    'host:invalid'
+                    'dsn' => 'host:invalid'
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()]
