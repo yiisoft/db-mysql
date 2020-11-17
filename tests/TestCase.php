@@ -15,7 +15,8 @@ use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
 use Yiisoft\Cache\CacheInterface;
-use Yiisoft\Db\Cache\ConnectionCache;
+use Yiisoft\Db\Cache\QueryCache;
+use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
@@ -37,13 +38,14 @@ class TestCase extends AbstractTestCase
     protected Aliases $aliases;
     protected CacheInterface $cache;
     protected Connection $connection;
-    protected ConnectionCache $connectionCache;
     protected ContainerInterface $container;
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected LoggerInterface $logger;
     protected Profiler $profiler;
+    protected QueryCache $queryCache;
+    protected SchemaCache $schemaCache;
 
     protected function setUp(): void
     {
@@ -62,19 +64,13 @@ class TestCase extends AbstractTestCase
             $this->aliases,
             $this->cache,
             $this->connection,
-            $this->connectionCache,
             $this->container,
             $this->dataProvider,
             $this->logger,
+            $this->queryCache,
+            $this->schemaCache,
             $this->profiler
         );
-    }
-
-    protected function buildKeyCache(array $key): string
-    {
-        $jsonKey = json_encode($key);
-
-        return md5($jsonKey);
     }
 
     /**
@@ -114,8 +110,9 @@ class TestCase extends AbstractTestCase
         $this->cache = $this->container->get(SimpleCacheInterface::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
-        $this->connectionCache = $this->container->get(ConnectionCache::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
+        $this->queryCache = $this->container->get(QueryCache::class);
+        $this->schemaCache = $this->container->get(SchemaCache::class);
 
         DatabaseFactory::initialize($this->container, []);
     }

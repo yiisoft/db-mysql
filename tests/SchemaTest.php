@@ -318,7 +318,7 @@ SQL;
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new Schema($this->getConnection());
+        $schema = new Schema($this->getConnection(), $this->schemaCache);
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -477,7 +477,7 @@ SQL;
         $db = $this->getConnection();
         $schema = $this->getConnection()->getSchema();
 
-        $db->getConnectionCache()->setEnableSchemaCache(true);
+        $db->getSchemaCache()->setEnableCache(true);
         $db->setTablePrefix($tablePrefix);
 
         $noCacheTable = $schema->getTableSchema($tableName, true);
