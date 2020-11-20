@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use function array_merge;
 use Closure;
+use function is_string;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -14,11 +16,9 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\QueryBuilder;
+
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
-
-use function array_merge;
-use function is_string;
 
 /**
  * @group mysql
@@ -146,7 +146,7 @@ final class QueryBuilderTest extends TestCase
             ],
             [
                 ['=', 'jsoncol', new JsonExpression([false])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[false]']
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[false]'],
             ],
             'object with type. Type is ignored for MySQL' => [
                 ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
@@ -159,61 +159,61 @@ final class QueryBuilderTest extends TestCase
                     new JsonExpression(
                         [
                             'user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'],
-                            'props' => ['mood' => 'good']
+                            'props' => ['mood' => 'good'],
                         ]
-                    )
+                    ),
                 ],
                 '[[data]] = CAST(:qp0 AS JSON)',
-                [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}']
+                [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}'],
             ],
             'null value' => [
                 ['=', 'jsoncol', new JsonExpression(null)],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => 'null']
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => 'null'],
             ],
             'null as array value' => [
                 ['=', 'jsoncol', new JsonExpression([null])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[null]']
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[null]'],
             ],
             'null as object value' => [
                 ['=', 'jsoncol', new JsonExpression(['nil' => null])],
-                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}']
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}'],
             ],
             'query' => [
                 [
                     '=',
                     'jsoncol',
-                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]))
+                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1])),
                 ],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
-                [':qp0' => 1]
+                [':qp0' => 1],
             ],
             'query with type, that is ignored in MySQL' => [
                 [
                     '=',
                     'jsoncol',
-                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]), 'jsonb')
+                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]), 'jsonb'),
                 ],
-                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1]
+                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
             ],
             'nested and combined json expression' => [
                 [
                     '=',
                     'jsoncol',
-                    new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])]))
+                    new JsonExpression(new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])),
                 ],
-                "[[jsoncol]] = CAST(:qp0 AS JSON)", [':qp0' => '{"a":1,"b":2,"d":{"e":3}}']
+                '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
             ],
             'search by property in JSON column (issue #15838)' => [
                 ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
-                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42]
-            ]
+                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
+            ],
         ]);
     }
 
     /**
      * @dataProvider buildConditionsProvider
      *
-     * @param ExpressionInterface|array $condition
+     * @param array|ExpressionInterface $condition
      * @param string|null $expected
      * @param array $expectedParams
      *
@@ -276,7 +276,7 @@ final class QueryBuilderTest extends TestCase
     /**
      * @dataProvider buildLikeConditionsProviderTrait
      *
-     * @param object|array $condition
+     * @param array|object $condition
      * @param string|null $expected
      * @param array $expectedParams
      *
@@ -386,7 +386,7 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider insertProviderTrait
      *
      * @param string $table
-     * @param ColumnSchema|array $columns
+     * @param array|ColumnSchema $columns
      * @param array $params
      * @param string|null $expectedSQL
      * @param array $expectedParams
@@ -513,7 +513,7 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider upsertProvider
      *
      * @param string $table
-     * @param ColumnSchema|array $insertColumns
+     * @param array|ColumnSchema $insertColumns
      * @param array|bool|null $updateColumns
      * @param string|string[] $expectedSQL
      * @param array $expectedParams

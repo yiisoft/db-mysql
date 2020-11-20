@@ -4,10 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use function array_change_key_case;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function bindec;
+use function explode;
 use PDO;
 use PDOException;
+use function preg_match;
+use function preg_match_all;
+use function str_replace;
+use function stripos;
+use function strpos;
+use function strtolower;
+
+use function trim;
+use function version_compare;
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
 use Yiisoft\Db\Constraint\ConstraintFinderTrait;
@@ -19,21 +33,6 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
-
-use function array_change_key_case;
-use function array_map;
-use function array_merge;
-use function array_values;
-use function bindec;
-use function explode;
-use function preg_match;
-use function preg_match_all;
-use function str_replace;
-use function stripos;
-use function strpos;
-use function strtolower;
-use function trim;
-use function version_compare;
 
 final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
@@ -597,7 +596,7 @@ SQL;
      * This method may be overridden by child classes to create a DBMS-specific column schema builder.
      *
      * @param string $type type of the column. See {@see ColumnSchemaBuilder::$type}.
-     * @param int|string|array $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
+     * @param array|int|string $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
      *
      * @return ColumnSchemaBuilder column schema builder instance
      */

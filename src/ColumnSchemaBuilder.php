@@ -44,7 +44,6 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     /**
      * Builds the comment specification for the column.
      *
-     *
      * @return string a string containing the COMMENT keyword and the comment itself.
      */
     protected function buildCommentString(): string
