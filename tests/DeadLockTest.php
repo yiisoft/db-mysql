@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use ErrorException;
-use RuntimeException;
-use Throwable;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Transaction\Transaction;
-
 use function date;
+use ErrorException;
 use function file_get_contents;
 use function file_put_contents;
 use function floor;
 use function function_exists;
+
 use function get_class;
 use function implode;
 use function is_file;
@@ -28,10 +23,15 @@ use function pcntl_wexitstatus;
 use function pcntl_wifexited;
 use function posix_kill;
 use function round;
+use RuntimeException;
 use function set_error_handler;
 use function sleep;
 use function sys_get_temp_dir;
+use Throwable;
 use function unlink;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Mysql\Connection;
+use Yiisoft\Db\Transaction\Transaction;
 
 /**
  * @group mysql
@@ -195,9 +195,9 @@ final class DeadLockTest extends TestCase
             /* insert test row */
             $first->createCommand()
                 ->insert('{{customer}}', [
-                    'id'      => 97,
-                    'email'   => 'deadlock@example.com',
-                    'name'    => 'test',
+                    'id' => 97,
+                    'email' => 'deadlock@example.com',
+                    'name' => 'test',
                     'address' => 'test address',
                 ])
                 ->execute();

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use function json_decode;
 use JsonException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
 
-use function json_decode;
+use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
 
 final class ColumnSchema extends AbstractColumnSchema
 {

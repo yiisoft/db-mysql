@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\TestUtility\TestQueryTrait;
 
 /**
@@ -40,8 +40,8 @@ final class QueryTest extends TestCase
         $result = $query->column();
 
         $this->assertCount(2, $result);
-        $this->assertContains("2", $result);
-        $this->assertContains("3", $result);
-        $this->assertNotContains("1", $result);
+        $this->assertContains('2', $result);
+        $this->assertContains('3', $result);
+        $this->assertNotContains('1', $result);
     }
 }

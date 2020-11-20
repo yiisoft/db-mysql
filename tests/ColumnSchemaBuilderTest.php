@@ -39,7 +39,7 @@ final class ColumnSchemaBuilderTest extends TestCase
             ['string(50) NOT NULL COMMENT \'Property name\' COLLATE ascii_general_ci', Schema::TYPE_STRING, 50, [
                 ['comment', 'Property name'],
                 ['append', 'COLLATE ascii_general_ci'],
-                ['notNull']
+                ['notNull'],
             ]],
         ];
     }
