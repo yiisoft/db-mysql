@@ -4,9 +4,19 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use function array_merge;
+use function array_values;
+use function ctype_digit;
+use function implode;
 use PDO;
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function reset;
 use Throwable;
-use Yiisoft\Db\Connection\ConnectionInterface;
+use function trim;
+
+use function version_compare;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -16,17 +26,6 @@ use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
-
-use function array_merge;
-use function array_values;
-use function ctype_digit;
-use function implode;
-use function preg_match;
-use function preg_match_all;
-use function preg_replace;
-use function reset;
-use function trim;
-use function version_compare;
 
 final class QueryBuilder extends AbstractQueryBuilder
 {
@@ -52,7 +51,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         Schema::TYPE_BINARY => 'blob',
         Schema::TYPE_BOOLEAN => 'tinyint(1)',
         Schema::TYPE_MONEY => 'decimal(19,4)',
-        Schema::TYPE_JSON => 'json'
+        Schema::TYPE_JSON => 'json',
     ];
 
     /**
@@ -124,7 +123,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @param string $name the name of the index. The name will be properly quoted by the method.
      * @param string $table the table that the new index will be created for. The table name will be properly quoted by
      * the method.
-     * @param string|array $columns the column(s) that should be included in the index. If there are multiple columns,
+     * @param array|string $columns the column(s) that should be included in the index. If there are multiple columns,
      * separate them with commas or use an array to represent them. Each column name will be properly quoted by the
      * method, unless a parenthesis is found in the name.
      * @param bool $unique whether to add UNIQUE constraint on the created index.
@@ -620,7 +619,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      *
      * If a type cannot be found in {@see typeMap}, it will be returned without any change.
      *
-     * @param string|ColumnSchemaBuilder $type abstract column type
+     * @param ColumnSchemaBuilder|string $type abstract column type
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -667,12 +666,12 @@ final class QueryBuilder extends AbstractQueryBuilder
     /**
      * Checks the ability to use fractional seconds.
      *
-     * @return bool
-     *
      * @throws Exception
      * @throws InvalidConfigException
      *
      * {@see https://dev.mysql.com/doc/refman/5.6/en/fractional-seconds.html}
+     *
+     * @return bool
      */
     private function supportsFractionalSeconds(): bool
     {

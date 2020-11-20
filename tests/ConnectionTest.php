@@ -141,10 +141,10 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -176,10 +176,10 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -214,10 +214,10 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'host:invalid'
+                    'host:invalid',
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -250,10 +250,10 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    $this->params()['yiisoft/db-mysql']['dsn']
+                    $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -285,10 +285,10 @@ final class ConnectionTest extends TestCase
                     $this->cache,
                     $this->logger,
                     $this->profiler,
-                    'host:invalid'
+                    'host:invalid',
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
