@@ -94,12 +94,12 @@ final class CommandTest extends TestCase
      *
      * @dataProvider bindParamsNonWhereProviderTrait
      *
+     * @param string $sql
+     *
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws InvalidConfigException
      * @throws NotSupportedException
-     *
-     * @param string $sql
      */
     public function testBindParamsNonWhere(string $sql): void
     {
@@ -110,13 +110,13 @@ final class CommandTest extends TestCase
             [
                 'name' => 'testParams',
                 'email' => 'testParams@example.com',
-                'address' => '1'
+                'address' => '1',
             ]
         )->execute();
 
         $params = [
             ':email' => 'testParams@example.com',
-            ':len'   => 5,
+            ':len' => 5,
         ];
 
         $command = $db->createCommand($sql, $params);

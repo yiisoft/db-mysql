@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use function constant;
 use PDO;
 use Yiisoft\Db\Command\Command;
-use Yiisoft\Db\Connection\Connection as AbstractConnection;
 
-use function constant;
+use Yiisoft\Db\Connection\Connection as AbstractConnection;
 
 /**
  * Database connection class prefilled for MYSQL Server.

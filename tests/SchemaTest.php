@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use function array_map;
 use PDO;
+use function trim;
+use function version_compare;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
+
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\TableSchema;
-use Yiisoft\Db\TestUtility\AnyCaseValue;
 use Yiisoft\Db\TestUtility\TestSchemaTrait;
-
-use function array_map;
-use function trim;
-use function version_compare;
 
 /**
  * @group mysql
@@ -69,7 +68,7 @@ final class SchemaTest extends TestCase
             ],
             'smallint_col' => [
                 'type' => 'smallint',
-                'dbType' =>  version_compare($version, '8.0.17', '>') ? 'smallint' : 'smallint(1)',
+                'dbType' => version_compare($version, '8.0.17', '>') ? 'smallint' : 'smallint(1)',
                 'phpType' => 'integer',
                 'allowNull' => true,
                 'autoIncrement' => false,

@@ -149,7 +149,7 @@ final class ConnectionTest extends TestCase
                     'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -181,7 +181,7 @@ final class ConnectionTest extends TestCase
                     'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -216,7 +216,7 @@ final class ConnectionTest extends TestCase
                     'dsn' => 'host:invalid'
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -249,7 +249,7 @@ final class ConnectionTest extends TestCase
                     'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
@@ -281,7 +281,7 @@ final class ConnectionTest extends TestCase
                     'dsn' => 'host:invalid'
                 ],
                 'setUsername()' => [$db->getUsername()],
-                'setPassword()' => [$db->getPassword()]
+                'setPassword()' => [$db->getPassword()],
             ]
         );
 
