@@ -146,7 +146,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()],
@@ -178,7 +178,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()],
@@ -213,7 +213,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'host:invalid'
+                    'dsn' => 'host:invalid',
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()],
@@ -246,7 +246,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn']
+                    'dsn' => $this->params()['yiisoft/db-mysql']['dsn'],
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()],
@@ -278,7 +278,7 @@ final class ConnectionTest extends TestCase
             [
                 '__class' => Connection::class,
                 '__construct()' => [
-                    'dsn' => 'host:invalid'
+                    'dsn' => 'host:invalid',
                 ],
                 'setUsername()' => [$db->getUsername()],
                 'setPassword()' => [$db->getPassword()],
