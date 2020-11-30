@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use function explode;
-use function file_get_contents;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -13,8 +11,6 @@ use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
-use function str_replace;
-use function trim;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cache\ArrayCache;
 use Yiisoft\Cache\Cache;
@@ -27,11 +23,15 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
-
 use Yiisoft\Di\Container;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
+
+use function explode;
+use function file_get_contents;
+use function str_replace;
+use function trim;
 
 class TestCase extends AbstractTestCase
 {

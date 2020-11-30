@@ -253,7 +253,7 @@ final class ConnectionTest extends TestCase
             ]
         );
 
-        $db->getSchemaCache()->setEnableCache(false);
+        $db->getSchemaCache()->setEnable(false);
 
         $db->setShuffleMasters(false);
 
