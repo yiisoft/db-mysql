@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use function array_map;
 use PDO;
-use function trim;
-use function version_compare;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
-
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\TableSchema;
 use Yiisoft\Db\TestUtility\TestSchemaTrait;
+
+use function array_map;
+use function trim;
+use function version_compare;
 
 /**
  * @group mysql
@@ -317,7 +317,7 @@ SQL;
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new Schema($this->getConnection());
+        $schema = new Schema($this->getConnection(), $this->schemaCache);
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -473,26 +473,24 @@ SQL;
         string $testTablePrefix,
         string $testTableName
     ): void {
+        $db = $this->getConnection();
         $schema = $this->getConnection()->getSchema();
 
-        $schema->getDb()->setEnableSchemaCache(true);
-
-        $schema->getDb()->setSchemaCache($this->cache);
-
-        $schema->getDb()->setTablePrefix($tablePrefix);
+        $db->getSchemaCache()->setEnable(true);
+        $db->setTablePrefix($tablePrefix);
 
         $noCacheTable = $schema->getTableSchema($tableName, true);
 
         $this->assertInstanceOf(TableSchema::class, $noCacheTable);
 
         /* Compare */
-        $schema->getDb()->setTablePrefix($testTablePrefix);
+        $db->setTablePrefix($testTablePrefix);
 
         $testNoCacheTable = $schema->getTableSchema($testTableName);
 
         $this->assertSame($noCacheTable, $testNoCacheTable);
 
-        $schema->getDb()->setTablePrefix($tablePrefix);
+        $db->setTablePrefix($tablePrefix);
 
         $schema->refreshTableSchema($tableName);
 
@@ -502,7 +500,7 @@ SQL;
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
-        $schema->getDb()->setTablePrefix($testTablePrefix);
+        $db->setTablePrefix($testTablePrefix);
 
         $schema->refreshTableSchema($testTablePrefix);
 
