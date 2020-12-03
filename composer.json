@@ -28,7 +28,7 @@
         "phpunit/phpunit": "^9.4",
         "roave/infection-static-analysis-plugin": "^1.6",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.2",
+        "vimeo/psalm": "^4.3",
         "yiisoft/aliases": "^1.1",
         "yiisoft/di": "^3.0@dev",
         "yiisoft/log-target-file": "^3.0@dev"
