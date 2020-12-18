@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Mysql\Tests;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -105,7 +104,7 @@ class TestCase extends AbstractTestCase
         $this->container = new Container($this->config());
 
         $this->aliases = $this->container->get(Aliases::class);
-        $this->cache = $this->container->get(SimpleCacheInterface::class);
+        $this->cache = $this->container->get(CacheInterface::class);
         $this->logger = $this->container->get(LoggerInterface::class);
         $this->profiler = $this->container->get(Profiler::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
@@ -289,8 +288,6 @@ class TestCase extends AbstractTestCase
                     Reference::to(ArrayCache::class),
                 ],
             ],
-
-            SimpleCacheInterface::class => CacheInterface::class,
 
             LoggerInterface::class => Logger::class,
 
