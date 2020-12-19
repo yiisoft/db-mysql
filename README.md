@@ -44,17 +44,18 @@ Using yiisoft/composer-config-plugin automatically get the settings of `Yiisoft\
 Di-Container:
 
 ```php
-use Yiisoft\Db\Mysql\Connection as MysqlConnection;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Mysql\Connection as MySqlConnection;
 
 return [
-    MysqlConnection::class => [
-        '__class' => MysqlConnection::class,
+    ConnectionInterface::class => [
+        '__class' => MySqlConnection::class,
         '__construct()' => [
-            'dsn' => $params['yiisoft/db-mysql']['dsn']
+            'dsn' => $params['yiisoft/db-mysql']['dsn'],
         ],
         'setUsername()' => [$params['yiisoft/db-mysql']['username']],
-        'setPassword()' => [$params['yiisoft/db-mysql']['password']]
-    ]
+        'setPassword()' => [$params['yiisoft/db-mysql']['password']],
+    ],
 ];
 ```
 
