@@ -26,6 +26,7 @@ use Yiisoft\Di\Container;
 use Yiisoft\Factory\Definitions\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
+use Yiisoft\Profiler\ProfilerInterface;
 
 use function explode;
 use function file_get_contents;
@@ -42,7 +43,7 @@ class TestCase extends AbstractTestCase
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected LoggerInterface $logger;
-    protected Profiler $profiler;
+    protected ProfilerInterface $profiler;
     protected QueryCache $queryCache;
     protected SchemaCache $schemaCache;
 
@@ -106,7 +107,7 @@ class TestCase extends AbstractTestCase
         $this->aliases = $this->container->get(Aliases::class);
         $this->cache = $this->container->get(CacheInterface::class);
         $this->logger = $this->container->get(LoggerInterface::class);
-        $this->profiler = $this->container->get(Profiler::class);
+        $this->profiler = $this->container->get(ProfilerInterface::class);
         $this->connection = $this->container->get(ConnectionInterface::class);
         $this->queryCache = $this->container->get(QueryCache::class);
         $this->schemaCache = $this->container->get(SchemaCache::class);
@@ -290,6 +291,7 @@ class TestCase extends AbstractTestCase
             ],
 
             LoggerInterface::class => Logger::class,
+            ProfilerInterface::class => Profiler::class,
 
             ConnectionInterface::class => [
                 '__class' => Connection::class,
