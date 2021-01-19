@@ -19,6 +19,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 
         parent::__construct($type, $length);
     }
+
     /**
      * Builds the unsigned string for column. Defaults to unsupported.
      *

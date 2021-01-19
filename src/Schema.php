@@ -622,7 +622,6 @@ SQL;
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return mixed constraints.
-     *
      */
     private function loadTableConstraints(string $tableName, string $returnType)
     {

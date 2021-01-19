@@ -151,7 +151,6 @@ final class QueryBuilder extends AbstractQueryBuilder
      * method.
      * @param string $table the table whose foreign is to be dropped. The name will be properly quoted by the method.
      *
-     *
      * @return string the SQL statement for dropping a foreign key constraint.
      */
     public function dropForeignKey(string $name, string $table): string
