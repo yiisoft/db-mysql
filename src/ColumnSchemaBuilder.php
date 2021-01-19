@@ -4,10 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
+    private ConnectionInterface $db;
+
+    public function __construct(string $type, $length, ConnectionInterface $db)
+    {
+        $this->db = $db;
+
+        parent::__construct($type, $length);
+    }
     /**
      * Builds the unsigned string for column. Defaults to unsupported.
      *
@@ -26,7 +37,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     protected function buildAfterString(): string
     {
         /** @var Connection $db */
-        $db = $this->getDb();
+        $db = $this->db;
 
         return $this->getAfter() !== null ? ' AFTER ' . $db->quoteColumnName($this->getAfter()) : '';
     }
@@ -44,12 +55,14 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     /**
      * Builds the comment specification for the column.
      *
+     * @throws Exception|InvalidConfigException
+     *
      * @return string a string containing the COMMENT keyword and the comment itself.
      */
     protected function buildCommentString(): string
     {
         /** @var Connection $db */
-        $db = $this->getDb();
+        $db = $this->db;
 
         return $this->getComment() !== null ? ' COMMENT ' . $db->quoteValue($this->getComment()) : '';
     }
