@@ -4,23 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use function array_change_key_case;
-use function array_map;
-use function array_merge;
-use function array_values;
-use function bindec;
-use function explode;
+use JsonException;
 use PDO;
 use PDOException;
-use function preg_match;
-use function preg_match_all;
-use function str_replace;
-use function stripos;
-use function strpos;
-use function strtolower;
-
-use function trim;
-use function version_compare;
+use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ConstraintFinderInterface;
@@ -28,11 +15,25 @@ use Yiisoft\Db\Constraint\ConstraintFinderTrait;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
+
+use function array_change_key_case;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function bindec;
+use function explode;
+use function preg_match;
+use function preg_match_all;
+use function str_replace;
+use function stripos;
+use function strpos;
+use function strtolower;
+use function trim;
+use function version_compare;
 
 final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
@@ -120,9 +121,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all table names in the database. The names have NO schema name prefix.
      */
@@ -142,7 +141,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $name table name.
      *
-     * @throws Exception
+     * @throws Exception|Throwable
      *
      * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
@@ -166,11 +165,9 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $tableName table name.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return Constraint|null primary key for the given table, `null` if the table has no primary key.
+     * @return Constraint|null primary key for the given table, `null` if the table has no primary key.*
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
@@ -182,9 +179,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $tableName table name.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return ForeignKeyConstraint[] foreign keys for the given table.
      */
@@ -198,9 +193,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @param string $tableName table name.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return IndexConstraint[] indexes for the given table.
      */
@@ -247,9 +240,7 @@ SQL;
      *
      * @param string $tableName table name.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return Constraint[] unique constraints for the given table.
      */
@@ -302,7 +293,7 @@ SQL;
      * @param TableSchema $table the table metadata object.
      * @param string $name the table name.
      */
-    protected function resolveTableNames($table, $name): void
+    protected function resolveTableNames(TableSchema $table, string $name): void
     {
         $parts = explode('.', str_replace('`', '', $name));
 
@@ -320,6 +311,8 @@ SQL;
      * Loads the column information into a {@see ColumnSchema} object.
      *
      * @param array $info column information.
+     *
+     * @throws JsonException
      *
      * @return ColumnSchema the column schema object.
      */
@@ -385,7 +378,7 @@ SQL;
              */
             if (
                 ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
-                && preg_match('/^current_timestamp(?:\(([0-9]*)\))?$/i', (string) $info['default'], $matches)
+                && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
@@ -404,11 +397,11 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws Exception if DB query fails.
+     * @throws Exception|Throwable if DB query fails.
      *
      * @return bool whether the table exists in the database.
      */
-    protected function findColumns($table): bool
+    protected function findColumns(TableSchema $table): bool
     {
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->getFullName());
 
@@ -453,13 +446,11 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return string $sql the result of 'SHOW CREATE TABLE'.
      */
-    protected function getCreateTableSql($table): string
+    protected function getCreateTableSql(TableSchema $table): string
     {
         $row = $this->getDb()->createCommand(
             'SHOW CREATE TABLE ' . $this->quoteTableName($table->getFullName())
@@ -480,9 +471,9 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws Exception
+     * @throws Exception|Throwable
      */
-    protected function findConstraints($table)
+    protected function findConstraints(TableSchema $table): void
     {
         $sql = <<<'SQL'
 SELECT
@@ -565,13 +556,11 @@ SQL;
      *
      * @param TableSchema $table the table metadata.
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes($table): array
+    public function findUniqueIndexes(TableSchema $table): array
     {
         $sql = $this->getCreateTableSql($table);
 
@@ -606,7 +595,6 @@ SQL;
     }
 
     /**
-     * @throws InvalidConfigException
      * @throws Exception
      *
      * @return bool whether the version of the MySQL being used is older than 5.1.
@@ -631,9 +619,7 @@ SQL;
      * - foreignKeys
      * - uniques
      *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
+     * @throws Exception|InvalidConfigException|Throwable
      *
      * @return mixed constraints.
      */

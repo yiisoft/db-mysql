@@ -476,7 +476,8 @@ SQL;
         $db = $this->getConnection();
         $schema = $this->getConnection()->getSchema();
 
-        $db->getSchemaCache()->setEnable(true);
+        $this->schemaCache->setEnable(true);
+
         $db->setTablePrefix($tablePrefix);
 
         $noCacheTable = $schema->getTableSchema($tableName, true);

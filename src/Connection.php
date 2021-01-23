@@ -15,8 +15,6 @@ use function constant;
  */
 final class Connection extends AbstractConnection
 {
-    private ?Schema $schema = null;
-
     /**
      * Creates a command for execution.
      *
@@ -31,7 +29,7 @@ final class Connection extends AbstractConnection
             $sql = $this->quoteSql($sql);
         }
 
-        $command = new Command($this->getProfiler(), $this->getLogger(), $this, $this->getQueryCache(), $sql);
+        $command = new Command($this, $sql);
 
         return $command->bindValues($params);
     }
@@ -43,7 +41,7 @@ final class Connection extends AbstractConnection
      */
     public function getSchema(): Schema
     {
-        return $this->schema ?? ($this->schema = new Schema($this, $this->getSchemaCache()));
+        return new Schema($this);
     }
 
     /**
