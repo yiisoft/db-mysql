@@ -14,7 +14,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     private ConnectionInterface $db;
 
     /**
-     *  @param int|string|array|null $length column size or precision definition.
+     *  @param array|int|string|null $length column size or precision definition.
      */
     public function __construct(string $type, $length, ConnectionInterface $db)
     {
