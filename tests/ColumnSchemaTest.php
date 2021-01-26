@@ -13,7 +13,6 @@ use Yiisoft\Db\Mysql\ColumnSchema;
  */
 final class ColumnSchemaTest extends TestCase
 {
-
     public function bigintValueProvider(): array
     {
         return [

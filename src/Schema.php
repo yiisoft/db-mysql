@@ -33,7 +33,6 @@ use function stripos;
 use function strpos;
 use function strtolower;
 use function trim;
-use function version_compare;
 
 /**
  * @psalm-type ColumnArray = array{
