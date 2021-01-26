@@ -79,8 +79,10 @@ final class Connection extends AbstractConnection
                 $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->getEmulatePrepare());
             }
 
-            if ($this->getCharset() !== null) {
-                $pdo->exec('SET NAMES ' . $pdo->quote($this->getCharset()));
+            $charset = $this->getCharset();
+
+            if ($charset !== null) {
+                $pdo->exec('SET NAMES ' . $pdo->quote($charset));
             }
         }
     }

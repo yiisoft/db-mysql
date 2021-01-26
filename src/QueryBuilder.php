@@ -88,11 +88,8 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $quotedTable = $this->getDb()->quoteTableName($table);
 
+        /** @psalm-var array<array-key, string> $row */
         $row = $this->getDb()->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
-
-        if ($row === false) {
-            throw new Exception("Unable to find column '$oldName' in table '$table'.");
-        }
 
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
@@ -239,8 +236,8 @@ final class QueryBuilder extends AbstractQueryBuilder
 
             if ($value === null) {
                 $pk = $table->getPrimaryKey();
-                $key = reset($pk);
-                $value = $this->getDb()->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
+                $key = (string) reset($pk);
+                $value = (int) $this->getDb()->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
             } else {
                 $value = (int) $value;
             }
@@ -274,6 +271,10 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @param int|object|null $offset
      *
      * @return string the LIMIT and OFFSET clauses.
+     *
+     * @psalm-suppress ImplementedParamTypeMismatch
+     * @psalm-suppress PossiblyInvalidCast
+     * @psalm-suppress PossiblyNullOperand
      */
     public function buildLimit($limit, $offset): string
     {
@@ -341,13 +342,19 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     protected function prepareInsertValues(string $table, $columns, array $params = []): array
     {
+        /**
+         * @var array $names
+         * @var array $placeholders
+         */
         [$names, $placeholders, $values, $params] = parent::prepareInsertValues($table, $columns, $params);
         if (!$columns instanceof Query && empty($names)) {
             $tableSchema = $this->getDb()->getSchema()->getTableSchema($table);
-            $columns = $tableSchema->getColumns();
+
             if ($tableSchema !== null) {
+                $columns = $tableSchema->getColumns();
                 $columns = !empty($tableSchema->getPrimaryKey())
                     ? $tableSchema->getPrimaryKey() : [reset($columns)->getName()];
+                /** @var string $name */
                 foreach ($columns as $name) {
                     $names[] = $this->getDb()->quoteColumnName($name);
                     $placeholders[] = 'DEFAULT';
@@ -394,6 +401,7 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $insertSql = $this->insert($table, $insertColumns, $params);
 
+        /** @var array $uniqueNames */
         [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
 
         if (empty($uniqueNames)) {
@@ -402,14 +410,17 @@ final class QueryBuilder extends AbstractQueryBuilder
 
         if ($updateColumns === true) {
             $updateColumns = [];
+            /** @var string $name */
             foreach ($updateNames as $name) {
                 $updateColumns[$name] = new Expression('VALUES(' . $this->getDb()->quoteColumnName($name) . ')');
             }
         } elseif ($updateColumns === false) {
-            $name = $this->getDb()->quoteColumnName(reset($uniqueNames));
+            $columnName = (string) reset($uniqueNames);
+            $name = $this->getDb()->quoteColumnName($columnName);
             $updateColumns = [$name => new Expression($this->getDb()->quoteTableName($table) . '.' . $name)];
         }
 
+        /** @var array $updates */
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
 
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
@@ -516,19 +527,16 @@ final class QueryBuilder extends AbstractQueryBuilder
      *
      * @throws Exception|Throwable in case when table does not contain column.
      *
-     * @return string|null the column definition.
+     * @return string the column definition.
      */
-    private function getColumnDefinition(string $table, string $column): ?string
+    private function getColumnDefinition(string $table, string $column): string
     {
-        $result = null;
+        $result = '';
 
         $quotedTable = $this->getDb()->quoteTableName($table);
 
+        /** @var array<array-key, string> $row */
         $row = $this->getDb()->createCommand('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
-
-        if ($row === false) {
-            throw new Exception("Unable to find column '$column' in table '$table'.");
-        }
 
         if (!isset($row['Create Table'])) {
             $row = array_values($row);
@@ -643,8 +651,16 @@ final class QueryBuilder extends AbstractQueryBuilder
      */
     private function supportsFractionalSeconds(): bool
     {
-        $version = $this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+        $result = false;
 
-        return version_compare($version, '5.6.4', '>=');
+        $slavePdo = $this->getDb()->getSlavePdo();
+
+        if ($slavePdo !== null) {
+            /** @var string $version */
+            $version = $slavePdo->getAttribute(PDO::ATTR_SERVER_VERSION);
+            $result = version_compare($version, '5.6.4', '>=');
+        }
+
+        return $result;
     }
 }

@@ -34,6 +34,10 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
+        /**
+         * @var JsonExpression $expression
+         * @var mixed|Query $value
+         */
         $value = $expression->getValue();
 
         if ($value instanceof Query) {

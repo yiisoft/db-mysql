@@ -23,6 +23,23 @@ final class ConnectionTest extends TestCase
         $this->assertIsObject($this->getConnection(true));
     }
 
+    public function testInitConnection(): void
+    {
+        $db = $this->getConnection();
+
+        $db->setEmulatePrepare(true);
+
+        $db->open();
+
+        $this->assertTrue($db->getEmulatePrepare());
+
+        $db->setEmulatePrepare(false);
+
+        $this->assertFalse($db->getEmulatePrepare());
+
+        $db->close();
+    }
+
     public function testConstruct(): void
     {
         $db = $this->getConnection();
