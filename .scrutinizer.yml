@@ -11,7 +11,7 @@ build:
             version: 7.4.14
             compile_options: '--with-config-file-path=/home/scrutinizer/.phpenv/versions/7.4.14/etc --with-config-file-scan-dir=/home/scrutinizer/.phpenv/versions/7.4.14/etc/conf.d --prefix=/home/scrutinizer/.phpenv/versions/7.4.14 --libexecdir=/home/scrutinizer/.phpenv/versions/7.4.14/libexec --enable-intl --with-openssl --enable-gd --enable-exif --with-libzip --with-zlib --with-sodium --with-pdo-sqlite --enable-soap --enable-xmlreader --with-xsl --enable-ftp --with-tidy --with-xmlrpc --enable-sysvsem --enable-sysvshm --enable-sysvmsg --enable-shmop --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-pcntl --with-readline --enable-mbstring --with-curl --with-pgsql --with-pdo-pgsql --with-gettext --enable-sockets --with-bz2 --enable-bcmath --enable-calendar --with-libdir=lib --enable-fpm --enable-maintainer-zts --with-gmp --with-kerberos --with-imap --with-imap-ssl --with-apxs2=/usr/bin/apxs --with-ldap --with-pear=/home/scrutinizer/.phpenv/versions/7.4.14/pear'
 
-        mysql: true
+        mysql: 8
 
     nodes:
         analysis:
