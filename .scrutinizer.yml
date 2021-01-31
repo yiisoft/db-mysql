@@ -5,16 +5,35 @@ filter:
     paths:
         - "src/*"
 
-tools:
-    external_code_coverage:
-        timeout: 660
-
 build:
+    environment:
+        php:
+            version: 7.4.14
+            compile_options: '--with-config-file-path=/home/scrutinizer/.phpenv/versions/7.4.14/etc --with-config-file-scan-dir=/home/scrutinizer/.phpenv/versions/7.4.14/etc/conf.d --prefix=/home/scrutinizer/.phpenv/versions/7.4.14 --libexecdir=/home/scrutinizer/.phpenv/versions/7.4.14/libexec --enable-intl --with-openssl --enable-gd --enable-exif --with-libzip --with-zlib --with-sodium --with-pdo-sqlite --enable-soap --enable-xmlreader --with-xsl --enable-ftp --with-tidy --with-xmlrpc --enable-sysvsem --enable-sysvshm --enable-sysvmsg --enable-shmop --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-pcntl --with-readline --enable-mbstring --with-curl --with-pgsql --with-pdo-pgsql --with-gettext --enable-sockets --with-bz2 --enable-bcmath --enable-calendar --with-libdir=lib --enable-fpm --enable-maintainer-zts --with-gmp --with-kerberos --with-imap --with-imap-ssl --with-apxs2=/usr/bin/apxs --with-ldap --with-pear=/home/scrutinizer/.phpenv/versions/7.4.14/pear'
+
     nodes:
         analysis:
-            environment:
-                php: 7.4.12
-
             tests:
                 override:
                     - php-scrutinizer-run
+
+        tests-and-coverage:
+            services:
+                mysql: 5.7
+
+            dependencies:
+                override:
+                    - composer self-update
+                    - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
+            tests:
+                before:
+                    - sed -i "s/'password' => 'root'/'password' => ''/" tests/TestCase.php
+                    - 'mysql -u root -e "CREATE DATABASE yiitest"'
+
+                override:
+                    -
+                        command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+                        on_node: 1
+                        coverage:
+                            file: coverage.xml
+                            format: php-clover
