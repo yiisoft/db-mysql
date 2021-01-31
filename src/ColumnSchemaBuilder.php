@@ -9,10 +9,16 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
+/**
+ * The class ColumnSchemaBuilder for Mysql database.
+ */
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     private ConnectionInterface $db;
 
+    /**
+     *  @param array|int|string|null $length column size or precision definition.
+     */
     public function __construct(string $type, $length, ConnectionInterface $db)
     {
         $this->db = $db;
@@ -40,7 +46,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
         /** @var Connection $db */
         $db = $this->db;
 
-        return $this->getAfter() !== null ? ' AFTER ' . $db->quoteColumnName($this->getAfter()) : '';
+        return $this->getAfter() !== null ? ' AFTER ' . $db->quoteColumnName((string) $this->getAfter()) : '';
     }
 
     /**
@@ -65,7 +71,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
         /** @var Connection $db */
         $db = $this->db;
 
-        return $this->getComment() !== null ? ' COMMENT ' . $db->quoteValue($this->getComment()) : '';
+        return $this->getComment() !== null ? ' COMMENT ' . $db->quoteValue((string) $this->getComment()) : '';
     }
 
     public function __toString(): string

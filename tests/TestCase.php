@@ -267,6 +267,7 @@ class TestCase extends AbstractTestCase
                 'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306'))->asString(),
                 'username' => 'root',
                 'password' => 'root',
+                'charset' => 'utf8mb4',
                 'fixture' => __DIR__ . '/Data/mysql.sql',
             ],
         ];
@@ -301,6 +302,7 @@ class TestCase extends AbstractTestCase
                 ],
                 'setUsername()' => [$params['yiisoft/db-mysql']['username']],
                 'setPassword()' => [$params['yiisoft/db-mysql']['password']],
+                'setCharset()' => [$params['yiisoft/db-mysql']['charset']],
             ],
         ];
     }

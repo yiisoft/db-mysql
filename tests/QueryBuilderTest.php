@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use function array_merge;
 use Closure;
-use function is_string;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -16,9 +15,11 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\QueryBuilder;
-
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\TestUtility\TestQueryBuilderTrait;
+
+use function array_merge;
+use function is_string;
 
 /**
  * @group mysql
@@ -48,6 +49,24 @@ final class QueryBuilderTest extends TestCase
         $expected = 'ALTER TABLE `item` AUTO_INCREMENT=4';
         $sql = $qb->resetSequence('item', 4);
         $this->assertEquals($expected, $sql);
+    }
+
+    public function testResetSequenceNoAssociated(): void
+    {
+        $qb = $this->getQueryBuilder(true, true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("There is no sequence associated with table 'constraints'");
+        $sql = $qb->resetSequence('constraints');
+    }
+
+    public function testResetSequenceTableNoExist(): void
+    {
+        $qb = $this->getQueryBuilder(true, true);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Table not found: noExist');
+        $sql = $qb->resetSequence('noExist', 1);
     }
 
     public function addDropForeignKeysProvider(): array
@@ -539,5 +558,98 @@ final class QueryBuilderTest extends TestCase
         } else {
             $this->assertIsOneOf($actualParams, $expectedParams);
         }
+    }
+
+    public function testRenameColumn(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $sql = $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test');
+        $this->assertSame(
+            'ALTER TABLE `alpha` CHANGE `string_identifier` `string_identifier_test` varchar(255) NOT NULL',
+            $sql,
+        );
+
+        $sql = $qb->renameColumn('alpha', 'string_identifier_test', 'string_identifier');
+        $this->assertSame(
+            'ALTER TABLE `alpha` CHANGE `string_identifier_test` `string_identifier`',
+            $sql,
+        );
+    }
+
+    public function testRenameColumnTableNoExist(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $this->expectException(Exception::class);
+        $sql = $qb->renameColumn('noExist', 'string_identifier', 'string_identifier_test');
+    }
+
+    public function testCheckIntegrity(): void
+    {
+        $db = $this->getConnection();
+
+        $db->createCommand()->checkIntegrity('public', 'item', false)->execute();
+
+        $sql = 'INSERT INTO {{item}}([[name]], [[category_id]]) VALUES (\'invalid\', 99999)';
+
+        $command = $db->createCommand($sql);
+        $command->execute();
+
+        $db->createCommand()->checkIntegrity('public', 'item', true)->execute();
+
+        $this->expectException(IntegrityException::class);
+        $command->execute();
+    }
+
+    public function testCommentTable(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $expected = "ALTER TABLE [[comment]] COMMENT 'This is my table.'";
+        $sql = $qb->addCommentOnTable('comment', 'This is my table.');
+        $this->assertEquals($this->replaceQuotes($expected), $sql);
+
+        $expected = "ALTER TABLE [[comment]] COMMENT ''";
+        $sql = $qb->dropCommentFromTable('comment');
+        $this->assertEquals($this->replaceQuotes($expected), $sql);
+    }
+
+    public function testCommentColumn(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $expected = 'ALTER TABLE [[comment]] CHANGE [[add_comment]] [[add_comment]]' .
+            " varchar(255) NOT NULL COMMENT 'This is my column.'";
+        $sql = $qb->addCommentOnColumn('comment', 'add_comment', 'This is my column.');
+        $this->assertEquals($this->replaceQuotes($expected), $sql);
+
+        $expected = 'ALTER TABLE [[comment]] CHANGE [[replace_comment]] [[replace_comment]]' .
+            " varchar(255) DEFAULT NULL COMMENT 'This is my column.'";
+        $sql = $qb->addCommentOnColumn('comment', 'replace_comment', 'This is my column.');
+        $this->assertEquals($this->replaceQuotes($expected), $sql);
+
+        $expected = 'ALTER TABLE [[comment]] CHANGE [[delete_comment]] [[delete_comment]]' .
+            " varchar(128) NOT NULL COMMENT ''";
+        $sql = $qb->dropCommentFromColumn('comment', 'delete_comment');
+        $this->assertEquals($this->replaceQuotes($expected), $sql);
+    }
+
+    public function testAddCheck(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\QueryBuilder::addCheck is not supported by MySQL.');
+        $qb->addCheck('noExist', 'noExist', 'noExist');
+    }
+
+    public function testDropCheck(): void
+    {
+        $qb = $this->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\QueryBuilder::dropCheck is not supported by MySQL.');
+        $qb->dropCheck('noExist', 'noExist');
     }
 }

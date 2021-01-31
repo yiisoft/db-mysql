@@ -18,6 +18,9 @@ use Yiisoft\Json\Json;
 
 use function count;
 
+/**
+ * The class JsonExpressionBuilder builds {@see JsonExpression} for Mysql database.
+ */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;
@@ -34,6 +37,10 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
+        /**
+         * @var JsonExpression $expression
+         * @var mixed|Query $value
+         */
         $value = $expression->getValue();
 
         if ($value instanceof Query) {

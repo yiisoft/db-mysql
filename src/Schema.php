@@ -33,13 +33,70 @@ use function stripos;
 use function strpos;
 use function strtolower;
 use function trim;
-use function version_compare;
 
+/**
+ * The class Schema is the class for retrieving metadata from a Mysql database (version 5.7 and above).
+ *
+ * @psalm-type ColumnArray = array{
+ *   table_schema: string,
+ *   table_name: string,
+ *   column_name: string,
+ *   data_type: string,
+ *   type_type: string|null,
+ *   character_maximum_length: int,
+ *   column_comment: string|null,
+ *   modifier: int,
+ *   is_nullable: bool,
+ *   column_default: mixed,
+ *   is_autoinc: bool,
+ *   sequence_name: string|null,
+ *   enum_values: array<array-key, float|int|string>|string|null,
+ *   numeric_precision: int|null,
+ *   numeric_scale: int|null,
+ *   size: string|null,
+ *   is_pkey: bool|null,
+ *   dimension: int
+ * }
+ *
+ * @psalm-type ColumnInfoArray = array{
+ *   field: string,
+ *   type: string,
+ *   collation: string|null,
+ *   null: string,
+ *   key: string,
+ *   default: string|null,
+ *   extra: string,
+ *   privileges: string,
+ *   comment: string
+ * }
+ *
+ * @psalm-type RowConstraint = array{
+ *   constraint_name: string,
+ *   column_name: string,
+ *   referenced_table_name: string,
+ *   referenced_column_name: string
+ * }
+ *
+ * @psalm-type ConstraintArray = array<
+ *   array-key,
+ *   array {
+ *     name: string,
+ *     column_name: string,
+ *     type: string,
+ *     foreign_table_schema: string|null,
+ *     foreign_table_name: string|null,
+ *     foreign_column_name: string|null,
+ *     on_update: string,
+ *     on_delete: string,
+ *     check_expr: string
+ *   }
+ * >
+ */
 final class Schema extends AbstractSchema implements ConstraintFinderInterface
 {
     use ConstraintFinderTrait;
 
-    private bool $oldMysql;
+    /** @var array<array-key, string> $typeMap */
     private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_INTEGER,
@@ -108,7 +165,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
         }
 
         $resolvedName->fullName(($resolvedName->getSchemaName() !== $this->defaultSchema ?
-            $resolvedName->getSchemaName() . '.' : '') . $resolvedName->getName());
+            (string) $resolvedName->getSchemaName() . '.' : '') . (string) $resolvedName->getName());
 
         return $resolvedName;
     }
@@ -171,7 +228,9 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
-        return $this->loadTableConstraints($tableName, 'primaryKey');
+        $tablePrimaryKey = $this->loadTableConstraints($tableName, 'primaryKey');
+
+        return $tablePrimaryKey instanceof Constraint ? $tablePrimaryKey : null;
     }
 
     /**
@@ -181,11 +240,13 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return ForeignKeyConstraint[] foreign keys for the given table.
+     * @return array|ForeignKeyConstraint[] foreign keys for the given table.
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
-        return $this->loadTableConstraints($tableName, 'foreignKeys');
+        $tableForeignKeys = $this->loadTableConstraints($tableName, 'foreignKeys');
+
+        return is_array($tableForeignKeys) ? $tableForeignKeys : [];
     }
 
     /**
@@ -199,7 +260,7 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
      */
     protected function loadTableIndexes(string $tableName): array
     {
-        static $sql = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT
     `s`.`INDEX_NAME` AS `name`,
     `s`.`COLUMN_NAME` AS `column_name`,
@@ -217,10 +278,15 @@ SQL;
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
+        /** @var array<array-key, array<array-key, mixed>> $indexes */
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
         $indexes = ArrayHelper::index($indexes, null, 'name');
         $result = [];
 
+        /**
+         * @psalm-var object|string|null $name
+         * @psalm-var array<array-key, array<array-key, mixed>> $index
+         */
         foreach ($indexes as $name => $index) {
             $ic = new IndexConstraint();
 
@@ -242,11 +308,13 @@ SQL;
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return Constraint[] unique constraints for the given table.
+     * @return array|Constraint[] unique constraints for the given table.
      */
     protected function loadTableUniques(string $tableName): array
     {
-        return $this->loadTableConstraints($tableName, 'uniques');
+        $tableUniques = $this->loadTableConstraints($tableName, 'uniques');
+
+        return is_array($tableUniques) ? $tableUniques : [];
     }
 
     /**
@@ -300,7 +368,7 @@ SQL;
         if (isset($parts[1])) {
             $table->schemaName($parts[0]);
             $table->name($parts[1]);
-            $table->fullName($table->getSchemaName() . '.' . $table->getName());
+            $table->fullName((string) $table->getSchemaName() . '.' . (string) $table->getName());
         } else {
             $table->name($parts[0]);
             $table->fullName($parts[0]);
@@ -310,7 +378,7 @@ SQL;
     /**
      * Loads the column information into a {@see ColumnSchema} object.
      *
-     * @param array $info column information.
+     * @var array $info column information.
      *
      * @throws JsonException
      *
@@ -320,6 +388,7 @@ SQL;
     {
         $column = $this->createColumnSchema();
 
+        /** @psalm-var ColumnInfoArray $info */
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(strpos($info['key'], 'PRI') !== false);
@@ -403,7 +472,9 @@ SQL;
      */
     protected function findColumns(TableSchema $table): bool
     {
-        $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($table->getFullName());
+        $tableName = $table->getFullName() ?? '';
+
+        $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($tableName);
 
         try {
             $columns = $this->getDb()->createCommand($sql)->queryAll();
@@ -422,8 +493,11 @@ SQL;
             throw $e;
         }
 
+        $slavePdo = $this->getDb()->getSlavePdo();
+
+        /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
-            if ($this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
+            if ($slavePdo !== null && $slavePdo->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
                 $info = array_change_key_case($info, CASE_LOWER);
             }
 
@@ -452,8 +526,11 @@ SQL;
      */
     protected function getCreateTableSql(TableSchema $table): string
     {
+        $tableName = $table->getFullName() ?? '';
+
+        /** @var array<array-key, string> $row */
         $row = $this->getDb()->createCommand(
-            'SHOW CREATE TABLE ' . $this->quoteTableName($table->getFullName())
+            'SHOW CREATE TABLE ' . $this->quoteTableName($tableName)
         )->queryOne();
 
         if (isset($row['Create Table'])) {
@@ -501,6 +578,7 @@ SQL;
 
             $constraints = [];
 
+            /**  @psalm-var RowConstraint $row */
             foreach ($rows as $row) {
                 $constraints[$row['constraint_name']]['referenced_table_name'] = $row['referenced_table_name'];
                 $constraints[$row['constraint_name']]['columns'][$row['column_name']] = $row['referenced_column_name'];
@@ -508,6 +586,10 @@ SQL;
 
             $table->foreignKeys([]);
 
+            /**
+             * @var string $name
+             * @var array{referenced_table_name: string, columns: array} $constraint
+             */
             foreach ($constraints as $name => $constraint) {
                 $table->foreignKey($name, array_merge(
                     [$constraint['referenced_table_name']],
@@ -595,22 +677,6 @@ SQL;
     }
 
     /**
-     * @throws Exception
-     *
-     * @return bool whether the version of the MySQL being used is older than 5.1.
-     */
-    protected function isOldMysql(): bool
-    {
-        if ($this->oldMysql === null) {
-            $version = $this->getDb()->getSlavePdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
-
-            $this->oldMysql = version_compare($version, '5.1', '<=');
-        }
-
-        return $this->oldMysql;
-    }
-
-    /**
      * Loads multiple types of constraints and returns the specified ones.
      *
      * @param string $tableName table name.
@@ -621,11 +687,13 @@ SQL;
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return mixed constraints.
+     * @return (Constraint|ForeignKeyConstraint)[]|Constraint|null constraints.
+     *
+     * @psalm-return Constraint|list<Constraint|ForeignKeyConstraint>|null
      */
     private function loadTableConstraints(string $tableName, string $returnType)
     {
-        static $sql = <<<'SQL'
+        $sql = <<<'SQL'
 SELECT
     `kcu`.`CONSTRAINT_NAME` AS `name`,
     `kcu`.`COLUMN_NAME` AS `column_name`,
@@ -677,6 +745,7 @@ SQL;
             ]
         )->queryAll();
 
+        /** @var array<array-key, array> $constraints */
         $constraints = $this->normalizePdoRowKeyCase($constraints, true);
         $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
 
@@ -686,7 +755,15 @@ SQL;
             'uniques' => [],
         ];
 
+        /**
+         * @var string $type
+         * @var array $names
+         */
         foreach ($constraints as $type => $names) {
+            /**
+             * @psalm-var object|string|null $name
+             * @psalm-var ConstraintArray $constraint
+             */
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
