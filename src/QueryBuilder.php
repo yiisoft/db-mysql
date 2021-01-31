@@ -125,8 +125,9 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @param array|string $columns the column(s) that should be included in the index. If there are multiple columns,
      * separate them with commas or use an array to represent them. Each column name will be properly quoted by the
      * method, unless a parenthesis is found in the name.
-     * @psalm-param array<array-key, ExpressionInterface|string>|string $columns
      * @param bool $unique whether to add UNIQUE constraint on the created index.
+     *
+     * @psalm-param array<array-key, ExpressionInterface|string>|string $columns
      *
      * @throws Exception|InvalidArgumentException
      *
