@@ -9,6 +9,9 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 
+/**
+ * The class ColumnSchemaBuilder for Mysql database.
+ */
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     private ConnectionInterface $db;

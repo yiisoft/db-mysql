@@ -18,6 +18,9 @@ use Yiisoft\Json\Json;
 
 use function count;
 
+/**
+ * The class JsonExpressionBuilder builds {@see JsonExpression} for Mysql database.
+ */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
     use ExpressionBuilderTrait;

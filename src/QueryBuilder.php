@@ -29,6 +29,9 @@ use function reset;
 use function trim;
 use function version_compare;
 
+/**
+ * The class QueryBuilder is the query builder for Mysql databases.
+ */
 final class QueryBuilder extends AbstractQueryBuilder
 {
     /**

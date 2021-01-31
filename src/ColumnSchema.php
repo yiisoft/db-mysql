@@ -11,6 +11,9 @@ use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
 
 use function json_decode;
 
+/**
+ * The class ColumnSchema for Mysql database.
+ */
 final class ColumnSchema extends AbstractColumnSchema
 {
     /**

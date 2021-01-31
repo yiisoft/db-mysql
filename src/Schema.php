@@ -35,6 +35,8 @@ use function strtolower;
 use function trim;
 
 /**
+ * The class Schema is the class for retrieving metadata from a Mysql database (version 5.7 and above).
+ *
  * @psalm-type ColumnArray = array{
  *   table_schema: string,
  *   table_name: string,

@@ -11,7 +11,7 @@ use Yiisoft\Db\Connection\Connection as AbstractConnection;
 use function constant;
 
 /**
- * Database connection class prefilled for MYSQL Server.
+ * The class Connection represents a connection to a database via [PDO](https://secure.php.net/manual/en/book.pdo.php).
  */
 final class Connection extends AbstractConnection
 {
