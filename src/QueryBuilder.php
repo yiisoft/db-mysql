@@ -13,6 +13,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilder as AbstractQueryBuilder;
@@ -124,6 +125,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @param array|string $columns the column(s) that should be included in the index. If there are multiple columns,
      * separate them with commas or use an array to represent them. Each column name will be properly quoted by the
      * method, unless a parenthesis is found in the name.
+     * @psalm-param array<array-key, ExpressionInterface|string>|string $columns
      * @param bool $unique whether to add UNIQUE constraint on the created index.
      *
      * @throws Exception|InvalidArgumentException
@@ -267,24 +269,20 @@ final class QueryBuilder extends AbstractQueryBuilder
     }
 
     /**
-     * @param int|object|null $limit
-     * @param int|object|null $offset
+     * @param Expression|int|null $limit
+     * @param Expression|int|null $offset
      *
      * @return string the LIMIT and OFFSET clauses.
-     *
-     * @psalm-suppress ImplementedParamTypeMismatch
-     * @psalm-suppress PossiblyInvalidCast
-     * @psalm-suppress PossiblyNullOperand
      */
     public function buildLimit($limit, $offset): string
     {
         $sql = '';
 
         if ($this->hasLimit($limit)) {
-            $sql = 'LIMIT ' . $limit;
+            $sql = 'LIMIT ' . (string) $limit;
 
             if ($this->hasOffset($offset)) {
-                $sql .= ' OFFSET ' . $offset;
+                $sql .= ' OFFSET ' . (string) $offset;
             }
         } elseif ($this->hasOffset($offset)) {
             /**
@@ -420,7 +418,10 @@ final class QueryBuilder extends AbstractQueryBuilder
             $updateColumns = [$name => new Expression($this->getDb()->quoteTableName($table) . '.' . $name)];
         }
 
-        /** @var array $updates */
+        /**
+         *  @psalm-var array<array-key, mixed> $updates
+         *  @psalm-var array<string, ExpressionInterface|string> $updateColumns
+         */
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
 
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
