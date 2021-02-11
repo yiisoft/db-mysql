@@ -31,7 +31,7 @@
         "vimeo/psalm": "^4.2",
         "yiisoft/aliases": "^1.1",
         "yiisoft/di": "^3.0@dev",
-        "yiisoft/log-target-file": "^3.0@dev"
+        "yiisoft/log-target-file": "^1.0"
     },
     "autoload": {
         "psr-4": {
