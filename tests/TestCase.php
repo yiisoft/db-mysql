@@ -24,7 +24,7 @@ use Yiisoft\Db\Factory\DatabaseFactory;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\TestUtility\IsOneOfAssert;
 use Yiisoft\Di\Container;
-use Yiisoft\Factory\Definitions\Reference;
+use Yiisoft\Factory\Definition\Reference;
 use Yiisoft\Log\Logger;
 use Yiisoft\Profiler\Profiler;
 use Yiisoft\Profiler\ProfilerInterface;
