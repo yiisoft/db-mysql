@@ -49,7 +49,7 @@ use Yiisoft\Db\Mysql\Connection as MySqlConnection;
 
 return [
     ConnectionInterface::class => [
-        '__class' => MySqlConnection::class,
+        'class' => MySqlConnection::class,
         '__construct()' => [
             'dsn' => $params['yiisoft/db-mysql']['dsn'],
         ],
