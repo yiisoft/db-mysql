@@ -35,7 +35,7 @@ use function version_compare;
 final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
-     * @var array mapping from abstract column types (keys) to physical column types (values).
+     * @var array<string, string> mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
         Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
@@ -625,6 +625,7 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @throws Exception
      *
      * @return array
+     * @psalm-return array<string, string>
      */
     private function defaultTimeTypeMap(): array
     {

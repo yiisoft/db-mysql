@@ -587,7 +587,6 @@ SQL;
             $table->foreignKeys([]);
 
             /**
-             * @var string $name
              * @var array{referenced_table_name: string, columns: array} $constraint
              */
             foreach ($constraints as $name => $constraint) {
