@@ -242,7 +242,7 @@ final class ConnectionTest extends TestCase
             ['Yiisoft\Db\Connection\Connection::openFromPoolSequentially', 'host:invalid']
         );
 
-        $db->setMasters('1', $this->createConnection('host:invalid'));
+        $db->setMaster('1', $this->createConnection('host:invalid'));
 
         try {
             $db->open();
