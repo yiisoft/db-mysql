@@ -423,7 +423,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         }
 
         /**
-         *  @psalm-var array<array-key, mixed> $updates
+         *  @psalm-var array<array-key, string> $updates
          *  @psalm-var array<string, ExpressionInterface|string> $updateColumns
          */
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
