@@ -17,7 +17,7 @@ class TestCase extends AbstractTestCase
     protected const DB_DSN = 'mysql:host=127.0.0.1;dbname=yiitest;port=3306';
     protected const DB_FIXTURES_PATH = __DIR__ . '/Fixture/mysql.sql';
     protected const DB_USERNAME = 'root';
-    protected const DB_PASSWORD = 'root';
+    protected const DB_PASSWORD = '';
     protected const DB_CHARSET = 'UTF8MB4';
     protected array $dataProvider;
     protected string $likeEscapeCharSql = '';
