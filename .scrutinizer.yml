@@ -20,7 +20,7 @@ build:
     services:
       mysql: latest
         env:
-          MYSQL_DATABASE: yiitest
+          MYSQL_DATABASE: "yiitest"
 
           dependencies:
             override:
