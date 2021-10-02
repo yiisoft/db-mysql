@@ -16,23 +16,23 @@ build:
         override:
           - php-scrutinizer-run
 
-  tests-and-coverage:
-    services:
-      mysql: 5.7
+    tests-and-coverage:
+      services:
+        mysql: 5.7
 
-    dependencies:
-      override:
-        - composer self-update
-        - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
+        dependencies:
+          override:
+            - composer self-update
+            - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
-    tests:
-      before:
-        - 'mysql -u root -e "CREATE DATABASE yiitest"'
+        tests:
+          before:
+            - 'mysql -u root -e "CREATE DATABASE yiitest"'
 
-      override:
-        -
-          command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
-          on_node: 1
-          coverage:
-            file: coverage.xml
-            format: php-clover
+          override:
+            -
+              command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+              on_node: 1
+              coverage:
+                file: coverage.xml
+                format: php-clover
