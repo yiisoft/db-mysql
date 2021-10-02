@@ -21,7 +21,7 @@
         "php": "^7.4|^8.0",
         "ext-json": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "dev-move-schemacache-to-schema-class as 3.0",
+        "yiisoft/db": "^3.0",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
@@ -53,11 +53,5 @@
     "scripts": {
         "test": "phpunit --testdox --no-interaction",
         "test-watch": "phpunit-watcher watch"
-    },
-    "repositories": [
-        {
-            "type": "github",
-            "url": "https://github.com/terabytesoftw/db"
-        }
-    ]
+    }
 }
