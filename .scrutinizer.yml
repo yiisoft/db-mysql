@@ -30,8 +30,7 @@ build:
           - 'mysql -u root -e "CREATE DATABASE yiitest"'
 
         override:
-          -
-            command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+          - command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
             on_node: 1
             coverage:
               file: coverage.xml
