@@ -378,7 +378,7 @@ SQL;
     /**
      * Loads the column information into a {@see ColumnSchema} object.
      *
-     * @var array $info column information.
+     * @param array $info column information.
      *
      * @throws JsonException
      *

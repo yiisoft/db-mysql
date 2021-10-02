@@ -21,13 +21,14 @@ jobs:
           - ubuntu-latest
 
         php:
-          - "7.4"
+          - 7.4
 
     services:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_PASSWORD: ''
           MYSQL_DATABASE: yiitest
         ports:
           - 3306:3306
