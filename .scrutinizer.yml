@@ -1,37 +1,37 @@
 checks:
-    php: true
+  php: true
 
 filter:
-    paths:
-        - "src/*"
+  paths:
+    - "src/*"
 
 build:
-    environment:
-        php:
-            version: 8.0.11
+  environment:
+    php:
+      version: 8.0.11
 
-    nodes:
-        analysis:
-            tests:
-                override:
-                    - php-scrutinizer-run
+  nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
 
-        tests-and-coverage:
-            services:
-                mysql: latest
+  tests-and-coverage:
+    services:
+      mysql: latest
+        env:
+          MYSQL_DATABASE: yiitest
 
-            dependencies:
-                override:
-                    - composer self-update
-                    - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
-            tests:
-                before:
-                    - 'mysql -u root -e "CREATE DATABASE yiitest"'
+          dependencies:
+            override:
+              - composer self-update
+              - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
-                override:
-                    -
-                        command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
-                        on_node: 1
-                        coverage:
-                            file: coverage.xml
-                            format: php-clover
+          tests:
+            override:
+              -
+                command: "./vendor/bin/phpunit --coverage-clover ./coverage.xml"
+                on_node: 1
+                coverage:
+                file: coverage.xml
+                format: php-clover
