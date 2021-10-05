@@ -679,11 +679,6 @@ SQL;
         return new ColumnSchemaBuilder($type, $length, $this->getDb());
     }
 
-    public function setDefaultSchema(?string $defaultSchema): void
-    {
-        $this->defaultSchema = $defaultSchema;
-    }
-
     private function getTableComment(?string $schema, string $name): string
     {
         $sql = "SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE table_name='$name'";
