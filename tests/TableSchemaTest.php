@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\QueryBuilder;
 
 /**
