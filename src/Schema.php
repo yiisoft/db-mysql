@@ -159,9 +159,11 @@ final class Schema extends AbstractSchema implements ConstraintFinderInterface
         if (isset($parts[1])) {
             $resolvedName->schemaName($parts[0]);
             $resolvedName->name($parts[1]);
+            $resolvedName->comment($this->getTableComment($parts[0], $parts[1]));
         } else {
             $resolvedName->schemaName($this->defaultSchema);
             $resolvedName->name($name);
+            $resolvedName->comment($this->getTableComment($this->defaultSchema, $name));
         }
 
         $resolvedName->fullName(($resolvedName->getSchemaName() !== $this->defaultSchema ?
@@ -369,9 +371,11 @@ SQL;
             $table->schemaName($parts[0]);
             $table->name($parts[1]);
             $table->fullName((string) $table->getSchemaName() . '.' . (string) $table->getName());
+            $table->comment($this->getTableComment($parts[0], $parts[1]));
         } else {
             $table->name($parts[0]);
             $table->fullName($parts[0]);
+            $table->comment($this->getTableComment(null, $parts[0]));
         }
     }
 
@@ -673,6 +677,26 @@ SQL;
     public function createColumnSchemaBuilder(string $type, $length = null): ColumnSchemaBuilder
     {
         return new ColumnSchemaBuilder($type, $length, $this->getDb());
+    }
+
+    public function setDefaultSchema(?string $defaultSchema): void
+    {
+        $this->defaultSchema = $defaultSchema;
+    }
+
+    private function getTableComment(?string $schema, string $name): string
+    {
+        $sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_name='$name'";
+
+        if ($schema !== null) {
+            $sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES " .
+                "WHERE table_schema='$schema' AND table_name='$name'";
+        }
+
+        /** @psalm-var array<string, string> */
+        $tableinfo = $this->getDb()->createCommand($sql)->queryOne();
+
+        return $tableinfo['TABLE_COMMENT'] ?? '';
     }
 
     /**

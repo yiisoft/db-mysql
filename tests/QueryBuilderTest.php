@@ -604,11 +604,14 @@ final class QueryBuilderTest extends TestCase
 
     public function testCommentTable(): void
     {
+        $db = $this->getConnection();
         $qb = $this->getQueryBuilder();
 
         $expected = "ALTER TABLE [[comment]] COMMENT 'This is my table.'";
         $sql = $qb->addCommentOnTable('comment', 'This is my table.');
         $this->assertEquals($this->replaceQuotes($expected), $sql);
+
+        $db->createCommand($sql)->execute();
 
         $expected = "ALTER TABLE [[comment]] COMMENT ''";
         $sql = $qb->dropCommentFromTable('comment');

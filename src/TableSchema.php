@@ -13,7 +13,13 @@ use Yiisoft\Db\Schema\TableSchema as AbstractTableSchema;
  */
 final class TableSchema extends AbstractTableSchema
 {
+    private ?string $comment = null;
     private array $foreignKeys = [];
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
 
     /**
      * @return array foreign keys of this table. Each array element is of the following structure:
@@ -29,6 +35,11 @@ final class TableSchema extends AbstractTableSchema
     public function getForeignKeys(): array
     {
         return $this->foreignKeys;
+    }
+
+    public function comment(?string $comment): void
+    {
+        $this->comment = $comment;
     }
 
     public function foreignKey(string $id, array $to): void
