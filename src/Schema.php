@@ -686,10 +686,10 @@ SQL;
 
     private function getTableComment(?string $schema, string $name): string
     {
-        $sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_name='$name'";
+        $sql = "SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE table_name='$name'";
 
         if ($schema !== null) {
-            $sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES " .
+            $sql = "SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES " .
                 "WHERE table_schema='$schema' AND table_name='$name'";
         }
 
