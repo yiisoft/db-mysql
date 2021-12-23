@@ -66,19 +66,6 @@ final class Connection extends AbstractConnection
     }
 
     /**
-     * Creates the PDO instance.
-     *
-     * This method is called by {@see open} to establish a DB connection. The default implementation will create a PHP
-     * PDO instance. You may override this method if the default PDO needs to be adapted for certain DBMS.
-     *
-     * @return PDO the pdo instance
-     */
-    protected function createPdoInstance(): PDO
-    {
-        return new PDO($this->getDsn(), $this->getUsername(), $this->getPassword(), $this->getAttributes());
-    }
-
-    /**
      * Returns the name of the DB driver.
      *
      * @return string name of the DB driver
