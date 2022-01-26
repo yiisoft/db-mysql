@@ -37,6 +37,8 @@ jobs:
 
         php:
           - 7.4
+          - 8.0
+          - 8.1
 
     steps:
       - name: Checkout
@@ -45,7 +47,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "${{ matrix.php }}"
+          php-version: ${{ matrix.php }}
           extensions: ${{ env.extensions }}
           tools: composer:v2, cs2pr
           coverage: none
