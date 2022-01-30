@@ -10,8 +10,6 @@ use PDOException;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Constraint\ConstraintFinderInterface;
-use Yiisoft\Db\Constraint\ConstraintFinderTrait;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Exception\Exception;
@@ -92,10 +90,8 @@ use function trim;
  *   }
  * >
  */
-final class Schema extends AbstractSchema implements ConstraintFinderInterface
+final class Schema extends AbstractSchema
 {
-    use ConstraintFinderTrait;
-
     /** @var array<array-key, string> $typeMap */
     private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
