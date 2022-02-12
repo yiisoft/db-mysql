@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\TestUtility\TestBatchQueryResultTrait;
+use Yiisoft\Db\TestSupport\TestBatchQueryResultTrait;
 
 /**
  * @group mysql

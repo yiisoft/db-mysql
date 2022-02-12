@@ -45,8 +45,7 @@ final class ColumnSchemaTest extends TestCase
 
         $query = (new Query($db))->from('negative_default_values')->one();
 
-        /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
-        $this->assertSame($bigint, (string) $query['bigint_col']);
+        $this->assertSame($bigint, $query['bigint_col']);
     }
 
     public function testDbTypeCastJson(): void

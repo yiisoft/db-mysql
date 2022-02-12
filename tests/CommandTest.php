@@ -9,7 +9,7 @@ use yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestUtility\TestCommandTrait;
+use Yiisoft\Db\TestSupport\TestCommandTrait;
 
 /**
  * @group mysql
@@ -19,6 +19,14 @@ final class CommandTest extends TestCase
     use TestCommandTrait;
 
     protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+
+    public function testAddCheck(): void
+    {
+        $db = $this->getConnection();
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\PDO\QueryBuilderPDOMysql::addCheck is not supported by MySQL.');
+        $db->createCommand()->addCheck('noExist', 'noExist', 'noExist')->execute();
+    }
 
     public function testAddDropPrimaryKey(): void
     {
