@@ -10,10 +10,10 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
-use Yiisoft\Db\Expression\ExpressionBuilderTrait;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Json\Json;
 
 use function count;
@@ -23,18 +23,12 @@ use function count;
  */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
-    use ExpressionBuilderTrait;
-
     public const PARAM_PREFIX = ':qp';
 
-    /**
-     * @param ExpressionInterface|JsonExpression $expression the expression to be built
-     * @param array $params
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
-     *
-     * @return string
-     */
+    public function __construct(private QueryBuilderInterface $queryBuilder)
+    {
+    }
+
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
         /**

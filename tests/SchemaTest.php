@@ -10,9 +10,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
-use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\PDO\SchemaPDOMysql;
 use Yiisoft\Db\Mysql\TableSchema;
-use Yiisoft\Db\TestUtility\TestSchemaTrait;
+use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
 use function array_map;
 use function trim;
@@ -256,13 +256,13 @@ final class SchemaTest extends TestCase
         }
 
         $sql = <<<SQL
-CREATE TABLE  IF NOT EXISTS `datetime_test`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-SQL;
+        CREATE TABLE  IF NOT EXISTS `datetime_test`  (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        SQL;
 
         $this->getConnection()->createCommand($sql)->execute();
 
@@ -283,11 +283,11 @@ SQL;
         }
 
         $sql = <<<SQL
-CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
-  `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
-  `ts` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-SQL;
+        CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
+            `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
+            `ts` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        SQL;
 
         $this->getConnection()->createCommand($sql)->execute();
 
@@ -317,7 +317,7 @@ SQL;
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new Schema($this->getConnection(), $this->schemaCache);
+        $schema = new SchemaPDOMysql($this->getConnection(), $this->schemaCache);
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -346,17 +346,17 @@ SQL;
      */
     public function testGetTableNames(array $pdoAttributes): void
     {
-        $connection = $this->getConnection(true);
+        $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $connection->getPDO()->setAttribute($name, $value);
+            $db->getPDO()->setAttribute($name, $value);
         }
 
-        $schema = $connection->getSchema();
+        $schema = $db->getSchema();
 
         $tables = $schema->getTableNames();
 
-        if ($connection->getDriverName() === 'sqlsrv') {
+        if ($db->getDriverName() === 'sqlsrv') {
             $tables = array_map(static function ($item) {
                 return trim($item, '[]');
             }, $tables);
@@ -423,12 +423,9 @@ SQL;
             $this->expectException(NotSupportedException::class);
         }
 
-        $connection = $this->getConnection();
-
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-
+        $db = $this->getConnection();
+        $db->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
 
@@ -448,12 +445,9 @@ SQL;
             $this->expectException(NotSupportedException::class);
         }
 
-        $connection = $this->getConnection();
-
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
-
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-
+        $db = $this->getConnection();
+        $db->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
 
@@ -474,39 +468,29 @@ SQL;
         string $testTableName
     ): void {
         $db = $this->getConnection();
-        $schema = $this->getConnection()->getSchema();
+        $schema = $db->getSchema();
 
         $this->schemaCache->setEnable(true);
 
         $db->setTablePrefix($tablePrefix);
-
         $noCacheTable = $schema->getTableSchema($tableName, true);
-
         $this->assertInstanceOf(TableSchema::class, $noCacheTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
-
         $testNoCacheTable = $schema->getTableSchema($testTableName);
-
         $this->assertSame($noCacheTable, $testNoCacheTable);
 
         $db->setTablePrefix($tablePrefix);
-
         $schema->refreshTableSchema($tableName);
-
         $refreshedTable = $schema->getTableSchema($tableName, false);
-
         $this->assertInstanceOf(TableSchema::class, $refreshedTable);
         $this->assertNotSame($noCacheTable, $refreshedTable);
 
         /* Compare */
         $db->setTablePrefix($testTablePrefix);
-
         $schema->refreshTableSchema($testTablePrefix);
-
         $testRefreshedTable = $schema->getTableSchema($testTableName, false);
-
         $this->assertInstanceOf(TableSchema::class, $testRefreshedTable);
         $this->assertEquals($refreshedTable, $testRefreshedTable);
         $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
