@@ -6,20 +6,15 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Closure;
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
 
-use function array_merge;
 use function is_string;
 
 /**

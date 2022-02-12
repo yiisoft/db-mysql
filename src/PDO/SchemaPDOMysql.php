@@ -881,9 +881,9 @@ final class SchemaPDOMysql extends Schema
      *
      * @param string $tableName table name.
      *
-     * @return array unique constraints for the given table.
-     *
      * @throws Exception|InvalidConfigException|Throwable
+     *
+     * @return array unique constraints for the given table.
      */
     protected function loadTableUniques(string $tableName): array
     {

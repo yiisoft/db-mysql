@@ -72,7 +72,7 @@ final class QueryBuilderPDOMysql extends QueryBuilder
      */
     public function addCheck(string $name, string $table, string $expression): string
     {
-        throw new NotSupportedException(QueryBuilderPDOMysql::class . '::addCheck is not supported by MySQL.');
+        throw new NotSupportedException(self::class . '::addCheck is not supported by MySQL.');
     }
 
     public function addCommentOnColumn(string $table, string $column, string $comment): string

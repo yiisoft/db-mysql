@@ -11,8 +11,6 @@ use Yiisoft\Db\Connection\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Query\QueryBuilderInterface;
-use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 final class CommandPDOMysql extends Command
 {
@@ -27,7 +25,7 @@ final class CommandPDOMysql extends Command
     }
 
     /**
-     * @throws Exception|PDOException|InvalidConfigException
+     * @throws Exception|InvalidConfigException|PDOException
      */
     public function prepare(?bool $forRead = null): void
     {
