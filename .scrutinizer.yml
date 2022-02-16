@@ -27,15 +27,16 @@ build:
       services:
         mysql: 5.7
 
+          # Define any additional environment variables that are needed by the service.
+          env:
+            MYSQL_DATABASE: yiitest
+
       dependencies:
         override:
           - composer self-update
           - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
       tests:
-        before:
-          - mysql -u root -e "CREATE DATABASE yiitest"
-
         override:
           - command: ./vendor/bin/phpunit --coverage-clover ./coverage.xml
             on_node: 1
