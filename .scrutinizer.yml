@@ -23,9 +23,10 @@ build:
         override:
           - php-scrutinizer-run
 
-    phpunit-and-coverage:
+    phpunit:
       services:
-        mysql: 5.7
+        db-mysql:
+          image: mysql:5.7
 
           # Define any additional environment variables that are needed by the service.
           env:
