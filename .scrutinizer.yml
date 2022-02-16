@@ -30,9 +30,20 @@ build:
 
           # Define any additional environment variables that are needed by the service.
           env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: true
             MYSQL_ROOT_PASSWORD: ''
-            MYSQL_DATABASE: 'yiitest'
+            MYSQL_DATABASE: yiitest
+
+          # We automatically forward these ports from your localhost to the service's port.
+          # Alternatively, you can also access the service on the "$SERVICE_SOME_NAME_IP"
+          # environment variable.
+          ports:
+            # Forward 127.0.0.1:12345 -> SERVICE_IP:12345
+            - 3306
+
+          # If your service writes data to disk like most databases do, you can significantly
+          # speed up tests by mounting a ramdisk at those paths.
+          ramdisks:
+            - /var/lib/data
 
       dependencies:
         override:
