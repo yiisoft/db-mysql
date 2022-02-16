@@ -30,6 +30,9 @@ build:
 
           # Define any additional environment variables that are needed by the service.
           env:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+            # user and password are set in the yml file
+            MYSQL_PASSWORD: ''
             MYSQL_ROOT_PASSWORD: ''
             MYSQL_DATABASE: yiitest
 
