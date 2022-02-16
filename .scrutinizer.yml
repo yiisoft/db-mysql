@@ -30,11 +30,8 @@ build:
 
           # Define any additional environment variables that are needed by the service.
           env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: true
-            MYSQL_USER: mysql
-            MYSQL_PASSWORD: 'mysql'
-            MYSQL_ROOT_PASSWORD: ''
-            MYSQL_DATABASE: yiitest
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+            MYSQL_DATABASE: 'yiitest'
 
           # We automatically forward these ports from your localhost to the service's port.
           # Alternatively, you can also access the service on the "$SERVICE_SOME_NAME_IP"
