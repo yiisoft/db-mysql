@@ -10,7 +10,10 @@ build:
     php:
       version: 8.0.15
       ini:
-        "xdebug.mode": coverage
+        xdebug.mode: coverage
+
+    variables:
+      COMPOSER_ROOT_VERSION: 'dev-dev'
 
   nodes:
     analysis:
@@ -18,9 +21,9 @@ build:
         override:
           - php-scrutinizer-run
 
-    tests-and-coverage:
+    phpunit-and-coverage:
       services:
-        mysql: 8.0
+        mysql: 5.7
 
       dependencies:
         override:
