@@ -6,13 +6,11 @@ filter:
     - "src/*"
 
 build:
-  image: default-bionic
-
   environment:
     php:
       version: 8.0.15
       ini:
-        xdebug.mode: coverage
+        "xdebug.mode": coverage
 
     variables:
       COMPOSER_ROOT_VERSION: 'dev-dev'
@@ -25,14 +23,7 @@ build:
 
     phpunit:
       services:
-        db-mysql:
-          image: mysql:5.7
-
-          # Define any additional environment variables that are needed by the service.
-          env:
-            MYSQL_PASSWORD: ''
-            MYSQL_ROOT_PASSWORD: ''
-            MYSQL_DATABASE: 'yiitest'
+        mysql: 5.7
 
       dependencies:
         override:
@@ -40,6 +31,9 @@ build:
           - composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
       tests:
+        before:
+          - mysql -u root -e "CREATE DATABASE yiitest"
+
         override:
           - command: ./vendor/bin/phpunit --coverage-clover ./coverage.xml
             on_node: 1
