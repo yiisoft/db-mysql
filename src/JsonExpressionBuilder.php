@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use JsonException;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidArgumentException;
+use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
@@ -24,6 +29,9 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
     {
     }
 
+    /**
+     * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
+     */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
         /**

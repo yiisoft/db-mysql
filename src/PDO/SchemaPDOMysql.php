@@ -488,6 +488,9 @@ final class SchemaPDOMysql extends Schema
         return $sql;
     }
 
+    /**
+     * @throws Exception|InvalidCallException|InvalidConfigException|Throwable
+     */
     public function insert(string $table, array $columns): bool|array
     {
         $command = $this->db->createCommand()->insert($table, $columns);

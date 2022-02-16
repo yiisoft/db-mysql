@@ -10,9 +10,9 @@ use Yiisoft\Db\Schema\QuoterInterface;
 final class Quoter extends BaseQuoter implements QuoterInterface
 {
     public function __construct(
-        private array|string $columnQuoteCharacter,
-        private array|string $tableQuoteCharacter,
-        private string $tablePrefix = ''
+        array|string $columnQuoteCharacter,
+        array|string $tableQuoteCharacter,
+        string $tablePrefix = ''
     ) {
         parent::__construct($columnQuoteCharacter, $tableQuoteCharacter, $tablePrefix);
     }

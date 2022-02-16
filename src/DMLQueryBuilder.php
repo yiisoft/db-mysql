@@ -18,9 +18,8 @@ use Yiisoft\Db\Query\QueryBuilderInterface;
 
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    public function __construct(
-        private QueryBuilderInterface $queryBuilder,
-    ) {
+    public function __construct(private QueryBuilderInterface $queryBuilder)
+    {
         parent::__construct($queryBuilder);
     }
 
