@@ -17,7 +17,7 @@ final class Quoter extends BaseQuoter implements QuoterInterface
         parent::__construct($columnQuoteCharacter, $tableQuoteCharacter, $tablePrefix);
     }
 
-    public function quoteValue(int|string $value): int|string
+    public function quoteValue(mixed $value): mixed
     {
         if (!is_string($value)) {
             return $value;
