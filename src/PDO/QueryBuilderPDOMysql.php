@@ -204,7 +204,6 @@ final class QueryBuilderPDOMysql extends QueryBuilder
                 $columns = $tableSchema->getColumns();
                 $columns = !empty($tableSchema->getPrimaryKey())
                     ? $tableSchema->getPrimaryKey() : [reset($columns)->getName()];
-                /** @var string $name */
                 foreach ($columns as $name) {
                     $names[] = $this->quoter->quoteColumnName($name);
                     $placeholders[] = 'DEFAULT';

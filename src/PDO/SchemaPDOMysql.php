@@ -507,7 +507,6 @@ final class SchemaPDOMysql extends Schema
             $tablePrimaryKey = $tableSchema->getPrimaryKey();
         }
 
-        /** @var string $name */
         foreach ($tablePrimaryKey as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
                 $result[$name] = $this->getLastInsertID((string) $tableSchema?->getSequenceName());

@@ -46,7 +46,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . $this->queryBuilder->quoter()->quoteColumnName($column)
             . (empty($definition) ? '' : ' ' . $definition)
             . ' COMMENT '
-            . $this->queryBuilder->quoter()->quoteValue($comment);
+            . (string) $this->queryBuilder->quoter()->quoteValue($comment);
 
         if ($check === 1) {
             $alterSql .= ' ' . $checkMatches[0];
@@ -63,7 +63,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'ALTER TABLE '
             . $this->queryBuilder->quoter()->quoteTableName($table)
             . ' COMMENT '
-            . $this->queryBuilder->quoter()->quoteValue($comment);
+            . (string) $this->queryBuilder->quoter()->quoteValue($comment);
     }
 
     /**

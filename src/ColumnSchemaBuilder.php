@@ -62,7 +62,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     protected function buildCommentString(): string
     {
         return $this->getComment() !== null ? ' COMMENT '
-            . $this->quoter->quoteValue((string) $this->getComment()) : '';
+            . (string) $this->quoter->quoteValue($this->getComment()) : '';
     }
 
     public function __toString(): string
