@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql;
+namespace Yiisoft\Db\Mysql\Builder;
 
 use JsonException;
 use Yiisoft\Db\Exception\Exception;
