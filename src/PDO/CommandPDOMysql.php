@@ -8,6 +8,7 @@ use PDOException;
 use Yiisoft\Db\Cache\QueryCache;
 use Yiisoft\Db\Command\Command;
 use Yiisoft\Db\Connection\ConnectionPDOInterface;
+use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Query\QueryBuilderInterface;
@@ -90,7 +91,7 @@ final class CommandPDOMysql extends Command
                 break;
             } catch (PDOException $e) {
                 $rawSql = $rawSql ?: $this->getRawSql();
-                $e = $this->db->getSchema()->convertException($e, $rawSql);
+                $e = (new ConvertException($e, $rawSql))->run();
 
                 if ($this->retryHandler === null || !($this->retryHandler)($e, $attempt)) {
                     throw $e;
