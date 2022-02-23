@@ -19,6 +19,36 @@ final class CommandPDOMysql extends Command
         parent::__construct($queryCache);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function insertEx(string $table, array $columns): bool|array
+    {
+        $params = [];
+        $sql = $this->db->getQueryBuilder()->insertEx($table, $columns, $params);
+        $this->setSql($sql)->bindValues($params);
+
+        if (!$this->execute()) {
+            return false;
+        }
+
+        $tableSchema = $this->queryBuilder()->schema()->getTableSchema($table);
+        $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+
+        $result = [];
+        foreach ($tablePrimaryKeys as $name) {
+            if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
+                $result[$name] = $this->queryBuilder()->schema()->getLastInsertID((string) $tableSchema?->getSequenceName());
+                continue;
+            }
+
+            /** @var mixed */
+            $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
+        }
+
+        return $result;
+    }
+
     public function queryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
