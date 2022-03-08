@@ -13,8 +13,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Query\QueryInterface;
 
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
@@ -84,8 +84,8 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      * The method will properly escape the table and column names.
      *
      * @param string $table the table that new rows will be inserted into/updated in.
-     * @param array|Query $insertColumns the column data (name => value) to be inserted into the table or instance of
-     * {@see Query} to perform `INSERT INTO ... SELECT` SQL statement.
+     * @param array|QueryInterface $insertColumns the column data (name => value) to be inserted into the table or
+     * instance of {@see Query} to perform `INSERT INTO ... SELECT` SQL statement.
      * @param array|bool $updateColumns the column data (name => value) to be updated if they already exist. If `true`
      * is passed, the column data will be updated to match the insert column data. If `false` is passed, no update will
      * be performed if the column data already exists.
@@ -97,8 +97,12 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      *
      * @return string the resulting SQL.
      */
-    public function upsert(string $table, Query|array $insertColumns, bool|array $updateColumns, array &$params): string
-    {
+    public function upsert(
+        string $table,
+        QueryInterface|array $insertColumns,
+        bool|array $updateColumns,
+        array &$params
+    ): string {
         $insertSql = $this->insert($table, $insertColumns, $params);
 
         /** @var array $uniqueNames */

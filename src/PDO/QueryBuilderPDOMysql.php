@@ -58,6 +58,8 @@ final class QueryBuilderPDOMysql extends QueryBuilder
         Schema::TYPE_MONEY => 'decimal(19,4)',
         Schema::TYPE_JSON => 'json',
     ];
+    private DDLQueryBuilder $ddlBuilder;
+    private DMLQueryBuilder $dmlBuilder;
 
     public function __construct(
         private CommandInterface $command,
@@ -66,7 +68,7 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     ) {
         $this->ddlBuilder = new DDLQueryBuilder($this);
         $this->dmlBuilder = new DMLQueryBuilder($this);
-        parent::__construct($quoter, $schema);
+        parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder);
     }
 
     /**

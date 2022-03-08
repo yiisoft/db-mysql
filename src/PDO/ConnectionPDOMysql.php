@@ -202,6 +202,7 @@ final class ConnectionPDOMysql extends Connection implements ConnectionPDOInterf
 
     public function getSlavePDO(bool $fallbackToMaster = true): ?PDO
     {
+        /** @var ConnectionPDOMysql|null $db */
         $db = $this->getSlave(false);
 
         if ($db === null) {
@@ -223,6 +224,7 @@ final class ConnectionPDOMysql extends Connection implements ConnectionPDOInterf
         }
 
         if (!empty($this->masters)) {
+            /** @var ConnectionPDOMysql|null $db */
             $db = $this->getMaster();
 
             if ($db !== null) {
