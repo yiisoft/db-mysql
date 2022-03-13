@@ -91,12 +91,10 @@ final class CommandPDOMysql extends Command
         }
     }
 
-    protected function getCacheKey(string $method, array|int|null $fetchMode, string $rawSql): array
+    protected function getCacheKey(string $rawSql): array
     {
         return [
             __CLASS__,
-            $method,
-            $fetchMode,
             $this->db->getDriver()->getDsn(),
             $this->db->getDriver()->getUsername(),
             $rawSql,
