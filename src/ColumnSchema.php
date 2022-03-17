@@ -24,7 +24,7 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * @param mixed $value input value.
      *
-     *@throws JsonException
+     * @throws JsonException
      *
      * @return mixed converted value.
      */
