@@ -24,9 +24,9 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * @param mixed $value input value.
      *
-     * @return mixed converted value.
      *@throws JsonException
      *
+     * @return mixed converted value.
      */
     public function phpTypecast(mixed $value): mixed
     {

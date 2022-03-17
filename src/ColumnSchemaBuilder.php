@@ -55,7 +55,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
     /**
      * Builds the comment specification for the column.
      *
-     * @throws InvalidConfigException|Exception
+     * @throws Exception|InvalidConfigException
      *
      * @return string a string containing the COMMENT keyword and the comment itself.
      */

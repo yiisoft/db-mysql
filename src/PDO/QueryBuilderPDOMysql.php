@@ -222,7 +222,7 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     }
 
     /**
-     * @throws Throwable|Exception
+     * @throws Exception|Throwable
      */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
