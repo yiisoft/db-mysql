@@ -150,7 +150,7 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function dropCommentFromTable(string $table): string
     {
@@ -221,6 +221,9 @@ final class QueryBuilderPDOMysql extends QueryBuilder
         return $this->quoter;
     }
 
+    /**
+     * @throws Throwable|Exception
+     */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
         return $this->ddlBuilder->renameColumn($table, $oldName, $newName);
@@ -261,8 +264,6 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     /**
      * Contains array of default expression builders. Extend this method and override it, if you want to change default
      * expression builders for this query builder.
-     *
-     * @return array
      *
      * See {@see ExpressionBuilder} docs for details.
      */

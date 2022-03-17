@@ -146,6 +146,8 @@ final class SchemaPDOMysql extends Schema
      * @param array|int|string|null $length length or precision of the column. See {@see ColumnSchemaBuilder::$length}.
      *
      * @return ColumnSchemaBuilder column schema builder instance
+     *
+     * @psalm-param string[]|int|string|null $length
      */
     public function createColumnSchemaBuilder(string $type, array|int|string $length = null): ColumnSchemaBuilder
     {
