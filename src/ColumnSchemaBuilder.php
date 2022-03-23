@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Exception\Exception;
+use Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
@@ -15,9 +15,9 @@ use Yiisoft\Db\Schema\QuoterInterface;
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
-     *  @param array|int|string|null $length column size or precision definition.
+     *  @psalm-param string[]|int|string|null $length column size or precision definition.
      */
-    public function __construct(string $type, $length, private QuoterInterface $quoter)
+    public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
     {
         parent::__construct($type, $length);
     }

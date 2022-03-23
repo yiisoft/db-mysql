@@ -9,6 +9,10 @@ use Yiisoft\Db\Schema\QuoterInterface;
 
 final class Quoter extends BaseQuoter implements QuoterInterface
 {
+    /**
+     * @psalm-param string[]|string $columnQuoteCharacter
+     * @psalm-param string[]|string $tableQuoteCharacter
+     */
     public function __construct(
         array|string $columnQuoteCharacter,
         array|string $tableQuoteCharacter,
