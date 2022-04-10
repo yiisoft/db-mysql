@@ -298,11 +298,11 @@ final class SchemaPDOMysql extends Schema
             throw $e;
         }
 
-        $slavePdo = $this->db->getSlavePdo();
+        $pdo = $this->db->getOpenPDO();
 
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
-            if ($slavePdo !== null && $slavePdo->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
+            if ($pdo !== null && $pdo->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
                 $info = array_change_key_case($info, CASE_LOWER);
             }
 
@@ -876,7 +876,7 @@ final class SchemaPDOMysql extends Schema
      */
     protected function normalizePdoRowKeyCase(array $row, bool $multiple): array
     {
-        if ($this->db->getSlavePdo()?->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_UPPER) {
+        if ($this->db->getPdo()?->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_UPPER) {
             return $row;
         }
 
