@@ -134,6 +134,8 @@ final class ConnectionTest extends TestCase
      */
     public function testGetPdoAfterClose(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->getConnection();
 
         $db->setSlave('1', $this->getConnection());
@@ -153,6 +155,8 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheWorks(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->getConnection();
         $cacheKeyNormalizer = new CacheKeyNormalizer();
 
@@ -194,6 +198,8 @@ final class ConnectionTest extends TestCase
 
     public function testServerStatusCacheCanBeDisabled(): void
     {
+        $this->markTestSkipped('Only for master/slave');
+
         $db = $this->getConnection();
         $cacheKeyNormalizer = new CacheKeyNormalizer();
 
