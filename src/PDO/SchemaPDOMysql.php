@@ -426,7 +426,12 @@ final class SchemaPDOMysql extends Schema
             $sql .= ' FROM ' . $this->db->getQuoter()->quoteSimpleTableName($schema);
         }
 
-        return $this->db->createCommand($sql)->queryColumn();
+        $tableNames = $this->db->createCommand($sql)->queryColumn();
+        if (!$tableNames) {
+            return [];
+        }
+
+        return $tableNames;
     }
 
     /**
