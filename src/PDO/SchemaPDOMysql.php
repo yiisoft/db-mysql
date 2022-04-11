@@ -298,7 +298,7 @@ final class SchemaPDOMysql extends Schema
             throw $e;
         }
 
-        $pdo = $this->db->getOpenPDO();
+        $pdo = $this->db->getActivePDO();
 
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {

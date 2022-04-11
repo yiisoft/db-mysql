@@ -424,7 +424,7 @@ final class SchemaTest extends TestCase
         }
 
         $db = $this->getConnection();
-        $db->getOpenPDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
         $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
@@ -446,7 +446,7 @@ final class SchemaTest extends TestCase
         }
 
         $db = $this->getConnection();
-        $db->getOpenPDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
         $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
         $this->assertMetadataEquals($expected, $constraints);
     }
