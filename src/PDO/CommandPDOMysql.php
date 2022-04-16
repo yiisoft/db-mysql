@@ -30,7 +30,7 @@ final class CommandPDOMysql extends CommandPDO
         $result = [];
         foreach ($tablePrimaryKeys as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
-                $result[$name] = $this->queryBuilder()->schema()->getLastInsertID((string) $tableSchema?->getSequenceName());
+                $result[$name] = $this->db->getLastInsertID((string) $tableSchema?->getSequenceName());
                 continue;
             }
 
