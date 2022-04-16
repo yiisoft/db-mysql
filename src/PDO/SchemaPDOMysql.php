@@ -443,12 +443,7 @@ final class SchemaPDOMysql extends Schema
      */
     protected function getCacheKey(string $name): array
     {
-        return [
-            __CLASS__,
-            $this->db->getDriver()->getDsn(),
-            $this->db->getDriver()->getUsername(),
-            $this->getRawTableName($name),
-        ];
+        return array_merge([__CLASS__], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
     }
 
     /**
@@ -460,11 +455,7 @@ final class SchemaPDOMysql extends Schema
      */
     protected function getCacheTag(): string
     {
-        return md5(serialize([
-            __CLASS__,
-            $this->db->getDriver()->getDsn(),
-            $this->db->getDriver()->getUsername(),
-        ]));
+        return md5(serialize(array_merge([__CLASS__], $this->db->getCacheKey())));
     }
 
     /**
