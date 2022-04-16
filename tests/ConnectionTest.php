@@ -35,12 +35,6 @@ final class ConnectionTest extends TestCase
         $db->close();
     }
 
-    public function testConstruct(): void
-    {
-        $db = $this->getConnection();
-        $this->assertEquals($this->dsn, $db->getDriver()->getDsn());
-    }
-
     public function testGetDriverName(): void
     {
         $db = $this->getConnection();
@@ -59,7 +53,7 @@ final class ConnectionTest extends TestCase
 
         $db->close();
         $this->assertFalse($db->isActive());
-        $this->assertNull($db->getDriver()->getPDO());
+        $this->assertNull($db->getPdo());
 
         $db = $this->getConnection(false, 'unknown::memory:');
         $this->expectException(Exception::class);
