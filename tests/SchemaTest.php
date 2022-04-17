@@ -10,7 +10,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
-use Yiisoft\Db\Mysql\PDO\SchemaPDOMysql;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\TableSchema;
 use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
@@ -317,7 +317,7 @@ final class SchemaTest extends TestCase
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new SchemaPDOMysql($this->getConnection(), $this->schemaCache);
+        $schema = new Schema($this->getConnection(), $this->schemaCache);
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',

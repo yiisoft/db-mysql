@@ -2,15 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\PDO;
+namespace Yiisoft\Db\Mysql;
 
 use JsonException;
-use PDO;
-use PDOException;
 use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Connection\ConnectionPDOInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
@@ -18,10 +16,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\ColumnSchema;
-use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
-use Yiisoft\Db\Mysql\TableSchema;
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
 use function array_change_key_case;
 use function array_map;
@@ -96,7 +91,7 @@ use function trim;
  *   }
  * >
  */
-final class SchemaPDOMysql extends Schema
+final class Schema extends AbstractSchema
 {
     /** @var array<array-key, string> $typeMap */
     private array $typeMap = [
@@ -131,7 +126,7 @@ final class SchemaPDOMysql extends Schema
         'json' => self::TYPE_JSON,
     ];
 
-    public function __construct(private ConnectionPDOInterface $db, SchemaCache $schemaCache)
+    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
     {
         parent::__construct($schemaCache);
     }
@@ -269,7 +264,7 @@ final class SchemaPDOMysql extends Schema
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
-            if ($previous instanceof PDOException && str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
+            if ($previous && str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
                 /**
                  * table does not exist.
                  *
@@ -281,13 +276,9 @@ final class SchemaPDOMysql extends Schema
             throw $e;
         }
 
-        $pdo = $this->db->getActivePDO();
-
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
-            if ($pdo !== null && $pdo->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_LOWER) {
-                $info = array_change_key_case($info, CASE_LOWER);
-            }
+            $info = $this->normalizeRowKeyCase($info, false);
 
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
@@ -364,7 +355,7 @@ final class SchemaPDOMysql extends Schema
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
-            if (!$previous instanceof PDOException || !str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
+            if ($previous === null || !str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
                 throw $e;
             }
 
@@ -643,7 +634,7 @@ final class SchemaPDOMysql extends Schema
         ])->queryAll();
 
         /** @var array<array-key, array> $constraints */
-        $constraints = $this->normalizePdoRowKeyCase($constraints, true);
+        $constraints = $this->normalizeRowKeyCase($constraints, true);
         $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
 
         $result = [
@@ -765,7 +756,7 @@ final class SchemaPDOMysql extends Schema
         ])->queryAll();
 
         /** @var array[] $indexes */
-        $indexes = $this->normalizePdoRowKeyCase($indexes, true);
+        $indexes = $this->normalizeRowKeyCase($indexes, true);
         $indexes = ArrayHelper::index($indexes, null, 'name');
         $result = [];
 
@@ -844,21 +835,15 @@ final class SchemaPDOMysql extends Schema
     }
 
     /**
-     * Changes row's array key case to lower if PDO's one is set to uppercase.
+     * Changes row's array key case to lower.
      *
      * @param array $row row's array or an array of row's arrays.
      * @param bool $multiple whether multiple rows or a single row passed.
      *
-     * @throws \Exception
-     *
      * @return array normalized row or rows.
      */
-    protected function normalizePdoRowKeyCase(array $row, bool $multiple): array
+    protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
-        if ($this->db->getPdo()?->getAttribute(PDO::ATTR_CASE) !== PDO::CASE_UPPER) {
-            return $row;
-        }
-
         if ($multiple) {
             return array_map(static function (array $row) {
                 return array_change_key_case($row, CASE_LOWER);
