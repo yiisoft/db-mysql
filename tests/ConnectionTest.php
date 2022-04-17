@@ -9,8 +9,8 @@ use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Mysql\PDO\TransactionPDOMysql;
 use Yiisoft\Db\TestSupport\TestConnectionTrait;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * @group mysql
@@ -232,16 +232,16 @@ final class ConnectionTest extends TestCase
     {
         $db = $this->getConnection(true);
 
-        $transaction = $db->beginTransaction(TransactionPDOMysql::READ_UNCOMMITTED);
+        $transaction = $db->beginTransaction(TransactionInterface::READ_UNCOMMITTED);
         $transaction->commit();
 
-        $transaction = $db->beginTransaction(TransactionPDOMysql::READ_COMMITTED);
+        $transaction = $db->beginTransaction(TransactionInterface::READ_COMMITTED);
         $transaction->commit();
 
-        $transaction = $db->beginTransaction(TransactionPDOMysql::REPEATABLE_READ);
+        $transaction = $db->beginTransaction(TransactionInterface::REPEATABLE_READ);
         $transaction->commit();
 
-        $transaction = $db->beginTransaction(TransactionPDOMysql::SERIALIZABLE);
+        $transaction = $db->beginTransaction(TransactionInterface::SERIALIZABLE);
         $transaction->commit();
 
         /* should not be any exception so far */
@@ -255,7 +255,7 @@ final class ConnectionTest extends TestCase
         $result = $db->transaction(static function (ConnectionInterface $db) {
             $db->createCommand()->insert('profile', ['description' => 'test transaction shortcut'])->execute();
             return true;
-        }, TransactionPDOMysql::READ_UNCOMMITTED);
+        }, TransactionInterface::READ_UNCOMMITTED);
 
         $this->assertTrue($result, 'transaction shortcut valid value should be returned from callback');
 

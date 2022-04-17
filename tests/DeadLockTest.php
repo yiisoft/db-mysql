@@ -9,7 +9,7 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Mysql\PDO\TransactionPDOMysql;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function date;
 use function file_get_contents;
@@ -235,7 +235,7 @@ final class DeadLockTest extends TestCase
 
                     $this->log('child 1: commit');
                 });
-            }, TransactionPDOMysql::REPEATABLE_READ);
+            }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
@@ -247,7 +247,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log(
                 'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -320,7 +320,7 @@ final class DeadLockTest extends TestCase
 
                     $this->log('child 2: commit');
                 });
-            }, TransactionPDOMysql::REPEATABLE_READ);
+            }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
@@ -332,7 +332,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log(
                 'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
