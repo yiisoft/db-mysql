@@ -10,6 +10,7 @@ use Yiisoft\Db\Connection\ConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Mysql\Quoter;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -80,7 +81,7 @@ final class ConnectionPDOMysql extends ConnectionPDO
     public function getSchema(): SchemaInterface
     {
         if ($this->schema === null) {
-            $this->schema = new SchemaPDOMysql($this, $this->schemaCache);
+            $this->schema = new Schema($this, $this->schemaCache);
         }
 
         return $this->schema;
