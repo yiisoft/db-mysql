@@ -149,14 +149,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
-     */
-    public function createSavepoint(string $name): void
-    {
-        $this->db->createCommand("SAVEPOINT $name")->execute();
-    }
-
-    /**
      * Returns all unique indexes for the given table.
      *
      * Each array element is of the following structure:
@@ -220,24 +212,6 @@ final class Schema extends AbstractSchema
         }
 
         return $name;
-    }
-
-    public function rollBackSavepoint(string $name): void
-    {
-        $this->db->createCommand("ROLLBACK TO SAVEPOINT $name")->execute();
-    }
-
-    /**
-     * @throws Exception|InvalidConfigException|Throwable
-     */
-    public function releaseSavepoint(string $name): void
-    {
-        $this->db->createCommand("RELEASE SAVEPOINT $name")->execute();
-    }
-
-    public function setTransactionIsolationLevel(string $level): void
-    {
-        $this->db->createCommand("SET TRANSACTION ISOLATION LEVEL $level")->execute();
     }
 
     public function supportsSavepoint(): bool
