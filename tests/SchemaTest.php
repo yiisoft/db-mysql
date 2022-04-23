@@ -543,4 +543,14 @@ final class SchemaTest extends TestCase
             'another unique index' => ['someCol2'],
         ], $uniqueIndexes);
     }
+
+    public function testGetSchemaDefaultValues(): void
+    {
+        $this->markTestSkipped('MySQL does not support default value constraints.');
+    }
+
+    public function testGetSchemaChecks(): void
+    {
+        $this->markTestSkipped('MySQL does not support check constraints.');
+    }
 }

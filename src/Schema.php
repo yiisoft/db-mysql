@@ -483,12 +483,12 @@ final class Schema extends AbstractSchema
                     }
 
                     if ($column->getSize() === 1 && $type === 'tinyint') {
-                        $column->type('boolean');
+                        $column->type(self::TYPE_BOOLEAN);
                     } elseif ($type === 'bit') {
                         if ($column->getSize() > 32) {
-                            $column->type('bigint');
+                            $column->type(self::TYPE_BIGINT);
                         } elseif ($column->getSize() === 32) {
-                            $column->type('integer');
+                            $column->type(self::TYPE_INTEGER);
                         }
                     }
                 }
@@ -612,9 +612,9 @@ final class Schema extends AbstractSchema
         $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
 
         $result = [
-            'primaryKey' => null,
-            'foreignKeys' => [],
-            'uniques' => [],
+            self::PRIMARY_KEY => null,
+            self::FOREIGN_KEYS => [],
+            self::UNIQUES => [],
         ];
 
         /**
@@ -629,14 +629,11 @@ final class Schema extends AbstractSchema
             foreach ($names as $name => $constraint) {
                 switch ($type) {
                     case 'PRIMARY KEY':
-                        $ct = (new Constraint())
+                        $result[self::PRIMARY_KEY] = (new Constraint())
                             ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
-
-                        $result['primaryKey'] = $ct;
-
                         break;
                     case 'FOREIGN KEY':
-                        $fk = (new ForeignKeyConstraint())
+                        $result[self::FOREIGN_KEYS][] = (new ForeignKeyConstraint())
                             ->foreignSchemaName($constraint[0]['foreign_table_schema'])
                             ->foreignTableName($constraint[0]['foreign_table_name'])
                             ->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'))
@@ -644,17 +641,11 @@ final class Schema extends AbstractSchema
                             ->onUpdate($constraint[0]['on_update'])
                             ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
                             ->name($name);
-
-                        $result['foreignKeys'][] = $fk;
-
                         break;
                     case 'UNIQUE':
-                        $ct = (new Constraint())
+                        $result[self::UNIQUES][] = (new Constraint())
                             ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
                             ->name($name);
-
-                        $result['uniques'][] = $ct;
-
                         break;
                 }
             }
@@ -692,7 +683,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
-        $tableForeignKeys = $this->loadTableConstraints($tableName, 'foreignKeys');
+        $tableForeignKeys = $this->loadTableConstraints($tableName, self::FOREIGN_KEYS);
 
         return is_array($tableForeignKeys) ? $tableForeignKeys : [];
     }
@@ -763,7 +754,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTablePrimaryKey(string $tableName): ?Constraint
     {
-        $tablePrimaryKey = $this->loadTableConstraints($tableName, 'primaryKey');
+        $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
 
         return $tablePrimaryKey instanceof Constraint ? $tablePrimaryKey : null;
     }
@@ -803,7 +794,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableUniques(string $tableName): array
     {
-        $tableUniques = $this->loadTableConstraints($tableName, 'uniques');
+        $tableUniques = $this->loadTableConstraints($tableName, self::UNIQUES);
 
         return is_array($tableUniques) ? $tableUniques : [];
     }
