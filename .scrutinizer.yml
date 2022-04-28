@@ -20,7 +20,7 @@ build:
 
     phpunit:
       services:
-        mysql: 8.0
+        mysql: 5.7
 
       dependencies:
         override:
