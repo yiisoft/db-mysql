@@ -138,6 +138,8 @@ final class DeadLockTest extends TestCase
                 $errors[] = 'child did not exit itself';
             } else {
                 $exitStatus = pcntl_wexitstatus($status);
+                var_dump($exitStatus);
+                var_dump(self::CHILD_EXIT_CODE_DEADLOCK);
                 if (self::CHILD_EXIT_CODE_DEADLOCK === $exitStatus) {
                     $deadlockHitCount++;
                 } elseif (0 !== $exitStatus) {
