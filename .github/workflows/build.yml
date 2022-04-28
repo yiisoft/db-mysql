@@ -42,7 +42,7 @@ jobs:
 
         mysql:
           - 5.7
-          - latest
+          - 8.0.28
 
     services:
       mysql:
