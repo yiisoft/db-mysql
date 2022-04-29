@@ -23,7 +23,7 @@ build:
     phpunit:
       services:
         db-mysql:
-          image: mysql:8.0.28
+          image: mysql:8.0.29
 
           # Define any additional environment variables that are needed by the service.
           env:
