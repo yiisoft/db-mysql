@@ -18,6 +18,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 
+use Yiisoft\Db\Schema\TableSchemaInterface;
 use function array_change_key_case;
 use function array_map;
 use function array_merge;
@@ -160,13 +161,13 @@ final class Schema extends AbstractSchema
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes(TableSchema $table): array
+    public function findUniqueIndexes(TableSchemaInterface $table): array
     {
         $sql = $this->getCreateTableSql($table);
 
