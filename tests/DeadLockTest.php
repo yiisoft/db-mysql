@@ -304,7 +304,7 @@ final class DeadLockTest extends TestCase
             $this->log('child 2: connect');
 
             /* @var ConnectionInteface $second */
-            $second = $this->getConnection();
+            $second = $this->getConnection(true);
             $second->open();
 
             /* sleep(1); */
