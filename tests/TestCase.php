@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Exception;
 use PHPUnit\Framework\TestCase as AbstractTestCase;
 use Yiisoft\Db\Driver\PDODriver;
 use Yiisoft\Db\Mysql\PDO\ConnectionPDOMysql;
@@ -57,7 +58,7 @@ class TestCase extends AbstractTestCase
         $this->db?->close();
         unset(
             $this->cache,
-            $this->connection,
+            $this->db,
             $this->logger,
             $this->queryCache,
             $this->schemaCache,

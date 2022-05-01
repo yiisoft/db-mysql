@@ -49,16 +49,20 @@ final class CommandTest extends TestCase
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
         $db->createCommand()->addPrimaryKey($name, $tableName, ['int1'])->execute();
+        $pk = $schema->getTablePrimaryKey($tableName, true);
 
-        $this->assertEquals(['int1'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertNotNull($pk);
+        $this->assertEquals(['int1'], $pk->getColumnNames());
 
         $db->createCommand()->dropPrimaryKey($name, $tableName)->execute();
 
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
         $db->createCommand()->addPrimaryKey($name, $tableName, ['int1', 'int2'])->execute();
+        $pk = $schema->getTablePrimaryKey($tableName, true);
 
-        $this->assertEquals(['int1', 'int2'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertNotNull($pk);
+        $this->assertEquals(['int1', 'int2'], $pk->getColumnNames());
     }
 
     /**

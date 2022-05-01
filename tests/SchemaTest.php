@@ -267,8 +267,10 @@ final class SchemaTest extends TestCase
         $this->getConnection()->createCommand($sql)->execute();
 
         $schema = $this->getConnection()->getTableSchema('datetime_test');
+        $this->assertNotNull($schema);
 
         $dt = $schema->getColumn('dt');
+        $this->assertNotNull($dt);
 
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
@@ -292,13 +294,16 @@ final class SchemaTest extends TestCase
         $this->getConnection()->createCommand($sql)->execute();
 
         $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
+        $this->assertNotNull($schema);
 
         $dt = $schema->getColumn('dt');
+        $this->assertNotNull($dt);
 
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
         $ts = $schema->getColumn('ts');
+        $this->assertNotNull($ts);
 
         $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
@@ -317,7 +322,10 @@ final class SchemaTest extends TestCase
          * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
          * returns in response to the query `SHOW FULL COLUMNS FROM ...`
          */
-        $schema = new Schema($this->getConnection(), $this->schemaCache);
+        $db = $this->getConnection();
+
+        $this->assertNotNull($this->schemaCache);
+        $schema = new Schema($db, $this->schemaCache);
 
         $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
@@ -349,7 +357,7 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()->setAttribute($name, $value);
+            $db->getPDO()?->setAttribute($name, $value);
         }
 
         $schema = $db->getSchema();
@@ -470,6 +478,8 @@ final class SchemaTest extends TestCase
         $db = $this->getConnection();
         $schema = $db->getSchema();
 
+        $this->assertNotNull($this->schemaCache);
+
         $this->schemaCache->setEnable(true);
 
         $db->setTablePrefix($tablePrefix);
@@ -512,13 +522,19 @@ final class SchemaTest extends TestCase
 
         /* @var $schema Schema */
         $schema = $db->getSchema();
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+        $this->assertNotNull($tableSchema);
+
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals([], $uniqueIndexes);
 
         $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', true)->execute();
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+        $this->assertNotNull($tableSchema);
+
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals([
             'somecolUnique' => ['somecol'],
         ], $uniqueIndexes);
@@ -526,8 +542,11 @@ final class SchemaTest extends TestCase
         // create another column with upper case letter that fails postgres
         // see https://github.com/yiisoft/yii2/issues/10613
         $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', true)->execute();
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+        $this->assertNotNull($tableSchema);
+
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals([
             'somecolUnique' => ['somecol'],
             'someCol2Unique' => ['someCol2'],
@@ -535,8 +554,11 @@ final class SchemaTest extends TestCase
 
         // see https://github.com/yiisoft/yii2/issues/13814
         $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', true)->execute();
+        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
-        $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
+        $this->assertNotNull($tableSchema);
+
+        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals([
             'somecolUnique' => ['somecol'],
             'someCol2Unique' => ['someCol2'],
