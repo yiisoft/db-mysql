@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\PDO;
 
 use PDO;
-use Yiisoft\Db\Command\CommandPDOInterface;
-use Yiisoft\Db\Connection\ConnectionPDO;
+use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
+use Yiisoft\Db\Driver\PDO\ConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Mysql\Quoter;
