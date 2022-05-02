@@ -237,6 +237,7 @@ final class DeadLockTest extends TestCase
                 });
             }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
+            $this->assertIsArray($e->errorInfo);
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
             /* Deadlock found when trying to get lock; try restarting transaction */
@@ -322,6 +323,7 @@ final class DeadLockTest extends TestCase
                 });
             }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
+            $this->assertIsArray($e->errorInfo);
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
             /* Deadlock found when trying to get lock; try restarting transaction */
@@ -384,6 +386,7 @@ final class DeadLockTest extends TestCase
      */
     private function deleteLog(): void
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile && is_file($this->logFile)) {
             unlink($this->logFile);
         }
@@ -399,6 +402,7 @@ final class DeadLockTest extends TestCase
      */
     private function getLogContentAndDelete(): ?string
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile && is_file($this->logFile)) {
             $content = file_get_contents($this->logFile);
 
@@ -406,6 +410,8 @@ final class DeadLockTest extends TestCase
 
             return $content;
         }
+
+        return null;
     }
 
     /**
@@ -416,6 +422,7 @@ final class DeadLockTest extends TestCase
      */
     private function log(string $message): void
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile) {
             $time = microtime(true);
 

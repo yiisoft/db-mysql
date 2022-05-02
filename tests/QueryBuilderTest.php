@@ -11,8 +11,9 @@ use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
 
 use function is_string;
@@ -91,7 +92,10 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
         [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $replacedQuotes = $this->replaceQuotes($expected);
+
+        $this->assertIsString($replacedQuotes);
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
         $this->assertEquals($expectedParams, $params);
     }
 
@@ -109,7 +113,10 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection();
         $query = (new Query($db))->filterWhere($condition);
         [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $replacedQuotes = $this->replaceQuotes($expected);
+
+        $this->assertIsString($replacedQuotes);
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
         $this->assertEquals($expectedParams, $params);
     }
 
@@ -126,13 +133,16 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection();
         $params = [];
         $sql = $db->getQueryBuilder()->buildFrom([$table], $params);
-        $this->assertEquals('FROM ' . $this->replaceQuotes($expected), $sql);
+        $replacedQuotes = $this->replaceQuotes($expected);
+
+        $this->assertIsString($replacedQuotes);
+        $this->assertEquals('FROM ' . $replacedQuotes, $sql);
     }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeConditionsProvider
      *
-     * @param array|object $condition
+     * @param array|ExpressionInterface $condition
      * @param string|null $expected
      * @param array $expectedParams
      *
@@ -143,7 +153,10 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
         [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
+        $replacedQuotes = $this->replaceQuotes($expected);
+
+        $this->assertIsString($replacedQuotes);
+        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
         $this->assertEquals($expectedParams, $params);
     }
 
@@ -258,7 +271,7 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertProvider
      *
      * @param string $table
-     * @param array|ColumnSchema $columns
+     * @param array|QueryInterface $columns
      * @param array $params
      * @param string|null $expectedSQL
      * @param array $expectedParams
@@ -361,8 +374,8 @@ final class QueryBuilderTest extends TestCase
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsertProvider
      *
      * @param string $table
-     * @param array|ColumnSchema $insertColumns
-     * @param array|bool|null $updateColumns
+     * @param array|QueryInterface $insertColumns
+     * @param array|bool $updateColumns
      * @param string|string[] $expectedSQL
      * @param array $expectedParams
      *

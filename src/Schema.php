@@ -17,6 +17,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
+use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_change_key_case;
 use function array_map;
@@ -160,13 +161,13 @@ final class Schema extends AbstractSchema
      * ]
      * ```
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return array all unique indexes for the given table.
      */
-    public function findUniqueIndexes(TableSchema $table): array
+    public function findUniqueIndexes(TableSchemaInterface $table): array
     {
         $sql = $this->getCreateTableSql($table);
 
@@ -222,13 +223,13 @@ final class Schema extends AbstractSchema
     /**
      * Collects the metadata of table columns.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|Throwable if DB query fails.
      *
      * @return bool whether the table exists in the database.
      */
-    protected function findColumns(TableSchema $table): bool
+    protected function findColumns(TableSchemaInterface $table): bool
     {
         $tableName = $table->getFullName() ?? '';
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->db->getQuoter()->quoteTableName($tableName);
@@ -271,11 +272,11 @@ final class Schema extends AbstractSchema
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|Throwable
      */
-    protected function findConstraints(TableSchema $table): void
+    protected function findConstraints(TableSchemaInterface $table): void
     {
         $sql = <<<SQL
         SELECT
@@ -409,13 +410,13 @@ final class Schema extends AbstractSchema
     /**
      * Gets the CREATE TABLE sql string.
      *
-     * @param TableSchema $table the table metadata.
+     * @param TableSchemaInterface $table the table metadata.
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
      * @return string $sql the result of 'SHOW CREATE TABLE'.
      */
-    protected function getCreateTableSql(TableSchema $table): string
+    protected function getCreateTableSql(TableSchemaInterface $table): string
     {
         $tableName = $table->getFullName() ?? '';
 
@@ -766,9 +767,9 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|Throwable
      *
-     * @return TableSchema|null DBMS-dependent table metadata, `null` if the table does not exist.
+     * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchema
+    protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
         $table = new TableSchema();
 
@@ -823,11 +824,11 @@ final class Schema extends AbstractSchema
      *
      * @param string $name the table name.
      *
-     * @return TableSchema
+     * @return TableSchemaInterface
      *
-     * {@see TableSchema}
+     * {@see TableSchemaInterface}
      */
-    protected function resolveTableName(string $name): TableSchema
+    protected function resolveTableName(string $name): TableSchemaInterface
     {
         $resolvedName = new TableSchema();
 
@@ -850,10 +851,10 @@ final class Schema extends AbstractSchema
     /**
      * Resolves the table name and schema name (if any).
      *
-     * @param TableSchema $table the table metadata object.
+     * @param TableSchemaInterface $table the table metadata object.
      * @param string $name the table name.
      */
-    protected function resolveTableNames(TableSchema $table, string $name): void
+    protected function resolveTableNames(TableSchemaInterface $table, string $name): void
     {
         $parts = explode('.', str_replace('`', '', $name));
 
