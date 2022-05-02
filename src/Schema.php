@@ -826,7 +826,7 @@ final class Schema extends AbstractSchema
      *
      * @return TableSchemaInterface
      *
-     * {@see TableSchema}
+     * {@see TableSchemaInterface}
      */
     protected function resolveTableName(string $name): TableSchemaInterface
     {
