@@ -458,6 +458,12 @@ final class Schema extends AbstractSchema
         $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
+        $extra = $info['extra'];
+        if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
+            $extra = strtoupper(substr($extra, 18));
+        }
+        $column->extra(trim($extra));
+
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
             $type = strtolower($matches[1]);
 
@@ -516,6 +522,8 @@ final class Schema extends AbstractSchema
             } else {
                 $column->defaultValue($column->phpTypecast($info['default']));
             }
+        } elseif ($info['default'] !== null) {
+            $column->defaultValue($column->phpTypecast($info['default']));
         }
 
         return $column;

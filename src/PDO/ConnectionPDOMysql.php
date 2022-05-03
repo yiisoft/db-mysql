@@ -60,9 +60,9 @@ final class ConnectionPDOMysql extends ConnectionPDO
     {
         if ($this->queryBuilder === null) {
             $this->queryBuilder = new QueryBuilderPDOMysql(
-                $this->createCommand(),
                 $this->getQuoter(),
                 $this->getSchema(),
+                $this->createCommand(),
             );
         }
 
