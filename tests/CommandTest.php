@@ -24,7 +24,7 @@ final class CommandTest extends TestCase
     {
         $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Mysql\PDO\QueryBuilderPDOMysql::addCheck is not supported by MySQL.');
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
         $db->createCommand()->addCheck('noExist', 'noExist', 'noExist')->execute();
     }
 

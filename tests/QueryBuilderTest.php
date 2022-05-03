@@ -12,6 +12,8 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Mysql\DDLQueryBuilder;
+use Yiisoft\Db\Mysql\TableSchema;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
@@ -261,9 +263,7 @@ final class QueryBuilderTest extends TestCase
     {
         $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\PDO\QueryBuilderPDOMysql::dropCheck is not supported by MySQL.'
-        );
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropCheck is not supported by MySQL.');
         $db->getQueryBuilder()->dropCheck('noExist', 'noExist');
     }
 
@@ -309,6 +309,31 @@ final class QueryBuilderTest extends TestCase
         );
     }
 
+    public function testColumnDefinitionNew()
+    {
+        $this->markTestSkipped('Only for compare getColumnDefinition from Schema and `SHOW CREATE TABLE`');
+
+        $db = $this->getConnection();
+        $ddlBuilder = new DDLQueryBuilder($db->getQueryBuilder());
+        $schema = $db->getSchema();
+
+        $views = ['testCreateView', 'animal_view'];
+        foreach ($schema->getTableSchemas() as $tableSchema) {
+            /** @var TableSchema $tableSchema */
+            if (in_array($tableSchema->getName(), $views)) {
+                continue;
+            }
+            foreach ($tableSchema->getColumnNames() as $columnName) {
+                $prefix = $tableSchema->getName() . '.' . $columnName . ' :: ';
+
+                $this->assertEquals(
+                    $prefix . $ddlBuilder->getColumnDefinition($tableSchema->getName(), $columnName),
+                    $prefix . $ddlBuilder->getColumnDefinitionFromSchema($tableSchema->getName(), $columnName),
+                );
+            }
+        }
+    }
+
     public function testRenameColumnTableNoExist(): void
     {
         $db = $this->getConnection();
@@ -321,13 +346,44 @@ final class QueryBuilderTest extends TestCase
         $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
 
-        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=6';
+        $checkSql = 'SHOW CREATE TABLE `item`;';
+
+        // change to max rows
+        $expected = <<<SQL
+SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+PREPARE autoincrement_stmt FROM @sql;
+EXECUTE autoincrement_stmt
+SQL;
         $sql = $qb->resetSequence('item');
         $this->assertSame($expected, $sql);
 
-        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=4';
-        $sql = $qb->resetSequence('item', 4);
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryOne();
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+
+        // change up
+        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=40;';
+        $sql = $qb->resetSequence('item', 40);
         $this->assertSame($expected, $sql);
+
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryOne();
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // and again change to max rows
+        $expected = <<<SQL
+SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+PREPARE autoincrement_stmt FROM @sql;
+EXECUTE autoincrement_stmt
+SQL;
+        $sql = $qb->resetSequence('item');
+        $this->assertSame($expected, $sql);
+
+        $db->createCommand($sql)->queryAll();
+        $result = $db->createCommand($checkSql)->queryOne();
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
     }
 
     public function testResetSequenceNoAssociated(): void
