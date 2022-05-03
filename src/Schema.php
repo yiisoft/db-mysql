@@ -522,7 +522,7 @@ final class Schema extends AbstractSchema
             } else {
                 $column->defaultValue($column->phpTypecast($info['default']));
             }
-        } elseif($info['default'] !== null) {
+        } elseif ($info['default'] !== null) {
             $column->defaultValue($column->phpTypecast($info['default']));
         }
 

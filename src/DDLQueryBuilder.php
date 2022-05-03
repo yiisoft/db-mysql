@@ -114,7 +114,6 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return $this->addCommentOnTable($table, '');
     }
 
-
     public function dropForeignKey(string $name, string $table): string
     {
         return 'ALTER TABLE '
@@ -216,6 +215,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @throws Exception|Throwable in case when table does not contain column.
      *
      * @return string the column definition.
+     *
      * @todo need change to getColumnDefinitionFromSchema with deep research
      */
     public function getColumnDefinition(string $table, string $column): string
