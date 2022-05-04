@@ -5,26 +5,34 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Throwable;
+use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Mysql\PDO\QueryBuilderPDOMysql;
 use Yiisoft\Db\Query\DDLQueryBuilder as AbstractDDLQueryBuilder;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Schema\QuoterInterface;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 use function array_values;
-use function in_array;
 use function preg_match;
 use function preg_replace;
 use function trim;
 
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
-    public function __construct(private QueryBuilderInterface $queryBuilder)
-    {
-        parent::__construct($queryBuilder);
+    public function __construct(
+        private CommandInterface $command,
+        private QueryBuilderInterface $queryBuilder,
+        private QuoterInterface $quoter,
+        SchemaInterface $schema
+    ) {
+        parent::__construct($queryBuilder, $quoter, $schema);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function addCheck(string $name, string $table, string $expression): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
@@ -96,11 +104,17 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'SET FOREIGN_KEY_CHECKS = ' . ($check ? 1 : 0);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function dropCheck(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
 
+    /**
+     * @throws Exception|Throwable
+     */
     public function dropCommentFromColumn(string $table, string $column): string
     {
         return $this->addCommentOnColumn($table, $column, '');
@@ -223,11 +237,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         $result = '';
         $quotedTable = $this->quoter->quoteTableName($table);
 
-        /** @var QueryBuilderPDOMysql $qb */
-        $qb = $this->queryBuilder;
-
         /** @var array<array-key, string> $row */
-        $row = $qb->command()->setSql('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
+        $row = $this->command->setSql('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
 
         if (!isset($row['Create Table'])) {
             $row = array_values($row);

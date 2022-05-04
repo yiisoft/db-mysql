@@ -16,15 +16,20 @@ use Yiisoft\Db\Query\DMLQueryBuilder as AbstractDMLQueryBuilder;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\QuoterInterface;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 use function implode;
 use function reset;
 
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    public function __construct(private QueryBuilderInterface $queryBuilder)
-    {
-        parent::__construct($queryBuilder);
+    public function __construct(
+        QueryBuilderInterface $queryBuilder,
+        private QuoterInterface $quoter,
+        private SchemaInterface $schema
+    ) {
+        parent::__construct($queryBuilder, $quoter, $schema);
     }
 
     /**
@@ -37,7 +42,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      * @param array|int|string|null $value the value for the primary key of the next new row inserted. If this is not
      * set, the next new row's primary key will have a value 1.
      *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|Throwable
+     * @throws Exception|InvalidArgumentException|Throwable
      *
      * @return string the SQL statement for resetting sequence.
      */

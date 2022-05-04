@@ -50,19 +50,14 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     private DQLQueryBuilder $dqlBuilder;
 
     public function __construct(
-        protected QuoterInterface $quoter,
-        protected SchemaInterface $schema,
-        private CommandInterface $command
+        QuoterInterface $quoter,
+        SchemaInterface $schema,
+        CommandInterface $command
     ) {
-        $this->ddlBuilder = new DDLQueryBuilder($this);
-        $this->dmlBuilder = new DMLQueryBuilder($this);
-        $this->dqlBuilder = new DQLQueryBuilder($this);
+        $this->ddlBuilder = new DDLQueryBuilder($command, $this, $quoter, $schema);
+        $this->dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
+        $this->dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
         parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
-    }
-
-    public function command(): CommandInterface
-    {
-        return $this->command;
     }
 
     public function getColumnType(ColumnSchemaBuilder|string $type): string
