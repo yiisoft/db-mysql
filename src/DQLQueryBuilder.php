@@ -9,20 +9,12 @@ use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Builder\JsonExpressionBuilder;
 use Yiisoft\Db\Query\DQLQueryBuilder as AbstractDQLQueryBuilder;
-use Yiisoft\Db\Query\QueryBuilderInterface;
-use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 use function array_merge;
 use function ctype_digit;
 
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
-    public function __construct(QueryBuilderInterface $queryBuilder, QuoterInterface $quoter, SchemaInterface $schema)
-    {
-        parent::__construct($queryBuilder, $quoter, $schema);
-    }
-
     public function buildLimit(Expression|int|null $limit, Expression|int|null $offset): string
     {
         $sql = '';
