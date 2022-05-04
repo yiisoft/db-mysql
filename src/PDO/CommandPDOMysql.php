@@ -8,6 +8,7 @@ use PDOException;
 use Yiisoft\Db\Driver\PDO\CommandPDO;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 final class CommandPDOMysql extends CommandPDO
 {
@@ -24,7 +25,7 @@ final class CommandPDOMysql extends CommandPDO
             return false;
         }
 
-        $tableSchema = $this->queryBuilder()->schema()->getTableSchema($table);
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
 
         $result = [];
@@ -44,6 +45,11 @@ final class CommandPDOMysql extends CommandPDO
     public function queryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
+    }
+
+    public function schema(): SchemaInterface
+    {
+        return $this->db->getSchema();
     }
 
     protected function internalExecute(?string $rawSql): void
