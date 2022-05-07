@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Throwable;
-use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -14,7 +13,6 @@ use Yiisoft\Db\Query\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
-use function array_values;
 use function preg_match;
 use function preg_replace;
 use function trim;
@@ -22,10 +20,9 @@ use function trim;
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
     public function __construct(
-        private CommandInterface $command,
         private QueryBuilderInterface $queryBuilder,
         private QuoterInterface $quoter,
-        SchemaInterface $schema
+        private SchemaInterface $schema
     ) {
         parent::__construct($queryBuilder, $quoter, $schema);
     }
@@ -90,12 +87,12 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws Exception|InvalidArgumentException
      */
-    public function createIndex(string $name, string $table, array|string $columns, bool $unique = false): string
+    public function createIndex(string $name, string $table, array|string $columns, ?string $indexType = null, ?string $indexMethod = null): string
     {
-        return 'ALTER TABLE '
-            . $this->quoter->quoteTableName($table)
-            . ($unique ? ' ADD UNIQUE INDEX ' : ' ADD INDEX ')
+        return 'CREATE '. ($indexType ? ($indexType . ' '): '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
+            . ($indexMethod !== null ? " USING $indexMethod" : '')
+            . ' ON ' . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
 
@@ -163,64 +160,6 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @todo need work with bit, tinybit and other new not suppoerted types (v.5.7 and later)
-     */
-//    public function getColumnDefinitionFromSchema($table, $oldName): string
-//    {
-//        $schema = $this->schema;
-//        $tableSchema = $schema->getTableSchema($table, true);
-//        if ($tableSchema === null) {
-//            throw new InvalidArgumentException("Table not found: $table");
-//        }
-//
-//        $oldColumnSchema = $tableSchema->getColumn($oldName);
-//        if ($oldColumnSchema === null) {
-//            return '';
-//        }
-//
-//        $columnSchemaBuilder = $this->schema->createColumnSchemaBuilder(
-//            $oldColumnSchema->getType(),
-//            $oldColumnSchema->getPrecision() ?? $oldColumnSchema->getSize()
-//        );
-//
-//        $defaultValue = $oldColumnSchema->getDefaultValue();
-//
-//        if ($oldColumnSchema->isAllowNull()) {
-//            if ($defaultValue === null) {
-//                if (!in_array($oldColumnSchema->getType(), [Schema::TYPE_TEXT, Schema::TYPE_BINARY], true)) {
-//                    $columnSchemaBuilder->defaultValue('NULL');
-//                }
-//                if ($oldColumnSchema->getType() === Schema::TYPE_TIMESTAMP) {
-//                    $columnSchemaBuilder->null();
-//                }
-//            } elseif ($oldColumnSchema->getType() !== Schema::TYPE_BINARY) {
-//                $columnSchemaBuilder->defaultValue($defaultValue);
-//            }
-//        } else {
-//            $columnSchemaBuilder->notNull();
-//            if ($defaultValue !== null && ($oldColumnSchema->getDbType() !== 'bit(1)' || !empty($defaultValue))) {
-//                $columnSchemaBuilder->defaultValue($defaultValue);
-//            }
-//        }
-//
-//        if (!empty($oldColumnSchema->getComment())) {
-//            $columnSchemaBuilder->comment($oldColumnSchema->getComment());
-//        }
-//
-//        if ($oldColumnSchema->isUnsigned()) {
-//            $columnSchemaBuilder->unsigned();
-//        }
-//
-//        if ($oldColumnSchema->isAutoIncrement()) {
-//            $columnSchemaBuilder->append('AUTO_INCREMENT');
-//        } elseif (!empty($oldColumnSchema->getExtra())) {
-//            $columnSchemaBuilder->append($oldColumnSchema->getExtra());
-//        }
-//
-//        return $this->queryBuilder->getColumnType($columnSchemaBuilder);
-//    }
-
-    /**
      * Gets column definition.
      *
      * @param string $table table name.
@@ -229,22 +168,15 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @throws Exception|Throwable in case when table does not contain column.
      *
      * @return string the column definition.
-     *
-     * @todo need change to getColumnDefinitionFromSchema with deep research
      */
     public function getColumnDefinition(string $table, string $column): string
     {
         $result = '';
-        $quotedTable = $this->quoter->quoteTableName($table);
 
-        /** @var array<array-key, string> $row */
-        $row = $this->command->setSql('SHOW CREATE TABLE ' . $quotedTable)->queryOne();
+        $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
-        if (!isset($row['Create Table'])) {
-            $row = array_values($row);
-            $sql = $row[1];
-        } else {
-            $sql = $row['Create Table'];
+        if (empty($sql)) {
+            return '';
         }
 
         if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {

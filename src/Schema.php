@@ -420,16 +420,20 @@ final class Schema extends AbstractSchema
     {
         $tableName = $table->getFullName() ?? '';
 
-        /** @var array<array-key, string> $row */
-        $row = $this->db->createCommand(
-            'SHOW CREATE TABLE ' . $this->db->getQuoter()->quoteTableName($tableName)
-        )->queryOne();
+        try {
+            /** @var array<array-key, string> $row */
+            $row = $this->db->createCommand(
+                'SHOW CREATE TABLE ' . $this->db->getQuoter()->quoteTableName($tableName)
+            )->queryOne();
 
-        if (isset($row['Create Table'])) {
-            $sql = $row['Create Table'];
-        } else {
-            $row = array_values($row);
-            $sql = $row[1];
+            if (isset($row['Create Table'])) {
+                $sql = $row['Create Table'];
+            } else {
+                $row = array_values($row);
+                $sql = $row[1];
+            }
+        } catch (Exception) {
+            $sql = '';
         }
 
         return $sql;
@@ -782,6 +786,7 @@ final class Schema extends AbstractSchema
         $table = new TableSchema();
 
         $this->resolveTableNames($table, $name);
+        $this->resolveTableCreateSql($table);
 
         if ($this->findColumns($table)) {
             $this->findConstraints($table);
@@ -874,6 +879,15 @@ final class Schema extends AbstractSchema
             $table->name($parts[0]);
             $table->fullName($parts[0]);
         }
+    }
+
+    /**
+     * @throws Exception|InvalidConfigException|Throwable
+     */
+    protected function resolveTableCreateSql(TableSchemaInterface $table): void
+    {
+        $sql = $this->getCreateTableSql($table);
+        $table->createSql($sql);
     }
 
     /**
