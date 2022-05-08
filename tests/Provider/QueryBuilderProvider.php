@@ -144,16 +144,7 @@ final class QueryBuilderProvider extends TestCase
 
     public function createDropIndexesProvider(): array
     {
-        $result = (new BaseQueryBuilderProvider($this->getConnection()))->createDropIndexesProvider();
-        $result['create'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_single]] ([[C_index_1]])';
-        $result['create (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD INDEX [[CN_constraints_2_multi]]'
-            . ' ([[C_index_2_1]], [[C_index_2_2]])';
-        $result['create unique'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE INDEX [[CN_constraints_2_single]]'
-            . ' ([[C_index_1]])';
-        $result['create unique (2 columns)'][0] = 'ALTER TABLE {{T_constraints_2}} ADD UNIQUE'
-            . ' INDEX [[CN_constraints_2_multi]] ([[C_index_2_1]], [[C_index_2_2]])';
-
-        return $result;
+        return (new BaseQueryBuilderProvider($this->getConnection()))->createDropIndexesProvider();
     }
 
     public function deleteProvider(): array

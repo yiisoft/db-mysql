@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\PDO;
 
-use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Mysql\DDLQueryBuilder;
 use Yiisoft\Db\Mysql\DMLQueryBuilder;
 use Yiisoft\Db\Mysql\DQLQueryBuilder;
@@ -21,6 +20,26 @@ use function array_merge;
  */
 final class QueryBuilderPDOMysql extends QueryBuilder
 {
+    /**
+     * Defines a FULLTEXT index type for {@see createIndex()}.
+     */
+    public const INDEX_FULLTEXT = 'FULLTEXT';
+
+    /**
+     * Defines a SPATIAL index type for {@see createIndex()}.
+     */
+    public const INDEX_SPATIAL = 'SPATIAL';
+
+    /**
+     * Defines a B-tree index method for {@see createIndex()}.
+     */
+    public const INDEX_B_TREE = 'btree';
+
+    /**
+     * Defines a hash index method for {@see createIndex()}.
+     */
+    public const INDEX_HASH = 'hash';
+
     /**
      * @psalm-var string[] $typeMap Mapping from abstract column types (keys) to physical column types (values).
      */
@@ -52,9 +71,8 @@ final class QueryBuilderPDOMysql extends QueryBuilder
     public function __construct(
         QuoterInterface $quoter,
         SchemaInterface $schema,
-        CommandInterface $command
     ) {
-        $this->ddlBuilder = new DDLQueryBuilder($command, $this, $quoter, $schema);
+        $this->ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
         $this->dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
         $this->dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
         parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
