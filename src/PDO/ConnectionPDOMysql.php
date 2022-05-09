@@ -48,11 +48,6 @@ final class ConnectionPDOMysql extends ConnectionPDO
         return new TransactionPDOMysql($this);
     }
 
-    public function getDriverName(): string
-    {
-        return 'mysql';
-    }
-
     /**
      * @throws Exception|InvalidConfigException
      */
@@ -100,17 +95,10 @@ final class ConnectionPDOMysql extends ConnectionPDO
      */
     protected function initConnection(): void
     {
-        $this->pdo = $this->driver->createConnection();
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         if ($this->getEmulatePrepare() !== null && constant('PDO::ATTR_EMULATE_PREPARES')) {
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $this->getEmulatePrepare());
+            $this->driver->attributes([PDO::ATTR_EMULATE_PREPARES => $this->getEmulatePrepare()]);
         }
 
-        $charset = $this->driver->getCharset();
-
-        if ($charset !== null) {
-            $this->pdo->exec('SET NAMES ' . $this->pdo->quote($charset));
-        }
+        $this->pdo = $this->driver->createConnection();
     }
 }
