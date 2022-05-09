@@ -11,6 +11,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Query\QueryBuilder;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
@@ -529,7 +530,7 @@ final class SchemaTest extends TestCase
         $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
         $this->assertEquals([], $uniqueIndexes);
 
-        $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', true)->execute();
+        $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', QueryBuilder::INDEX_UNIQUE)->execute();
         $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
         $this->assertNotNull($tableSchema);
@@ -541,7 +542,7 @@ final class SchemaTest extends TestCase
 
         // create another column with upper case letter that fails postgres
         // see https://github.com/yiisoft/yii2/issues/10613
-        $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', true)->execute();
+        $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
         $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
         $this->assertNotNull($tableSchema);
@@ -553,7 +554,7 @@ final class SchemaTest extends TestCase
         ], $uniqueIndexes);
 
         // see https://github.com/yiisoft/yii2/issues/13814
-        $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', true)->execute();
+        $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
         $tableSchema = $schema->getTableSchema('uniqueIndex', true);
 
         $this->assertNotNull($tableSchema);
