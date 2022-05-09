@@ -8,7 +8,6 @@ use PDO;
 use Yiisoft\Cache\CacheKeyNormalizer;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Mysql\PDO\PDODriver;
 use Yiisoft\Db\TestSupport\TestConnectionTrait;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
