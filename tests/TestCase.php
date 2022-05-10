@@ -15,7 +15,7 @@ class TestCase extends AbstractTestCase
     use TestTrait;
 
     protected string $drivername = 'mysql';
-    protected string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=33061';
+    protected string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=3306';
     protected string $username = 'root';
     protected string $password = '';
     protected string $charset = 'UTF8MB4';
