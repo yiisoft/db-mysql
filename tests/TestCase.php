@@ -15,7 +15,7 @@ class TestCase extends AbstractTestCase
     use TestTrait;
 
     protected string $drivername = 'mysql';
-    protected string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=3306';
+    protected string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=33061';
     protected string $username = 'root';
     protected string $password = '';
     protected string $charset = 'UTF8MB4';
@@ -35,6 +35,7 @@ class TestCase extends AbstractTestCase
         string $fixture = __DIR__ . '/Fixture/mysql.sql'
     ): ConnectionPDOMysql {
         $pdoDriver = new PDODriver($dsn ?? $this->dsn, $this->username, $this->password);
+        $pdoDriver->charset($this->charset);
         $this->db = new ConnectionPDOMysql($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
         $this->db->setLogger($this->createLogger());
         $this->db->setProfiler($this->createProfiler());
