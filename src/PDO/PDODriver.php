@@ -12,6 +12,10 @@ final class PDODriver extends AbstractPDODriver
     public function createConnection(): PDO
     {
         $this->attributes += [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+        if (PHP_VERSION_ID >= 80100) {
+            $this->attributes += [PDO::ATTR_STRINGIFY_FETCHES => true];
+        }
+
         $pdo = parent::createConnection();
 
         if ($this->charset !== null) {
