@@ -14,12 +14,12 @@ final class DriverTest extends TestCase
 {
     public function testConnectionCharset(): void
     {
-        $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
-
-        $pdo = $pdoDriver->createConnection();
+        $db = $this->getConnection();
+        $pdo = $db->getActivePDO();
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
         $this->assertEqualsIgnoringCase($this->charset, array_values($charset)[1]);
 
+        $pdoDriver = new PDODriver($this->dsn, $this->username, $this->password);
         $newCharset = 'latin1';
         $pdoDriver->charset($newCharset);
         $pdo = $pdoDriver->createConnection();
