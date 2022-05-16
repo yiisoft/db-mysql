@@ -12,8 +12,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryBuilderInterface;
+use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Json\Json;
 
 use function count;
@@ -36,11 +36,11 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
     {
         /**
          * @var JsonExpression $expression
-         * @var mixed|Query $value
+         * @var mixed|QueryInterface $value
          */
         $value = $expression->getValue();
 
-        if ($value instanceof Query) {
+        if ($value instanceof QueryInterface) {
             [$sql, $params] = $this->queryBuilder->build($value, $params);
 
             return "($sql)";
