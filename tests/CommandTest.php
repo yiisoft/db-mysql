@@ -30,27 +30,52 @@ final class CommandTest extends TestCase
         $schema = $db->getSchema();
 
         if ($schema->getTableSchema($tableName) !== null) {
-            $db->createCommand()->dropTable($tableName)->execute();
+            $db
+                ->createCommand()
+                ->dropTable($tableName)
+                ->execute();
         }
 
-        $db->createCommand()->createTable($tableName, [
-            'int1' => 'integer not null',
-            'int2' => 'integer not null',
-        ])->execute();
+        $db
+            ->createCommand()
+            ->createTable($tableName, [
+                'int1' => 'integer not null',
+                'int2' => 'integer not null',
+            ])
+            ->execute();
 
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
-        $db->createCommand()->addPrimaryKey($name, $tableName, ['int1'])->execute();
+        $db
+            ->createCommand()
+            ->addPrimaryKey($name, $tableName, ['int1'])
+            ->execute();
 
-        $this->assertEquals(['int1'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertEquals(
+            ['int1'],
+            $schema
+                ->getTablePrimaryKey($tableName, true)
+                ->getColumnNames(),
+        );
 
-        $db->createCommand()->dropPrimaryKey($name, $tableName)->execute();
+        $db
+            ->createCommand()
+            ->dropPrimaryKey($name, $tableName)
+            ->execute();
 
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
-        $db->createCommand()->addPrimaryKey($name, $tableName, ['int1', 'int2'])->execute();
+        $db
+            ->createCommand()
+            ->addPrimaryKey($name, $tableName, ['int1', 'int2'])
+            ->execute();
 
-        $this->assertEquals(['int1', 'int2'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertEquals(
+            ['int1', 'int2'],
+            $schema
+                ->getTablePrimaryKey($tableName, true)
+                ->getColumnNames(),
+        );
     }
 
     /**
@@ -105,14 +130,17 @@ final class CommandTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $db->createCommand()->insert(
-            'customer',
-            [
-                'name' => 'testParams',
-                'email' => 'testParams@example.com',
-                'address' => '1',
-            ]
-        )->execute();
+        $db
+            ->createCommand()
+            ->insert(
+                'customer',
+                [
+                    'name' => 'testParams',
+                    'email' => 'testParams@example.com',
+                    'address' => '1',
+                ]
+            )
+            ->execute();
 
         $params = [
             ':email' => 'testParams@example.com',
@@ -165,17 +193,21 @@ final class CommandTest extends TestCase
 
         $query = new Query($db);
 
-        $query->select($invalidSelectColumns)->from('{{customer}}');
+        $query
+            ->select($invalidSelectColumns)
+            ->from('{{customer}}');
 
         $command = $db->createCommand();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
 
-        $command->insert(
-            '{{customer}}',
-            $query
-        )->execute();
+        $command
+            ->insert(
+                '{{customer}}',
+                $query
+            )
+            ->execute();
     }
 
     /**

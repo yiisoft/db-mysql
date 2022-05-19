@@ -86,7 +86,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testAddDropForeignKey(string $sql, Closure $builder): void
     {
-        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertSame($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     public function addDropPrimaryKeysProvider(): array
@@ -111,7 +113,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testAddDropPrimaryKey(string $sql, Closure $builder): void
     {
-        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertSame($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     public function addDropUniquesProvider(): array
@@ -131,7 +135,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testAddDropUnique(string $sql, Closure $builder): void
     {
-        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertSame($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     /**
@@ -201,7 +207,12 @@ final class QueryBuilderTest extends TestCase
                 [
                     '=',
                     'jsoncol',
-                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1])),
+                    new JsonExpression(
+                        (new Query($this->getConnection()))
+                            ->select('params')
+                            ->from('user')
+                            ->where(['id' => 1]),
+                    ),
                 ],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
                 [':qp0' => 1],
@@ -210,7 +221,13 @@ final class QueryBuilderTest extends TestCase
                 [
                     '=',
                     'jsoncol',
-                    new JsonExpression((new Query($this->getConnection()))->select('params')->from('user')->where(['id' => 1]), 'jsonb'),
+                    new JsonExpression(
+                        (new Query($this->getConnection()))
+                            ->select('params')
+                            ->from('user')
+                            ->where(['id' => 1]),
+                        'jsonb'
+                    ),
                 ],
                 '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
             ],
@@ -247,7 +264,9 @@ final class QueryBuilderTest extends TestCase
 
         $query = (new Query($db))->where($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -269,7 +288,9 @@ final class QueryBuilderTest extends TestCase
     {
         $query = (new Query($this->getConnection()))->filterWhere($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -287,7 +308,9 @@ final class QueryBuilderTest extends TestCase
     {
         $params = [];
 
-        $sql = $this->getQueryBuilder()->buildFrom([$table], $params);
+        $sql = $this
+            ->getQueryBuilder()
+            ->buildFrom([$table], $params);
 
         $this->assertEquals('FROM ' . $this->replaceQuotes($expected), $sql);
     }
@@ -310,7 +333,9 @@ final class QueryBuilderTest extends TestCase
 
         $query = (new Query($db))->where($condition);
 
-        [$sql, $params] = $this->getQueryBuilder()->build($query);
+        [$sql, $params] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $this->replaceQuotes($expected)), $sql);
         $this->assertEquals($expectedParams, $params);
@@ -335,16 +360,20 @@ final class QueryBuilderTest extends TestCase
 
         $subQuery = new Query($db);
 
-        $subQuery->select('1')
+        $subQuery
+            ->select('1')
             ->from('Website w');
 
         $query = new Query($db);
 
-        $query->select('id')
+        $query
+            ->select('id')
             ->from('TotalExample t')
             ->where([$cond, $subQuery]);
 
-        [$actualQuerySql, $actualQueryParams] = $this->getQueryBuilder()->build($query);
+        [$actualQuerySql, $actualQueryParams] = $this
+            ->getQueryBuilder()
+            ->build($query);
 
         $this->assertEquals($expectedQuerySql, $actualQuerySql);
         $this->assertEquals($expectedQueryParams, $actualQueryParams);
@@ -375,7 +404,9 @@ final class QueryBuilderTest extends TestCase
      */
     public function testCreateDropIndex(string $sql, Closure $builder): void
     {
-        $this->assertSame($this->getConnection()->quoteSql($sql), $builder($this->getQueryBuilder()));
+        $this->assertSame($this
+            ->getConnection()
+            ->quoteSql($sql), $builder($this->getQueryBuilder()));
     }
 
     /**
@@ -395,7 +426,9 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()->delete($table, $condition, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->delete($table, $condition, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -419,7 +452,9 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = $params;
 
-        $actualSQL = $this->getQueryBuilder()->insert($table, $columns, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->insert($table, $columns, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -464,13 +499,15 @@ final class QueryBuilderTest extends TestCase
     public function testUpdate(
         string $table,
         array $columns,
-        $condition,
+               $condition,
         ?string $expectedSQL,
         array $expectedParams
     ): void {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()->update($table, $columns, $condition, $actualParams);
+        $actualSQL = $this
+            ->getQueryBuilder()
+            ->update($table, $columns, $condition, $actualParams);
 
         $this->assertSame($expectedSQL, $actualSQL);
         $this->assertSame($expectedParams, $actualParams);
@@ -544,7 +581,8 @@ final class QueryBuilderTest extends TestCase
     {
         $actualParams = [];
 
-        $actualSQL = $this->getQueryBuilder()
+        $actualSQL = $this
+            ->getQueryBuilder()
             ->upsert($table, $insertColumns, $updateColumns, $actualParams);
 
         if (is_string($expectedSQL)) {
@@ -589,14 +627,20 @@ final class QueryBuilderTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $db->createCommand()->checkIntegrity('public', 'item', false)->execute();
+        $db
+            ->createCommand()
+            ->checkIntegrity('public', 'item', false)
+            ->execute();
 
         $sql = 'INSERT INTO {{item}}([[name]], [[category_id]]) VALUES (\'invalid\', 99999)';
 
         $command = $db->createCommand($sql);
         $command->execute();
 
-        $db->createCommand()->checkIntegrity('public', 'item', true)->execute();
+        $db
+            ->createCommand()
+            ->checkIntegrity('public', 'item', true)
+            ->execute();
 
         $this->expectException(IntegrityException::class);
         $command->execute();

@@ -32,7 +32,10 @@ final class QueryTest extends TestCase
     {
         $db = $this->getConnection();
 
-        $query = (new Query($db))->from('customer')->select('id')->orderBy('id');
+        $query = (new Query($db))
+            ->from('customer')
+            ->select('id')
+            ->orderBy('id');
 
         /* In MySQL limit and offset arguments must both be non negative integer constant */
         $query->limit(new Expression('2'))->offset(new Expression('1'));
