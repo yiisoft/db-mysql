@@ -499,7 +499,7 @@ final class QueryBuilderTest extends TestCase
     public function testUpdate(
         string $table,
         array $columns,
-               $condition,
+        $condition,
         ?string $expectedSQL,
         array $expectedParams
     ): void {
