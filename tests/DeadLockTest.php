@@ -186,14 +186,16 @@ final class DeadLockTest extends TestCase
 
             $this->log('child 1: delete');
 
-            $first->createCommand()
+            $first
+                ->createCommand()
                 ->delete('{{customer}}', ['id' => 97])
                 ->execute();
 
             $this->log('child 1: insert');
 
             /* insert test row */
-            $first->createCommand()
+            $first
+                ->createCommand()
                 ->insert('{{customer}}', [
                     'id' => 97,
                     'email' => 'deadlock@example.com',
@@ -209,7 +211,8 @@ final class DeadLockTest extends TestCase
                     $this->log('child 1: select');
 
                     /* SELECT with shared lock */
-                    $first->createCommand('SELECT id FROM {{customer}} WHERE id = 97 LOCK IN SHARE MODE')
+                    $first
+                        ->createCommand('SELECT id FROM {{customer}} WHERE id = 97 LOCK IN SHARE MODE')
                         ->execute();
 
                     $this->log('child 1: send signal to child 2');
@@ -229,7 +232,8 @@ final class DeadLockTest extends TestCase
                     $this->log('child 1: update');
 
                     /* now do the 3rd update for deadlock */
-                    $first->createCommand()
+                    $first
+                        ->createCommand()
                         ->update('{{customer}}', ['name' => 'first'], ['id' => 97])
                         ->execute();
 
@@ -315,7 +319,8 @@ final class DeadLockTest extends TestCase
                 $second->transaction(function (Connection $second) {
                     $this->log('child 2: update');
                     /* do the 2nd update */
-                    $second->createCommand()
+                    $second
+                        ->createCommand()
                         ->update('{{customer}}', ['name' => 'second'], ['id' => 97])
                         ->execute();
 

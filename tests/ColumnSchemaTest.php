@@ -43,7 +43,9 @@ final class ColumnSchemaTest extends TestCase
 
         $command->execute();
 
-        $query = (new Query($db))->from('negative_default_values')->one();
+        $query = (new Query($db))
+            ->from('negative_default_values')
+            ->one();
 
         /** @todo need fix for this behaviour PHP8.1 + pdo_mysql */
         $this->assertSame($bigint, (string) $query['bigint_col']);

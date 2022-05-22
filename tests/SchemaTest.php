@@ -27,7 +27,9 @@ final class SchemaTest extends TestCase
 
     public function getExpectedColumns(): array
     {
-        $version = $this->getConnection()->getServerVersion();
+        $version = $this
+            ->getConnection()
+            ->getServerVersion();
 
         return [
             'int_col' => [
@@ -251,7 +253,9 @@ final class SchemaTest extends TestCase
 
     public function testLoadDefaultDatetimeColumn(): void
     {
-        if (!version_compare($this->getConnection()->getServerVersion(), '5.6', '>=')) {
+        if (!version_compare($this
+            ->getConnection()
+            ->getServerVersion(), '5.6', '>=')) {
             $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
         }
 
@@ -264,9 +268,14 @@ CREATE TABLE  IF NOT EXISTS `datetime_test`  (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 SQL;
 
-        $this->getConnection()->createCommand($sql)->execute();
+        $this
+            ->getConnection()
+            ->createCommand($sql)
+            ->execute();
 
-        $schema = $this->getConnection()->getTableSchema('datetime_test');
+        $schema = $this
+            ->getConnection()
+            ->getTableSchema('datetime_test');
 
         $dt = $schema->getColumn('dt');
 
@@ -276,7 +285,9 @@ SQL;
 
     public function testDefaultDatetimeColumnWithMicrosecs(): void
     {
-        if (!version_compare($this->getConnection()->getServerVersion(), '5.6.4', '>=')) {
+        if (!version_compare($this
+            ->getConnection()
+            ->getServerVersion(), '5.6.4', '>=')) {
             $this->markTestSkipped(
                 'CURRENT_TIMESTAMP with microseconds as default column value is supported since MySQL 5.6.4.'
             );
@@ -289,9 +300,14 @@ CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 SQL;
 
-        $this->getConnection()->createCommand($sql)->execute();
+        $this
+            ->getConnection()
+            ->createCommand($sql)
+            ->execute();
 
-        $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
+        $schema = $this
+            ->getConnection()
+            ->getTableSchema('current_timestamp_test');
 
         $dt = $schema->getColumn('dt');
 
@@ -349,7 +365,9 @@ SQL;
         $connection = $this->getConnection(true);
 
         foreach ($pdoAttributes as $name => $value) {
-            $connection->getPDO()->setAttribute($name, $value);
+            $connection
+                ->getPDO()
+                ->setAttribute($name, $value);
         }
 
         $schema = $connection->getSchema();
@@ -402,7 +420,9 @@ SQL;
             $this->expectException(NotSupportedException::class);
         }
 
-        $constraints = $this->getConnection()->getSchema()->{'getTable' . ucfirst($type)}($tableName);
+        $constraints = $this
+            ->getConnection()
+            ->getSchema()->{'getTable' . ucfirst($type)}($tableName);
 
         $this->assertMetadataEquals($expected, $constraints);
     }
@@ -425,7 +445,9 @@ SQL;
 
         $connection = $this->getConnection();
 
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+        $connection
+            ->getSlavePdo()
+            ->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 
         $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
@@ -450,7 +472,9 @@ SQL;
 
         $connection = $this->getConnection();
 
-        $connection->getSlavePdo()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
+        $connection
+            ->getSlavePdo()
+            ->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
 
         $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
@@ -474,7 +498,9 @@ SQL;
         string $testTableName
     ): void {
         $db = $this->getConnection();
-        $schema = $this->getConnection()->getSchema();
+        $schema = $this
+            ->getConnection()
+            ->getSchema();
 
         $this->schemaCache->setEnable(true);
 
@@ -517,14 +543,20 @@ SQL;
         $db = $this->getConnection();
 
         try {
-            $db->createCommand()->dropTable('uniqueIndex')->execute();
+            $db
+                ->createCommand()
+                ->dropTable('uniqueIndex')
+                ->execute();
         } catch (Exception $e) {
         }
 
-        $db->createCommand()->createTable('uniqueIndex', [
-            'somecol' => 'string',
-            'someCol2' => 'string',
-        ])->execute();
+        $db
+            ->createCommand()
+            ->createTable('uniqueIndex', [
+                'somecol' => 'string',
+                'someCol2' => 'string',
+            ])
+            ->execute();
 
         /* @var $schema Schema */
         $schema = $db->getSchema();
@@ -532,7 +564,10 @@ SQL;
         $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
         $this->assertEquals([], $uniqueIndexes);
 
-        $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', true)->execute();
+        $db
+            ->createCommand()
+            ->createIndex('somecolUnique', 'uniqueIndex', 'somecol', true)
+            ->execute();
 
         $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
         $this->assertEquals([
@@ -541,7 +576,10 @@ SQL;
 
         // create another column with upper case letter that fails postgres
         // see https://github.com/yiisoft/yii2/issues/10613
-        $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', true)->execute();
+        $db
+            ->createCommand()
+            ->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', true)
+            ->execute();
 
         $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
         $this->assertEquals([
@@ -550,7 +588,10 @@ SQL;
         ], $uniqueIndexes);
 
         // see https://github.com/yiisoft/yii2/issues/13814
-        $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', true)->execute();
+        $db
+            ->createCommand()
+            ->createIndex('another unique index', 'uniqueIndex', 'someCol2', true)
+            ->execute();
 
         $uniqueIndexes = $schema->findUniqueIndexes($schema->getTableSchema('uniqueIndex', true));
         $this->assertEquals([

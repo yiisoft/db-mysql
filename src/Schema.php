@@ -161,7 +161,7 @@ final class Schema extends AbstractSchema
         }
 
         $resolvedName->fullName(($resolvedName->getSchemaName() !== $this->defaultSchema ?
-            (string) $resolvedName->getSchemaName() . '.' : '') . (string) $resolvedName->getName());
+                (string) $resolvedName->getSchemaName() . '.' : '') . (string) $resolvedName->getName());
 
         return $resolvedName;
     }
@@ -186,7 +186,10 @@ final class Schema extends AbstractSchema
             $sql .= ' FROM ' . $this->quoteSimpleTableName($schema);
         }
 
-        return $this->getDb()->createCommand($sql)->queryColumn();
+        return $this
+            ->getDb()
+            ->createCommand($sql)
+            ->queryColumn();
     }
 
     /**
@@ -272,10 +275,12 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $indexes = $this->getDb()->createCommand($sql, [
-            ':schemaName' => $resolvedName->getSchemaName(),
-            ':tableName' => $resolvedName->getName(),
-        ])->queryAll();
+        $indexes = $this
+            ->getDb()
+            ->createCommand($sql, [
+                ':schemaName' => $resolvedName->getSchemaName(),
+                ':tableName' => $resolvedName->getName(),
+            ])->queryAll();
 
         /** @var array<array-key, array<array-key, mixed>> $indexes */
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
@@ -449,7 +454,7 @@ SQL;
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
-                    ? '(' . $matches[1] . ')' : '')));
+                        ? '(' . $matches[1] . ')' : '')));
             } elseif (isset($type) && $type === 'bit') {
                 $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
@@ -476,7 +481,10 @@ SQL;
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->quoteTableName($tableName);
 
         try {
-            $columns = $this->getDb()->createCommand($sql)->queryAll();
+            $columns = $this
+                ->getDb()
+                ->createCommand($sql)
+                ->queryAll();
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -492,7 +500,9 @@ SQL;
             throw $e;
         }
 
-        $slavePdo = $this->getDb()->getSlavePdo();
+        $slavePdo = $this
+            ->getDb()
+            ->getSlavePdo();
 
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
@@ -528,9 +538,11 @@ SQL;
         $tableName = $table->getFullName() ?? '';
 
         /** @var array<array-key, string> $row */
-        $row = $this->getDb()->createCommand(
-            'SHOW CREATE TABLE ' . $this->quoteTableName($tableName)
-        )->queryOne();
+        $row = $this
+            ->getDb()
+            ->createCommand(
+                'SHOW CREATE TABLE ' . $this->quoteTableName($tableName)
+            )->queryOne();
 
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
@@ -576,10 +588,12 @@ WHERE
 SQL;
 
         try {
-            $rows = $this->getDb()->createCommand($sql, [
-                ':schemaName' => $table->getSchemaName(),
-                ':tableName' => $table->getName(),
-            ])->queryAll();
+            $rows = $this
+                ->getDb()
+                ->createCommand($sql, [
+                    ':schemaName' => $table->getSchemaName(),
+                    ':tableName' => $table->getName(),
+                ])->queryAll();
 
             $constraints = [];
 
@@ -750,10 +764,12 @@ SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
 
-        $constraints = $this->getDb()->createCommand($sql, [
-            ':schemaName' => $resolvedName->getSchemaName(),
-            ':tableName' => $resolvedName->getName(),
-        ])->queryAll();
+        $constraints = $this
+            ->getDb()
+            ->createCommand($sql, [
+                ':schemaName' => $resolvedName->getSchemaName(),
+                ':tableName' => $resolvedName->getName(),
+            ])->queryAll();
 
         /** @var array<array-key, array> $constraints */
         $constraints = $this->normalizePdoRowKeyCase($constraints, true);
