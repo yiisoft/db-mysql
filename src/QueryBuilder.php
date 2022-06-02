@@ -272,7 +272,8 @@ final class QueryBuilder extends AbstractQueryBuilder
                 $key = (string) reset($pk);
                 $value = (int) $this
                         ->getDb()
-                        ->createCommand("SELECT MAX(`$key`) FROM $tableName")->queryScalar() + 1;
+                        ->createCommand("SELECT MAX(`$key`) FROM $tableName")
+                        ->queryScalar() + 1;
             } else {
                 $value = (int) $value;
             }

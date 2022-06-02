@@ -280,7 +280,8 @@ SQL;
             ->createCommand($sql, [
                 ':schemaName' => $resolvedName->getSchemaName(),
                 ':tableName' => $resolvedName->getName(),
-            ])->queryAll();
+            ])
+            ->queryAll();
 
         /** @var array<array-key, array<array-key, mixed>> $indexes */
         $indexes = $this->normalizePdoRowKeyCase($indexes, true);
@@ -542,7 +543,8 @@ SQL;
             ->getDb()
             ->createCommand(
                 'SHOW CREATE TABLE ' . $this->quoteTableName($tableName)
-            )->queryOne();
+            )
+            ->queryOne();
 
         if (isset($row['Create Table'])) {
             $sql = $row['Create Table'];
@@ -593,7 +595,8 @@ SQL;
                 ->createCommand($sql, [
                     ':schemaName' => $table->getSchemaName(),
                     ':tableName' => $table->getName(),
-                ])->queryAll();
+                ])
+                ->queryAll();
 
             $constraints = [];
 
@@ -769,7 +772,8 @@ SQL;
             ->createCommand($sql, [
                 ':schemaName' => $resolvedName->getSchemaName(),
                 ':tableName' => $resolvedName->getName(),
-            ])->queryAll();
+            ])
+            ->queryAll();
 
         /** @var array<array-key, array> $constraints */
         $constraints = $this->normalizePdoRowKeyCase($constraints, true);

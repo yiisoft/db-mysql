@@ -449,7 +449,8 @@ SQL;
             ->getSlavePdo()
             ->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
 
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
+        $constraints = $connection
+            ->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
         $this->assertMetadataEquals($expected, $constraints);
     }
@@ -476,7 +477,8 @@ SQL;
             ->getSlavePdo()
             ->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
 
-        $constraints = $connection->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
+        $constraints = $connection
+            ->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
 
         $this->assertMetadataEquals($expected, $constraints);
     }
