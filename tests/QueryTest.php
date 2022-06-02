@@ -38,7 +38,9 @@ final class QueryTest extends TestCase
             ->orderBy('id');
 
         /* In MySQL limit and offset arguments must both be non negative integer constant */
-        $query->limit(new Expression('2'))->offset(new Expression('1'));
+        $query
+            ->limit(new Expression('2'))
+            ->offset(new Expression('1'));
 
         $result = $query->column();
 
