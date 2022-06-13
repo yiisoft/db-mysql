@@ -16,6 +16,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Schema as AbstractSchema;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
@@ -440,15 +441,15 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Loads the column information into a {@see ColumnSchema} object.
+     * Loads the column information into a {@see ColumnSchemaInterface} object.
      *
      * @param array $info column information.
      *
      * @throws JsonException
      *
-     * @return ColumnSchema the column schema object.
+     * @return ColumnSchemaInterface the column schema object.
      */
-    protected function loadColumnSchema(array $info): ColumnSchema
+    protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $column = $this->createColumnSchema();
 
