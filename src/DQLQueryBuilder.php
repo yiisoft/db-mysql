@@ -8,7 +8,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Builder\JsonExpressionBuilder;
-use Yiisoft\Db\Query\DQLQueryBuilder as AbstractDQLQueryBuilder;
+use Yiisoft\Db\QueryBuilder\DQLQueryBuilder as AbstractDQLQueryBuilder;
 
 use function array_merge;
 use function ctype_digit;
