@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
-use Yiisoft\Db\Mysql\PDO\PDODriver;
+use Yiisoft\Db\Mysql\PDODriver;
 
 /**
  * @group mysql

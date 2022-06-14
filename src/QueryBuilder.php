@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\PDO;
+namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Mysql\DDLQueryBuilder;
-use Yiisoft\Db\Mysql\DMLQueryBuilder;
-use Yiisoft\Db\Mysql\DQLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\QueryBuilder;
+use Yiisoft\Db\QueryBuilder\QueryBuilder as AbstractQueryBuilder;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
@@ -18,7 +15,7 @@ use function array_merge;
 /**
  * The class QueryBuilder is the query builder for Mysql databases.
  */
-final class QueryBuilderPDOMysql extends QueryBuilder
+final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
      * Defines a FULLTEXT index type for {@see createIndex()}.
