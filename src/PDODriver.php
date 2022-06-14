@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql\PDO;
+namespace Yiisoft\Db\Mysql;
 
 use PDO;
 use Yiisoft\Db\Driver\PDO\PDODriver as AbstractPDODriver;
