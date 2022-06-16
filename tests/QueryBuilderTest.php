@@ -183,6 +183,16 @@ final class QueryBuilderTest extends TestCase
 
     public function testCheckIntegrity(): void
     {
+        $this->assertEqualsWithoutLE(
+            <<<SQL
+            SET FOREIGN_KEY_CHECKS = 1
+            SQL,
+            $this->getConnection()->getQueryBuilder()->checkIntegrity('dbo', 'item'),
+        );
+    }
+
+    public function testCheckIntegrityExecute(): void
+    {
         $db = $this->getConnection();
         $db->createCommand()->checkIntegrity('public', 'item', false)->execute();
         $sql = 'INSERT INTO {{item}}([[name]], [[category_id]]) VALUES (\'invalid\', 99999)';
