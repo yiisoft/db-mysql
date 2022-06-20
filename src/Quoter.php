@@ -27,6 +27,6 @@ final class Quoter extends BaseQuoter implements QuoterInterface
             return $value;
         }
 
-        return "'" . preg_replace('~[\x00\x0A\x0D\x1A\x22\x25\x27\x5C\x5F]~u', '\\\$0', $value) . "'";
+        return "'" . preg_replace('~[\x00\x0A\x0D\x1A\x22\x25\x27\x5C]~u', '\\\$0', $value) . "'";
     }
 }
