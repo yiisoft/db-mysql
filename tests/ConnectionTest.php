@@ -37,7 +37,7 @@ final class ConnectionTest extends TestCase
     public function testGetDriverName(): void
     {
         $db = $this->getConnection();
-        $this->assertEquals('mysql', $db->getDriverName());
+        $this->assertEquals('mysql', $db->getDriver()->getDriverName());
     }
 
     public function testQuoteValue(): void
