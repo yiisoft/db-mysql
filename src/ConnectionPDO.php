@@ -68,6 +68,11 @@ final class ConnectionPDO extends AbstractConnectionPDO
         return $this->quoter;
     }
 
+    public function getName(): string
+    {
+        return $this->getDriver()->getName();
+    }
+
     public function getSchema(): SchemaInterface
     {
         if ($this->schema === null) {
