@@ -18,15 +18,13 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v/stable.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/db-mysql/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-mysql/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/db-mysql/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/db-mysql/?branch=master)
-
+[![codecov](https://codecov.io/gh/yiisoft/db-mysql/branch/dev/graph/badge.svg?token=gsKVx3WQt4)](https://codecov.io/gh/yiisoft/db-mysql)
 
 ## Support version
 
 |  PHP | Mysql Version            |  CI-Actions
 |:----:|:------------------------:|:---:|
-|**7.4 - 8.0**| **5.7 - 8.0**|[![Build status](https://github.com/yiisoft/db-mysql/workflows/build/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3Abuild) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3A%22static+analysis%22) [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
+|**7.4 - 8.0**| **5.7 - 8.0**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
 
 ## Installation

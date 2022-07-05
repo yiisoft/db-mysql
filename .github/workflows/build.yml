@@ -37,7 +37,6 @@ jobs:
           - ubuntu-latest
 
         php:
-          - 7.4
           - 8.0
           - 8.1
 
@@ -58,22 +57,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup cache environment
-        id: cache-env
-        uses: shivammathur/cache-extensions@v1
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: ${{ env.extensions }}
-          key: ${{ env.key }}
-
-      - name: Cache extensions
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.cache-env.outputs.dir }}
-          key: ${{ steps.cache-env.outputs.key }}
-          restore-keys: ${{ steps.cache-env.outputs.key }}
+        uses: actions/checkout@v3
 
       - name: Install PHP with extensions
         uses: shivammathur/setup-php@v2
@@ -83,22 +67,6 @@ jobs:
           ini-values: date.timezone='UTC'
           coverage: pcov
 
-      - name: Determine composer cache directory on Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: echo "COMPOSER_CACHE_DIR=$(composer config cache-dir)" >> $GITHUB_ENV
-
-      - name: Determine composer cache directory on Windows
-        if: matrix.os == 'windows-latest'
-        run: echo "COMPOSER_CACHE_DIR=~\AppData\Local\Composer" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Cache dependencies installed with composer
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.COMPOSER_CACHE_DIR }}
-          key: php${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: |
-            php${{ matrix.php }}-composer-
-
       - name: Update composer
         run: composer self-update
 
@@ -106,4 +74,10 @@ jobs:
         run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
       - name: Run tests with phpunit
-        run: vendor/bin/phpunit --colors=always
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml

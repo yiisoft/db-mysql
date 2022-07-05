@@ -9,7 +9,7 @@ use yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestUtility\TestCommandTrait;
+use Yiisoft\Db\TestSupport\TestCommandTrait;
 
 /**
  * @group mysql
@@ -19,6 +19,14 @@ final class CommandTest extends TestCase
     use TestCommandTrait;
 
     protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+
+    public function testAddCheck(): void
+    {
+        $db = $this->getConnection();
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
+        $db->createCommand()->addCheck('noExist', 'noExist', 'noExist')->execute();
+    }
 
     public function testAddDropPrimaryKey(): void
     {
@@ -41,16 +49,20 @@ final class CommandTest extends TestCase
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
         $db->createCommand()->addPrimaryKey($name, $tableName, ['int1'])->execute();
+        $pk = $schema->getTablePrimaryKey($tableName, true);
 
-        $this->assertEquals(['int1'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertNotNull($pk);
+        $this->assertEquals(['int1'], $pk->getColumnNames());
 
         $db->createCommand()->dropPrimaryKey($name, $tableName)->execute();
 
         $this->assertNull($schema->getTablePrimaryKey($tableName, true));
 
         $db->createCommand()->addPrimaryKey($name, $tableName, ['int1', 'int2'])->execute();
+        $pk = $schema->getTablePrimaryKey($tableName, true);
 
-        $this->assertEquals(['int1', 'int2'], $schema->getTablePrimaryKey($tableName, true)->getColumnNames());
+        $this->assertNotNull($pk);
+        $this->assertEquals(['int1', 'int2'], $pk->getColumnNames());
     }
 
     /**

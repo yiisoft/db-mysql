@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Db\Mysql;
+namespace Yiisoft\Db\Mysql\Builder;
 
 use JsonException;
 use Yiisoft\Db\Exception\Exception;
@@ -10,10 +10,10 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
-use Yiisoft\Db\Expression\ExpressionBuilderTrait;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
+use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Json\Json;
 
 use function count;
@@ -23,27 +23,24 @@ use function count;
  */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
-    use ExpressionBuilderTrait;
-
     public const PARAM_PREFIX = ':qp';
 
+    public function __construct(private QueryBuilderInterface $queryBuilder)
+    {
+    }
+
     /**
-     * @param ExpressionInterface|JsonExpression $expression the expression to be built
-     * @param array $params
-     *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
-     *
-     * @return string
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
         /**
          * @var JsonExpression $expression
-         * @var mixed|Query $value
+         * @var mixed|QueryInterface $value
          */
         $value = $expression->getValue();
 
-        if ($value instanceof Query) {
+        if ($value instanceof QueryInterface) {
             [$sql, $params] = $this->queryBuilder->build($value, $params);
 
             return "($sql)";

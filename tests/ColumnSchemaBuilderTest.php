@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
 use Yiisoft\Db\Mysql\Schema;
-use Yiisoft\Db\TestUtility\TestColumnSchemaBuilderTrait;
+use Yiisoft\Db\TestSupport\TestColumnSchemaBuilderTrait;
 
 /**
  * @group mysql
@@ -17,7 +17,7 @@ final class ColumnSchemaBuilderTest extends TestCase
 
     public function getColumnSchemaBuilder($type, $length = null): ColumnSchemaBuilder
     {
-        return new ColumnSchemaBuilder($type, $length, $this->getConnection());
+        return new ColumnSchemaBuilder($type, $length, $this->getConnection()->getQuoter());
     }
 
     public function typesProvider(): array

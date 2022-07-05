@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
+use Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\QuoterInterface;
 
 /**
  * The class ColumnSchemaBuilder for Mysql database.
  */
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
-    private ConnectionInterface $db;
-
     /**
-     *  @param array|int|string|null $length column size or precision definition.
+     *  @psalm-param string[]|int|string|null $length column size or precision definition.
      */
-    public function __construct(string $type, $length, ConnectionInterface $db)
+    public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
     {
-        $this->db = $db;
-
         parent::__construct($type, $length);
     }
 
@@ -43,10 +39,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildAfterString(): string
     {
-        /** @var Connection $db */
-        $db = $this->db;
-
-        return $this->getAfter() !== null ? ' AFTER ' . $db->quoteColumnName((string) $this->getAfter()) : '';
+        return $this->getAfter() !== null ? ' AFTER ' . $this->quoter->quoteColumnName((string) $this->getAfter()) : '';
     }
 
     /**
@@ -68,24 +61,18 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildCommentString(): string
     {
-        /** @var Connection $db */
-        $db = $this->db;
-
-        return $this->getComment() !== null ? ' COMMENT ' . $db->quoteValue((string) $this->getComment()) : '';
+        return $this->getComment() !== null ? ' COMMENT '
+            . (string) $this->quoter->quoteValue($this->getComment()) : '';
     }
 
     public function __toString(): string
     {
-        switch ($this->getTypeCategory()) {
-            case self::CATEGORY_PK:
-                $format = '{type}{length}{comment}{check}{append}{pos}';
-                break;
-            case self::CATEGORY_NUMERIC:
-                $format = '{type}{length}{unsigned}{notnull}{default}{unique}{comment}{append}{pos}{check}';
-                break;
-            default:
-                $format = '{type}{length}{notnull}{default}{unique}{comment}{append}{pos}{check}';
-        }
+        $format = match ($this->getTypeCategory()) {
+            self::CATEGORY_PK => '{type}{length}{comment}{check}{append}{pos}',
+            self::CATEGORY_NUMERIC => '{type}{length}{unsigned}{notnull}{default}{unique}{comment}{append}' .
+                '{pos}{check}',
+            default => '{type}{length}{notnull}{default}{unique}{comment}{append}{pos}{check}',
+        };
 
         return $this->buildCompleteString($format);
     }

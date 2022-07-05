@@ -8,6 +8,7 @@ use JsonException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
+use Yiisoft\Db\Schema\Schema;
 
 use function json_decode;
 
@@ -27,7 +28,7 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * @return mixed converted value.
      */
-    public function phpTypecast($value)
+    public function phpTypecast(mixed $value): mixed
     {
         if ($value === null) {
             return null;
@@ -50,7 +51,7 @@ final class ColumnSchema extends AbstractColumnSchema
      * @return mixed converted value. This may also be an array containing the value as the first element and the PDO
      * type as the second element.
      */
-    public function dbTypecast($value)
+    public function dbTypecast(mixed $value): mixed
     {
         if ($value === null) {
             return null;

@@ -19,10 +19,10 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4|^8.0",
+        "php": "^8.0",
         "ext-json": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "^3.0",
+        "yiisoft/db": "dev-master",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {

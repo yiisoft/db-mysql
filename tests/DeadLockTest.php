@@ -8,8 +8,8 @@ use ErrorException;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Transaction\Transaction;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function date;
 use function file_get_contents;
@@ -165,8 +165,8 @@ final class DeadLockTest extends TestCase
     /**
      * Main body of first child process.
      *
-     * First child initializes test row and runs two nested {@see Connection::transaction()} to perform following
-     * operations:
+     * First child initializes test row and runs two nested {@see ConnectionInterface::transaction()} to perform
+     * following operations:
      * 1. `SELECT ... LOCK IN SHARE MODE` the test row with shared lock instead of needed exclusive lock.
      * 2. Send signal to SECOND child identified by PID {@see $pidSecond}.
      * 3. Waits few seconds.
@@ -204,8 +204,8 @@ final class DeadLockTest extends TestCase
 
             $this->log('child 1: transaction');
 
-            $first->transaction(function (Connection $first) use ($pidSecond) {
-                $first->transaction(function (Connection $first) use ($pidSecond) {
+            $first->transaction(function (ConnectionInterface $first) use ($pidSecond) {
+                $first->transaction(function (ConnectionInterface $first) use ($pidSecond) {
                     $this->log('child 1: select');
 
                     /* SELECT with shared lock */
@@ -235,8 +235,9 @@ final class DeadLockTest extends TestCase
 
                     $this->log('child 1: commit');
                 });
-            }, Transaction::REPEATABLE_READ);
+            }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
+            $this->assertIsArray($e->errorInfo);
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
             /* Deadlock found when trying to get lock; try restarting transaction */
@@ -247,7 +248,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log(
                 'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -273,8 +274,8 @@ final class DeadLockTest extends TestCase
      *
      * Second child at first will wait the signal from the first child in some seconds.
      *
-     * After receiving the signal it runs two nested {@see Connection::transaction()} to perform `UPDATE` with the
-     * test row.
+     * After receiving the signal it runs two nested {@see ConnectionInterface::transaction()} to perform `UPDATE` with
+     * the test row.
      *
      * @return int Exit code. In case of deadlock exit code is {@see CHILD_EXIT_CODE_DEADLOCK}. In case of success exit
      * code is 0. Other codes means an error.
@@ -303,16 +304,15 @@ final class DeadLockTest extends TestCase
 
             $this->log('child 2: connect');
 
-            /* @var Connection $second */
-
-            $second = $this->getConnection(true, false);
+            /* @var ConnectionInteface $second */
+            $second = $this->getConnection(true);
             $second->open();
 
             /* sleep(1); */
             $this->log('child 2: transaction');
 
-            $second->transaction(function (Connection $second) {
-                $second->transaction(function (Connection $second) {
+            $second->transaction(function (ConnectionInterface $second) {
+                $second->transaction(function (ConnectionInterface $second) {
                     $this->log('child 2: update');
                     /* do the 2nd update */
                     $second->createCommand()
@@ -321,8 +321,9 @@ final class DeadLockTest extends TestCase
 
                     $this->log('child 2: commit');
                 });
-            }, Transaction::REPEATABLE_READ);
+            }, TransactionInterface::REPEATABLE_READ);
         } catch (Exception $e) {
+            $this->assertIsArray($e->errorInfo);
             [$sqlError, $driverError, $driverMessage] = $e->errorInfo;
 
             /* Deadlock found when trying to get lock; try restarting transaction */
@@ -333,7 +334,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log(
                 'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -385,6 +386,7 @@ final class DeadLockTest extends TestCase
      */
     private function deleteLog(): void
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile && is_file($this->logFile)) {
             unlink($this->logFile);
         }
@@ -400,6 +402,7 @@ final class DeadLockTest extends TestCase
      */
     private function getLogContentAndDelete(): ?string
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile && is_file($this->logFile)) {
             $content = file_get_contents($this->logFile);
 
@@ -407,6 +410,8 @@ final class DeadLockTest extends TestCase
 
             return $content;
         }
+
+        return null;
     }
 
     /**
@@ -417,6 +422,7 @@ final class DeadLockTest extends TestCase
      */
     private function log(string $message): void
     {
+        /** @psalm-suppress RedundantCondition */
         if (null !== $this->logFile) {
             $time = microtime(true);
 
