@@ -366,7 +366,7 @@ final class Schema extends AbstractSchema
      *
      * @throws Exception|InvalidConfigException|Throwable
      *
-     * @return array all table names in the database. The names have NO schema name prefix.
+     * @return array All table names in the database. The names have NO schema name prefix.
      */
     protected function findTableNames(string $schema = ''): array
     {
@@ -376,12 +376,7 @@ final class Schema extends AbstractSchema
             $sql .= ' FROM ' . $this->db->getQuoter()->quoteSimpleTableName($schema);
         }
 
-        $tableNames = $this->db->createCommand($sql)->queryColumn();
-        if (!$tableNames) {
-            return [];
-        }
-
-        return $tableNames;
+        return $this->db->createCommand($sql)->queryColumn();
     }
 
     /**
