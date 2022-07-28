@@ -779,9 +779,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
-        $table = new TableSchema();
-
-        $this->resolveTableNames($table, $name);
+        $table = $this->resolveTableName($name);
         $this->resolveTableCreateSql($table);
 
         if ($this->findColumns($table)) {
@@ -855,26 +853,6 @@ final class Schema extends AbstractSchema
             (string) $resolvedName->getSchemaName() . '.' : '') . $resolvedName->getName());
 
         return $resolvedName;
-    }
-
-    /**
-     * Resolves the table name and schema name (if any).
-     *
-     * @param TableSchemaInterface $table the table metadata object.
-     * @param string $name the table name.
-     */
-    protected function resolveTableNames(TableSchemaInterface $table, string $name): void
-    {
-        $parts = explode('.', str_replace('`', '', $name));
-
-        if (isset($parts[1])) {
-            $table->schemaName($parts[0]);
-            $table->name($parts[1]);
-            $table->fullName((string) $table->getSchemaName() . '.' . $table->getName());
-        } else {
-            $table->name($parts[0]);
-            $table->fullName($parts[0]);
-        }
     }
 
     /**

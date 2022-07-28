@@ -35,7 +35,7 @@ class TestCase extends AbstractTestCase
         string $fixture = __DIR__ . '/Fixture/mysql.sql'
     ): ConnectionPDOMysql {
         $pdoDriver = new PDODriver($dsn ?? $this->dsn, $this->username, $this->password);
-        $pdoDriver->charset($this->charset);
+        $pdoDriver->setCharset($this->charset);
         $this->db = new ConnectionPDOMysql($pdoDriver, $this->createQueryCache(), $this->createSchemaCache());
         $this->db->setLogger($this->createLogger());
         $this->db->setProfiler($this->createProfiler());
