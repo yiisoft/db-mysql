@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Schema\Quoter as BaseQuoter;
-use Yiisoft\Db\Schema\QuoterInterface;
 
-final class Quoter extends BaseQuoter implements QuoterInterface
+final class Quoter extends BaseQuoter
 {
     /**
      * @psalm-param string[]|string $columnQuoteCharacter

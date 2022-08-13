@@ -12,6 +12,8 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\QueryBuilder\QueryBuilder;
+use Yiisoft\Db\Schema\TableName;
+use Yiisoft\Db\Schema\TableNameInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
