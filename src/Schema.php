@@ -837,11 +837,9 @@ final class Schema extends AbstractSchema
     {
         $resolvedName = new TableSchema();
 
-        $resolvedName->serverName($name->getServerName());
-        $resolvedName->catalogName($name->getCatalogName());
         $resolvedName->schemaName($name->getSchemaName() ?? $this->defaultSchema);
         $resolvedName->name($name->getTableName());
-        $resolvedName->fullName((string) $name);
+        $resolvedName->fullName($name->getSchemaName() === $this->defaultSchema ? $name->getTableName() : (string) $name);
 
         return $resolvedName;
     }
