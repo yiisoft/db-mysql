@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
+use Yiisoft\Db\Command\CommandInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -12,6 +14,8 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\QueryBuilder\QueryBuilder;
+use Yiisoft\Db\Schema\TableName;
+use Yiisoft\Db\Schema\TableNameInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 use Yiisoft\Db\TestSupport\TestSchemaTrait;
 
@@ -575,5 +579,54 @@ final class SchemaTest extends TestCase
     public function testGetSchemaChecks(): void
     {
         $this->markTestSkipped('MySQL does not support check constraints.');
+    }
+
+    /**
+     * @dataProvider tableSchemaWithDbSchemesDataProvider
+     */
+    public function testTableSchemaWithDbSchemes(string|TableNameInterface $tableName, string $expectedSchemaName, string $expectedTableName): void
+    {
+        $db = $this->getConnection();
+
+        $commandMock = $this->createMock(CommandInterface::class);
+        $commandMock
+            ->method('queryAll')
+            ->willReturn([]);
+
+        $mockDb = $this->createMock(ConnectionInterface::class);
+
+        $mockDb->method('getQuoter')
+            ->willReturn($db->getQuoter());
+
+        $mockDb->method('createTableName')
+            ->willReturnCallback(function(...$params) use($db) {return $db->createTableName(...$params);});
+
+        $mockDb
+            ->method('createCommand')
+            ->with(self::callback(function($sql) {return true;}), self::callback(function ($params) use($expectedSchemaName, $expectedTableName) {
+                $this->assertEquals($expectedSchemaName, $params[':schemaName']);
+                $this->assertEquals($expectedTableName, $params[':tableName']);
+                return true;
+            }))
+            ->willReturn($commandMock);
+
+        $schema = new Schema($mockDb, $this->createSchemaCache());
+
+        $schema->getTablePrimaryKey($tableName);
+    }
+
+    public function tableSchemaWithDbSchemesDataProvider(): array
+    {
+        return [
+            ['animal', '', 'animal',],
+            [new TableName('animal'), '', 'animal',],
+            ['public.animal', 'public', 'animal',],
+            ['`public`.`animal`', 'public', 'animal',],
+            ['`other`.`animal2`', 'other', 'animal2',],
+            ['other.`animal2`', 'other', 'animal2',],
+            ['other.animal2', 'other', 'animal2',],
+            [new TableName('animal2', 'other'), 'other', 'animal2',],
+            ['catalog.other.animal2', 'other', 'animal2',],
+        ];
     }
 }
