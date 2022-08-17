@@ -128,11 +128,6 @@ final class Schema extends AbstractSchema
         'json' => self::TYPE_JSON,
     ];
 
-    public function __construct(private ConnectionInterface $db, SchemaCache $schemaCache)
-    {
-        parent::__construct($schemaCache);
-    }
-
     /**
      * Create a column schema builder instance giving the type and value precision.
      *
@@ -193,27 +188,6 @@ final class Schema extends AbstractSchema
     public function getLastInsertID(?string $sequenceName = null): string
     {
         return $this->db->getLastInsertID($sequenceName);
-    }
-
-    /**
-     * Returns the actual name of a given table name.
-     *
-     * This method will strip off curly brackets from the given table name and replace the percentage character '%' with
-     * {@see ConnectionInterface::tablePrefix}.
-     *
-     * @param string $name the table name to be converted.
-     *
-     * @return string the real name of the given table name.
-     */
-    public function getRawTableName(string $name): string
-    {
-        if (str_contains($name, '{{')) {
-            $name = preg_replace('/{{(.*?)}}/', '\1', $name);
-
-            return str_replace('%', $this->db->getTablePrefix(), $name);
-        }
-
-        return $name;
     }
 
     public function supportsSavepoint(): bool
@@ -839,18 +813,20 @@ final class Schema extends AbstractSchema
     {
         $resolvedName = new TableSchema();
 
-        $parts = explode('.', str_replace('`', '', $name));
-
-        if (isset($parts[1])) {
-            $resolvedName->schemaName($parts[0]);
-            $resolvedName->name($parts[1]);
-        } else {
-            $resolvedName->schemaName($this->defaultSchema);
-            $resolvedName->name($name);
+        $parts = array_reverse(
+            $this->db->getQuoter()->getTableNameParts($name)
+        );
+        foreach ($parts as &$part) {
+            $part = $this->db->getQuoter()->unquoteSimpleTableName($part);
         }
+        unset($part);
 
-        $resolvedName->fullName(($resolvedName->getSchemaName() !== $this->defaultSchema ?
-            (string) $resolvedName->getSchemaName() . '.' : '') . $resolvedName->getName());
+        $resolvedName->name($parts[0] ?? '');
+        $resolvedName->schemaName($parts[1] ?? $this->defaultSchema);
+
+        $resolvedName->fullName($resolvedName->getSchemaName() === $this->defaultSchema ?
+            implode('.', array_reverse($parts)) : $resolvedName->getName()
+        );
 
         return $resolvedName;
     }
