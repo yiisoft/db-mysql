@@ -816,15 +816,11 @@ final class Schema extends AbstractSchema
         $parts = array_reverse(
             $this->db->getQuoter()->getTableNameParts($name)
         );
-        foreach ($parts as &$part) {
-            $part = $this->db->getQuoter()->unquoteSimpleTableName($part);
-        }
-        unset($part);
 
         $resolvedName->name($parts[0] ?? '');
         $resolvedName->schemaName($parts[1] ?? $this->defaultSchema);
 
-        $resolvedName->fullName($resolvedName->getSchemaName() === $this->defaultSchema ?
+        $resolvedName->fullName($resolvedName->getSchemaName() !== $this->defaultSchema ?
             implode('.', array_reverse($parts)) : $resolvedName->getName()
         );
 
