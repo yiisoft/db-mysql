@@ -35,6 +35,7 @@ final class Quoter extends BaseQuoter
         return "'" . str_replace(
             ["\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a"],
             ["\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z"],
-            $value) . "'";
+            $value
+        ) . "'";
     }
 }
