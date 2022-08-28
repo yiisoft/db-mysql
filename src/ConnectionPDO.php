@@ -10,6 +10,7 @@ use Yiisoft\Db\Driver\PDO\ConnectionPDO as AbstractConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
+use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -62,7 +63,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
     public function getQuoter(): QuoterInterface
     {
         if ($this->quoter === null) {
-            $this->quoter = new Quoter('`', '`', $this->getTablePrefix());
+            $this->quoter = new Quoter('`', '`', $this->getTablePrefix(), $this->getActivePDO());
         }
 
         return $this->quoter;

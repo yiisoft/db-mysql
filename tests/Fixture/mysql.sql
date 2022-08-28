@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS `order_with_null_fk` CASCADE;
 DROP TABLE IF EXISTS `category` CASCADE;
 DROP TABLE IF EXISTS `customer` CASCADE;
 DROP TABLE IF EXISTS `profile` CASCADE;
+DROP TABLE IF EXISTS `quoter` CASCADE;
 DROP TABLE IF EXISTS `null_values` CASCADE;
 DROP TABLE IF EXISTS `negative_default_values` CASCADE;
 DROP TABLE IF EXISTS `type` CASCADE;
@@ -45,6 +46,13 @@ CREATE TABLE `profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `quoter` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(16) NOT NULL,
+   `description` varchar(128) NOT NULL,
+   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `customer` (
