@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use function chr;
+use function str_replace;
+
 /**
  * @group mysql
  */
