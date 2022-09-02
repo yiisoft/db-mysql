@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use PDO;
 use Yiisoft\Db\Schema\Quoter as BaseQuoter;
-use Yiisoft\Db\Schema\QuoterInterface;
 
-final class Quoter extends BaseQuoter implements QuoterInterface
+/**
+ * @todo Remove or use? Where is question
+ * Temporary not used. Need add more tests for many charset
+ */
+final class Quoter extends BaseQuoter
 {
     /**
      * @psalm-param string[]|string $columnQuoteCharacter
@@ -16,9 +20,10 @@ final class Quoter extends BaseQuoter implements QuoterInterface
     public function __construct(
         array|string $columnQuoteCharacter,
         array|string $tableQuoteCharacter,
-        string $tablePrefix = ''
+        string $tablePrefix = '',
+        protected PDO|null $pdo = null
     ) {
-        parent::__construct($columnQuoteCharacter, $tableQuoteCharacter, $tablePrefix);
+        parent::__construct($columnQuoteCharacter, $tableQuoteCharacter, $tablePrefix, $pdo);
     }
 
     public function quoteValue(mixed $value): mixed
@@ -27,6 +32,10 @@ final class Quoter extends BaseQuoter implements QuoterInterface
             return $value;
         }
 
-        return "'" . preg_replace('~[\x00\x0A\x0D\x1A\x22\x25\x27\x5C]~u', '\\\$0', $value) . "'";
+        return "'" . str_replace(
+            ['\\', "\x00", "\n", "\r", "'", '"', "\x1a"],
+            ['\\\\', '\\0', '\\n', '\\r', "\'", '\"', '\\Z'],
+            $value
+        ) . "'";
     }
 }
