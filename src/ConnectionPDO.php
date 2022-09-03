@@ -33,7 +33,8 @@ final class ConnectionPDO extends AbstractConnectionPDO
             // Solution for close connections from https://stackoverflow.com/questions/18277233/pdo-closing-connection
             try {
                 $this->pdo->query('KILL CONNECTION_ID()');
-            } catch (\Exception) {}
+            } catch (\Exception) {
+            }
 
             $this->pdo = null;
             $this->transaction = null;
