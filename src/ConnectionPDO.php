@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use PDO;
+use Psr\Log\LogLevel;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
 use Yiisoft\Db\Driver\PDO\ConnectionPDO as AbstractConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
+use Yiisoft\Db\Schema\Quoter;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -20,6 +22,25 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  */
 final class ConnectionPDO extends AbstractConnectionPDO
 {
+    public function close(): void
+    {
+        if ($this->pdo !== null) {
+            $this->logger?->log(
+                LogLevel::DEBUG,
+                'Closing DB connection: ' . $this->driver->getDsn() . ' ' . __METHOD__,
+            );
+
+            // Solution for close connections from https://stackoverflow.com/questions/18277233/pdo-closing-connection
+            try {
+                $this->pdo->query('KILL CONNECTION_ID()');
+            } catch (\Exception) {
+            }
+
+            $this->pdo = null;
+            $this->transaction = null;
+        }
+    }
+
     public function createCommand(?string $sql = null, array $params = []): CommandPDOInterface
     {
         $command = new CommandPDO($this, $this->queryCache);
@@ -62,7 +83,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
     public function getQuoter(): QuoterInterface
     {
         if ($this->quoter === null) {
-            $this->quoter = new Quoter('`', '`', $this->getTablePrefix());
+            $this->quoter = new Quoter($this, '`', '`', $this->getTablePrefix());
         }
 
         return $this->quoter;

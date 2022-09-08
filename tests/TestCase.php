@@ -65,5 +65,6 @@ class TestCase extends AbstractTestCase
             $this->schemaCache,
             $this->profiler
         );
+        gc_collect_cycles();
     }
 }
