@@ -68,14 +68,19 @@ final class QueryBuilderTest extends TestCase
      * @param array $columns
      * @param array $value
      * @param string|null $expected
+     * @param array $expectedParams
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
-    public function testBatchInsert(string $table, array $columns, array $value, ?string $expected): void
+    public function testBatchInsert(string $table, array $columns, array $value, ?string $expected, array $expectedParams = []): void
     {
+        $params = [];
         $db = $this->getConnection();
-        $sql = $db->getQueryBuilder()->batchInsert($table, $columns, $value);
+
+        $sql = $db->getQueryBuilder()->batchInsert($table, $columns, $value, $params);
+
         $this->assertEquals($expected, $sql);
+        $this->assertEquals($expectedParams, $params);
     }
 
     /**
