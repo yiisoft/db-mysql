@@ -22,7 +22,7 @@
         "php": "^8.0",
         "ext-json": "*",
         "ext-pdo": "*",
-        "yiisoft/db": "dev-master",
+        "yiisoft/db": "^3.0@dev",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
@@ -31,7 +31,7 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.18",
         "yiisoft/aliases": "^1.1|^2.0",
-        "yiisoft/log-target-file": "^1.0"
+        "yiisoft/log-target-file": "^2.0"
     },
     "autoload": {
         "psr-4": {
