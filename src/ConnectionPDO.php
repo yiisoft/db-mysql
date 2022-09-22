@@ -82,7 +82,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
     public function getQuoter(): QuoterInterface
     {
         if ($this->quoter === null) {
-            $this->quoter = new Quoter( '`', '`', $this->getTablePrefix());
+            $this->quoter = new Quoter('`', '`', $this->getTablePrefix());
         }
 
         return $this->quoter;
