@@ -360,7 +360,7 @@ final class Schema extends AbstractSchema
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([__CLASS__], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
+        return array_merge([self::class], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
     }
 
     /**
@@ -372,7 +372,7 @@ final class Schema extends AbstractSchema
      */
     protected function getCacheTag(): string
     {
-        return md5(serialize(array_merge([__CLASS__], $this->db->getCacheKey())));
+        return md5(serialize(array_merge([self::class], $this->db->getCacheKey())));
     }
 
     /**
@@ -790,9 +790,7 @@ final class Schema extends AbstractSchema
     protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
         if ($multiple) {
-            return array_map(static function (array $row) {
-                return array_change_key_case($row, CASE_LOWER);
-            }, $row);
+            return array_map(static fn (array $row) => array_change_key_case($row, CASE_LOWER), $row);
         }
 
         return array_change_key_case($row, CASE_LOWER);
@@ -802,8 +800,6 @@ final class Schema extends AbstractSchema
      * Resolves the table name and schema name (if any).
      *
      * @param string $name the table name.
-     *
-     * @return TableSchemaInterface
      *
      * {@see TableSchemaInterface}
      */
