@@ -790,7 +790,7 @@ final class Schema extends AbstractSchema
     protected function normalizeRowKeyCase(array $row, bool $multiple): array
     {
         if ($multiple) {
-            return array_map(static fn(array $row) => array_change_key_case($row, CASE_LOWER), $row);
+            return array_map(static fn (array $row) => array_change_key_case($row, CASE_LOWER), $row);
         }
 
         return array_change_key_case($row, CASE_LOWER);
@@ -800,7 +800,6 @@ final class Schema extends AbstractSchema
      * Resolves the table name and schema name (if any).
      *
      * @param string $name the table name.
-     *
      *
      * {@see TableSchemaInterface}
      */

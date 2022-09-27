@@ -16,7 +16,6 @@ use function file_get_contents;
 use function file_put_contents;
 use function floor;
 use function function_exists;
-use function get_class;
 use function implode;
 use function is_file;
 use function microtime;
