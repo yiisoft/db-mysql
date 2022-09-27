@@ -87,7 +87,6 @@ final class QueryBuilder extends AbstractQueryBuilder
      * If the version of MySQL is lower than 5.6.4, then the types will be without fractional seconds, otherwise with
      * fractional seconds.
      *
-     * @return array
      * @psalm-return array<string, string>
      */
     private function defaultTimeTypeMap(): array
