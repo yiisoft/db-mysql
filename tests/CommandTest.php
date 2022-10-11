@@ -111,7 +111,6 @@ final class CommandTest extends TestCase
      *
      * @dataProvider bindParamsNonWhereProviderTrait
      *
-     *
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws InvalidConfigException
@@ -169,7 +168,6 @@ final class CommandTest extends TestCase
      *
      * @dataProvider invalidSelectColumnsProviderTrait
      *
-     *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
@@ -197,7 +195,6 @@ final class CommandTest extends TestCase
      * Test command upsert.
      *
      * @dataProvider upsertProviderTrait
-     *
      *
      * @throws Exception
      * @throws InvalidArgumentException
