@@ -12,7 +12,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 /**
  * The class ColumnSchemaBuilder for Mysql database.
  */
-final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
+final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \Stringable
 {
     /**
      *  @psalm-param string[]|int|string|null $length column size or precision definition.

@@ -107,16 +107,7 @@ final class DeadLockTest extends TestCase
              * PARENT
              * nothing to do
              */
-        } catch (Exception $e) {
-            /* wait all children */
-            while (-1 !== pcntl_wait($status)) {
-                /* nothing to do */
-            }
-
-            $this->deleteLog();
-
-            throw $e;
-        } catch (Throwable $e) {
+        } catch (Exception|Throwable $e) {
             /* wait all children */
             while (-1 !== pcntl_wait($status)) {
                 /* nothing to do */
@@ -248,16 +239,9 @@ final class DeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (\Exception|Throwable $e) {
             $this->log(
-                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
-                . $e->getTraceAsString() . '>>'
-            );
-
-            return 1;
-        } catch (Throwable $e) {
-            $this->log(
-                'child 1: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 1: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
@@ -334,16 +318,9 @@ final class DeadLockTest extends TestCase
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (\Exception|Throwable $e) {
             $this->log(
-                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
-                . $e->getTraceAsString() . '>>'
-            );
-
-            return 1;
-        } catch (Throwable $e) {
-            $this->log(
-                'child 2: ! exit <<' . get_class($e) . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
+                'child 2: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
             );
 
@@ -372,7 +349,6 @@ final class DeadLockTest extends TestCase
     /**
      * Sets filename for log file shared between children processes.
      *
-     * @param string $filename
      */
     private function setLogFile(string $filename): void
     {
