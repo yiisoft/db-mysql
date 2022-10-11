@@ -73,7 +73,7 @@ final class QueryBuilderTest extends TestCase
      *
      * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
      */
-    public function testBuildCondition(array|\Yiisoft\Db\Expression\ExpressionInterface|string $condition, ?string $expected, array $expectedParams): void
+    public function testBuildCondition(array|ExpressionInterface|string $condition, ?string $expected, array $expectedParams): void
     {
         $db = $this->getConnection();
         $query = (new Query($db))->where($condition);
