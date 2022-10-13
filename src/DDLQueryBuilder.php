@@ -87,8 +87,13 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * @throws Exception|InvalidArgumentException
      */
-    public function createIndex(string $name, string $table, array|string $columns, ?string $indexType = null, ?string $indexMethod = null): string
-    {
+    public function createIndex(
+        string $name,
+        string $table,
+        array|string $columns,
+        string $indexType = null,
+        string $indexMethod = null
+    ): string {
         return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
             . ($indexMethod !== null ? " USING $indexMethod" : '')

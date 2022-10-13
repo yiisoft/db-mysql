@@ -52,7 +52,7 @@ final class CommandPDO extends AbstractCommandPDO
         return $this->db->getSchema();
     }
 
-    protected function internalExecute(?string $rawSql): void
+    protected function internalExecute(string|null $rawSql): void
     {
         $attempt = 0;
 
@@ -63,7 +63,10 @@ final class CommandPDO extends AbstractCommandPDO
                     && $this->isolationLevel !== null
                     && $this->db->getTransaction() === null
                 ) {
-                    $this->db->transaction(fn (?string $rawSql) => $this->internalExecute($rawSql), $this->isolationLevel);
+                    $this->db->transaction(
+                        fn (string|null $rawSql) => $this->internalExecute($rawSql),
+                        $this->isolationLevel,
+                    );
                 } else {
                     $this->pdoStatement?->execute();
                 }
