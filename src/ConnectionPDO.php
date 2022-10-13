@@ -40,7 +40,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
         }
     }
 
-    public function createCommand(?string $sql = null, array $params = []): CommandPDOInterface
+    public function createCommand(string $sql = null, array $params = []): CommandPDOInterface
     {
         $command = new CommandPDO($this, $this->queryCache);
 

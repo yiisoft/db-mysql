@@ -183,7 +183,7 @@ final class Schema extends AbstractSchema
     /**
      * @inheritDoc
      */
-    public function getLastInsertID(?string $sequenceName = null): string
+    public function getLastInsertID(string $sequenceName = null): string
     {
         return $this->db->getLastInsertID($sequenceName);
     }
@@ -733,7 +733,7 @@ final class Schema extends AbstractSchema
      *
      * @return Constraint|null primary key for the given table, `null` if the table has no primary key.*
      */
-    protected function loadTablePrimaryKey(string $tableName): ?Constraint
+    protected function loadTablePrimaryKey(string $tableName): Constraint|null
     {
         $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
 
@@ -749,7 +749,7 @@ final class Schema extends AbstractSchema
      *
      * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
-    protected function loadTableSchema(string $name): ?TableSchemaInterface
+    protected function loadTableSchema(string $name): TableSchemaInterface|null
     {
         $table = $this->resolveTableName($name);
         $this->resolveTableCreateSql($table);
