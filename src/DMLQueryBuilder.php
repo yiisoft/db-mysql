@@ -46,7 +46,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      *
      * @return string the SQL statement for resetting sequence.
      */
-    public function resetSequence(string $tableName, int|string|null $value = null): string
+    public function resetSequence(string $tableName, int|string $value = null): string
     {
         $table = $this->schema->getTableSchema($tableName);
 
