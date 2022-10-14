@@ -20,8 +20,11 @@
     "prefer-stable": true,
     "require": {
         "php": "^8.0",
+        "ext-ctype": "*",
         "ext-json": "*",
         "ext-pdo": "*",
+        "psr/log": "^2.0|^3.0",
+        "yiisoft/arrays": "^2.1",
         "yiisoft/db": "^3.0@dev",
         "yiisoft/json": "^1.0"
     },
