@@ -155,7 +155,7 @@ final class QueryBuilderTest extends TestCase
 
     public function testCheckIntegrity(): void
     {
-        $this->assertEqualsWithoutLE(
+        $this->assertSame(
             <<<SQL
             SET FOREIGN_KEY_CHECKS = 1
             SQL,
