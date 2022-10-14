@@ -306,7 +306,17 @@ SQL;
         $this->assertIsArray($result);
         $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
 
-        // change up
+        // key as string
+        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=40;';
+        $sql = $qb->resetSequence('item', '40');
+        $this->assertSame($expected, $sql);
+
+        $db->createCommand($sql)->execute();
+        $result = $db->createCommand($checkSql)->queryOne();
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // change up, key as int
         $expected = 'ALTER TABLE `item` AUTO_INCREMENT=40;';
         $sql = $qb->resetSequence('item', 40);
         $this->assertSame($expected, $sql);
