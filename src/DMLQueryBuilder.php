@@ -39,14 +39,14 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
      * or 1.
      *
      * @param string $tableName the name of the table whose primary key sequence will be reset.
-     * @param array|int|string|null $value the value for the primary key of the next new row inserted. If this is not
-     * set, the next new row's primary key will have a value 1.
+     * @param int|string|null $value the value for the primary key of the next new row inserted. If this is not set, the
+     * next new row's primary key will have a value 1.
      *
      * @throws Exception|InvalidArgumentException|Throwable
      *
      * @return string the SQL statement for resetting sequence.
      */
-    public function resetSequence(string $tableName, array|int|string|null $value = null): string
+    public function resetSequence(string $tableName, int|string|null $value = null): string
     {
         $table = $this->schema->getTableSchema($tableName);
 
