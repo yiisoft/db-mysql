@@ -18,13 +18,15 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v/stable.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
+[![rector](https://github.com/yiisoft/db-mysql/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/rector.yml)
 [![codecov](https://codecov.io/gh/yiisoft/db-mysql/branch/dev/graph/badge.svg?token=gsKVx3WQt4)](https://codecov.io/gh/yiisoft/db-mysql)
+[![StyleCI](https://github.styleci.io/repos/145220107/shield?branch=master)](https://github.styleci.io/repos/145220107?branch=master)
 
 ## Support version
 
 |  PHP | Mysql Version            |  CI-Actions
 |:----:|:------------------------:|:---:|
-|**7.4 - 8.0**| **5.7 - 8.0**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
+|**8.0 - 8.2**| **5.7 - 8.0**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml) [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
 
 ## Installation
@@ -93,6 +95,15 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 
 ```shell
 ./vendor/bin/psalm
+```
+
+### Rector
+
+Use [Rector](https://github.com/rectorphp/rector) to make codebase follow some specific rules or 
+use either newest or any specific version of PHP: 
+
+```shell
+./vendor/bin/rector
 ```
 
 ### Support the project
