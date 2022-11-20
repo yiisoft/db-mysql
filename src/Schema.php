@@ -181,19 +181,6 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getLastInsertID(string $sequenceName = null): string
-    {
-        return $this->db->getLastInsertID($sequenceName);
-    }
-
-    public function supportsSavepoint(): bool
-    {
-        return $this->db->isSavepointEnabled();
-    }
-
-    /**
      * Collects the metadata of table columns.
      *
      * @param TableSchemaInterface $table the table metadata.
