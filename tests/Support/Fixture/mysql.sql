@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS `T_upsert` CASCADE;
 DROP TABLE IF EXISTS `T_upsert_1`;
 DROP TABLE IF EXISTS `negative_default_values` CASCADE;
 DROP TABLE IF EXISTS `comment` CASCADE;
+DROP TABLE IF EXISTS `alpha`;
 DROP TABLE IF EXISTS `animal` CASCADE;
 DROP VIEW IF EXISTS `animal_view`;
 
@@ -209,6 +210,12 @@ CREATE TABLE `comment` (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `alpha` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `string_identifier` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `animal` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(255) NOT NULL,
@@ -254,6 +261,15 @@ INSERT INTO `order_item_with_null_fk` (order_id, item_id, quantity, subtotal) VA
 INSERT INTO `order_item_with_null_fk` (order_id, item_id, quantity, subtotal) VALUES (2, 5, 1, 15.0);
 INSERT INTO `order_item_with_null_fk` (order_id, item_id, quantity, subtotal) VALUES (2, 3, 1, 8.0);
 INSERT INTO `order_item_with_null_fk` (order_id, item_id, quantity, subtotal) VALUES (3, 2, 1, 40.0);
+
+INSERT INTO `alpha` (id, string_identifier) VALUES (1, '1');
+INSERT INTO `alpha` (id, string_identifier) VALUES (2, '1a');
+INSERT INTO `alpha` (id, string_identifier) VALUES (3, '01');
+INSERT INTO `alpha` (id, string_identifier) VALUES (4, '001');
+INSERT INTO `alpha` (id, string_identifier) VALUES (5, '2');
+INSERT INTO `alpha` (id, string_identifier) VALUES (6, '2b');
+INSERT INTO `alpha` (id, string_identifier) VALUES (7, '02');
+INSERT INTO `alpha` (id, string_identifier) VALUES (8, '002');
 
 INSERT INTO `animal` (`type`) VALUES ('yiiunit\data\ar\Cat');
 INSERT INTO `animal` (`type`) VALUES ('yiiunit\data\ar\Dog');
