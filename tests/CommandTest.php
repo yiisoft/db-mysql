@@ -96,6 +96,22 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
+     * Test command getRawSql.
+     *
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql()
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     *
+     * {@see https://github.com/yiisoft/yii2/issues/8592}
+     */
+    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
+    {
+        parent::testGetRawSql($sql, $params, $expectedRawSql);
+    }
+
+    /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update()
      */
     public function testUpdate(
