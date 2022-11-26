@@ -32,7 +32,7 @@ class TestCase extends AbstractTestCase
     protected function getConnection(
         $reset = false,
         ?string $dsn = null,
-        string $fixture = __DIR__ . '/Fixture/mysql.sql'
+        string $fixture = __DIR__ . '/Support/Fixture/mysql.sql'
     ): ConnectionPDOMysql {
         $pdoDriver = new PDODriver($dsn ?? $this->dsn, $this->username, $this->password);
         $pdoDriver->setCharset($this->charset);

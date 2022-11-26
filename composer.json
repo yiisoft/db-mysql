@@ -25,7 +25,7 @@
         "ext-pdo": "*",
         "psr/log": "^2.0|^3.0",
         "yiisoft/arrays": "^2.1",
-        "yiisoft/db": "dev-temp as 3.0@dev",
+        "yiisoft/db": "dev-user-varadic as 3.0@dev",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
@@ -45,6 +45,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Yiisoft\\Db\\Tests\\": "vendor/yiisoft/db/tests",
             "Yiisoft\\Db\\Mysql\\Tests\\": "tests"
         }
     },

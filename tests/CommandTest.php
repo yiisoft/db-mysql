@@ -4,86 +4,72 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestSupport\TestCommandTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
 /**
  * @group mysql
  */
-final class CommandTest extends TestCase
+final class CommandTest extends CommonCommandTest
 {
-    use TestCommandTrait;
+    use TestTrait;
 
     protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
 
     public function testAddCheck(): void
     {
-        $db = $this->getConnection();
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
-        $db->createCommand()->addCheck('noExist', 'noExist', 'noExist')->execute();
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Schema::loadTableChecks() is not supported by Mysql.');
+
+        parent::testAddCheck();
     }
 
-    public function testAddDropPrimaryKey(): void
+    public function testAddDefaultValue(): void
     {
-        $db = $this->getConnection();
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Schema::loadTableDefaultValues() is not supported by MySQL.');
 
-        $tableName = 'test_pk';
-        $name = 'test_pk_constraint';
+        parent::testAddDefaultValue();
+    }
 
+    public function testAlterColumn(): void
+    {
+        $db = $this->getConnection(true);
+
+        $command = $db->createCommand();
+        $command->alterColumn('{{customer}}', 'email', 'text')->execute();
         $schema = $db->getSchema();
+        $columns = $schema->getTableSchema('{{customer}}')->getColumns();
 
-        if ($schema->getTableSchema($tableName) !== null) {
-            $db->createCommand()->dropTable($tableName)->execute();
-        }
+        $this->assertArrayHasKey('email', $columns);
+        $this->assertSame('text', $columns['email']->getDbType());
+    }
 
-        $db->createCommand()->createTable($tableName, [
-            'int1' => 'integer not null',
-            'int2' => 'integer not null',
-        ])->execute();
+    public function testDropCheck(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Schema::loadTableChecks() is not supported by Mysql.');
 
-        $this->assertNull($schema->getTablePrimaryKey($tableName, true));
+        parent::testDropCheck();
+    }
 
-        $db->createCommand()->addPrimaryKey($name, $tableName, ['int1'])->execute();
-        $pk = $schema->getTablePrimaryKey($tableName, true);
+    public function testDropDefaultValue(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Schema::loadTableDefaultValues() is not supported by MySQL.');
 
-        $this->assertNotNull($pk);
-        $this->assertEquals(['int1'], $pk->getColumnNames());
-
-        $db->createCommand()->dropPrimaryKey($name, $tableName)->execute();
-
-        $this->assertNull($schema->getTablePrimaryKey($tableName, true));
-
-        $db->createCommand()->addPrimaryKey($name, $tableName, ['int1', 'int2'])->execute();
-        $pk = $schema->getTablePrimaryKey($tableName, true);
-
-        $this->assertNotNull($pk);
-        $this->assertEquals(['int1', 'int2'], $pk->getColumnNames());
+        parent::testDropDefaultValue();
     }
 
     /**
      * Make sure that `{{something}}` in values will not be encoded.
      *
-     * @dataProvider batchInsertSqlProviderTrait
-     *
-     * @param string $table
-     * @param array $columns
-     * @param array $values
-     * @param string $expected
-     * @param array $expectedParams
-     * @param int $insertedRow
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert()
      *
      * {@see https://github.com/yiisoft/yii2/issues/11242}
      */
-    public function testBatchInsertSQL(
+    public function testBatchInsert(
         string $table,
         array $columns,
         array $values,
@@ -91,126 +77,27 @@ final class CommandTest extends TestCase
         array $expectedParams = [],
         int $insertedRow = 1
     ): void {
-        $db = $this->getConnection(true);
-
-        $command = $db->createCommand();
-
-        $command->batchInsert($table, $columns, $values);
-
-        $command->prepare(false);
-
-        $this->assertSame($expected, $command->getSql());
-        $this->assertSame($expectedParams, $command->getParams());
-
-        $command->execute();
-        $this->assertEquals($insertedRow, (new Query($db))->from($table)->count());
+        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow);
     }
 
     /**
-     * Test whether param binding works in other places than WHERE.
-     *
-     * @dataProvider bindParamsNonWhereProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update()
      */
-    public function testBindParamsNonWhere(string $sql): void
-    {
-        $db = $this->getConnection();
-
-        $db->createCommand()->insert(
-            'customer',
-            [
-                'name' => 'testParams',
-                'email' => 'testParams@example.com',
-                'address' => '1',
-            ]
-        )->execute();
-
-        $params = [
-            ':email' => 'testParams@example.com',
-            ':len' => 5,
-        ];
-
-        $command = $db->createCommand($sql, $params);
-
-        $this->assertEquals('Params', $command->queryScalar());
+    public function testUpdate(
+        string $table,
+        array $columns,
+        array|string $conditions,
+        array $params,
+        string $expected
+    ): void {
+        parent::testUpdate($table, $columns, $conditions, $params, $expected);
     }
 
     /**
-     * Test command getRawSql.
-     *
-     * @dataProvider getRawSqlProviderTrait
-     *
-     * @param string $sql
-     * @param array $params
-     * @param string $expectedRawSql
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     *
-     * {@see https://github.com/yiisoft/yii2/issues/8592}
-     */
-    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
-    {
-        $db = $this->getConnection();
-
-        $command = $db->createCommand($sql, $params);
-
-        $this->assertEquals($expectedRawSql, $command->getRawSql());
-    }
-
-    /**
-     * Test INSERT INTO ... SELECT SQL statement with wrong query object.
-     *
-     * @dataProvider invalidSelectColumnsProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
-    public function testInsertSelectFailed(mixed $invalidSelectColumns): void
-    {
-        $db = $this->getConnection();
-
-        $query = new Query($db);
-
-        $query->select($invalidSelectColumns)->from('{{customer}}');
-
-        $command = $db->createCommand();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected select query object with enumerated (named) parameters');
-
-        $command->insert(
-            '{{customer}}',
-            $query
-        )->execute();
-    }
-
-    /**
-     * Test command upsert.
-     *
-     * @dataProvider upsertProviderTrait
-     *
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::upsert()
      */
     public function testUpsert(array $firstData, array $secondData): void
     {
-        $db = $this->getConnection(true);
-
-        $this->assertEquals(0, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-
-        $this->performAndCompareUpsertResult($db, $firstData);
-
-        $this->assertEquals(1, $db->createCommand('SELECT COUNT(*) FROM {{T_upsert}}')->queryScalar());
-
-        $this->performAndCompareUpsertResult($db, $secondData);
+        parent::testUpsert($firstData, $secondData);
     }
 }

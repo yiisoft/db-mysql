@@ -512,7 +512,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableChecks(string $tableName): array
     {
-        throw new NotSupportedException('MySQL does not support check constraints.');
+        throw new NotSupportedException(__METHOD__ . '() is not supported by Mysql.');
     }
 
     /**
@@ -650,7 +650,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableDefaultValues(string $tableName): array
     {
-        throw new NotSupportedException('MySQL does not support default value constraints.');
+        throw new NotSupportedException(__METHOD__ . '() is not supported by MySQL.');
     }
 
     /**
