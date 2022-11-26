@@ -18,6 +18,13 @@ final class CommandProvider
         return $baseCommandProvider->batchInsert($this->getConnection());
     }
 
+    public function createIndex(): array
+    {
+        $baseCommandProvider = new BaseCommandProvider();
+
+        return $baseCommandProvider->createIndex();
+    }
+
     public function update(): array
     {
         $baseCommandProvider = new BaseCommandProvider();

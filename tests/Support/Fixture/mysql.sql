@@ -7,8 +7,14 @@ DROP TABLE IF EXISTS `order_with_null_fk` CASCADE;
 DROP TABLE IF EXISTS `category` CASCADE;
 DROP TABLE IF EXISTS `customer` CASCADE;
 DROP TABLE IF EXISTS `profile` CASCADE;
+DROP TABLE IF EXISTS `quoter` CASCADE;
 DROP TABLE IF EXISTS `type` CASCADE;
+DROP TABLE IF EXISTS `T_constraints_4` CASCADE;
+DROP TABLE IF EXISTS `T_constraints_3` CASCADE;
+DROP TABLE IF EXISTS `T_constraints_2` CASCADE;
+DROP TABLE IF EXISTS `T_constraints_1` CASCADE;
 DROP TABLE IF EXISTS `T_upsert` CASCADE;
+DROP TABLE IF EXISTS `T_upsert_1`;
 DROP TABLE IF EXISTS `negative_default_values` CASCADE;
 DROP TABLE IF EXISTS `animal` CASCADE;
 DROP VIEW IF EXISTS `animal_view`;
@@ -17,6 +23,13 @@ CREATE TABLE `profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `quoter` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(16) NOT NULL,
+   `description` varchar(128) NOT NULL,
+   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `customer` (
@@ -88,6 +101,49 @@ CREATE TABLE `composite_fk` (
   CONSTRAINT `FK_composite_fk_order_item` FOREIGN KEY (`order_id`,`item_id`) REFERENCES `order_item` (`order_id`,`item_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `T_constraints_1`
+(
+    `C_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `C_not_null` INT NOT NULL,
+    `C_check` VARCHAR(255) NULL CHECK (`C_check` <> ''),
+    `C_unique` INT NOT NULL,
+    `C_default` INT NOT NULL DEFAULT 0,
+    CONSTRAINT `CN_unique` UNIQUE (`C_unique`)
+)
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+
+CREATE TABLE `T_constraints_2`
+(
+    `C_id_1` INT NOT NULL,
+    `C_id_2` INT NOT NULL,
+    `C_index_1` INT NULL,
+    `C_index_2_1` INT NULL,
+    `C_index_2_2` INT NULL,
+    CONSTRAINT `CN_constraints_2_multi` UNIQUE (`C_index_2_1`, `C_index_2_2`),
+    CONSTRAINT `CN_pk` PRIMARY KEY (`C_id_1`, `C_id_2`)
+)
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+
+CREATE INDEX `CN_constraints_2_single` ON `T_constraints_2` (`C_index_1`);
+
+CREATE TABLE `T_constraints_3`
+(
+    `C_id` INT NOT NULL,
+    `C_fk_id_1` INT NOT NULL,
+    `C_fk_id_2` INT NOT NULL,
+    CONSTRAINT `CN_constraints_3` FOREIGN KEY (`C_fk_id_1`, `C_fk_id_2`) REFERENCES `T_constraints_2` (`C_id_1`, `C_id_2`) ON DELETE CASCADE ON UPDATE CASCADE
+)
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+
+CREATE TABLE `T_constraints_4`
+(
+    `C_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `C_col_1` INT NULL,
+    `C_col_2` INT NOT NULL,
+    CONSTRAINT `CN_constraints_4` UNIQUE (`C_col_1`, `C_col_2`)
+)
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+
 CREATE TABLE `T_upsert`
 (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -101,6 +157,11 @@ CREATE TABLE `T_upsert`
     UNIQUE (`email`, `recovery_email`)
 )
 ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+
+CREATE TABLE `T_upsert_1` (
+  `a` int(11) NOT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `type` (
   `int_col` integer NOT NULL,

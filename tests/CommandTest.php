@@ -46,6 +46,21 @@ final class CommandTest extends CommonCommandTest
         $this->assertSame('text', $columns['email']->getDbType());
     }
 
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::createIndex()
+     *
+     * @throws Throwable
+     */
+    public function testCreateIndex(
+        string $name,
+        string $tableName,
+        array|string $column,
+        string|null $indexType,
+        string|null $indexMethod,
+    ): void {
+        parent::testCreateIndex($name, $tableName, $column, $indexType, $indexMethod);
+    }
+
     public function testDropCheck(): void
     {
         $this->expectException(NotSupportedException::class);
