@@ -18,13 +18,6 @@ final class CommandProvider
         return $baseCommandProvider->batchInsert($this->getConnection());
     }
 
-    public function createIndex(): array
-    {
-        $baseCommandProvider = new BaseCommandProvider();
-
-        return $baseCommandProvider->createIndex();
-    }
-
     /**
      * @throws Exception
      * @throws InvalidConfigException

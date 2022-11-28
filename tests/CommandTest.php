@@ -47,18 +47,17 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::createIndex()
-     *
-     * @throws Throwable
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert()
      */
-    public function testCreateIndex(
-        string $name,
-        string $tableName,
-        array|string $column,
-        string|null $indexType,
-        string|null $indexMethod,
+    public function testBatchInsert(
+        string $table,
+        array $columns,
+        array $values,
+        string $expected,
+        array $expectedParams = [],
+        int $insertedRow = 1
     ): void {
-        parent::testCreateIndex($name, $tableName, $column, $indexType, $indexMethod);
+        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow);
     }
 
     public function testDropCheck(): void
@@ -78,33 +77,11 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * Make sure that `{{something}}` in values will not be encoded.
-     *
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert()
-     *
-     * {@see https://github.com/yiisoft/yii2/issues/11242}
-     */
-    public function testBatchInsert(
-        string $table,
-        array $columns,
-        array $values,
-        string $expected,
-        array $expectedParams = [],
-        int $insertedRow = 1
-    ): void {
-        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow);
-    }
-
-    /**
-     * Test command getRawSql.
-     *
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql()
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws NotSupportedException
-     *
-     * {@see https://github.com/yiisoft/yii2/issues/8592}
      */
     public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
