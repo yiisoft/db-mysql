@@ -8,7 +8,7 @@ use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandPDOTest;
 
 /**
- * @group sqlite
+ * @group mysql
  */
 final class CommandPDOTest extends CommonCommandPDOTest
 {
