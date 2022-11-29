@@ -157,7 +157,9 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array all unique indexes for the given table.
      */
@@ -185,7 +187,8 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|Throwable if DB query fails.
+     * @throws Exception
+     * @throws Throwable if DB query fails.
      *
      * @return bool whether the table exists in the database.
      */
@@ -234,7 +237,8 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
@@ -323,7 +327,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array All table names in the database. The names have NO schema name prefix.
      */
@@ -367,7 +373,9 @@ final class Schema extends AbstractSchema
      *
      * @param TableSchemaInterface $table the table metadata.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return string $sql the result of 'SHOW CREATE TABLE'.
      */
@@ -499,7 +507,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableChecks(string $tableName): array
     {
-        throw new NotSupportedException('MySQL does not support check constraints.');
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
 
     /**
@@ -511,7 +519,9 @@ final class Schema extends AbstractSchema
      * - foreignKeys
      * - uniques
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array|Constraint|null (Constraint|ForeignKeyConstraint)[]|Constraint|null constraints.
      */
@@ -637,7 +647,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadTableDefaultValues(string $tableName): array
     {
-        throw new NotSupportedException('MySQL does not support default value constraints.');
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
 
     /**
@@ -645,7 +655,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array foreign keys for the given table.
      */
@@ -661,7 +673,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return IndexConstraint[] indexes for the given table.
      */
@@ -716,7 +730,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return Constraint|null primary key for the given table, `null` if the table has no primary key.*
      */
@@ -732,7 +748,8 @@ final class Schema extends AbstractSchema
      *
      * @param string $name table name.
      *
-     * @throws Exception|Throwable
+     * @throws Exception
+     * @throws Throwable
      *
      * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
      */
@@ -755,7 +772,9 @@ final class Schema extends AbstractSchema
      *
      * @param string $tableName table name.
      *
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      *
      * @return array unique constraints for the given table.
      */
@@ -810,7 +829,9 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * @throws Exception|InvalidConfigException|Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     protected function resolveTableCreateSql(TableSchemaInterface $table): void
     {

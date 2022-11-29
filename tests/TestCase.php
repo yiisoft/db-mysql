@@ -10,6 +10,9 @@ use Yiisoft\Db\Mysql\PDODriver;
 use Yiisoft\Db\Mysql\ConnectionPDO as ConnectionPDOMysql;
 use Yiisoft\Db\TestSupport\TestTrait;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class TestCase extends AbstractTestCase
 {
     use TestTrait;
@@ -19,20 +22,15 @@ class TestCase extends AbstractTestCase
     protected string $username = 'root';
     protected string $password = '';
     protected string $charset = 'UTF8MB4';
-    protected array $dataProvider;
+    protected array $dataProvider = [];
     protected string $likeEscapeCharSql = '';
     protected array $likeParameterReplacements = [];
     protected ?ConnectionPDOMysql $db = null;
 
-    /**
-     * @param bool $reset whether to clean up the test database.
-     *
-     * @return ConnectionPDOMysql
-     */
     protected function getConnection(
-        $reset = false,
+        bool $reset = false,
         ?string $dsn = null,
-        string $fixture = __DIR__ . '/Fixture/mysql.sql'
+        string $fixture = __DIR__ . '/Support/Fixture/mysql.sql'
     ): ConnectionPDOMysql {
         $pdoDriver = new PDODriver($dsn ?? $this->dsn, $this->username, $this->password);
         $pdoDriver->setCharset($this->charset);
