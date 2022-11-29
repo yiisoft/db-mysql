@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="false"
-         colors="true"
-         verbose="true"
-         bootstrap="vendor/autoload.php"
-         failOnRisky="true"
-         failOnWarning="true"
-         executionOrder="default"
-         resolveDependencies="true">
+<phpunit
+  backupGlobals="false"
+  colors="true"
+  verbose="true"
+  bootstrap="vendor/autoload.php"
+  failOnRisky="true"
+  failOnWarning="true"
+  executionOrder="default"
+  resolveDependencies="true"
+>
 
   <coverage>
     <include>
@@ -22,6 +24,7 @@
   <php>
     <ini name="error_reporting" value="-1"/>
   </php>
+
   <testsuites>
     <testsuite name="Mysql">
       <directory>./tests</directory>

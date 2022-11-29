@@ -19,7 +19,7 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v/stable.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![rector](https://github.com/yiisoft/db-mysql/actions/workflows/rector.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/rector.yml)
-[![codecov](https://codecov.io/gh/yiisoft/db-mysql/branch/dev/graph/badge.svg?token=gsKVx3WQt4)](https://codecov.io/gh/yiisoft/db-mysql)
+[![codecov](https://codecov.io/gh/yiisoft/db-mysql/branch/master/graph/badge.svg?token=gsKVx3WQt4)](https://codecov.io/gh/yiisoft/db-mysql)
 [![StyleCI](https://github.styleci.io/repos/145220107/shield?branch=master)](https://github.styleci.io/repos/145220107?branch=master)
 
 ## Support version
@@ -45,11 +45,11 @@ Di-Container:
 
 ```php
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Mysql\Connection as MySqlConnection;
+use Yiisoft\Db\Mysql\ConnectionPDO;
 
 return [
     ConnectionInterface::class => [
-        'class' => MySqlConnection::class,
+        'class' => ConnectionPDO::class,
         '__construct()' => [
             'dsn' => $params['yiisoft/db-mysql']['dsn'],
         ],
@@ -104,6 +104,16 @@ use either newest or any specific version of PHP:
 
 ```shell
 ./vendor/bin/rector
+```
+
+### Composer require checker
+
+This package uses [composer-require-checker](https://github.com/maglnet/ComposerRequireChecker) to check if all dependencies are correctly defined in `composer.json`.
+
+To run the checker, execute the following command:
+
+```shell
+./vendor/bin/composer-require-checker
 ```
 
 ### Support the project
