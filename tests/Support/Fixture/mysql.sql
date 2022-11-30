@@ -306,37 +306,6 @@ INSERT INTO `beta` (id, alpha_string_identifier) VALUES (6, '2b');
 INSERT INTO `beta` (id, alpha_string_identifier) VALUES (7, '2b');
 INSERT INTO `beta` (id, alpha_string_identifier) VALUES (8, '02');
 
-/**
- * (MySQL-)Database Schema for validator tests
- */
-
-DROP TABLE IF EXISTS `validator_main` CASCADE;
-DROP TABLE IF EXISTS `validator_ref` CASCADE;
-
-CREATE TABLE `validator_main` (
-  `id`     INT(11) NOT NULL AUTO_INCREMENT,
-  `field1` VARCHAR(255),
-  PRIMARY KEY (`id`)
-) ENGINE =InnoDB  DEFAULT CHARSET =utf8;
-
-CREATE TABLE `validator_ref` (
-  `id`      INT(11) NOT NULL AUTO_INCREMENT,
-  `a_field` VARCHAR(255),
-  `ref`     INT(11),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-INSERT INTO `validator_main` (id, field1) VALUES (1, 'just a string1');
-INSERT INTO `validator_main` (id, field1) VALUES (2, 'just a string2');
-INSERT INTO `validator_main` (id, field1) VALUES (3, 'just a string3');
-INSERT INTO `validator_main` (id, field1) VALUES (4, 'just a string4');
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_2', 2);
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_3', 3);
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_4', 4);
-INSERT INTO `validator_ref` (a_field, ref) VALUES ('ref_to_5', 5);
-
 /* bit test, see https://github.com/yiisoft/yii2/issues/9006 */
 
 DROP TABLE IF EXISTS `bit_values` CASCADE;

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use PDOException;
+use Throwable;
 use Yiisoft\Db\Driver\PDO\CommandPDO as AbstractCommandPDO;
+use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 final class CommandPDO extends AbstractCommandPDO
 {
@@ -35,7 +36,7 @@ final class CommandPDO extends AbstractCommandPDO
                 continue;
             }
 
-            /** @var mixed */
+            /** @psalm-var mixed */
             $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
         }
 
@@ -47,11 +48,11 @@ final class CommandPDO extends AbstractCommandPDO
         return $this->db->getQueryBuilder();
     }
 
-    public function schema(): SchemaInterface
-    {
-        return $this->db->getSchema();
-    }
-
+    /**
+     * @psalm-suppress UnusedClosureParam
+     *
+     * @throws Throwable
+     */
     protected function internalExecute(string|null $rawSql): void
     {
         $attempt = 0;
@@ -64,7 +65,7 @@ final class CommandPDO extends AbstractCommandPDO
                     && $this->db->getTransaction() === null
                 ) {
                     $this->db->transaction(
-                        fn (string|null $rawSql) => $this->internalExecute($rawSql),
+                        fn (ConnectionPDOInterface $db) => $this->internalExecute($rawSql),
                         $this->isolationLevel,
                     );
                 } else {
