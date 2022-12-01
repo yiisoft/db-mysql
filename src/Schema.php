@@ -319,6 +319,24 @@ final class Schema extends AbstractSchema
         }
     }
 
+    protected function findTableComment(TableSchemaInterface $tableSchema): void
+    {
+        $sql = <<<SQL
+        SELECT `TABLE_COMMENT`
+        FROM `INFORMATION_SCHEMA`.`TABLES`
+        WHERE
+              `TABLE_SCHEMA` = COALESCE(:schemaName, DATABASE()) AND
+              `TABLE_NAME` = :tableName;
+        SQL;
+
+        $comment = $this->db->createCommand($sql, [
+            ':schemaName' => $tableSchema->getSchemaName(),
+            ':tableName' => $tableSchema->getName(),
+        ])->queryScalar();
+
+        $tableSchema->comment(is_string($comment) ? $comment : null);
+    }
+
     /**
      * Returns all table names in the database.
      *
@@ -757,6 +775,7 @@ final class Schema extends AbstractSchema
     {
         $table = $this->resolveTableName($name);
         $this->resolveTableCreateSql($table);
+        $this->findTableComment($table);
 
         if ($this->findColumns($table)) {
             $this->findConstraints($table);
