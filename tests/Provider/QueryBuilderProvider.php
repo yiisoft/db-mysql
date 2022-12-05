@@ -107,7 +107,8 @@ final class QueryBuilderProvider
                         '=',
                         'jsoncol',
                         new JsonExpression(
-                            (new Query($db))->select('params')->from('user')->where(['id' => 1]), 'jsonb'
+                            (new Query($db))->select('params')->from('user')->where(['id' => 1]),
+                            'jsonb'
                         ),
                     ],
                     '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
