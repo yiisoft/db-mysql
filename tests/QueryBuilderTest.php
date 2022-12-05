@@ -14,6 +14,8 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
+use function version_compare;
+
 /**
  * @group mysql
  *
@@ -43,13 +45,17 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection(true);
 
         $qb = $db->getQueryBuilder();
+        $sql = <<<SQL
+        ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
+        SQL;
 
-        $this->assertSame(
-            <<<SQL
-            ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
-            SQL,
-            $qb->addCommentOnColumn('customer', 'id', 'Primary key.'),
-        );
+        if (version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
+            SQL;
+        }
+
+        $this->assertSame($sql, $qb->addCommentOnColumn('customer', 'id', 'Primary key.'));
     }
 
     /**
@@ -286,13 +292,17 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection(true);
 
         $qb = $db->getQueryBuilder();
+        $sql = <<<SQL
+        ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT ''
+        SQL;
 
-        $this->assertSame(
-            <<<SQL
-            ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT ''
-            SQL,
-            $qb->dropCommentFromColumn('customer', 'id'),
-        );
+        if (version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
+            SQL;
+        }
+
+        $this->assertSame($sql, $qb->dropCommentFromColumn('customer', 'id'));
     }
 
     public function testDropCommentFromTable(): void
