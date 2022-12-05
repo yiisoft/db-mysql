@@ -287,7 +287,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /**
      * @throws Exception
      */
-    public function testDropDefaulValue(): void
+    public function testDropDefaultValue(): void
     {
         $db = $this->getConnection(true);
 
