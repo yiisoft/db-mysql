@@ -85,6 +85,14 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
+     * @throws NotSupportedException
+     */
+    public function addDefaultValue(string $name, string $table, string $column, mixed $value): string
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
+    }
+
+    /**
      * @throws Exception|InvalidArgumentException
      */
     public function createIndex(
@@ -130,6 +138,14 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return $this->addCommentOnTable($table, '');
     }
 
+    /**
+     * @throws NotSupportedException
+     */
+    public function dropDefaultValue(string $name, string $table): string
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
+    }
+
     public function dropForeignKey(string $name, string $table): string
     {
         return 'ALTER TABLE '
@@ -170,7 +186,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @param string $table table name.
      * @param string $column column name.
      *
-     * @throws Exception|Throwable in case when table does not contain column.
+     * @throws Throwable in case when table does not contain column.
      *
      * @return string the column definition.
      */
