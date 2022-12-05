@@ -32,7 +32,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
 
-        $qb->addCheck('table', 'check1', 'check1 > 0');
+        $qb->addCheck('customer', 'id', 'id > 0');
     }
 
     /**
@@ -43,13 +43,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection(true);
 
         $qb = $db->getQueryBuilder();
-        $sql = $qb->addCommentOnColumn('customer', 'id', 'Primary key.');
 
         $this->assertSame(
             <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL,
-            $sql,
+            $qb->addCommentOnColumn('customer', 'id', 'Primary key.'),
         );
     }
 
@@ -83,7 +82,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.');
 
-        $qb->addDefaultValue('name', 'table', 'column', 'value');
+        $qb->addDefaultValue('CN_pk', 'T_constraints_1', 'C_default', 1);
     }
 
     /**
@@ -256,6 +255,32 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->dropCheck('CN_check', 'T_constraints_1');
     }
 
+    /**
+     * Test for issue https://github.com/yiisoft/yii2/issues/15500
+     */
+    public function testDefaultValues()
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        // Primary key columns should have NULL as value
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `null_values` (`id`) VALUES (DEFAULT)
+            SQL,
+            $qb->insert('null_values', []),
+        );
+
+        // Non-primary key columns should have DEFAULT as value
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `negative_default_values` (`tinyint_col`) VALUES (DEFAULT)
+            SQL,
+            $qb->insert('negative_default_values', []),
+        );
+    }
+
     public function testDropCommentFromColumn(): void
     {
         $db = $this->getConnection(true);
@@ -353,18 +378,55 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testInsertEx($table, $columns, $params, $expectedSQL, $expectedParams);
     }
 
+    /**
+     * @link https://github.com/yiisoft/yii2/issues/14663
+     */
+    public function testInsertInteger()
+    {
+        $db = $this->getConnection();
+
+        $command = $db->createCommand();
+
+        // Integer value should not be converted to string, when column is `int`.
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `type` (`int_col`) VALUES (22)
+            SQL,
+            $command->insert('{{type}}', ['int_col' => 22])->getRawSql(),
+        );
+
+        // Integer value should not be converted to string, when column is `int unsigned`.
+        $sql = $command->insert('{{type}}', ['int_col3' => 22])->getRawSql();
+        $this->assertEquals('INSERT INTO `type` (`int_col3`) VALUES (22)', $sql);
+
+        // int value should not be converted to string, when column is `bigint unsigned`.
+        $this->assertEquals(
+            <<<SQL
+            INSERT INTO `type` (`bigint_col`) VALUES (22)
+            SQL,
+            $command->insert('{{type}}', ['bigint_col' => 22])->getRawSql(),
+        );
+
+        // string value should not be converted
+        $this->assertEquals(
+            <<<SQL
+            INSERT INTO `type` (`bigint_col`) VALUES ('1000000000000')
+            SQL,
+            $command->insert('{{type}}', ['bigint_col' => '1000000000000'])->getRawSql(),
+        );
+    }
+
     public function testRenameColumn(): void
     {
         $db = $this->getConnection();
 
         $qb = $db->getQueryBuilder();
-        $sql = $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test');
 
         $this->assertSame(
             <<<SQL
             ALTER TABLE `alpha` CHANGE `string_identifier` `string_identifier_test` varchar(255) NOT NULL
             SQL,
-            $sql,
+            $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test'),
         );
     }
 
@@ -376,24 +438,91 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     {
         $db = $this->getConnection(true);
 
+        $command = $db->createCommand();
+        $qb = $db->getQueryBuilder();
+        $checkSql = 'SHOW CREATE TABLE `item`;';
+
+        // Change to max rows.
+        $sql = <<<SQL
+        SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+        SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+        PREPARE autoincrement_stmt FROM @sql;
+        EXECUTE autoincrement_stmt
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item'));
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+
+        // Key as string.
+        $sql = <<<SQL
+        ALTER TABLE `item` AUTO_INCREMENT=40;
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item', '40'));
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // Change up, key as int.
+        $sql = <<<SQL
+        ALTER TABLE `item` AUTO_INCREMENT=40;
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item', 40));
+
+        $db->createCommand($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // And again change to max rows.
+        $sql = <<<SQL
+        SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+        SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+        PREPARE autoincrement_stmt FROM @sql;
+        EXECUTE autoincrement_stmt
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item'));
+
+        $db->createCommand($sql)->queryAll();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+    }
+
+    public function testResetSequenceNoAssociated(): void
+    {
+        $db = $this->getConnection();
+
         $qb = $db->getQueryBuilder();
 
-        $this->assertSame(
-            <<<SQL
-            SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
-            SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
-            PREPARE autoincrement_stmt FROM @sql;
-            EXECUTE autoincrement_stmt
-            SQL,
-            $qb->resetSequence('item'),
-        );
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("There is no sequence associated with table 'constraints'");
 
-        $this->assertSame(
-            <<<SQL
-            ALTER TABLE `item` AUTO_INCREMENT=3;
-            SQL,
-            $qb->resetSequence('item', 3),
-        );
+        $qb->resetSequence('constraints');
+    }
+
+    public function testResetSequenceTableNoExist(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Table not found: noExist');
+
+        $qb->resetSequence('noExist', 1);
     }
 
     /**
