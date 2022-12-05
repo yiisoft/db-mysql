@@ -362,6 +362,20 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
+    public function testDropUnique(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            DROP INDEX `test_uq_constraint` ON `test_uq`
+            SQL,
+            $qb->dropUnique('test_uq_constraint', 'test_uq', ['int1']),
+        );
+    }
+
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insert()
      */
