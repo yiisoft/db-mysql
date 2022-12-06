@@ -4,401 +4,550 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Closure;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\TestSupport\TestQueryBuilderTrait;
+use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
-use function is_string;
+use function version_compare;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class QueryBuilderTest extends TestCase
+final class QueryBuilderTest extends CommonQueryBuilderTest
 {
-    use TestQueryBuilderTrait;
+    use TestTrait;
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addDropForeignKeysProvider
-     */
-    public function testAddDropForeignKey(string $sql, Closure $builder): void
+    public function testAddcheck(): void
     {
         $db = $this->getConnection();
-        $this->assertSame($db->getQuoter()->quoteSql($sql), $builder($db->getQueryBuilder()));
+
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
+
+        $qb->addCheck('customer', 'id', 'id > 0');
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addDropPrimaryKeysProvider
-     */
-    public function testAddDropPrimaryKey(string $sql, Closure $builder): void
-    {
-        $db = $this->getConnection();
-        $this->assertSame($db->getQuoter()->quoteSql($sql), $builder($db->getQueryBuilder()));
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addDropUniquesProvider
-     */
-    public function testAddDropUnique(string $sql, Closure $builder): void
-    {
-        $db = $this->getConnection();
-        $this->assertSame($db->getQuoter()->quoteSql($sql), $builder($db->getQueryBuilder()));
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsertProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
-     */
-    public function testBatchInsert(string $table, array $columns, array $value, ?string $expected, array $expectedParams = []): void
-    {
-        $params = [];
-        $db = $this->getConnection();
-
-        $sql = $db->getQueryBuilder()->batchInsert($table, $columns, $value, $params);
-
-        $this->assertEquals($expected, $sql);
-        $this->assertEquals($expectedParams, $params);
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildConditionsProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
-     */
-    public function testBuildCondition(array|ExpressionInterface|string $condition, ?string $expected, array $expectedParams): void
-    {
-        $db = $this->getConnection();
-        $query = (new Query($db))->where($condition);
-        [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $replacedQuotes = $this->replaceQuotes($expected);
-
-        $this->assertIsString($replacedQuotes);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
-        $this->assertEquals($expectedParams, $params);
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFilterConditionProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
-     */
-    public function testBuildFilterCondition(array $condition, ?string $expected, array $expectedParams): void
-    {
-        $db = $this->getConnection();
-        $query = (new Query($db))->filterWhere($condition);
-        [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $replacedQuotes = $this->replaceQuotes($expected);
-
-        $this->assertIsString($replacedQuotes);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
-        $this->assertEquals($expectedParams, $params);
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFromDataProvider
-     *
      * @throws Exception
      */
-    public function testBuildFrom(string $table, string $expected): void
+    public function testAddCommentOnColumn(): void
     {
-        $db = $this->getConnection();
-        $params = [];
-        $sql = $db->getQueryBuilder()->buildFrom([$table], $params);
-        $replacedQuotes = $this->replaceQuotes($expected);
+        $db = $this->getConnection(true);
 
-        $this->assertIsString($replacedQuotes);
-        $this->assertEquals('FROM ' . $replacedQuotes, $sql);
+        $qb = $db->getQueryBuilder();
+        $sql = <<<SQL
+        ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
+        SQL;
+
+        if (version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
+            SQL;
+        }
+
+        $this->assertSame($sql, $qb->addCommentOnColumn('customer', 'id', 'Primary key.'));
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeConditionsProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
+     * @throws Exception
      */
-    public function testBuildLikeCondition(array|ExpressionInterface $condition, ?string $expected, array $expectedParams): void
+    public function testAddCommentOnTable(): void
     {
         $db = $this->getConnection();
-        $query = (new Query($db))->where($condition);
-        [$sql, $params] = $db->getQueryBuilder()->build($query);
-        $replacedQuotes = $this->replaceQuotes($expected);
 
-        $this->assertIsString($replacedQuotes);
-        $this->assertEquals('SELECT *' . (empty($expected) ? '' : ' WHERE ' . $replacedQuotes), $sql);
-        $this->assertEquals($expectedParams, $params);
+        $qb = $db->getQueryBuilder();
+        $sql = $qb->addCommentOnTable('customer', 'Customer table.');
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `customer` COMMENT 'Customer table.'
+            SQL,
+            $sql,
+        );
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildExistsParamsProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
+     * @throws Exception
      */
-    public function testBuildWhereExists(string $cond, ?string $expectedQuerySql): void
+    public function testAddDefaultValue(): void
     {
         $db = $this->getConnection();
-        $expectedQueryParams = [];
-        $subQuery = new Query($db);
-        $subQuery->select('1')->from('Website w');
-        $query = new Query($db);
-        $query->select('id')->from('TotalExample t')->where([$cond, $subQuery]);
-        [$actualQuerySql, $actualQueryParams] = $db->getQueryBuilder()->build($query);
-        $this->assertEquals($expectedQuerySql, $actualQuerySql);
-        $this->assertEquals($expectedQueryParams, $actualQueryParams);
+
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.');
+
+        $qb->addDefaultValue('CN_pk', 'T_constraints_1', 'C_default', 1);
     }
 
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addForeignKey()
+     */
+    public function testAddForeignKey(
+        string $name,
+        string $table,
+        array|string $columns,
+        string $refTable,
+        array|string $refColumns,
+        string|null $delete,
+        string|null $update,
+        string $expected
+    ): void {
+        parent::testAddForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addPrimaryKey()
+     */
+    public function testAddPrimaryKey(string $name, string $table, array|string $columns, string $expected): void
+    {
+        parent::testAddPrimaryKey($name, $table, $columns, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addUnique()
+     */
+    public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
+    {
+        parent::testAddUnique($name, $table, $columns, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsert()
+     */
+    public function testBatchInsert(string $table, array $columns, array $rows, string $expected): void
+    {
+        parent::testBatchInsert($table, $columns, $rows, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildCondition()
+     */
+    public function testBuildCondition(
+        array|ExpressionInterface|string $condition,
+        string|null $expected,
+        array $expectedParams
+    ): void {
+        parent::testBuildCondition($condition, $expected, $expectedParams);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeCondition()
+     */
+    public function testBuildLikeCondition(
+        array|ExpressionInterface $condition,
+        string $expected,
+        array $expectedParams
+    ): void {
+        parent::testBuildLikeCondition($condition, $expected, $expectedParams);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFrom()
+     */
+    public function testBuildWithFrom(mixed $table, string $expectedSql, array $expectedParams = []): void
+    {
+        parent::testBuildWithFrom($table, $expectedSql, $expectedParams);
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
+     */
+    public function testBuildWithOffset(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+        $query = (new Query($db))->offset(10);
+
+        [$sql, $params] = $qb->build($query);
+
+        $this->assertSame(
+            <<<SQL
+            SELECT * LIMIT 10, 18446744073709551615
+            SQL,
+            $sql,
+        );
+
+        $this->assertSame([], $params);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildWhereExists()
+     */
+    public function testBuildWithWhereExists(string $cond, string $expectedQuerySql): void
+    {
+        parent::testBuildWithWhereExists($cond, $expectedQuerySql);
+    }
+
+    /**
+     * @throws Exception
+     * @throws NotSupportedException
+     */
     public function testCheckIntegrity(): void
     {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
         $this->assertSame(
             <<<SQL
             SET FOREIGN_KEY_CHECKS = 1
             SQL,
-            $this->getConnection()->getQueryBuilder()->checkIntegrity('dbo', 'item'),
+            $qb->checkIntegrity('', 'customer'),
         );
     }
 
-    public function testCheckIntegrityExecute(): void
+    public function testCreateTable(): void
     {
         $db = $this->getConnection();
-        $db->createCommand()->checkIntegrity('public', 'item', false)->execute();
-        $sql = 'INSERT INTO {{item}}([[name]], [[category_id]]) VALUES (\'invalid\', 99999)';
-        $command = $db->createCommand($sql);
-        $command->execute();
-        $db->createCommand()->checkIntegrity('public', 'item', true)->execute();
-        $this->expectException(IntegrityException::class);
-        $command->execute();
-    }
 
-    public function testCommentColumn(): void
-    {
-        $db = $this->getConnection();
         $qb = $db->getQueryBuilder();
 
-        $expected = 'ALTER TABLE [[comment]] CHANGE [[add_comment]] [[add_comment]]' .
-            " varchar(255) NOT NULL COMMENT 'This is my column.'";
-        $sql = $qb->addCommentOnColumn('comment', 'add_comment', 'This is my column.');
-        $this->assertEquals($this->replaceQuotes($expected), $sql);
-
-        $expected = 'ALTER TABLE [[comment]] CHANGE [[replace_comment]] [[replace_comment]]' .
-            " varchar(255) DEFAULT NULL COMMENT 'This is my column.'";
-        $sql = $qb->addCommentOnColumn('comment', 'replace_comment', 'This is my column.');
-        $this->assertEquals($this->replaceQuotes($expected), $sql);
-
-        $expected = 'ALTER TABLE [[comment]] CHANGE [[delete_comment]] [[delete_comment]]' .
-            " varchar(128) NOT NULL COMMENT ''";
-        $sql = $qb->dropCommentFromColumn('comment', 'delete_comment');
-        $this->assertEquals($this->replaceQuotes($expected), $sql);
-    }
-
-    public function testCommentTable(): void
-    {
-        $db = $this->getConnection();
-        $qb = $db->getQueryBuilder();
-
-        $expected = "ALTER TABLE [[comment]] COMMENT 'This is my table.'";
-        $sql = $qb->addCommentOnTable('comment', 'This is my table.');
-        $this->assertEquals($this->replaceQuotes($expected), $sql);
-
-        $expected = "ALTER TABLE [[comment]] COMMENT ''";
-        $sql = $qb->dropCommentFromTable('comment');
-        $this->assertEquals($this->replaceQuotes($expected), $sql);
+        $this->assertSame(
+            <<<SQL
+            CREATE TABLE `test` (
+            \t`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            \t`name` varchar(255) NOT NULL,
+            \t`email` varchar(255) NOT NULL,
+            \t`status` int(11) NOT NULL,
+            \t`created_at` datetime(0) NOT NULL
+            )
+            SQL,
+            $qb->createTable(
+                'test',
+                [
+                    'id' => 'pk',
+                    'name' => 'string(255) NOT NULL',
+                    'email' => 'string(255) NOT NULL',
+                    'status' => 'integer NOT NULL',
+                    'created_at' => 'datetime NOT NULL',
+                ],
+            ),
+        );
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::createDropIndexesProvider
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::delete()
      */
-    public function testCreateDropIndex(string $sql, Closure $builder): void
+    public function testDelete(string $table, array|string $condition, string $expectedSQL, array $expectedParams): void
     {
-        $db = $this->getConnection();
-        $this->assertSame($db->getQuoter()->quoteSql($sql), $builder($db->getQueryBuilder()));
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::deleteProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
-     */
-    public function testDelete(string $table, array|string $condition, ?string $expectedSQL, array $expectedParams): void
-    {
-        $actualParams = [];
-        $db = $this->getConnection();
-        $this->assertSame($expectedSQL, $db->getQueryBuilder()->delete($table, $condition, $actualParams));
-        $this->assertSame($expectedParams, $actualParams);
+        parent::testDelete($table, $condition, $expectedSQL, $expectedParams);
     }
 
     public function testDropCheck(): void
     {
         $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropCheck is not supported by MySQL.');
-        $db->getQueryBuilder()->dropCheck('noExist', 'noExist');
+
+        $qb->dropCheck('CN_check', 'T_constraints_1');
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
+     * Test for issue https://github.com/yiisoft/yii2/issues/15500
+     */
+    public function testDefaultValues()
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        // Primary key columns should have NULL as value
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `null_values` (`id`) VALUES (DEFAULT)
+            SQL,
+            $qb->insert('null_values', []),
+        );
+
+        // Non-primary key columns should have DEFAULT as value
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `negative_default_values` (`tinyint_col`) VALUES (DEFAULT)
+            SQL,
+            $qb->insert('negative_default_values', []),
+        );
+    }
+
+    public function testDropCommentFromColumn(): void
+    {
+        $db = $this->getConnection(true);
+
+        $qb = $db->getQueryBuilder();
+        $sql = <<<SQL
+        ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT ''
+        SQL;
+
+        if (version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
+            SQL;
+        }
+
+        $this->assertSame($sql, $qb->dropCommentFromColumn('customer', 'id'));
+    }
+
+    public function testDropCommentFromTable(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `customer` COMMENT ''
+            SQL,
+            $qb->dropCommentFromTable('customer'),
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testDropDefaultValue(): void
+    {
+        $db = $this->getConnection(true);
+
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropDefaultValue is not supported by MySQL.');
+
+        $qb->dropDefaultValue('CN_pk', 'T_constraints_1');
+    }
+
+    public function testDropForeignKey(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `T_constraints_3` DROP FOREIGN KEY `CN_constraints_3`
+            SQL,
+            $qb->dropForeignKey('CN_constraints_3', 'T_constraints_3'),
+        );
+    }
+
+    public function testDropPrimaryKey(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `T_constraints_1` DROP PRIMARY KEY
+            SQL,
+            $qb->dropPrimaryKey('CN_pk', 'T_constraints_1'),
+        );
+    }
+
+    public function testDropUnique(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            DROP INDEX `test_uq_constraint` ON `test_uq`
+            SQL,
+            $qb->dropUnique('test_uq_constraint', 'test_uq', ['int1']),
+        );
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insert()
      */
     public function testInsert(
         string $table,
         array|QueryInterface $columns,
         array $params,
-        ?string $expectedSQL,
+        string $expectedSQL,
         array $expectedParams
     ): void {
-        $actualParams = $params;
+        parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertEx()
+     */
+    public function testInsertEx(
+        string $table,
+        array|QueryInterface $columns,
+        array $params,
+        string $expectedSQL,
+        array $expectedParams
+    ): void {
+        parent::testInsertEx($table, $columns, $params, $expectedSQL, $expectedParams);
+    }
+
+    /**
+     * @link https://github.com/yiisoft/yii2/issues/14663
+     */
+    public function testInsertInteger()
+    {
         $db = $this->getConnection();
-        $this->assertSame($expectedSQL, $db->getQueryBuilder()->insert($table, $columns, $actualParams));
-        $this->assertSame($expectedParams, $actualParams);
+
+        $command = $db->createCommand();
+
+        // Integer value should not be converted to string, when column is `int`.
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `type` (`int_col`) VALUES (22)
+            SQL,
+            $command->insert('{{type}}', ['int_col' => 22])->getRawSql(),
+        );
+
+        // Integer value should not be converted to string, when column is `int unsigned`.
+        $sql = $command->insert('{{type}}', ['int_col3' => 22])->getRawSql();
+        $this->assertEquals('INSERT INTO `type` (`int_col3`) VALUES (22)', $sql);
+
+        // int value should not be converted to string, when column is `bigint unsigned`.
+        $this->assertEquals(
+            <<<SQL
+            INSERT INTO `type` (`bigint_col`) VALUES (22)
+            SQL,
+            $command->insert('{{type}}', ['bigint_col' => 22])->getRawSql(),
+        );
+
+        // string value should not be converted
+        $this->assertEquals(
+            <<<SQL
+            INSERT INTO `type` (`bigint_col`) VALUES ('1000000000000')
+            SQL,
+            $command->insert('{{type}}', ['bigint_col' => '1000000000000'])->getRawSql(),
+        );
     }
 
     public function testRenameColumn(): void
     {
         $db = $this->getConnection();
+
         $qb = $db->getQueryBuilder();
 
-        $sql = $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test');
         $this->assertSame(
-            'ALTER TABLE `alpha` CHANGE `string_identifier` `string_identifier_test` varchar(255) NOT NULL',
-            $sql,
+            <<<SQL
+            ALTER TABLE `alpha` CHANGE `string_identifier` `string_identifier_test` varchar(255) NOT NULL
+            SQL,
+            $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test'),
         );
-
-        $sql = $qb->renameColumn('alpha', 'string_identifier_test', 'string_identifier');
-        $this->assertSame(
-            'ALTER TABLE `alpha` CHANGE `string_identifier_test` `string_identifier`',
-            $sql,
-        );
-    }
-
-    public function testRenameColumnTableNoExist(): void
-    {
-        $this->markTestSkipped('In current implementation not generated Exception if table not exists');
-        $db = $this->getConnection();
-        $this->expectException(Exception::class);
-        $sql = $db->getQueryBuilder()->renameColumn('noExist', 'string_identifier', 'string_identifier_test');
-    }
-
-    public function testResetSequence(): void
-    {
-        $db = $this->getConnection(true);
-        $qb = $db->getQueryBuilder();
-
-        $checkSql = 'SHOW CREATE TABLE `item`;';
-
-        // change to max rows
-        $expected = <<<SQL
-SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
-SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
-PREPARE autoincrement_stmt FROM @sql;
-EXECUTE autoincrement_stmt
-SQL;
-        $sql = $qb->resetSequence('item');
-        $this->assertSame($expected, $sql);
-
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryOne();
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
-
-        // key as string
-        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=40;';
-        $sql = $qb->resetSequence('item', '40');
-        $this->assertSame($expected, $sql);
-
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryOne();
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
-
-        // change up, key as int
-        $expected = 'ALTER TABLE `item` AUTO_INCREMENT=40;';
-        $sql = $qb->resetSequence('item', 40);
-        $this->assertSame($expected, $sql);
-
-        $db->createCommand($sql)->execute();
-        $result = $db->createCommand($checkSql)->queryOne();
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
-
-        // and again change to max rows
-        $expected = <<<SQL
-SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
-SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
-PREPARE autoincrement_stmt FROM @sql;
-EXECUTE autoincrement_stmt
-SQL;
-        $sql = $qb->resetSequence('item');
-        $this->assertSame($expected, $sql);
-
-        $db->createCommand($sql)->queryAll();
-        $result = $db->createCommand($checkSql)->queryOne();
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
-    }
-
-    public function testResetSequenceNoAssociated(): void
-    {
-        $db = $this->getConnection();
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("There is no sequence associated with table 'constraints'");
-        $sql = $db->getQueryBuilder()->resetSequence('constraints');
-    }
-
-    public function testResetSequenceTableNoExist(): void
-    {
-        $db = $this->getConnection();
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Table not found: noExist');
-        $sql = $db->getQueryBuilder()->resetSequence('noExist', 1);
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::updateProvider
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
+     * @throws Exception
+     * @throws NotSupportedException
+     */
+    public function testResetSequence(): void
+    {
+        $db = $this->getConnection(true);
+
+        $command = $db->createCommand();
+        $qb = $db->getQueryBuilder();
+        $checkSql = 'SHOW CREATE TABLE `item`;';
+
+        // Change to max rows.
+        $sql = <<<SQL
+        SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+        SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+        PREPARE autoincrement_stmt FROM @sql;
+        EXECUTE autoincrement_stmt
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item'));
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+
+        // Key as string.
+        $sql = <<<SQL
+        ALTER TABLE `item` AUTO_INCREMENT=40;
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item', '40'));
+
+        $command->setSql($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // Change up, key as int.
+        $sql = <<<SQL
+        ALTER TABLE `item` AUTO_INCREMENT=40;
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item', 40));
+
+        $db->createCommand($sql)->execute();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+
+        // And again change to max rows.
+        $sql = <<<SQL
+        SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
+        SET @sql = CONCAT('ALTER TABLE `item` AUTO_INCREMENT =', @new_autoincrement_value);
+        PREPARE autoincrement_stmt FROM @sql;
+        EXECUTE autoincrement_stmt
+        SQL;
+
+        $this->assertSame($sql, $qb->resetSequence('item'));
+
+        $db->createCommand($sql)->queryAll();
+        $result = $command->setSql($checkSql)->queryOne();
+
+        $this->assertIsArray($result);
+        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::update()
      */
     public function testUpdate(
         string $table,
         array $columns,
         array|string $condition,
-        ?string $expectedSQL,
+        string $expectedSQL,
         array $expectedParams
     ): void {
-        $actualParams = [];
-        $db = $this->getConnection();
-        $this->assertSame($expectedSQL, $db->getQueryBuilder()->update($table, $columns, $condition, $actualParams));
-        $this->assertSame($expectedParams, $actualParams);
+        parent::testUpdate($table, $columns, $condition, $expectedSQL, $expectedParams);
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsertProvider
-     *
-     * @param string|string[] $expectedSQL
-     *
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|NotSupportedException
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert()
      */
-    public function testUpsert(string $table, array|QueryInterface $insertColumns, array|bool $updateColumns, string|array $expectedSQL, array $expectedParams): void
-    {
-        $actualParams = [];
-        $db = $this->getConnection();
-        $actualSQL = $db->getQueryBuilder()->upsert($table, $insertColumns, $updateColumns, $actualParams);
-
-        if (is_string($expectedSQL)) {
-            $this->assertSame($expectedSQL, $actualSQL);
-        } else {
-            $this->assertContains($actualSQL, $expectedSQL);
-        }
-
-        if (ArrayHelper::isAssociative($expectedParams)) {
-            $this->assertSame($expectedParams, $actualParams);
-        } else {
-            $this->assertIsOneOf($actualParams, $expectedParams);
-        }
+    public function testUpsert(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns,
+        string|array $expectedSQL,
+        array $expectedParams
+    ): void {
+        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
     }
 }
