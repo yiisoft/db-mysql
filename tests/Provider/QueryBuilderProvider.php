@@ -8,49 +8,22 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Tests\Provider\BaseQueryBuilderProvider;
+use Yiisoft\Db\Tests\Provider\AbstractQueryBuilderProvider;
 
 use function array_replace;
 
-final class QueryBuilderProvider
+final class QueryBuilderProvider extends AbstractQueryBuilderProvider
 {
     use TestTrait;
 
-    public function addForeignKey(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->addForeignKey($this->getDriverName());
-    }
-
-    public function addPrimaryKey(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->addPrimaryKey($this->getDriverName());
-    }
-
-    public function addUnique(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->addUnique($this->getDriverName());
-    }
-
-    public function batchInsert(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->batchInsert($this->getDriverName());
-    }
+    protected string $likeEscapeCharSql = '';
+    protected array $likeParameterReplacements = [];
 
     public function buildCondition(): array
     {
         $db = $this->getConnection();
 
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        $buildCondition = $baseQueryBuilderProvider->buildCondition($db);
+        $buildCondition = parent::buildCondition();
 
         return array_merge(
             $buildCondition,
@@ -131,55 +104,6 @@ final class QueryBuilderProvider
         );
     }
 
-    public function buildFrom(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->buildFrom($this->getDriverName());
-    }
-
-    public function buildLikeCondition(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->buildLikeCondition($this->getDriverName());
-    }
-
-    public function buildWhereExists(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->buildWhereExists($this->getDriverName());
-    }
-
-    public function delete(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->delete($this->getDriverName());
-    }
-
-    public function insert(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->insert($this->getConnection());
-    }
-
-    public function insertEx(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->insertEx($this->getConnection());
-    }
-
-    public function update(): array
-    {
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-
-        return $baseQueryBuilderProvider->update($this->getDriverName());
-    }
-
     public function upsert(): array
     {
         $concreteData = [
@@ -245,8 +169,7 @@ final class QueryBuilderProvider
             ],
         ];
 
-        $baseQueryBuilderProvider = new BaseQueryBuilderProvider();
-        $upsert = $baseQueryBuilderProvider->upsert($this->getConnection());
+        $upsert = parent::upsert();
 
         foreach ($concreteData as $testName => $data) {
             $upsert[$testName] = array_replace($upsert[$testName], $data);
