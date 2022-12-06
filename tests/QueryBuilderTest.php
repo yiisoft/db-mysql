@@ -525,30 +525,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
     }
 
-    public function testResetSequenceNoAssociated(): void
-    {
-        $db = $this->getConnection();
-
-        $qb = $db->getQueryBuilder();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("There is no sequence associated with table 'constraints'");
-
-        $qb->resetSequence('constraints');
-    }
-
-    public function testResetSequenceTableNoExist(): void
-    {
-        $db = $this->getConnection();
-
-        $qb = $db->getQueryBuilder();
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Table not found: noExist');
-
-        $qb->resetSequence('noExist', 1);
-    }
-
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::update()
      */

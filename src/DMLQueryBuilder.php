@@ -51,12 +51,12 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         $table = $this->schema->getTableSchema($tableName);
 
         if ($table === null) {
-            throw new InvalidArgumentException("Table not found: $tableName");
+            throw new InvalidArgumentException("Table not found: '$tableName'.");
         }
 
         $sequenceName = $table->getSequenceName();
         if ($sequenceName === null) {
-            throw new InvalidArgumentException("There is no sequence associated with table '$tableName'.");
+            throw new InvalidArgumentException("There is not sequence associated with table '$tableName'.");
         }
 
         $tableName = $this->quoter->quoteTableName($tableName);
