@@ -32,7 +32,7 @@ final class ColumnSchemaBuilderProvider extends AbstractColumnSchemaBuilderProvi
                         ['comment', 'Property name'],
                         ['append', 'COLLATE ascii_general_ci'],
                         ['notNull'],
-                    ]
+                    ],
                 ],
                 ['integer(10) AFTER `test`', Schema::TYPE_INTEGER, 10, [['after', 'test']]],
                 ['integer(10) FIRST', Schema::TYPE_INTEGER, 10, [['first']]],
