@@ -9,6 +9,8 @@ use Yiisoft\Db\Tests\Common\CommonColumnSchemaBuilderTest;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
 {
