@@ -33,26 +33,6 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \
     }
 
     /**
-     * Builds the after constraint for the column. Defaults to unsupported.
-     *
-     * @return string a string containing the AFTER constraint.
-     */
-    protected function buildAfterString(): string
-    {
-        return $this->getAfter() !== null ? ' AFTER ' . $this->quoter->quoteColumnName((string) $this->getAfter()) : '';
-    }
-
-    /**
-     * Builds the first constraint for the column. Defaults to unsupported.
-     *
-     * @return string a string containing the FIRST constraint.
-     */
-    protected function buildFirstString(): string
-    {
-        return $this->isFirst() ? ' FIRST' : '';
-    }
-
-    /**
      * Builds the comment specification for the column.
      *
      * @throws Exception|InvalidConfigException
@@ -68,10 +48,9 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \
     public function __toString(): string
     {
         $format = match ($this->getTypeCategory()) {
-            self::CATEGORY_PK => '{type}{length}{comment}{check}{append}{pos}',
-            self::CATEGORY_NUMERIC => '{type}{length}{unsigned}{notnull}{default}{unique}{comment}{append}' .
-                '{pos}{check}',
-            default => '{type}{length}{notnull}{default}{unique}{comment}{append}{pos}{check}',
+            self::CATEGORY_PK => '{type}{length}{comment}{check}{append}',
+            self::CATEGORY_NUMERIC => '{type}{length}{unsigned}{notnull}{default}{unique}{comment}{append}{check}',
+            default => '{type}{length}{notnull}{default}{unique}{comment}{append}{check}',
         };
 
         return $this->buildCompleteString($format);

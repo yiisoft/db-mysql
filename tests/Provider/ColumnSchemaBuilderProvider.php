@@ -34,8 +34,6 @@ final class ColumnSchemaBuilderProvider extends AbstractColumnSchemaBuilderProvi
                         ['notNull'],
                     ],
                 ],
-                ['integer(10) AFTER `test`', Schema::TYPE_INTEGER, 10, [['after', 'test']]],
-                ['integer(10) FIRST', Schema::TYPE_INTEGER, 10, [['first']]],
             ],
         );
     }
