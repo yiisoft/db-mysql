@@ -399,7 +399,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $expectedSQL,
         array $expectedParams
     ): void {
-        parent::testInsertEx($table, $columns, $params, $expectedSQL, $expectedParams);
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\QueryBuilder\DMLQueryBuilder::insertEx() is not supported by this DBMS.');
+
+        $db = $this->getConnection(true);
+        $qb = $db->getQueryBuilder();
+        $qb->insertEx($table, $columns, $params);
     }
 
     /**
