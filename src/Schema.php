@@ -23,6 +23,7 @@ use function array_merge;
 use function array_values;
 use function bindec;
 use function explode;
+use function ksort;
 use function md5;
 use function preg_match;
 use function preg_match_all;
@@ -177,6 +178,8 @@ final class Schema extends AbstractSchema
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }
+
+        ksort($uniqueIndexes);
 
         return $uniqueIndexes;
     }
@@ -359,6 +362,27 @@ final class Schema extends AbstractSchema
         }
 
         return $this->db->createCommand($sql)->queryColumn();
+    }
+
+    protected function findViewNames(string $schema = ''): array
+    {
+        $sql = match ($schema) {
+            '' => <<<SQL
+            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema != 'sys'
+            SQL,
+            default => <<<SQL
+            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema = '$schema'
+            SQL,
+        };
+
+        /** @psalm-var string[][] $views */
+        $views = $this->db->createCommand($sql)->queryAll();
+
+        foreach ($views as $key => $view) {
+            $views[$key] = $view['view'];
+        }
+
+        return $views;
     }
 
     /**
