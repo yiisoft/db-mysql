@@ -238,6 +238,88 @@ final class SchemaProvider extends AbstractSchemaProvider
         ];
     }
 
+    public function columnsTypeBit(): array
+    {
+        return [
+            [
+                [
+                    'bit_col_1' => [
+                        'type' => 'integer',
+                        'dbType' => 'bit(1)',
+                        'phpType' => 'integer',
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 1,
+                        'precision' => 1,
+                        'scale' => null,
+                        'defaultValue' => 0,
+                    ],
+                    'bit_col_2' => [
+                        'type' => 'integer',
+                        'dbType' => 'bit(1)',
+                        'phpType' => 'integer',
+                        'allowNull' => true,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 1,
+                        'precision' => 1,
+                        'scale' => null,
+                        'defaultValue' => 1,
+                    ],
+                    'bit_col_3' => [
+                        'type' => 'integer',
+                        'dbType' => 'bit(32)',
+                        'phpType' => 'integer',
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 32,
+                        'precision' => 32,
+                        'scale' => null,
+                        'defaultValue' => 0,
+                    ],
+                    'bit_col_4' => [
+                        'type' => 'integer',
+                        'dbType' => 'bit(32)',
+                        'phpType' => 'integer',
+                        'allowNull' => true,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 32,
+                        'precision' => 32,
+                        'scale' => null,
+                        'defaultValue' => 130,
+                    ],
+                    'bit_col_5' => [
+                        'type' => 'bigint',
+                        'dbType' => 'bit(64)',
+                        'phpType' => 'integer',
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 64,
+                        'precision' => 64,
+                        'scale' => null,
+                        'defaultValue' => 0,
+                    ],
+                    'bit_col_6' => [
+                        'type' => 'bigint',
+                        'dbType' => 'bit(64)',
+                        'phpType' => 'integer',
+                        'allowNull' => true,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 64,
+                        'precision' => 64,
+                        'scale' => null,
+                        'defaultValue' => 130,
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function columnsTypeChar(): array
     {
         return parent::columnsTypeChar();

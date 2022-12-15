@@ -90,6 +90,17 @@ final class SchemaTest extends CommonSchemaTest
         parent::testColumnSchema($columns);
     }
 
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit()
+     *
+     * @throws Exception
+     * @throws NotSupportedException
+     */
+    public function testColumnSchemaWithTypeBit(array $columns): void
+    {
+        $this->columnSchema($columns, 'type_bit');
+    }
+
     public function testDefaultValueDatetimeColumn(): void
     {
         $db = $this->getConnection();
