@@ -238,9 +238,6 @@ final class Schema extends AbstractSchema
      * Collects the foreign key column details for the given table.
      *
      * @param TableSchemaInterface $table the table metadata.
-     *
-     * @throws Exception
-     * @throws Throwable
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
@@ -263,61 +260,34 @@ final class Schema extends AbstractSchema
             `kcu`.`CONSTRAINT_NAME` = `rc`.`CONSTRAINT_NAME` AND
             `kcu`.`TABLE_SCHEMA` = `rc`.`CONSTRAINT_SCHEMA` AND
             `kcu`.`TABLE_NAME` = `rc`.`TABLE_NAME`
-        WHERE
-            `rc`.`CONSTRAINT_SCHEMA` = COALESCE(:schemaName, DATABASE()) AND
-            `rc`.`TABLE_NAME` = :tableName
+        WHERE `rc`.`CONSTRAINT_SCHEMA` = COALESCE(:schemaName, DATABASE()) AND `rc`.`TABLE_NAME` = :tableName
         SQL;
 
-        try {
-            $rows = $this->db->createCommand($sql, [
-                ':schemaName' => $table->getSchemaName(),
-                ':tableName' => $table->getName(),
-            ])->queryAll();
+        $constraints = [];
+        $rows = $this->db->createCommand($sql, [
+            ':schemaName' => $table->getSchemaName(),
+            ':tableName' => $table->getName(),
+        ])->queryAll();
 
-            $constraints = [];
+        /**  @psalm-var RowConstraint $row */
+        foreach ($rows as $row) {
+            $constraints[$row['constraint_name']]['referenced_table_name'] = $row['referenced_table_name'];
+            $constraints[$row['constraint_name']]['columns'][$row['column_name']] = $row['referenced_column_name'];
+        }
 
-            /**  @psalm-var RowConstraint $row */
-            foreach ($rows as $row) {
-                $constraints[$row['constraint_name']]['referenced_table_name'] = $row['referenced_table_name'];
-                $constraints[$row['constraint_name']]['columns'][$row['column_name']] = $row['referenced_column_name'];
-            }
+        $table->foreignKeys([]);
 
-            $table->foreignKeys([]);
-
-            /**
-             * @var array{referenced_table_name: string, columns: array} $constraint
-             */
-            foreach ($constraints as $name => $constraint) {
-                $table->foreignKey($name, array_merge(
+        /**
+         * @var array{referenced_table_name: string, columns: array} $constraint
+         */
+        foreach ($constraints as $name => $constraint) {
+            $table->foreignKey(
+                $name,
+                array_merge(
                     [$constraint['referenced_table_name']],
                     $constraint['columns']
-                ));
-            }
-        } catch (Exception $e) {
-            $previous = $e->getPrevious();
-
-            if ($previous === null || !str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
-                throw $e;
-            }
-
-            // table does not exist, try to determine the foreign keys using the table creation sql
-            $sql = $this->getCreateTableSql($table);
-            $regexp = '/FOREIGN KEY\s+\(([^)]+)\)\s+REFERENCES\s+([^(^\s]+)\s*\(([^)]+)\)/mi';
-
-            if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $match) {
-                    $fks = array_map('trim', explode(',', str_replace('`', '', $match[1])));
-                    $pks = array_map('trim', explode(',', str_replace('`', '', $match[3])));
-                    $constraint = [str_replace('`', '', $match[2])];
-
-                    foreach ($fks as $k => $name) {
-                        $constraint[$name] = $pks[$k];
-                    }
-
-                    $table->foreignKey(md5(serialize($constraint)), $constraint);
-                }
-                $table->foreignKeys(array_values($table->getForeignKeys()));
-            }
+                ),
+            );
         }
     }
 
