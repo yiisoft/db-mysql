@@ -321,6 +321,27 @@ final class Schema extends AbstractSchema
         }
     }
 
+    /**
+     * Returns all schema names in the database, including the default one but not system schemas.
+     *
+     * This method should be overridden by child classes in order to support this feature because the default
+     * implementation simply throws an exception.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     *
+     * @return array All schema names in the database, except system schemas.
+     */
+    protected function findSchemaNames(): array
+    {
+        $sql = <<<SQL
+        SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')
+        SQL;
+
+        return $this->db->createCommand($sql)->queryColumn();
+    }
+
     protected function findTableComment(TableSchemaInterface $tableSchema): void
     {
         $sql = <<<SQL

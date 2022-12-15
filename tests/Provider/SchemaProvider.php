@@ -240,8 +240,7 @@ final class SchemaProvider extends AbstractSchemaProvider
 
     public function columnsTypeChar(): array
     {
-        return [
-        ];
+        return parent::columnsTypeChar();
     }
 
     public function constraints(): array
