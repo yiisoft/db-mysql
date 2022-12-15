@@ -28,7 +28,6 @@ use function md5;
 use function preg_match;
 use function preg_match_all;
 use function serialize;
-use function str_replace;
 use function stripos;
 use function strtolower;
 use function trim;
