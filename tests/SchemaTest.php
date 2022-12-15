@@ -247,43 +247,6 @@ final class SchemaTest extends CommonSchemaTest
             'type',
         ];
 
-        if (version_compare($db->getServerVersion(), '8.0', '<')) {
-            $expectedTableNames = [
-                'T_constraints_1',
-                'T_constraints_2',
-                'T_constraints_3',
-                'T_constraints_4',
-                'T_upsert',
-                'T_upsert_1',
-                'alpha',
-                'animal',
-                'animal_view',
-                'beta',
-                'bit_values',
-                'category',
-                'comment',
-                'composite_fk',
-                'constraints',
-                'customer',
-                'default_pk',
-                'department',
-                'document',
-                'dossier',
-                'employee',
-                'item',
-                'negative_default_values',
-                'null_values',
-                'order',
-                'order_item',
-                'order_item_with_null_fk',
-                'order_with_null_fk',
-                'profile',
-                'quoter',
-                'storage',
-                'type',
-            ];
-        }
-
         foreach ($expectedTableNames as $tableName) {
             $this->assertContains($tableName, $tablesNames);
         }
