@@ -284,7 +284,9 @@ final class SchemaTest extends CommonSchemaTest
             ];
         }
 
-        $this->assertSame($expectedTableNames, $tablesNames);
+        foreach ($expectedTableNames as $tableName) {
+            $this->assertContains($tableName, $tablesNames);
+        }
     }
 
     /**
