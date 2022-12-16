@@ -320,11 +320,6 @@ final class SchemaProvider extends AbstractSchemaProvider
         ];
     }
 
-    public function columnsTypeChar(): array
-    {
-        return parent::columnsTypeChar();
-    }
-
     public function constraints(): array
     {
         $constraints = parent::constraints();
