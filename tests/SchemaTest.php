@@ -333,7 +333,7 @@ final class SchemaTest extends CommonSchemaTest
         $mockDb
             ->method('createCommand')
             ->with(
-                self::callback(fn ($sql) => true),
+                self::callback(static fn ($sql) => true),
                 self::callback(
                     function ($params) use ($expectedTableName, $expectedSchemaName) {
                         $this->assertEquals($expectedTableName, $params[':tableName']);
