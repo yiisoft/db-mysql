@@ -4,320 +4,40 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use PDO;
+use ReflectionException;
+use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
-use Yiisoft\Db\QueryBuilder\QueryBuilder;
-use Yiisoft\Db\Schema\TableSchemaInterface;
-use Yiisoft\Db\TestSupport\TestSchemaTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Schema\ColumnSchema;
+use Yiisoft\Db\Tests\Common\CommonSchemaTest;
+use Yiisoft\Db\Tests\Support\Assert;
+use Yiisoft\Db\Tests\Support\DbHelper;
 
-use function array_map;
-use function trim;
 use function version_compare;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class SchemaTest extends TestCase
+final class SchemaTest extends CommonSchemaTest
 {
-    use TestSchemaTrait;
-
-    public function getExpectedColumns(): array
-    {
-        $version = $this->getConnection()->getServerVersion();
-
-        return [
-            'int_col' => [
-                'type' => 'integer',
-                'dbType' => version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
-                'phpType' => 'integer',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => version_compare($version, '8.0.17', '>') ? null : 11,
-                'precision' => version_compare($version, '8.0.17', '>') ? null : 11,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'int_col2' => [
-                'type' => 'integer',
-                'dbType' => version_compare($version, '8.0.17', '>') ? 'int' : 'int(11)',
-                'phpType' => 'integer',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => version_compare($version, '8.0.17', '>') ? null : 11,
-                'precision' => version_compare($version, '8.0.17', '>') ? null : 11,
-                'scale' => null,
-                'defaultValue' => 1,
-            ],
-            'tinyint_col' => [
-                'type' => 'tinyint',
-                'dbType' => version_compare($version, '8.0.17', '>') ? 'tinyint' : 'tinyint(3)',
-                'phpType' => 'integer',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => version_compare($version, '8.0.17', '>') ? null : 3,
-                'precision' => version_compare($version, '8.0.17', '>') ? null : 3,
-                'scale' => null,
-                'defaultValue' => 1,
-            ],
-            'smallint_col' => [
-                'type' => 'smallint',
-                'dbType' => version_compare($version, '8.0.17', '>') ? 'smallint' : 'smallint(1)',
-                'phpType' => 'integer',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => version_compare($version, '8.0.17', '>') ? null : 1,
-                'precision' => version_compare($version, '8.0.17', '>') ? null : 1,
-                'scale' => null,
-                'defaultValue' => 1,
-            ],
-            'char_col' => [
-                'type' => 'char',
-                'dbType' => 'char(100)',
-                'phpType' => 'string',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 100,
-                'precision' => 100,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'char_col2' => [
-                'type' => 'string',
-                'dbType' => 'varchar(100)',
-                'phpType' => 'string',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 100,
-                'precision' => 100,
-                'scale' => null,
-                'defaultValue' => 'something',
-            ],
-            'char_col3' => [
-                'type' => 'text',
-                'dbType' => 'text',
-                'phpType' => 'string',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'enum_col' => [
-                'type' => 'string',
-                'dbType' => "enum('a','B','c,D')",
-                'phpType' => 'string',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => ['a', 'B', 'c,D'],
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'float_col' => [
-                'type' => 'double',
-                'dbType' => 'double(4,3)',
-                'phpType' => 'double',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 4,
-                'precision' => 4,
-                'scale' => 3,
-                'defaultValue' => null,
-            ],
-            'float_col2' => [
-                'type' => 'double',
-                'dbType' => 'double',
-                'phpType' => 'double',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => 1.23,
-            ],
-            'blob_col' => [
-                'type' => 'binary',
-                'dbType' => 'blob',
-                'phpType' => 'resource',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'numeric_col' => [
-                'type' => 'decimal',
-                'dbType' => 'decimal(5,2)',
-                'phpType' => 'string',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 5,
-                'precision' => 5,
-                'scale' => 2,
-                'defaultValue' => '33.22',
-            ],
-            'time' => [
-                'type' => 'timestamp',
-                'dbType' => 'timestamp',
-                'phpType' => 'string',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => '2002-01-01 00:00:00',
-            ],
-            'bool_col' => [
-                'type' => 'boolean',
-                'dbType' => 'tinyint(1)',
-                'phpType' => 'boolean',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 1,
-                'precision' => 1,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-            'bool_col2' => [
-                'type' => 'boolean',
-                'dbType' => 'tinyint(1)',
-                'phpType' => 'boolean',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 1,
-                'precision' => 1,
-                'scale' => null,
-                'defaultValue' => 1,
-            ],
-            'ts_default' => [
-                'type' => 'timestamp',
-                'dbType' => 'timestamp',
-                'phpType' => 'string',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => new Expression('CURRENT_TIMESTAMP'),
-            ],
-            'bit_col' => [
-                'type' => 'integer',
-                'dbType' => 'bit(8)',
-                'phpType' => 'integer',
-                'allowNull' => false,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => 8,
-                'precision' => 8,
-                'scale' => null,
-                'defaultValue' => 130, // b'10000010'
-            ],
-            'json_col' => [
-                'type' => 'json',
-                'dbType' => 'json',
-                'phpType' => 'array',
-                'allowNull' => true,
-                'autoIncrement' => false,
-                'enumValues' => null,
-                'size' => null,
-                'precision' => null,
-                'scale' => null,
-                'defaultValue' => null,
-            ],
-        ];
-    }
-
-    public function testLoadDefaultDatetimeColumn(): void
-    {
-        if (!version_compare($this->getConnection()->getServerVersion(), '5.6', '>=')) {
-            $this->markTestSkipped('Default datetime columns are supported since MySQL 5.6.');
-        }
-
-        $sql = <<<SQL
-        CREATE TABLE  IF NOT EXISTS `datetime_test`  (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-        SQL;
-
-        $this->getConnection()->createCommand($sql)->execute();
-
-        $schema = $this->getConnection()->getTableSchema('datetime_test');
-        $this->assertNotNull($schema);
-
-        $dt = $schema->getColumn('dt');
-        $this->assertNotNull($dt);
-
-        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
-    }
-
-    public function testDefaultDatetimeColumnWithMicrosecs(): void
-    {
-        if (!version_compare($this->getConnection()->getServerVersion(), '5.6.4', '>=')) {
-            $this->markTestSkipped(
-                'CURRENT_TIMESTAMP with microseconds as default column value is supported since MySQL 5.6.4.'
-            );
-        }
-
-        $sql = <<<SQL
-        CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
-            `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
-            `ts` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-        SQL;
-
-        $this->getConnection()->createCommand($sql)->execute();
-
-        $schema = $this->getConnection()->getTableSchema('current_timestamp_test');
-        $this->assertNotNull($schema);
-
-        $dt = $schema->getColumn('dt');
-        $this->assertNotNull($dt);
-
-        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
-
-        $ts = $schema->getColumn('ts');
-        $this->assertNotNull($ts);
-
-        $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
-    }
+    use TestTrait;
 
     /**
      * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed as
      * CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
      *
-     * {@see https://mariadb.com/kb/en/library/now/#description}
-     * {@see https://github.com/yiisoft/yii2/issues/15167}
+     * {@link https://mariadb.com/kb/en/library/now/#description}
+     * {@link https://github.com/yiisoft/yii2/issues/15167}
+     *
+     * @throws ReflectionException
      */
     public function testAlternativeDisplayOfDefaultCurrentTimestampInMariaDB(): void
     {
@@ -327,10 +47,9 @@ final class SchemaTest extends TestCase
          */
         $db = $this->getConnection();
 
-        $this->assertNotNull($this->schemaCache);
-        $schema = new Schema($db, $this->schemaCache);
+        $schema = new Schema($db, DbHelper::getSchemaCache());
 
-        $column = $this->invokeMethod($schema, 'loadColumnSchema', [[
+        $column = Assert::invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
             'type' => 'timestamp',
             'collation' => null,
@@ -348,267 +67,285 @@ final class SchemaTest extends TestCase
     }
 
     /**
-     * @dataProvider pdoAttributesProviderTrait
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns()
      *
      * @throws Exception
-     * @throws InvalidConfigException
      */
-    public function testGetTableNames(array $pdoAttributes): void
+    public function testColumnSchema(array $columns): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getConnection();
 
-        foreach ($pdoAttributes as $name => $value) {
-            $db->getPDO()?->setAttribute($name, $value);
+        if (version_compare($db->getServerVersion(), '8.0.17', '>')) {
+            // int_col Mysql 8.0.17+.
+            $columns['int_col']['dbType'] = 'int';
+            $columns['int_col']['size'] = null;
+            $columns['int_col']['precision'] = null;
+
+            // int_col2 Mysql 8.0.17+.
+            $columns['int_col2']['dbType'] = 'int';
+            $columns['int_col2']['size'] = null;
+            $columns['int_col2']['precision'] = null;
+
+            // tinyint_col Mysql 8.0.17+.
+            $columns['tinyint_col']['dbType'] = 'tinyint';
+            $columns['tinyint_col']['size'] = null;
+            $columns['tinyint_col']['precision'] = null;
+
+            // smallint_col Mysql 8.0.17+.
+            $columns['smallint_col']['dbType'] = 'smallint';
+            $columns['smallint_col']['size'] = null;
+            $columns['smallint_col']['precision'] = null;
         }
 
-        $schema = $db->getSchema();
-
-        $tables = $schema->getTableNames();
-
-        if ($db->getDriver()->getDriverName() === 'sqlsrv') {
-            $tables = array_map(static fn ($item) => trim($item, '[]'), $tables);
-        }
-
-        $this->assertContains('customer', $tables);
-        $this->assertContains('category', $tables);
-        $this->assertContains('item', $tables);
-        $this->assertContains('order', $tables);
-        $this->assertContains('order_item', $tables);
-        $this->assertContains('type', $tables);
-        $this->assertContains('animal', $tables);
-        $this->assertContains('animal_view', $tables);
-    }
-
-    public function constraintsProvider()
-    {
-        $result = $this->constraintsProviderTrait();
-
-        $result['1: check'][2] = false;
-
-        $result['2: primary key'][2]->name(null);
-
-        $result['2: check'][2] = false;
-
-        $result['3: check'][2] = false;
-
-        $result['4: check'][2] = false;
-
-        return $result;
+        parent::testColumnSchema($columns);
     }
 
     /**
-     * @dataProvider constraintsProvider
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit()
      */
-    public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
+    public function testColumnSchemaWithTypeBit(array $columns): void
     {
-        if ($expected === false) {
-            $this->expectException(NotSupportedException::class);
-        }
-
-        $constraints = $this->getConnection()->getSchema()->{'getTable' . ucfirst($type)}($tableName);
-
-        $this->assertMetadataEquals($expected, $constraints);
+        $this->columnSchema($columns, 'type_bit');
     }
 
     /**
-     * @dataProvider lowercaseConstraintsProviderTrait
-     *
      * @throws Exception
      * @throws InvalidConfigException
+     * @throws Throwable
      */
-    public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
+    public function testDefaultValueDatetimeColumn(): void
     {
-        if ($expected === false) {
-            $this->expectException(NotSupportedException::class);
-        }
-
         $db = $this->getConnection();
-        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-        $this->assertMetadataEquals($expected, $constraints);
+
+        $command = $db->createCommand();
+        $schema = $db->getSchema();
+
+        $sql = <<<SQL
+        CREATE TABLE  IF NOT EXISTS `datetime_test`  (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        SQL;
+
+        $command->setSql($sql)->execute();
+
+        $schema = $schema->getTableSchema('datetime_test');
+
+        $this->assertNotNull($schema);
+
+        $dt = $schema->getColumn('dt');
+
+        $this->assertNotNull($dt);
+
+        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
     }
 
     /**
-     * @dataProvider uppercaseConstraintsProviderTrait
-     *
      * @throws Exception
      * @throws InvalidConfigException
+     * @throws Throwable
      */
-    public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
+    public function testDefaultValueDatetimeColumnWithMicrosecs(): void
     {
-        if ($expected === false) {
-            $this->expectException(NotSupportedException::class);
-        }
-
         $db = $this->getConnection();
-        $db->getActivePDO()->setAttribute(PDO::ATTR_CASE, PDO::CASE_UPPER);
-        $constraints = $db->getSchema()->{'getTable' . ucfirst($type)}($tableName, true);
-        $this->assertMetadataEquals($expected, $constraints);
-    }
 
-    /**
-     * @depends testSchemaCache
-     *
-     * @dataProvider tableSchemaCachePrefixesProviderTrait
-     */
-    public function testTableSchemaCacheWithTablePrefixes(
-        string $tablePrefix,
-        string $tableName,
-        string $testTablePrefix,
-        string $testTableName
-    ): void {
-        $db = $this->getConnection();
+        $command = $db->createCommand();
         $schema = $db->getSchema();
 
-        $this->assertNotNull($this->schemaCache);
+        $sql = <<<SQL
+        CREATE TABLE  IF NOT EXISTS `current_timestamp_test`  (
+            `dt` datetime(2) NOT NULL DEFAULT CURRENT_TIMESTAMP(2),
+            `ts` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        SQL;
 
-        $this->schemaCache->setEnable(true);
+        $command->setSql($sql)->execute();
 
-        $db->setTablePrefix($tablePrefix);
-        $noCacheTable = $schema->getTableSchema($tableName, true);
-        $this->assertInstanceOf(TableSchemaInterface::class, $noCacheTable);
+        $schema = $schema->getTableSchema('current_timestamp_test');
 
-        /* Compare */
-        $db->setTablePrefix($testTablePrefix);
-        $testNoCacheTable = $schema->getTableSchema($testTableName);
-        $this->assertSame($noCacheTable, $testNoCacheTable);
+        $this->assertNotNull($schema);
 
-        $db->setTablePrefix($tablePrefix);
-        $schema->refreshTableSchema($tableName);
-        $refreshedTable = $schema->getTableSchema($tableName, false);
-        $this->assertInstanceOf(TableSchemaInterface::class, $refreshedTable);
-        $this->assertNotSame($noCacheTable, $refreshedTable);
+        $dt = $schema->getColumn('dt');
 
-        /* Compare */
-        $db->setTablePrefix($testTablePrefix);
-        $schema->refreshTableSchema($testTablePrefix);
-        $testRefreshedTable = $schema->getTableSchema($testTableName, false);
-        $this->assertInstanceOf(TableSchemaInterface::class, $testRefreshedTable);
-        $this->assertEquals($refreshedTable, $testRefreshedTable);
-        $this->assertNotSame($testNoCacheTable, $testRefreshedTable);
-    }
+        $this->assertNotNull($dt);
 
-    public function testFindUniqueIndexes(): void
-    {
-        $db = $this->getConnection();
+        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
 
-        try {
-            $db->createCommand()->dropTable('uniqueIndex')->execute();
-        } catch (Exception) {
-        }
+        $ts = $schema->getColumn('ts');
 
-        $db->createCommand()->createTable('uniqueIndex', [
-            'somecol' => 'string',
-            'someCol2' => 'string',
-        ])->execute();
-
-        /* @var $schema Schema */
-        $schema = $db->getSchema();
-        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
-
-        $this->assertNotNull($tableSchema);
-
-        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
-        $this->assertEquals([], $uniqueIndexes);
-
-        $db->createCommand()->createIndex('somecolUnique', 'uniqueIndex', 'somecol', QueryBuilder::INDEX_UNIQUE)->execute();
-        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
-
-        $this->assertNotNull($tableSchema);
-
-        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
-        $this->assertEquals([
-            'somecolUnique' => ['somecol'],
-        ], $uniqueIndexes);
-
-        // create another column with upper case letter that fails postgres
-        // see https://github.com/yiisoft/yii2/issues/10613
-        $db->createCommand()->createIndex('someCol2Unique', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
-        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
-
-        $this->assertNotNull($tableSchema);
-
-        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
-        $this->assertEquals([
-            'somecolUnique' => ['somecol'],
-            'someCol2Unique' => ['someCol2'],
-        ], $uniqueIndexes);
-
-        // see https://github.com/yiisoft/yii2/issues/13814
-        $db->createCommand()->createIndex('another unique index', 'uniqueIndex', 'someCol2', QueryBuilder::INDEX_UNIQUE)->execute();
-        $tableSchema = $schema->getTableSchema('uniqueIndex', true);
-
-        $this->assertNotNull($tableSchema);
-
-        $uniqueIndexes = $schema->findUniqueIndexes($tableSchema);
-        $this->assertEquals([
-            'somecolUnique' => ['somecol'],
-            'someCol2Unique' => ['someCol2'],
-            'another unique index' => ['someCol2'],
-        ], $uniqueIndexes);
-    }
-
-    public function testGetSchemaDefaultValues(): void
-    {
-        $this->markTestSkipped('MySQL does not support default value constraints.');
+        $this->assertNotNull($ts);
+        $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
     }
 
     public function testGetSchemaChecks(): void
     {
-        $this->markTestSkipped('MySQL does not support check constraints.');
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.'
+        );
+
+        parent::testGetSchemaChecks();
+    }
+
+    public function testGetSchemaDefaultValues(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\Schema::loadTableDefaultValues is not supported by MySQL.'
+        );
+
+        parent::testGetSchemaDefaultValues();
     }
 
     /**
-     * @dataProvider tableSchemaWithDbSchemesDataProvider
+     * @throws NotSupportedException
      */
-    public function testTableSchemaWithDbSchemes(string $tableName, string $expectedTableName, string $expectedSchemaName = ''): void
+    public function testGetSchemaNames(): void
     {
         $db = $this->getConnection();
 
-        $commandMock = $this->createMock(CommandInterface::class);
-        $commandMock
-            ->method('queryAll')
-            ->willReturn([]);
+        $schema = $db->getSchema();
 
-        $mockDb = $this->createMock(ConnectionInterface::class);
-
-        $mockDb->method('getQuoter')
-            ->willReturn($db->getQuoter());
-
-        $mockDb
-            ->method('createCommand')
-            ->with(self::callback(fn ($sql) => true), self::callback(function ($params) use ($expectedTableName, $expectedSchemaName) {
-                $this->assertEquals($expectedTableName, $params[':tableName']);
-                $this->assertEquals($expectedSchemaName, $params[':schemaName']);
-                return true;
-            }))
-            ->willReturn($commandMock);
-
-        $schema = new Schema($mockDb, $this->createSchemaCache());
-
-        $schema->getTablePrimaryKey($tableName);
+        $this->assertSame(['yiitest'], $schema->getSchemaNames());
     }
 
     /**
-     * @dataProvider tableSchemaWithDbSchemesDataProvider
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeChar()
      */
-    public function testQuoterTableParts(string $tableName, ...$expectedParts): void
-    {
-        $quoter = $this->getConnection()->getQuoter();
-
-        $parts = $quoter->getTableNameParts($tableName);
-
-        $this->assertEquals($expectedParts, array_reverse($parts));
+    public function testGetStringFieldsSize(
+        string $columnName,
+        string $columnType,
+        int|null $columnSize,
+        string $columnDbType
+    ): void {
+        parent::testGetStringFieldsSize($columnName, $columnType, $columnSize, $columnDbType);
     }
 
-    public function tableSchemaWithDbSchemesDataProvider(): array
+    public function testGetTableChecks(): void
     {
-        return [
-            ['animal', 'animal',],
-            ['`other`.`animal2`', 'animal2', 'other',],
-            ['other.`animal2`', 'animal2', 'other',],
-            ['other.animal2', 'animal2', 'other',],
-            ['catalog.other.animal2', 'animal2', 'other'],
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.'
+        );
+
+        parent::testGetTableChecks();
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
+    public function testGetTableNamesWithSchema(): void
+    {
+        $db = $this->getConnection(true);
+
+        $schema = $db->getSchema();
+        $tablesNames = $schema->getTableNames('yiitest');
+
+        $expectedTableNames = [
+            'alpha',
+            'animal',
+            'animal_view',
+            'beta',
+            'bit_values',
+            'category',
+            'comment',
+            'composite_fk',
+            'constraints',
+            'customer',
+            'default_pk',
+            'department',
+            'document',
+            'dossier',
+            'employee',
+            'item',
+            'negative_default_values',
+            'null_values',
+            'order',
+            'order_item',
+            'order_item_with_null_fk',
+            'order_with_null_fk',
+            'profile',
+            'quoter',
+            'storage',
+            'T_constraints_1',
+            'T_constraints_2',
+            'T_constraints_3',
+            'T_constraints_4',
+            'T_upsert',
+            'T_upsert_1',
+            'type',
         ];
+
+        foreach ($expectedTableNames as $tableName) {
+            $this->assertContains($tableName, $tablesNames);
+        }
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
+     */
+    public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
+    {
+        parent::testTableSchemaConstraints($tableName, $type, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
+     */
+    public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
+    {
+        parent::testTableSchemaConstraintsWithPdoLowercase($tableName, $type, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
+     */
+    public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
+    {
+        parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::tableSchemaWithDbSchemes()
+     */
+    public function testTableSchemaWithDbSchemes(
+        string $tableName,
+        string $expectedTableName,
+        string $expectedSchemaName = ''
+    ): void {
+        $db = $this->getConnection();
+
+        $commandMock = $this->createMock(CommandInterface::class);
+        $commandMock->method('queryAll')->willReturn([]);
+        $mockDb = $this->createMock(ConnectionInterface::class);
+        $mockDb->method('getQuoter')->willReturn($db->getQuoter());
+        $mockDb
+            ->method('createCommand')
+            ->with(
+                self::callback(static fn ($sql) => true),
+                self::callback(
+                    function ($params) use ($expectedTableName, $expectedSchemaName) {
+                        $this->assertEquals($expectedTableName, $params[':tableName']);
+                        $this->assertEquals($expectedSchemaName, $params[':schemaName']);
+
+                        return true;
+                    }
+                )
+            )
+            ->willReturn($commandMock);
+
+        $schema = new Schema($mockDb, DbHelper::getSchemaCache());
+        $schema->getTablePrimaryKey($tableName);
     }
 }

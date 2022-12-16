@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS `quoter` CASCADE;
 DROP TABLE IF EXISTS `null_values` CASCADE;
 DROP TABLE IF EXISTS `negative_default_values` CASCADE;
 DROP TABLE IF EXISTS `type` CASCADE;
+DROP TABLE IF EXISTS `type_bit`;
 DROP TABLE IF EXISTS `constraints` CASCADE;
 DROP TABLE IF EXISTS `animal` CASCADE;
 DROP TABLE IF EXISTS `default_pk` CASCADE;
@@ -162,6 +163,15 @@ CREATE TABLE `type` (
   `ts_default` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `bit_col` BIT(8) NOT NULL DEFAULT b'10000010',
   `json_col` json
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `type_bit` (
+  `bit_col_1` BIT(1) NOT NULL,
+  `bit_col_2` BIT(1) DEFAULT b'1',
+  `bit_col_3` BIT(32) NOT NULL,
+  `bit_col_4` BIT(32) DEFAULT b'10000010',
+  `bit_col_5` BIT(64) NOT NULL,
+  `bit_col_6` BIT(64) DEFAULT b'10000010'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `animal` (
