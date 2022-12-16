@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use ReflectionException;
+use Throwable;
+use Yiisoft\Db\Command\CommandInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Schema;
@@ -30,6 +36,8 @@ final class SchemaTest extends CommonSchemaTest
      *
      * {@link https://mariadb.com/kb/en/library/now/#description}
      * {@link https://github.com/yiisoft/yii2/issues/15167}
+     *
+     * @throws ReflectionException
      */
     public function testAlternativeDisplayOfDefaultCurrentTimestampInMariaDB(): void
     {
@@ -60,6 +68,8 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns()
+     *
+     * @throws Exception
      */
     public function testColumnSchema(array $columns): void
     {
@@ -92,15 +102,17 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit()
-     *
-     * @throws Exception
-     * @throws NotSupportedException
      */
     public function testColumnSchemaWithTypeBit(array $columns): void
     {
         $this->columnSchema($columns, 'type_bit');
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testDefaultValueDatetimeColumn(): void
     {
         $db = $this->getConnection();
@@ -131,6 +143,11 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testDefaultValueDatetimeColumnWithMicrosecs(): void
     {
         $db = $this->getConnection();
@@ -185,6 +202,9 @@ final class SchemaTest extends CommonSchemaTest
         parent::testGetSchemaDefaultValues();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetSchemaNames(): void
     {
         $db = $this->getConnection();
@@ -216,6 +236,9 @@ final class SchemaTest extends CommonSchemaTest
         parent::testGetTableChecks();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetTableNamesWithSchema(): void
     {
         $db = $this->getConnection(true);
@@ -265,6 +288,8 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
      */
     public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
     {
@@ -273,6 +298,8 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
      */
     public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
     {
@@ -281,9 +308,44 @@ final class SchemaTest extends CommonSchemaTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     *
+     * @throws Exception
      */
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
+    }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::tableSchemaWithDbSchemes()
+     */
+    public function testTableSchemaWithDbSchemes(
+        string $tableName,
+        string $expectedTableName,
+        string $expectedSchemaName = ''
+    ): void {
+        $db = $this->getConnection();
+
+        $commandMock = $this->createMock(CommandInterface::class);
+        $commandMock->method('queryAll')->willReturn([]);
+        $mockDb = $this->createMock(ConnectionInterface::class);
+        $mockDb->method('getQuoter')->willReturn($db->getQuoter());
+        $mockDb
+            ->method('createCommand')
+            ->with(
+                self::callback(fn ($sql) => true),
+                self::callback(
+                    function ($params) use ($expectedTableName, $expectedSchemaName) {
+                        $this->assertEquals($expectedTableName, $params[':tableName']);
+                        $this->assertEquals($expectedSchemaName, $params[':schemaName']);
+
+                        return true;
+                    }
+                )
+            )
+            ->willReturn($commandMock);
+
+        $schema = new Schema($mockDb, DbHelper::getSchemaCache());
+        $schema->getTablePrimaryKey($tableName);
     }
 }

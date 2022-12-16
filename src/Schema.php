@@ -237,6 +237,10 @@ final class Schema extends AbstractSchema
      * Collects the foreign key column details for the given table.
      *
      * @param TableSchemaInterface $table the table metadata.
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
      */
     protected function findConstraints(TableSchemaInterface $table): void
     {
@@ -290,6 +294,11 @@ final class Schema extends AbstractSchema
         }
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     protected function findSchemaNames(): array
     {
         $sql = <<<SQL
@@ -299,6 +308,11 @@ final class Schema extends AbstractSchema
         return $this->db->createCommand($sql)->queryColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     protected function findTableComment(TableSchemaInterface $tableSchema): void
     {
         $sql = <<<SQL
@@ -342,6 +356,11 @@ final class Schema extends AbstractSchema
         return $this->db->createCommand($sql)->queryColumn();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     protected function findViewNames(string $schema = ''): array
     {
         $sql = match ($schema) {
