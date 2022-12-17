@@ -38,7 +38,7 @@ final class QuoterTest extends AbstractQuoterTest
     public function testQuoteSimpleColumnName(
         string $columnName,
         string $expectedQuotedColumnName,
-        string $expectedUnQuotedColumnName
+        string $expectedUnQuotedColumnName = null
     ): void {
         parent::testQuoteSimpleColumnName($columnName, $expectedQuotedColumnName, $expectedUnQuotedColumnName);
     }
