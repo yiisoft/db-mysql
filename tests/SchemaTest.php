@@ -8,12 +8,15 @@ use ReflectionException;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Constraint\Constraint;
+use Yiisoft\Db\Constraint\IndexConstraint;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\QueryBuilder;
 use Yiisoft\Db\Schema\ColumnSchema;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\Assert;
@@ -347,5 +350,77 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema = new Schema($mockDb, DbHelper::getSchemaCache());
         $schema->getTablePrimaryKey($tableName);
+    }
+
+    public function testWorkWithCheckConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.'
+        );
+
+        parent::testWorkWithCheckConstraint();
+    }
+
+    public function testWorkWithDefaultValueConstraint(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.'
+        );
+
+        parent::testWorkWithDefaultValueConstraint();
+    }
+
+    public function testWorkWithPrimaryKeyConstraint(): void
+    {
+        $tableName = 'test_table_with';
+        $constraintName = 't_constraint';
+        $columnName = 't_field';
+
+        $db = $this->getConnection();
+
+        $this->createTableForIndexAndConstraintTests($db, $tableName, $columnName);
+        $db->createCommand()->addPrimaryKey($constraintName, $tableName, $columnName)->execute();
+
+        $constraints = $db->getSchema()->getTablePrimaryKey($tableName, true);
+
+        $this->assertInstanceOf(Constraint::class, $constraints);
+        $this->assertEquals('', $constraints->getName());
+        $this->assertEquals([$columnName], $constraints->getColumnNames());
+
+        $db->createCommand()->dropPrimaryKey($constraintName, $tableName)->execute();
+
+        $constraints = $db->getSchema()->getTablePrimaryKey($tableName, true);
+
+        $this->assertNull($constraints);
+
+        $this->dropTableForIndexAndConstraintTests($db, $tableName);
+    }
+
+    public function withIndexDataProvider(): array
+    {
+        return array_merge(parent::withIndexDataProvider(), [
+            [
+                'indexType' => null,
+                'indexMethod' => QueryBuilder::INDEX_HASH,
+                'columnType' => 'varchar(16)',
+            ],
+            [
+                'indexType' => null,
+                'indexMethod' => QueryBuilder::INDEX_B_TREE,
+                'columnType' => 'varchar(16)',
+            ],
+            [
+                'indexType' => QueryBuilder::INDEX_FULLTEXT,
+                'indexMethod' => null,
+                'columnType' => 'varchar(16)',
+            ],
+            [
+                'indexType' => QueryBuilder::INDEX_SPATIAL,
+                'indexMethod' => null,
+                'columnType' => 'GEOMETRY NOT NULL',
+            ],
+        ]);
     }
 }
