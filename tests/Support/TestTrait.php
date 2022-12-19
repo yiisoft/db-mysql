@@ -15,11 +15,10 @@ trait TestTrait
 
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
-        $db = new ConnectionPDO(
-            new PDODriver($this->dsn, 'root', '', ['charset' => 'utf8mb4']),
-            DbHelper::getQueryCache(),
-            DbHelper::getSchemaCache(),
-        );
+        $pdoDriver = new PDODriver($this->dsn, 'root', '');
+        $pdoDriver->setCharset('utf8mb4');
+
+        $db = new ConnectionPDO($pdoDriver, DbHelper::getQueryCache(), DbHelper::getSchemaCache());
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/mysql.sql');
