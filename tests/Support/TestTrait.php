@@ -11,10 +11,12 @@ use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
 {
+    private string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=3306';
+
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
         $db = new ConnectionPDO(
-            new PDODriver('mysql:host=127.0.0.1;dbname=yiitest;port=3306', 'root', ''),
+            new PDODriver($this->dsn, 'root', ''),
             DbHelper::getQueryCache(),
             DbHelper::getSchemaCache(),
         );
@@ -29,5 +31,10 @@ trait TestTrait
     protected function getDriverName(): string
     {
         return 'mysql';
+    }
+
+    protected function setDsn(string $dsn): void
+    {
+        $this->dsn = $dsn;
     }
 }
