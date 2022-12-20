@@ -4,17 +4,28 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Throwable;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\TestSupport\TestQueryTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\AbstractQueryTest;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
-final class QueryTest extends TestCase
+final class QueryTest extends AbstractQueryTest
 {
-    use TestQueryTrait;
+    use TestTrait;
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testQueryIndexHint(): void
     {
         $db = $this->getConnection();
@@ -28,6 +39,11 @@ final class QueryTest extends TestCase
         $this->assertArrayHasKey('email', $row);
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     public function testLimitOffsetWithExpression(): void
     {
         $db = $this->getConnection();

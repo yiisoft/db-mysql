@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use ErrorException;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Throwable;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function date;
@@ -25,6 +27,7 @@ use function pcntl_sigtimedwait;
 use function pcntl_wait;
 use function pcntl_wexitstatus;
 use function pcntl_wifexited;
+use function posix_getpid;
 use function posix_kill;
 use function round;
 use function set_error_handler;
@@ -34,10 +37,14 @@ use function unlink;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class DeadLockTest extends TestCase
 {
-    public const CHILD_EXIT_CODE_DEADLOCK = 15;
+    use testTrait;
+
+    private const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
 
     /**
@@ -62,7 +69,7 @@ final class DeadLockTest extends TestCase
             $this->markTestSkipped('pcntl_sigtimedwait() is not available');
         }
 
-        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . \posix_getpid());
+        $this->setLogFile(sys_get_temp_dir() . '/deadlock_' . posix_getpid());
 
         $this->deleteLog();
 
@@ -106,7 +113,7 @@ final class DeadLockTest extends TestCase
              * PARENT
              * nothing to do
              */
-        } catch (Exception|Throwable $e) {
+        } catch (\Exception | Throwable $e) {
             /* wait all children */
             while (-1 !== pcntl_wait($status)) {
                 /* nothing to do */
@@ -238,7 +245,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception|Throwable $e) {
+        } catch (\Exception | Throwable $e) {
             $this->log(
                 'child 1: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -317,7 +324,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception|Throwable $e) {
+        } catch (\Exception | Throwable $e) {
             $this->log(
                 'child 2: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -337,6 +344,8 @@ final class DeadLockTest extends TestCase
      * In case of error in child process its execution bubbles up to phpunit to continue all the rest tests. So, all
      * the rest tests in this case will run both in the child and parent processes. Such mess must be prevented with
      * child's own error handler.
+     *
+     * @throws ErrorException
      */
     private function setErrorHandler(): void
     {
@@ -361,7 +370,7 @@ final class DeadLockTest extends TestCase
     private function deleteLog(): void
     {
         /** @psalm-suppress RedundantCondition */
-        if (null !== $this->logFile && is_file($this->logFile)) {
+        if (is_file($this->logFile)) {
             unlink($this->logFile);
         }
     }
@@ -376,8 +385,7 @@ final class DeadLockTest extends TestCase
      */
     private function getLogContentAndDelete(): ?string
     {
-        /** @psalm-suppress RedundantCondition */
-        if (null !== $this->logFile && is_file($this->logFile)) {
+        if (is_file($this->logFile)) {
             $content = file_get_contents($this->logFile);
 
             unlink($this->logFile);
@@ -396,17 +404,11 @@ final class DeadLockTest extends TestCase
      */
     private function log(string $message): void
     {
-        /** @psalm-suppress RedundantCondition */
-        if (null !== $this->logFile) {
-            $time = microtime(true);
+        $time = microtime(true);
+        $timeInt = floor($time);
+        $timeFrac = $time - $timeInt;
+        $timestamp = date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
 
-            $timeInt = floor($time);
-
-            $timeFrac = $time - $timeInt;
-
-            $timestamp = date('Y-m-d H:i:s', (int) $timeInt) . '.' . round($timeFrac * 1000);
-
-            file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
-        }
+        file_put_contents($this->logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
     }
 }

@@ -4,45 +4,37 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use JsonException;
+use PHPUnit\Framework\TestCase;
+use Throwable;
+use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Mysql\ColumnSchema;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Query\Query;
 
 /**
  * @group mysql
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ColumnSchemaTest extends TestCase
 {
-    public function bigintValueProvider(): array
-    {
-        return [
-            ['8817806877'],
-            ['3797444208'],
-            ['3199585540'],
-            ['1389831585'],
-            ['922337203685477580'],
-            ['9223372036854775807'],
-            ['-9223372036854775808'],
-        ];
-    }
+    use TestTrait;
 
     /**
-     * @dataProvider bigintValueProvider
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaProvider::bigIntValue()
+     *
+     * @throws Exception
+     * @throws Throwable
      */
-    public function testColumnBigInt($bigint): void
+    public function testColumnBigInt(string $bigint): void
     {
         $db = $this->getConnection(true);
+
         $command = $db->createCommand();
-
-        $command->insert(
-            'negative_default_values',
-            [
-                'bigint_col' => $bigint,
-            ]
-        );
-
+        $command->insert('negative_default_values', ['bigint_col' => $bigint]);
         $command->execute();
-
         $query = (new Query($db))->from('negative_default_values')->one();
 
         $this->assertSame($bigint, $query['bigint_col']);
@@ -51,16 +43,20 @@ final class ColumnSchemaTest extends TestCase
     public function testDbTypeCastJson(): void
     {
         $columnSchema = new ColumnSchema();
+
         $columnSchema->dbType('json');
         $columnSchema->type('json');
 
-        $expected = new JsonExpression('{"a":1}', 'json');
-        $this->assertEquals($expected, $columnSchema->dbTypeCast('{"a":1}'));
+        $this->assertEquals(new JsonExpression('{"a":1}', 'json'), $columnSchema->dbTypeCast('{"a":1}'));
     }
 
+    /**
+     * @throws JsonException
+     */
     public function testPhpTypeCastJson(): void
     {
         $columnSchema = new ColumnSchema();
+
         $columnSchema->type('json');
 
         $this->assertSame(['a' => 1], $columnSchema->phpTypeCast('{"a":1}'));
