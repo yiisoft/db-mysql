@@ -99,11 +99,11 @@ final class SchemaTest extends CommonSchemaTest
                 $columns['smallint_col']['size'] = null;
                 $columns['smallint_col']['precision'] = null;
             }
+
             if ($tableName === 'animal') {
                 $columns['id']['dbType'] = 'int';
                 $columns['id']['size'] = null;
                 $columns['id']['precision'] = null;
-
             }
         }
 
