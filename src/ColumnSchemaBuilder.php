@@ -15,7 +15,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \Stringable
 {
     /**
-     *  @psalm-param string[]|int|string|null $length column size or precision definition.
+     *  @psalm-param string[]|int[]|int|string|null $length column size or precision definition.
      */
     public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
     {
