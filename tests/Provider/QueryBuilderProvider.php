@@ -169,9 +169,7 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
             ],
             // @todo - SQL code have a bug. Need fix in next PR
             'no columns to update with unique' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`) VALUES (:qp0) ON DUPLICATE KEY UPDATE
-                SQL,
+                3 => 'INSERT INTO {{%T_upsert}} (`email`) VALUES (:qp0) ON DUPLICATE KEY UPDATE ',
             ],
         ];
 
