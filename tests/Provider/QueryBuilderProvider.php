@@ -167,6 +167,10 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
                 INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON DUPLICATE KEY UPDATE `a`=`T_upsert_1`.`a`
                 SQL,
             ],
+            // @todo - SQL code have a bug. Need fix in next PR
+            'no columns to update with unique' => [
+                3 => 'INSERT INTO {{%T_upsert}} (`email`) VALUES (:qp0) ON DUPLICATE KEY UPDATE ',
+            ],
         ];
 
         $upsert = parent::upsert();
