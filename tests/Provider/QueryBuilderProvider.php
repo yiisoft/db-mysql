@@ -108,68 +108,54 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
     {
         $concreteData = [
             'regular values' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`)
-                SQL,
+                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ' .
+                    'ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`)',
             ],
             'regular values with update part' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1
-                SQL,
+                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ' .
+                    'ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1',
             ],
             'regular values without update part' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ON DUPLICATE KEY UPDATE `email`=`T_upsert`.`email`
-                SQL,
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)',
             ],
             'query' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `status`=VALUES(`status`)
-                SQL,
+                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
+                    'WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `status`=VALUES(`status`)',
             ],
             'query with update part' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1
-                SQL,
+                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
+                    'WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1',
             ],
             'query without update part' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `email`=`T_upsert`.`email`
-                SQL,
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
+                    'WHERE `name`=:qp0 LIMIT 1',
             ],
             'values and expressions' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, now())
-                SQL,
+                3 => 'INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
+                    'ON DUPLICATE KEY UPDATE [[ts]]=VALUES([[ts]])',
             ],
             'values and expressions with update part' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, now())
-                SQL,
+                3 => 'INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
+                    'ON DUPLICATE KEY UPDATE [[orders]]=T_upsert.orders + 1',
             ],
             'values and expressions without update part' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, now())
-                SQL,
+                3 => 'INSERT IGNORE INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP)',
             ],
             'query, values and expressions with update part' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`, [[time]]) SELECT :phEmail AS `email`, now() AS [[time]] ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1
-                SQL,
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ' .
+                    'ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
-                3 => <<<SQL
-                INSERT INTO {{%T_upsert}} (`email`, [[time]]) SELECT :phEmail AS `email`, now() AS [[time]] ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1
-                SQL,
+                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
             ],
             'no columns to update' => [
-                3 => <<<SQL
-                INSERT INTO `T_upsert_1` (`a`) VALUES (:qp0) ON DUPLICATE KEY UPDATE `a`=`T_upsert_1`.`a`
-                SQL,
+                3 => 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)',
             ],
-            // @todo - SQL code have a bug. Need fix in next PR
             'no columns to update with unique' => [
-                3 => 'INSERT INTO {{%T_upsert}} (`email`) VALUES (:qp0) ON DUPLICATE KEY UPDATE ',
+                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`) VALUES (:qp0)',
+            ],
+            'no unique columns in table - simple insert' => [
+                3 => 'INSERT INTO {{%animal}} (`type`) VALUES (:qp0)',
             ],
         ];
 

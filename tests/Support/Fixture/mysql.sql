@@ -374,7 +374,7 @@ ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
 CREATE TABLE `T_upsert`
 (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `ts` INT NULL,
+    `ts` BIGINT NULL,
     `email` VARCHAR(128) NOT NULL UNIQUE,
     `recovery_email` VARCHAR(128) NULL,
     `address` TEXT NULL,
