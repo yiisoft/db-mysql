@@ -550,7 +550,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        string|array $expectedSQL,
+        string $expectedSQL,
         array $expectedParams
     ): void {
         parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
