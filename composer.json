@@ -36,7 +36,9 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.18",
         "yiisoft/aliases": "^2.0",
-        "yiisoft/log-target-file": "^2.0"
+        "yiisoft/log-target-file": "^2.0",
+        "yiisoft/cache": "^2.0",
+        "yiisoft/cache-file": "^2.0"
     },
     "autoload": {
         "psr-4": {
