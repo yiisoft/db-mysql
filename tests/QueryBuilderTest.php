@@ -555,4 +555,15 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
     }
+
+    /**
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert()
+     */
+    public function testUpsertExecute(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns
+    ): void {
+        parent::testUpsertExecute($table, $insertColumns, $updateColumns);
+    }
 }

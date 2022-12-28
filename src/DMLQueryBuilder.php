@@ -133,10 +133,10 @@ EXECUTE autoincrement_stmt";
                     'VALUES(' . $this->quoter->quoteColumnName($name) . ')'
                 );
             }
-        } elseif ($updateColumns === false) {
-            $columnName = (string) reset($uniqueNames);
-            $name = $this->quoter->quoteColumnName($columnName);
-            $updateColumns = [$name => new Expression($this->quoter->quoteTableName($table) . '.' . $name)];
+        }
+
+        if (empty($updateColumns)) {
+            return str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insertSql);
         }
 
         /**
