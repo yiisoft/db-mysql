@@ -17,7 +17,7 @@ final class DsnTest extends TestCase
     public function testAsString(): void
     {
         $this->assertSame(
-            'mysql:host=localhost;dbname=yiitest',
+            'mysql:host=localhost;dbname=yiitest;port=3306',
             (new Dsn('mysql', 'localhost', 'yiitest'))->asString(),
         );
     }
