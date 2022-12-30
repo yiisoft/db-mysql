@@ -112,6 +112,14 @@ EXECUTE autoincrement_stmt";
         bool|array $updateColumns,
         array &$params
     ): string {
+        if (!$insertColumns instanceof QueryInterface) {
+            $insertColumns = $this->normalizeColumnNames($table, $insertColumns);
+        }
+
+        if (!is_bool($updateColumns)) {
+            $updateColumns = $this->normalizeColumnNames($table, $updateColumns);
+        }
+
         $insertSql = $this->insert($table, $insertColumns, $params);
 
         /** @var array $uniqueNames */
