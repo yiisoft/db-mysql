@@ -8,18 +8,39 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\AbstractQueryTest;
+use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
 /**
  * @group mysql
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class QueryTest extends AbstractQueryTest
+final class QueryTest extends CommonQueryTest
 {
     use TestTrait;
+
+    /**
+     * Ensure no ambiguous column error occurs on indexBy with JOIN.
+     *
+     * @link https://github.com/yiisoft/yii2/issues/13859
+     */
+    public function testAmbiguousColumnIndexBy(): void
+    {
+        $db = $this->getConnection(true);
+
+        $selectExpression = "concat(customer.name,' in ', p.description) name";
+
+        $result = (new Query($db))
+            ->select([$selectExpression])
+            ->from('customer')
+            ->innerJoin('profile p', '[[customer]].[[profile_id]] = [[p]].[[id]]')
+            ->indexBy('id')
+            ->column();
+
+        $this->assertSame([1 => 'user1 in profile customer 1', 3 => 'user3 in profile customer 3'], $result);
+    }
 
     /**
      * @throws Exception
