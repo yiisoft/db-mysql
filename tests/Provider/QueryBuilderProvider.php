@@ -131,19 +131,19 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
                     'WHERE `name`=:qp0 LIMIT 1',
             ],
             'values and expressions' => [
-                3 => 'INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
-                    'ON DUPLICATE KEY UPDATE [[ts]]=VALUES([[ts]])',
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
+                    'ON DUPLICATE KEY UPDATE `ts`=VALUES(`ts`)',
             ],
             'values and expressions with update part' => [
-                3 => 'INSERT INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
-                    'ON DUPLICATE KEY UPDATE [[orders]]=T_upsert.orders + 1',
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
+                    'ON DUPLICATE KEY UPDATE `orders`=T_upsert.orders + 1',
             ],
             'values and expressions without update part' => [
-                3 => 'INSERT IGNORE INTO {{%T_upsert}} ({{%T_upsert}}.[[email]], [[ts]]) VALUES (:qp0, CURRENT_TIMESTAMP)',
+                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)',
             ],
             'query, values and expressions with update part' => [
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ' .
-                    'ON DUPLICATE KEY UPDATE `ts`=:qp1, [[orders]]=T_upsert.orders + 1',
+                    'ON DUPLICATE KEY UPDATE `ts`=:qp1, `orders`=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
                 3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',

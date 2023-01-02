@@ -6,25 +6,36 @@ namespace Yiisoft\Db\Mysql\Tests\Support;
 
 use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
 use Yiisoft\Db\Mysql\ConnectionPDO;
+use Yiisoft\Db\Mysql\Dsn;
 use Yiisoft\Db\Mysql\PDODriver;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
 {
-    private string $dsn = 'mysql:host=127.0.0.1;dbname=yiitest;port=3306';
+    private string $dsn = '';
 
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
-        $pdoDriver = new PDODriver($this->dsn, 'root', '');
-        $pdoDriver->setCharset('utf8mb4');
-
-        $db = new ConnectionPDO($pdoDriver, DbHelper::getQueryCache(), DbHelper::getSchemaCache());
+        $db = new ConnectionPDO(
+            new PDODriver($this->getDsn(), 'root', ''),
+            DbHelper::getQueryCache(),
+            DbHelper::getSchemaCache()
+        );
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/mysql.sql');
         }
 
         return $db;
+    }
+
+    protected function getDsn(): string
+    {
+        if ($this->dsn === '') {
+            $this->dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
+        }
+
+        return $this->dsn;
     }
 
     protected function getDriverName(): string
