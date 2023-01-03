@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Generator;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -126,7 +127,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsert()
      */
-    public function testBatchInsert(string $table, array $columns, array $rows, string $expected): void
+    public function testBatchInsert(string $table, array $columns, iterable|Generator $rows, string $expected): void
     {
         parent::testBatchInsert($table, $columns, $rows, $expected);
     }
