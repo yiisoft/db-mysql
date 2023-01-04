@@ -6,8 +6,8 @@ namespace Yiisoft\Db\Mysql;
 
 use PDO;
 use Psr\Log\LogLevel;
+use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
-use Yiisoft\Db\Driver\PDO\ConnectionPDO as AbstractConnectionPDO;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
