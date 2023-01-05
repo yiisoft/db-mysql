@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use PDO;
-use Yiisoft\Db\Driver\PDO\PDODriver as AbstractPDODriver;
+use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
 
 final class PDODriver extends AbstractPDODriver
 {
