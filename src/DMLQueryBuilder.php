@@ -33,6 +33,17 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     }
 
     /**
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
+    {
+        throw new NotSupportedException(__METHOD__ . ' is not supported by Mysql.');
+    }
+
+    /**
      * Creates a SQL statement for resetting the sequence value of a table's primary key.
      *
      * The sequence will be reset such that the primary key of the next new row inserted will have the specified value
