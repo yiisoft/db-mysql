@@ -8,7 +8,7 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\QueryBuilder\DDLQueryBuilder as AbstractDDLQueryBuilder;
+use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -93,7 +93,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws Exception|InvalidArgumentException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function createIndex(
         string $name,
@@ -165,7 +166,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws Exception|Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     public function renameColumn(string $table, string $oldName, string $newName): string
     {
