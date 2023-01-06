@@ -8,7 +8,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Builder\JsonExpressionBuilder;
-use Yiisoft\Db\QueryBuilder\DQLQueryBuilder as AbstractDQLQueryBuilder;
+use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 
 use function array_merge;
 use function ctype_digit;
@@ -41,9 +41,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     /**
      * Checks to see if the given limit is effective.
      *
-     * @param mixed $limit the given limit.
+     * @param mixed $limit The given limit.
      *
-     * @return bool whether the limit is effective.
+     * @return bool Whether the limit is effective.
      */
     protected function hasLimit(mixed $limit): bool
     {
@@ -54,9 +54,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     /**
      * Checks to see if the given offset is effective.
      *
-     * @param mixed $offset the given offset.
+     * @param mixed $offset The given offset.
      *
-     * @return bool whether the offset is effective.
+     * @return bool Whether the offset is effective.
      */
     protected function hasOffset(mixed $offset): bool
     {
