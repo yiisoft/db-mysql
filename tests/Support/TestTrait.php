@@ -18,7 +18,6 @@ trait TestTrait
     {
         $db = new ConnectionPDO(
             new PDODriver($this->getDsn(), 'root', ''),
-            DbHelper::getQueryCache(),
             DbHelper::getSchemaCache()
         );
 
