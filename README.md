@@ -11,6 +11,8 @@
 
 Yii DataBase MySQL Extension is a database extension for the Yii framework that allows developers to access and interact with [MySQL] and [MariaDb] databases. It provides a set of classes and methods for connecting to a [MySQL] and [MariaDb] database, executing SQL queries, and managing data within the database. The extension is designed to be easy to use and integrate into Yii-based applications, and supports a wide range of [MySQL], [MariaDb] features and functions. It also includes support for transactions, database schema management, and error handling.
 
+It is used in [YiiFramework] but can be used separately.
+
 [MariaDB]: https://mariadb.org/
 [MySQL]: https://www.mysql.com/
 [YiiFramework]: https://www.yiiframework.com/
