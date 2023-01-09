@@ -15,7 +15,7 @@ It is used in [Yii Framework] but can be used separately.
 
 [MariaDB]: https://mariadb.org/
 [MySQL]: https://www.mysql.com/
-[YiiFramework]: https://www.yiiframework.com/
+[Yii Framework]: https://www.yiiframework.com/
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v/stable.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
