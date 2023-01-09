@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Tests\Provider\AbstractColumnSchemaBuilderProvider;
 
 final class ColumnSchemaBuilderProvider extends AbstractColumnSchemaBuilderProvider

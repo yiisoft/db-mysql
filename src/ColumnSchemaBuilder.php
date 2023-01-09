@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 
 /**

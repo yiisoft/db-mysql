@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Schema\Quoter as BaseQuoter;
+use Yiisoft\Db\Schema\AbstractQuoter;
 
-final class Quoter extends BaseQuoter
+final class Quoter extends AbstractQuoter
 {
     public function quoteValue(mixed $value): mixed
     {

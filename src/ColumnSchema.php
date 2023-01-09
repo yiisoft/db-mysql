@@ -7,8 +7,7 @@ namespace Yiisoft\Db\Mysql;
 use JsonException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Schema\ColumnSchema as AbstractColumnSchema;
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Schema\AbstractColumnSchema;
 
 use function json_decode;
 
