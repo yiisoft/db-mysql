@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
@@ -73,7 +74,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
     }
 
-    public function getColumnType(ColumnSchemaBuilder|string $type): string
+    public function getColumnType(AbstractColumnSchemaBuilder|string $type): string
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
         return parent::getColumnType($type);
