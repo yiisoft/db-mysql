@@ -9,7 +9,7 @@
     <br>
 </p>
 
-Yii DataBase MySQL Extension is a database extension for the [Yii Framework] that allows developers to access and interact with [MySQL] and [MariaDb] databases. It provides a set of classes and methods for connecting to a [MySQL] and [MariaDb] database, executing SQL queries, and managing data within the database. The extension is designed to be easy to use and integrate into Yii-based applications, and supports a wide range of [MySQL], [MariaDb] features and functions. It also includes support for transactions, database schema management, and error handling.
+Yii Database MySQL Extension is a database extension for the [Yii Framework] that allows developers to access and interact with [MySQL] and [MariaDb] databases. It provides a set of classes and methods for connecting to a [MySQL] and [MariaDb] database, executing SQL queries, and managing data within the database. The extension is designed to be easy to use and integrate into Yii-based applications, and supports a wide range of [MySQL], [MariaDb] features and functions. It also includes support for transactions, database schema management, and error handling.
 
 It is used in [Yii Framework] but can be used separately.
 
@@ -39,9 +39,9 @@ composer require yiisoft/db-mysql
 
 ### Config with [Yii Framework]
 
-The configuration with [container di](https://github.com/yiisoft/di) of [YiiFramework].
+The configuration with [DI container](https://github.com/yiisoft/di) of [Yii Framework].
 
-Also you can use any container di which implements [PSR-11](https://www.php-fig.org/psr/psr-11/).
+Also you can use any DI container which implements [PSR-11](https://www.php-fig.org/psr/psr-11/).
 
 db.php
 
