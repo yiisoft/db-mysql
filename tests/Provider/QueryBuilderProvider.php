@@ -30,15 +30,15 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
             [
                 [
                     ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"lang":"uk","country":"UA"}'],
+                    '[[jsoncol]] = :qp0', [':qp0' => '{"lang":"uk","country":"UA"}'],
                 ],
                 [
                     ['=', 'jsoncol', new JsonExpression([false])],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[false]'],
+                    '[[jsoncol]] = :qp0', [':qp0' => '[false]'],
                 ],
                 'object with type. Type is ignored for MySQL' => [
                     ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
-                    '[[prices]] = CAST(:qp0 AS JSON)', [':qp0' => '{"seeds":15,"apples":25}'],
+                    '[[prices]] = :qp0', [':qp0' => '{"seeds":15,"apples":25}'],
                 ],
                 'nested json' => [
                     [
@@ -51,20 +51,20 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
                             ]
                         ),
                     ],
-                    '[[data]] = CAST(:qp0 AS JSON)',
+                    '[[data]] = :qp0',
                     [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}'],
                 ],
                 'null value' => [
                     ['=', 'jsoncol', new JsonExpression(null)],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => 'null'],
+                    '[[jsoncol]] = :qp0', [':qp0' => 'null'],
                 ],
                 'null as array value' => [
                     ['=', 'jsoncol', new JsonExpression([null])],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '[null]'],
+                    '[[jsoncol]] = :qp0', [':qp0' => '[null]'],
                 ],
                 'null as object value' => [
                     ['=', 'jsoncol', new JsonExpression(['nil' => null])],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"nil":null}'],
+                    '[[jsoncol]] = :qp0', [':qp0' => '{"nil":null}'],
                 ],
                 'query' => [
                     [
@@ -94,7 +94,7 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
                             new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])
                         ),
                     ],
-                    '[[jsoncol]] = CAST(:qp0 AS JSON)', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
+                    '[[jsoncol]] = :qp0', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
                 ],
                 'search by property in JSON column (issue #15838)' => [
                     ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],

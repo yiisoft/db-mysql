@@ -23,10 +23,12 @@ use function array_merge;
 use function array_values;
 use function bindec;
 use function explode;
+use function in_array;
+use function is_string;
 use function ksort;
 use function md5;
-use function preg_match;
 use function preg_match_all;
+use function preg_match;
 use function serialize;
 use function stripos;
 use function strtolower;
@@ -215,9 +217,15 @@ final class Schema extends AbstractSchema
             throw $e;
         }
 
+        $jsonColumns = $this->getJsonColumns($table);
+
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
+
+            if (in_array($info['field'], $jsonColumns, true)) {
+                $info['type'] = self::TYPE_JSON;
+            }
 
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
@@ -464,6 +472,7 @@ final class Schema extends AbstractSchema
         $column->type(self::TYPE_STRING);
 
         $extra = $info['extra'];
+
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
             $extra = strtoupper(substr($extra, 18));
         }
@@ -871,5 +880,21 @@ final class Schema extends AbstractSchema
     private function createColumnSchema(): ColumnSchema
     {
         return new ColumnSchema();
+    }
+
+    private function getJsonColumns(TableSchemaInterface $table): array
+    {
+        $sql = $this->getCreateTableSql($table);
+        $result = [];
+
+        $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
+
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $result[] = $match[1];
+            }
+        }
+
+        return $result;
     }
 }
