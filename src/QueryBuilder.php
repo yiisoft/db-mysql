@@ -8,6 +8,7 @@ use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder as BaseColumnSchemaBuilder;
 
 use function array_merge;
 
@@ -74,7 +75,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
     }
 
-    public function getColumnType(ColumnSchemaBuilder|string $type): string
+    public function getColumnType(BaseColumnSchemaBuilder|string $type): string
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
 
