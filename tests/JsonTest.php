@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Mysql\ColumnSchemaBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\Schema;
 
