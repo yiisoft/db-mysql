@@ -79,6 +79,7 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
 
+        /** @psalm-suppress UndefinedMethod */
         if ($type instanceof ColumnSchemaBuilder && $type->isJson()) {
             $type = Schema::TYPE_JSON;
         }

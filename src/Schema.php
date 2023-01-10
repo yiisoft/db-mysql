@@ -128,6 +128,7 @@ final class Schema extends AbstractSchema
     ];
 
     private array $jsonColumns = [];
+    /** @psalm-var array[][] $columnOverrides */
     private array $columnOverrides = [];
     private string|null $currentTable = null;
 
@@ -466,7 +467,10 @@ final class Schema extends AbstractSchema
     {
         $column = $this->createColumnSchema();
 
-        /** @psalm-var ColumnInfoArray $info */
+        /**
+         * @psalm-var ColumnInfoArray $info
+         * @psalm-suppress MixedArgument
+         */
         if (
             isset($this->jsonColumns[$this->currentTable]) &&
             in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
