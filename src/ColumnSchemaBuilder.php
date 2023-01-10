@@ -22,7 +22,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \
         parent::__construct($type, $length);
 
         if ($this->isJson()) {
-            $this->check("[[{name}]] is null or json_valid([[{name}]])");
+            $this->check('[[{name}]] is null or json_valid([[{name}]])');
         }
     }
 
