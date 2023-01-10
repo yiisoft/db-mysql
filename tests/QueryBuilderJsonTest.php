@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\Schema;
 
@@ -13,7 +14,7 @@ use Yiisoft\Db\Schema\Schema;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class JsonTest extends TestCase
+final class QueryBuilderJsonTest extends TestCase
 {
     use TestTrait;
 
@@ -67,6 +68,35 @@ final class JsonTest extends TestCase
             )
             SQL,
             $sql,
+        );
+    }
+
+    public function testInsertAndSelect()
+    {
+        $db = $this->getConnection(true);
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `storage` (`data`) VALUES (:qp0)
+            SQL,
+            $qb->insert('storage', ['data' => ['a' => 1, 'b' => 2]]),
+        );
+    }
+
+    public function testInsertJsonExpresionAndSelect()
+    {
+        $db = $this->getConnection(true);
+
+        $qb = $db->getQueryBuilder();
+        ;
+
+        $this->assertSame(
+            <<<SQL
+            INSERT INTO `storage` (`data`) VALUES (:qp0)
+            SQL,
+            $qb->insert('storage', ['data' => new JsonExpression(['a' => 1, 'b' => 2])]),
         );
     }
 }
