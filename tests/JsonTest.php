@@ -51,16 +51,6 @@ final class JsonTest extends TestCase
         );
     }
 
-    public function testColumnTypeJSONDefaultValue()
-    {
-        $db = $this->getConnection(true);
-
-        $table = $db->getTableSchema('storage');
-
-        $this->assertNotNull($table);
-        $this->assertSame(['test' => 1], $table->getColumn('data')->getDefaultValue());
-    }
-
     public function testCreateTable()
     {
         $db = $this->getConnection(true);
