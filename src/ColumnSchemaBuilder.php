@@ -20,10 +20,6 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \
     public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
     {
         parent::__construct($type, $length);
-
-        if ($this->isJson()) {
-            $this->check('[[{name}]] is null or json_valid([[{name}]])');
-        }
     }
 
     /**
@@ -58,10 +54,5 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \
         };
 
         return $this->buildCompleteString($format);
-    }
-
-    public function isJson(): bool
-    {
-        return $this->getType() === Schema::TYPE_JSON;
     }
 }
