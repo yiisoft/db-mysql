@@ -128,6 +128,7 @@ final class Schema extends AbstractSchema
     ];
 
     private array $jsonColumns = [];
+    /** @psalm-var array[][] $columnOverrides */
     private array $columnOverrides = [];
     private string|null $currentTable = null;
 
@@ -204,15 +205,17 @@ final class Schema extends AbstractSchema
         $tableName = $table->getFullName() ?? '';
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->db->getQuoter()->quoteTableName($tableName);
 
-        $this->currentTable = $tableName;
+        if ($tableName === '') {
+            $this->currentTable = $tableName;
+
+            $this->jsonColumns[$tableName] = array_merge(
+                $this->columnOverrides[$tableName],
+                $this->getJsonColumns($table),
+            );
+        }
 
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
-
-            $this->jsonColumns[$this->currentTable] = array_merge(
-                $this->columnOverrides[$tableName] ?? [],
-                $this->getJsonColumns($table),
-            );
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -469,6 +472,7 @@ final class Schema extends AbstractSchema
         /** @psalm-var ColumnInfoArray $info */
         if (
             isset($this->jsonColumns[$this->currentTable]) &&
+            is_array($this->jsonColumns[$this->currentTable]) &&
             in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
         ) {
             $info['type'] = self::TYPE_JSON;
