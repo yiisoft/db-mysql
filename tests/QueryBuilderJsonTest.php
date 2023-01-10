@@ -90,7 +90,7 @@ final class QueryBuilderJsonTest extends TestCase
         $db = $this->getConnection(true);
 
         $qb = $db->getQueryBuilder();
-        ;
+
 
         $this->assertSame(
             <<<SQL
