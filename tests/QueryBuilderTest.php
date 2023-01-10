@@ -15,6 +15,7 @@ use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
+use function str_contains;
 use function version_compare;
 
 /**
@@ -50,7 +51,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
         SQL;
 
-        if (version_compare($db->getServerVersion(), '8', '<')) {
+        if (!str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
+            SQL;
+        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL;
@@ -297,7 +302,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT ''
         SQL;
 
-        if (version_compare($db->getServerVersion(), '8', '<')) {
+        if (!str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '8', '<')) {
+            $sql = <<<SQL
+            ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
+            SQL;
+        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
             SQL;

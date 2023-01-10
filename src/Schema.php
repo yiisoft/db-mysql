@@ -23,10 +23,12 @@ use function array_merge;
 use function array_values;
 use function bindec;
 use function explode;
+use function in_array;
+use function is_string;
 use function ksort;
 use function md5;
-use function preg_match;
 use function preg_match_all;
+use function preg_match;
 use function serialize;
 use function stripos;
 use function strtolower;
@@ -125,6 +127,10 @@ final class Schema extends AbstractSchema
         'json' => self::TYPE_JSON,
     ];
 
+    private array $jsonColumns = [];
+    private array $columnOverrides = [];
+    private string|null $currentTable = null;
+
     /**
      * Create a column schema builder instance giving the type and value precision.
      *
@@ -198,8 +204,15 @@ final class Schema extends AbstractSchema
         $tableName = $table->getFullName() ?? '';
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->db->getQuoter()->quoteTableName($tableName);
 
+        $this->currentTable = $tableName;
+
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
+
+            $this->jsonColumns[$this->currentTable] = array_merge(
+                $this->columnOverrides[$tableName] ?? [],
+                $this->getJsonColumns($table),
+            );
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -454,6 +467,17 @@ final class Schema extends AbstractSchema
         $column = $this->createColumnSchema();
 
         /** @psalm-var ColumnInfoArray $info */
+        if (
+            isset($this->jsonColumns[$this->currentTable]) &&
+            in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
+        ) {
+            $info['type'] = self::TYPE_JSON;
+
+            if (is_string($info['default']) && preg_match("/^'(.*)'$/", $info['default'], $matches)) {
+                $info['default'] = $matches[1];
+            }
+        }
+
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
@@ -464,6 +488,7 @@ final class Schema extends AbstractSchema
         $column->type(self::TYPE_STRING);
 
         $extra = $info['extra'];
+
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
             $extra = strtoupper(substr($extra, 18));
         }
@@ -871,5 +896,21 @@ final class Schema extends AbstractSchema
     private function createColumnSchema(): ColumnSchema
     {
         return new ColumnSchema();
+    }
+
+    private function getJsonColumns(TableSchemaInterface $table): array
+    {
+        $sql = $this->getCreateTableSql($table);
+        $result = [];
+
+        $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
+
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $result[] = $match[1];
+            }
+        }
+
+        return $result;
     }
 }
