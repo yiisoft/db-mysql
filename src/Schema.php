@@ -469,10 +469,12 @@ final class Schema extends AbstractSchema
     {
         $column = $this->createColumnSchema();
 
-        /** @psalm-var ColumnInfoArray $info */
+        /**
+         * @psalm-var ColumnInfoArray $info
+         * @psalm-suppress MixedArgument
+         */
         if (
             isset($this->jsonColumns[$this->currentTable]) &&
-            is_array($this->jsonColumns[$this->currentTable]) &&
             in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
         ) {
             $info['type'] = self::TYPE_JSON;
