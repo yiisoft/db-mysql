@@ -225,10 +225,6 @@ final class Schema extends AbstractSchema
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
-
-                if (is_string($info['default']) && preg_match("/^'(.*)'$/", $info['default'], $matches)) {
-                    $info['default'] = $matches[1];
-                }
             }
 
             $column = $this->loadColumnSchema($info);

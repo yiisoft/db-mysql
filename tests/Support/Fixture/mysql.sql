@@ -234,7 +234,7 @@ CREATE TABLE `dossier` (
 
 CREATE TABLE `storage` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `data` JSON NOT NULL DEFAULT '{"test": 1}',
+  `data` JSON NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

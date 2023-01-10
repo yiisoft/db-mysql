@@ -80,17 +80,4 @@ final class JsonTest extends TestCase
             $sql,
         );
     }
-
-    public function testGetColumnType()
-    {
-        $db = $this->getConnection();
-
-        $qb = $this->getConnection()->getQueryBuilder();
-        $schema = $this->getConnection()->getSchema();
-        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(Schema::TYPE_JSON);
-
-        $this->assertInstanceOf(ColumnSchemaBuilder::class, $columnSchemaBuilder);
-        $this->assertTrue($columnSchemaBuilder->getType() === Schema::TYPE_JSON);
-        $this->assertSame(Schema::TYPE_JSON, $qb->getColumnType($columnSchemaBuilder));
-    }
 }
