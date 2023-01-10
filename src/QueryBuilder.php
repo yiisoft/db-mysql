@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
+use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Schema\ColumnSchemaBuilder as BaseColumnSchemaBuilder;
 
 use function array_merge;
 
@@ -75,10 +75,11 @@ final class QueryBuilder extends AbstractQueryBuilder
         parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
     }
 
-    public function getColumnType(BaseColumnSchemaBuilder|string $type): string
+    public function getColumnType(ColumnSchemaBuilder|string $type): string
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
 
+        /** @psalm-suppress UndefinedMethod */
         if ($type instanceof ColumnSchemaBuilder && $type->isJson()) {
             $type = Schema::TYPE_JSON;
         }
