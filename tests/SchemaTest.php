@@ -306,7 +306,7 @@ final class SchemaTest extends CommonSchemaTest
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
         $viewExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
-            true => ['user', 'animal_view'],
+            true => ['animal_view', 'user'],
             default => ['animal_view'],
         };
 
