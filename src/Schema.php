@@ -127,11 +127,6 @@ final class Schema extends AbstractSchema
         'json' => self::TYPE_JSON,
     ];
 
-    private array $jsonColumns = [];
-    /** @psalm-var array[][] $columnOverrides */
-    private array $columnOverrides = [];
-    private string|null $currentTable = null;
-
     /**
      * Create a column schema builder instance giving the type and value precision.
      *
@@ -205,15 +200,8 @@ final class Schema extends AbstractSchema
         $tableName = $table->getFullName() ?? '';
         $sql = 'SHOW FULL COLUMNS FROM ' . $this->db->getQuoter()->quoteTableName($tableName);
 
-        $this->currentTable = $tableName;
-
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
-
-            $this->jsonColumns[$this->currentTable] = array_merge(
-                $this->columnOverrides[$tableName] ?? [],
-                $this->getJsonColumns($table),
-            );
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -229,9 +217,19 @@ final class Schema extends AbstractSchema
             throw $e;
         }
 
+        $jsonColumns = $this->getJsonColumns($table);
+
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
+
+            if (in_array($info['field'], $jsonColumns, true)) {
+                $info['type'] = self::TYPE_JSON;
+
+                if (is_string($info['default']) && preg_match("/^'(.*)'$/", $info['default'], $matches)) {
+                    $info['default'] = $matches[1];
+                }
+            }
 
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
@@ -467,21 +465,7 @@ final class Schema extends AbstractSchema
     {
         $column = $this->createColumnSchema();
 
-        /**
-         * @psalm-var ColumnInfoArray $info
-         * @psalm-suppress MixedArgument
-         */
-        if (
-            isset($this->jsonColumns[$this->currentTable]) &&
-            in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
-        ) {
-            $info['type'] = self::TYPE_JSON;
-
-            if (is_string($info['default']) && preg_match("/^'(.*)'$/", $info['default'], $matches)) {
-                $info['default'] = $matches[1];
-            }
-        }
-
+        /** @psalm-var ColumnInfoArray $info */
         $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
