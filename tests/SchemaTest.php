@@ -77,7 +77,10 @@ final class SchemaTest extends CommonSchemaTest
     {
         $db = $this->getConnection();
 
-        if (version_compare($db->getServerVersion(), '8.0.17', '>')) {
+        if (
+            version_compare($db->getServerVersion(), '8.0.17', '>') &&
+            !str_contains($db->getServerVersion(), 'MariaDB')
+        ) {
             if ($tableName === 'type') {
                 // int_col Mysql 8.0.17+.
                 $columns['int_col']['dbType'] = 'int';
@@ -294,6 +297,20 @@ final class SchemaTest extends CommonSchemaTest
         foreach ($expectedTableNames as $tableName) {
             $this->assertContains($tableName, $tablesNames);
         }
+    }
+
+    public function testGetViewNames(): void
+    {
+        $db = $this->getConnection(true);
+
+        $schema = $db->getSchema();
+        $views = $schema->getViewNames();
+        $viewExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+            true => ['user', 'animal_view'],
+            default => ['animal_view'],
+        };
+
+        $this->assertSame($viewExpected, $views);
     }
 
     /**

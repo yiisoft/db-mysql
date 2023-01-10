@@ -78,6 +78,11 @@ final class QueryBuilder extends AbstractQueryBuilder
     public function getColumnType(ColumnSchemaBuilder|string $type): string
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
+
+        if ($type instanceof ColumnSchemaBuilder && $type->isJson()) {
+            $type = Schema::TYPE_JSON;
+        }
+
         return parent::getColumnType($type);
     }
 
