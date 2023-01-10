@@ -467,7 +467,10 @@ final class Schema extends AbstractSchema
         $column = $this->createColumnSchema();
 
         /** @psalm-var ColumnInfoArray $info */
-        if (in_array($info['field'], $this->jsonColumns[$this->currentTable], true)) {
+        if (
+            isset($this->jsonColumns[$this->currentTable]) &&
+            in_array($info['field'], $this->jsonColumns[$this->currentTable], true)
+        ) {
             $info['type'] = self::TYPE_JSON;
 
             if (is_string($info['default']) && preg_match("/^'(.*)'$/", $info['default'], $matches)) {
