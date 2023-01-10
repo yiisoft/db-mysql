@@ -55,7 +55,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL;
-        } else {
+        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL;
@@ -306,7 +306,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
             SQL;
-        } else {
+        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
             SQL;
