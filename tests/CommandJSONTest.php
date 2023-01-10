@@ -43,9 +43,13 @@ final class CommandJSONTest extends TestCase
 
         $command = $db->createCommand();
         $command->insert('storage', ['data' => ['a' => 1, 'b' => 2]])->execute();
+        $rowExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+            true => '{"a":1,"b":2}',
+            default => '{"a": 1, "b": 2}',
+        };
 
         $this->assertSame(
-            '{"a":1,"b":2}',
+            $rowExpected,
             $command->setSql(
                 <<<SQL
                 SELECT `data` FROM `storage`
@@ -60,9 +64,13 @@ final class CommandJSONTest extends TestCase
 
         $command = $db->createCommand();
         $command->insert('storage', ['data' => new JsonExpression(['a' => 1, 'b' => 2])])->execute();
+        $rowExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+            true => '{"a":1,"b":2}',
+            default => '{"a": 1, "b": 2}',
+        };
 
         $this->assertSame(
-            '{"a":1,"b":2}',
+            $rowExpected,
             $command->setSql(
                 <<<SQL
                 SELECT `data` FROM `storage`
