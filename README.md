@@ -60,7 +60,11 @@ return [
     ConnectionInterface::class => [
         'class' => ConnectionPDO::class,
         '__construct()' => [
-            'driver' => new PDODriver($params['yiisoft/db-mysql']['dsn']),
+            'driver' => new PDODriver(
+                $params['yiisoft/db-mysql']['dsn'],
+                $params['yiisoft/db-mysql']['username'],
+                $params['yiisoft/db-mysql']['password'],
+            ),
         ]
     ]
 ];
@@ -78,6 +82,8 @@ use Yiisoft\Db\Mysql\Dsn;
 return [
     'yiisoft/db-mysql' => [
         'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString(),
+        'username' => 'user',
+        'password' => 'password',
     ]
 ];
 ```
