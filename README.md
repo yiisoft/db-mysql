@@ -110,7 +110,7 @@ $cache = new Cache($arrayCache);
 $dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
 
 // Or any other PDO driver.
-$pdoDriver = new PDODriver($dsn); 
+$pdoDriver = new PDODriver($dsn, 'user', 'password'); 
 $schemaCache = new SchemaCache($cache);
 $db = new ConnectionPDO($pdoDriver, $schemaCache);
 ```
