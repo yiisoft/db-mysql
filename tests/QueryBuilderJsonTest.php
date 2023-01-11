@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
  * @group mysql
@@ -24,7 +24,7 @@ final class QueryBuilderJsonTest extends TestCase
 
         $qb = $this->getConnection()->getQueryBuilder();
         $schema = $this->getConnection()->getSchema();
-        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(Schema::TYPE_JSON);
+        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(SchemaInterface::TYPE_JSON);
         $sql = $qb->alterColumn('storage', 'id', $columnSchemaBuilder);
 
         $this->assertStringEndsWith(
@@ -41,7 +41,7 @@ final class QueryBuilderJsonTest extends TestCase
 
         $qb = $this->getConnection()->getQueryBuilder();
         $schema = $this->getConnection()->getSchema();
-        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(Schema::TYPE_JSON);
+        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(SchemaInterface::TYPE_JSON);
         $sql = $qb->addColumn('storage', 'abc', (string) $columnSchemaBuilder);
 
         $this->assertSame(
@@ -58,7 +58,7 @@ final class QueryBuilderJsonTest extends TestCase
 
         $qb = $this->getConnection()->getQueryBuilder();
         $schema = $this->getConnection()->getSchema();
-        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(Schema::TYPE_JSON);
+        $columnSchemaBuilder = $schema->createColumnSchemaBuilder(SchemaInterface::TYPE_JSON);
         $sql = $qb->createTable('storage', ['abc' => $columnSchemaBuilder]);
 
         $this->assertSame(

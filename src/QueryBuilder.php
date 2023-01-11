@@ -7,7 +7,6 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
 use Yiisoft\Db\Schema\ColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\Schema;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 use function array_merge;
@@ -41,25 +40,25 @@ final class QueryBuilder extends AbstractQueryBuilder
      * @psalm-var string[] $typeMap Mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
-        Schema::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-        Schema::TYPE_CHAR => 'char(1)',
-        Schema::TYPE_STRING => 'varchar(255)',
-        Schema::TYPE_TEXT => 'text',
-        Schema::TYPE_TINYINT => 'tinyint(3)',
-        Schema::TYPE_SMALLINT => 'smallint(6)',
-        Schema::TYPE_INTEGER => 'int(11)',
-        Schema::TYPE_BIGINT => 'bigint(20)',
-        Schema::TYPE_FLOAT => 'float',
-        Schema::TYPE_DOUBLE => 'double',
-        Schema::TYPE_DECIMAL => 'decimal(10,0)',
-        Schema::TYPE_DATE => 'date',
-        Schema::TYPE_BINARY => 'blob',
-        Schema::TYPE_BOOLEAN => 'tinyint(1)',
-        Schema::TYPE_MONEY => 'decimal(19,4)',
-        Schema::TYPE_JSON => 'json',
+        SchemaInterface::TYPE_PK => 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        SchemaInterface::TYPE_UPK => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        SchemaInterface::TYPE_BIGPK => 'bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        SchemaInterface::TYPE_UBIGPK => 'bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
+        SchemaInterface::TYPE_CHAR => 'char(1)',
+        SchemaInterface::TYPE_STRING => 'varchar(255)',
+        SchemaInterface::TYPE_TEXT => 'text',
+        SchemaInterface::TYPE_TINYINT => 'tinyint(3)',
+        SchemaInterface::TYPE_SMALLINT => 'smallint(6)',
+        SchemaInterface::TYPE_INTEGER => 'int(11)',
+        SchemaInterface::TYPE_BIGINT => 'bigint(20)',
+        SchemaInterface::TYPE_FLOAT => 'float',
+        SchemaInterface::TYPE_DOUBLE => 'double',
+        SchemaInterface::TYPE_DECIMAL => 'decimal(10,0)',
+        SchemaInterface::TYPE_DATE => 'date',
+        SchemaInterface::TYPE_BINARY => 'blob',
+        SchemaInterface::TYPE_BOOLEAN => 'tinyint(1)',
+        SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
+        SchemaInterface::TYPE_JSON => 'json',
     ];
     private DDLQueryBuilder $ddlBuilder;
     private DMLQueryBuilder $dmlBuilder;
@@ -79,9 +78,9 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
 
-        if ($type instanceof ColumnSchemaBuilder && $type->getType() === Schema::TYPE_JSON) {
+        if ($type instanceof ColumnSchemaBuilder && $type->getType() === SchemaInterface::TYPE_JSON) {
             $type->check('[[{name}]] is null or json_valid([[{name}]])');
-            $type = Schema::TYPE_JSON;
+            $type = SchemaInterface::TYPE_JSON;
         }
 
         return parent::getColumnType($type);
@@ -98,9 +97,9 @@ final class QueryBuilder extends AbstractQueryBuilder
     private function defaultTimeTypeMap(): array
     {
         return [
-            Schema::TYPE_DATETIME => 'datetime(0)',
-            Schema::TYPE_TIMESTAMP => 'timestamp(0)',
-            Schema::TYPE_TIME => 'time(0)',
+            SchemaInterface::TYPE_DATETIME => 'datetime(0)',
+            SchemaInterface::TYPE_TIMESTAMP => 'timestamp(0)',
+            SchemaInterface::TYPE_TIME => 'time(0)',
         ];
     }
 }
