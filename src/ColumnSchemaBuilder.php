@@ -6,13 +6,13 @@ namespace Yiisoft\Db\Mysql;
 
 use Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Schema\ColumnSchemaBuilder as AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 
 /**
  * The class ColumnSchemaBuilder for Mysql database.
  */
-final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder implements \Stringable
+final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
     /**
      *  @psalm-param string[]|int[]|int|string|null $length column size or precision definition.
