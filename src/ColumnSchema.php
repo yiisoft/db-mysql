@@ -8,7 +8,7 @@ use JsonException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Schema\AbstractColumnSchema;
-use Yiisoft\Db\Schema\Schema;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 use function json_decode;
 
@@ -34,7 +34,7 @@ final class ColumnSchema extends AbstractColumnSchema
             return null;
         }
 
-        if ($this->getType() === Schema::TYPE_JSON) {
+        if ($this->getType() === SchemaInterface::TYPE_JSON) {
             return json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR);
         }
 
@@ -61,7 +61,7 @@ final class ColumnSchema extends AbstractColumnSchema
             return $value;
         }
 
-        if ($this->getDbType() === Schema::TYPE_JSON) {
+        if ($this->getDbType() === SchemaInterface::TYPE_JSON) {
             return new JsonExpression($value, $this->getType());
         }
 
