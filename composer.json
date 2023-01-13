@@ -25,7 +25,7 @@
         "ext-pdo": "*",
         "psr/log": "^2.0|^3.0",
         "yiisoft/arrays": "^2.1",
-        "yiisoft/db": "dev-remove-unnecessary-stringable as 3.0@dev",
+        "yiisoft/db": "^3.0@dev",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
