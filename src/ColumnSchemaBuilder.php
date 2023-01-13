@@ -45,7 +45,7 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
             . (string) $this->quoter->quoteValue($this->getComment()) : '';
     }
 
-    public function __toString(): string
+    public function asString(): string
     {
         $format = match ($this->getTypeCategory()) {
             self::CATEGORY_PK => '{type}{length}{comment}{check}{append}',
