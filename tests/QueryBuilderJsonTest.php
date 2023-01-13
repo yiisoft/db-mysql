@@ -42,7 +42,7 @@ final class QueryBuilderJsonTest extends TestCase
         $qb = $this->getConnection()->getQueryBuilder();
         $schema = $this->getConnection()->getSchema();
         $columnSchemaBuilder = $schema->createColumnSchemaBuilder(SchemaInterface::TYPE_JSON);
-        $sql = $qb->addColumn('storage', 'abc', (string) $columnSchemaBuilder);
+        $sql = $qb->addColumn('storage', 'abc', $columnSchemaBuilder->asString());
 
         $this->assertSame(
             <<<SQL
