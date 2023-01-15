@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql;
 
 use JsonException;
 use Throwable;
-use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
@@ -14,6 +13,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Helper\ArrayHelper;
 use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
@@ -742,7 +742,7 @@ final class Schema extends AbstractSchema
 
         /** @var array[] $indexes */
         $indexes = $this->normalizeRowKeyCase($indexes, true);
-        $indexes = ArrayHelper::index($indexes, null, 'name');
+        $indexes = ArrayHelper::index($indexes, null, ['name']);
         $result = [];
 
         /**
