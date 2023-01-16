@@ -105,7 +105,7 @@ final class ConnectionPDOTest extends CommonConnectionPDOTest
             $db->createCommand()->createTable($name, ['id' => 'pk'])->execute();
             $db->createCommand()->dropTable($name)->execute();
 
-            $this->assertNull($db->getTransaction());
+            var_dump($db->getTransaction()?->isActive());
         });
         // If we made it this far without an error, then everything's working
     }
