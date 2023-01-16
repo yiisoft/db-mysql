@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use Throwable;
+use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidCallException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -90,5 +91,22 @@ final class ConnectionPDOTest extends CommonConnectionPDOTest
          * non-transactional tables, the AUTO_INCREMENT counter is not incremented.
          */
         $this->assertSame('0', $db->getLastInsertID());
+    }
+
+    public function testTransactionAutocommit()
+    {
+        $db = $this->getConnection(true);
+        $db->transaction(function (ConnectionPDOInterface $db) {
+            $this->assertTrue($db->getTransaction()->isActive());
+
+            // create table will cause the transaction to be implicitly committed
+            // (see https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html)
+            $name = 'test_implicit_transaction_table';
+            $db->createCommand()->createTable($name, ['id' => 'pk'])->execute();
+            $db->createCommand()->dropTable($name)->execute();
+
+            $this->assertNull($db->getTransaction());
+        });
+        // If we made it this far without an error, then everything's working
     }
 }

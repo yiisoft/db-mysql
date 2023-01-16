@@ -11,7 +11,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Common\CommonConnectionPDOTest;
+use Yiisoft\Db\Tests\Common\CommonConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -19,7 +19,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ConnectionTest extends CommonConnectionPDOTest
+final class ConnectionTest extends CommonConnectionTest
 {
     use TestTrait;
 
