@@ -104,8 +104,6 @@ final class ConnectionPDOTest extends CommonConnectionPDOTest
             $name = 'test_implicit_transaction_table';
             $db->createCommand()->createTable($name, ['id' => 'pk'])->execute();
             $db->createCommand()->dropTable($name)->execute();
-
-            var_dump($db->getTransaction()?->isActive());
         });
         // If we made it this far without an error, then everything's working
     }
