@@ -481,7 +481,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $command = $db->createCommand();
         $qb = $db->getQueryBuilder();
-        $checkSql = 'SHOW CREATE TABLE `item`;';
 
         // Change to max rows.
         $sql = <<<SQL
@@ -494,10 +493,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item'));
 
         $command->setSql($sql)->execute();
-        $result = $command->setSql($checkSql)->queryOne();
-
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $this->assertEquals(6, $insertResult['id']);
 
         // Key as string.
         $sql = <<<SQL
@@ -507,24 +504,21 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item', '40'));
 
         $command->setSql($sql)->execute();
-        $result = $command->setSql($checkSql)->queryOne();
-
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
+        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $this->assertEquals(40, $insertResult['id']);
 
         // Change up, key as int.
         $sql = <<<SQL
-        ALTER TABLE `item` AUTO_INCREMENT=40;
+        ALTER TABLE `item` AUTO_INCREMENT=43;
         SQL;
 
-        $this->assertSame($sql, $qb->resetSequence('item', 40));
+        $this->assertSame($sql, $qb->resetSequence('item', 43));
 
         $db->createCommand($sql)->execute();
-        $result = $command->setSql($checkSql)->queryOne();
+        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $this->assertEquals(43, $insertResult['id']);
 
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=40', array_values($result)[1]);
-
+        $command->delete('item',['>=','id', 6])->execute();
         // And again change to max rows.
         $sql = <<<SQL
         SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);
@@ -535,11 +529,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame($sql, $qb->resetSequence('item'));
 
-        $db->createCommand($sql)->queryAll();
-        $result = $command->setSql($checkSql)->queryOne();
-
-        $this->assertIsArray($result);
-        $this->assertStringContainsString('AUTO_INCREMENT=6', array_values($result)[1]);
+        $db->createCommand($sql)->execute();
+        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $this->assertEquals(6, $insertResult['id']);
     }
 
     /**
