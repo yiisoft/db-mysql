@@ -19,7 +19,7 @@ on:
       - 'infection.json.dist'
       - 'psalm.xml'
 
-name: build_ans_mode
+name: build_ansi_mode
 
 jobs:
   tests:
@@ -50,7 +50,7 @@ jobs:
           MYSQL_DATABASE: yiitest
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --sql-mode=ANSI
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Change mysql sql_mode
