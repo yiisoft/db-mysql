@@ -601,9 +601,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             }
         }
 
-        $command = $db->createCommand($qb->createTable('column_type_table', $columns));
-        echo $command->getRawSql();die;
-        $command->execute();
+        $db->createCommand($qb->createTable('column_type_table', $columns))->execute();
 
         $this->assertNotEmpty($db->getTableSchema('column_type_table', true));
 

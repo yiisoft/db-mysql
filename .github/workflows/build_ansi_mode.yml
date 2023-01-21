@@ -39,7 +39,7 @@ jobs:
           - 8.0
 
         mysql:
-          - mysql:5.7
+          - mysql:8.0.29
 
     services:
       mysql:
