@@ -518,7 +518,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(43, $insertResult['id']);
 
-        $command->delete('item',['>=','id', 6])->execute();
+        $command->delete('item', ['>=','id', 6])->execute();
         // And again change to max rows.
         $sql = <<<SQL
         SET @new_autoincrement_value := (SELECT MAX(`id`) + 1 FROM `item`);

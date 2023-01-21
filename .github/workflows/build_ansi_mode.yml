@@ -19,7 +19,7 @@ on:
       - 'infection.json.dist'
       - 'psalm.xml'
 
-name: build
+name: build_ans_mode
 
 jobs:
   tests:
@@ -53,6 +53,8 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3 --sql-mode=ANSI
 
     steps:
+      - name: Change mysql sql_mode
+        run: docker exec mysql mysql -u root -e "SET GLOBAL sql_mode = 'ANSI';"
       - name: Checkout.
         uses: actions/checkout@v3
 
