@@ -587,9 +587,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $columns = [];
         $i = 0;
 
-        echo $db->createCommand('SELECT @@sql_mode;')->queryScalar();die;
-
-
         foreach ($columnTypes as [$column, $builder, $expected]) {
             if (
                 !(
@@ -604,7 +601,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             }
         }
 
-        $db->createCommand($qb->createTable('column_type_table', $columns))->execute();
+        $command = $db->createCommand($qb->createTable('column_type_table', $columns));
+        echo $command->getRawSql();die;
+        $command->execute();
 
         $this->assertNotEmpty($db->getTableSchema('column_type_table', true));
 
