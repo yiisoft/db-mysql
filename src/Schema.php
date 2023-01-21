@@ -161,12 +161,12 @@ final class Schema extends AbstractSchema
 
         $uniqueIndexes = [];
 
-        $regexp = '/UNIQUE KEY\s+`(.+)`\s*\((`.+`)+\)/mi';
+        $regexp = '/UNIQUE KEY\s+[`"](.+)[`"]\s*\(([`"].+[`"])+\)/mi';
 
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
-                $indexColumns = array_map('trim', explode('`,`', trim($match[2], '`')));
+                $indexColumns = array_map('trim', preg_split('/[`"],[`"]/', trim($match[2], '`"')));
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }

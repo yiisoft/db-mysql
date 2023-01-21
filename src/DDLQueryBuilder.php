@@ -202,10 +202,10 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             return '';
         }
 
-        if (preg_match_all('/^\s*`(.*?)`\s+(.*?),?$/m', $sql, $matches)) {
-            foreach ($matches[1] as $i => $c) {
+        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches)) {
+            foreach ($matches[2] as $i => $c) {
                 if ($c === $column) {
-                    $result = $matches[2][$i];
+                    $result = $matches[3][$i];
                 }
             }
         }

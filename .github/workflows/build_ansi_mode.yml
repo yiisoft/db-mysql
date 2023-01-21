@@ -1,0 +1,82 @@
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - 'infection.json.dist'
+      - 'psalm.xml'
+
+name: build_ansi_mode
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }}-${{ matrix.mysql }}
+
+    env:
+      extensions: pdo, pdo_mysql
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+        php:
+          - 8.0
+
+        mysql:
+          - mysql:8.0.29
+
+    services:
+      mysql:
+        image: ${{ matrix.mysql }}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_PASSWORD: ''
+          MYSQL_DATABASE: yiitest
+        ports:
+          - 3306:3306
+        options: --name=mysql_ansi --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Change mysql sql_mode
+        run: docker exec mysql_ansi mysql -u root -e "SET GLOBAL sql_mode = 'ANSI';"
+      - name: Checkout.
+        uses: actions/checkout@v3
+
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ env.extensions }}
+          ini-values: date.timezone='UTC'
+          coverage: pcov
+
+      - name: Update composer.
+        run: composer self-update
+
+      - name: Install dependencies with composer.
+        run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
+
+      - name: Run tests with phpunit with code coverage.
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always
+
+      - name: Upload coverage to Codecov.
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
