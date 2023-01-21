@@ -13,10 +13,8 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
-use Yiisoft\Db\Tests\Provider\ColumnTypes;
 use function str_contains;
 use function version_compare;
 
@@ -572,40 +570,4 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
-
-    public function testCreateTableWithGetColumnTypes(): void
-    {
-        $db = $this->getConnection(true);
-
-        $qb = $db->getQueryBuilder();
-
-        if ($db->getTableSchema('column_type_table', true) !== null) {
-            $db->createCommand($qb->dropTable('column_type_table'))->execute();
-        }
-
-        $columnTypes = (new ColumnTypes($db))->getColumnTypes();
-        $columns = [];
-        $i = 0;
-
-        foreach ($columnTypes as [$column, $builder, $expected]) {
-            if (
-                !(
-                    strncmp($column, SchemaInterface::TYPE_PK, 2) === 0 ||
-                    strncmp($column, SchemaInterface::TYPE_UPK, 3) === 0 ||
-                    strncmp($column, SchemaInterface::TYPE_BIGPK, 5) === 0 ||
-                    strncmp($column, SchemaInterface::TYPE_UBIGPK, 6) === 0 ||
-                    str_starts_with(substr($column, -5), 'FIRST')
-                )
-            ) {
-                $columns['col' . ++$i] = str_replace('CHECK (value', 'CHECK ([[col' . $i . ']]', $column);
-            }
-        }
-
-        $db->createCommand($qb->createTable('column_type_table', $columns))->execute();
-
-        $this->assertNotEmpty($db->getTableSchema('column_type_table', true));
-
-        $db->close();
-    }
-
 }
