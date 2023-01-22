@@ -69,6 +69,34 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
+     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is provided
+     * as NULL.
+     *
+     * @see https://github.com/yiisoft/yii2/issues/19047
+     */
+    public function testAlternativeDisplayOfDefaultCurrentTimestampAsNullInMariaDB(): void
+    {
+        $db = $this->getConnection();
+
+        $schema = new Schema($db, DbHelper::getSchemaCache());
+
+        $column = Assert::invokeMethod($schema, 'loadColumnSchema', [[
+            'field' => 'emulated_MariaDB_field',
+            'type' => 'timestamp',
+            'collation' => NULL,
+            'null' => 'NO',
+            'key' => '',
+            'default' => NULL,
+            'extra' => '',
+            'privileges' => 'select,insert,update,references',
+            'comment' => '',
+        ]]);
+
+        $this->assertInstanceOf(ColumnSchema::class, $column);
+        $this->assertEquals(null, $column->getDefaultValue());
+    }
+
+    /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns()
      *
      * @throws Exception

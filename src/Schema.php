@@ -516,8 +516,9 @@ final class Schema extends AbstractSchema
              *
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
-            if (
-                ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
+            if (true
+//                isset($info['default'])
+                && ($column->getType() === 'timestamp' || $column->getType() === 'datetime')
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
