@@ -83,10 +83,10 @@ final class SchemaTest extends CommonSchemaTest
         $column = Assert::invokeMethod($schema, 'loadColumnSchema', [[
             'field' => 'emulated_MariaDB_field',
             'type' => 'timestamp',
-            'collation' => NULL,
+            'collation' => null,
             'null' => 'NO',
             'key' => '',
-            'default' => NULL,
+            'default' => null,
             'extra' => '',
             'privileges' => 'select,insert,update,references',
             'comment' => '',
