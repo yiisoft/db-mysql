@@ -270,7 +270,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /**
      * Test for issue https://github.com/yiisoft/yii2/issues/15500
      */
-    public function testDefaultValues()
+    public function testDefaultValues(): void
     {
         $db = $this->getConnection();
 
@@ -279,7 +279,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         // Primary key columns should have NULL as value
         $this->assertSame(
             <<<SQL
-            INSERT INTO `null_values` (`id`) VALUES (DEFAULT)
+            INSERT INTO `null_values` (`id`) VALUES (NULL)
             SQL,
             $qb->insert('null_values', []),
         );
