@@ -192,12 +192,16 @@ EXECUTE autoincrement_stmt";
             $tableSchema = $this->schema->getTableSchema($table);
 
             if ($tableSchema !== null) {
-                $columns = $tableSchema->getColumns();
-                $columns = !empty($tableSchema->getPrimaryKey())
-                    ? $tableSchema->getPrimaryKey() : [reset($columns)->getName()];
+                if (!empty($tableSchema->getPrimaryKey())) {
+                    $columns = $tableSchema->getPrimaryKey();
+                    $defaultValue = 'NULL';
+                } else {
+                    $columns = [current($tableSchema->getColumns())->getName()];
+                    $defaultValue = 'DEFAULT';
+                }
                 foreach ($columns as $name) {
                     $names[] = $this->quoter->quoteColumnName($name);
-                    $placeholders[] = 'DEFAULT';
+                    $placeholders[] = $defaultValue;
                 }
             }
         }
