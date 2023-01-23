@@ -104,6 +104,17 @@ final class QueryBuilderProvider extends AbstractQueryBuilderProvider
         );
     }
 
+    public function insert(): array
+    {
+        $insert = parent::insert();
+
+        $insert['empty columns'][3] = <<<SQL
+        INSERT INTO `customer` (`id`) VALUES (NULL)
+        SQL;
+
+        return $insert;
+    }
+
     public function upsert(): array
     {
         $concreteData = [
