@@ -19,7 +19,7 @@ on:
       - 'infection.json.dist'
       - 'psalm.xml'
 
-name: build_ansi_mode
+name: ansi-mode
 
 jobs:
   tests:
