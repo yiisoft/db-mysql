@@ -82,7 +82,7 @@ jobs:
         run: composer self-update
 
       - name: Install db.
-        uses: yiisoft/db/.github/actions/subpackage_install@dev-expression_interface
+        uses: ./.github/actions/subpackage_install
         with:
           CURRENT_PACKAGE: db
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
