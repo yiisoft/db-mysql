@@ -494,7 +494,7 @@ final class Schema extends AbstractSchema
                         $column->scale((int) $values[1]);
                     }
 
-                    if ($column->getSize() === 1 && $type === 'tinyint') {
+                    if ($column->getSize() === 1 && $type === 'bit') {
                         $column->type(self::TYPE_BOOLEAN);
                     } elseif ($type === 'bit') {
                         if ($column->getSize() > 32) {
@@ -517,12 +517,12 @@ final class Schema extends AbstractSchema
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
             if (
-                in_array($column->getType(), ['timestamp', 'datetime', 'date', 'time'], true)
+                in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
-            } elseif (isset($type) && $type === 'bit') {
+            } elseif (isset($type) && $type === 'bit' && $column->getType() !== self::TYPE_BOOLEAN) {
                 $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
                 $column->defaultValue($column->phpTypecast($info['default']));

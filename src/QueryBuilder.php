@@ -56,7 +56,7 @@ final class QueryBuilder extends AbstractQueryBuilder
         SchemaInterface::TYPE_DECIMAL => 'decimal(10,0)',
         SchemaInterface::TYPE_DATE => 'date',
         SchemaInterface::TYPE_BINARY => 'blob',
-        SchemaInterface::TYPE_BOOLEAN => 'tinyint(1)',
+        SchemaInterface::TYPE_BOOLEAN => 'bit(1)',
         SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
         SchemaInterface::TYPE_JSON => 'json',
     ];
