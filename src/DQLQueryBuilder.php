@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionBuilder;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Builder\JsonExpressionBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
@@ -15,15 +15,15 @@ use function ctype_digit;
 
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
-    public function buildLimit(Expression|int|null $limit, Expression|int|null $offset): string
+    public function buildLimit(ExpressionInterface|int|null $limit, ExpressionInterface|int|null $offset): string
     {
         $sql = '';
 
         if ($this->hasLimit($limit)) {
-            $sql = 'LIMIT ' . (string) $limit;
+            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string)$limit);
 
             if ($this->hasOffset($offset)) {
-                $sql .= ' OFFSET ' . (string) $offset;
+                $sql .= ' OFFSET ' . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
             }
         } elseif ($this->hasOffset($offset)) {
             /**
@@ -32,7 +32,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
              * http://stackoverflow.com/a/271650/1106908
              * http://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
-            $sql = "LIMIT $offset, 18446744073709551615"; // 2^64-1
+            $sql = 'LIMIT ' .
+                ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset) .
+                ', 18446744073709551615'; // 2^64-1
         }
 
         return $sql;
