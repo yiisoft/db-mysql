@@ -74,12 +74,12 @@ jobs:
         run: composer self-update
 
       - name: Install db.
-        uses: yiisoft/db/.github/actions/subpackage_install@master
+        uses: yiisoft/db/.github/actions/subpackage_install
         with:
-          CURRENT_PACKAGE: db
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
-          FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+          CURRENT_PACKAGE: db
+          FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
           WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
 
       - name: Install dependencies with composer.
