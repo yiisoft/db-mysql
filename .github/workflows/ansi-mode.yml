@@ -74,7 +74,7 @@ jobs:
         run: composer self-update
 
       - name: Install db.
-        uses: yiisoft/db/.github/actions/subpackage_install
+        uses: yiisoft/actions/db/subpackage-install@db-composite-reusable
         with:
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
