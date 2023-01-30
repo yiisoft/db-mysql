@@ -488,9 +488,9 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->createTable(
             $tableName,
             [
-                'id' =>  $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_PK),
-                'bool_col' =>  $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_BOOLEAN),
-                'status' =>  $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_TINYINT, 1),
+                'id' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_PK),
+                'bool_col' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_BOOLEAN),
+                'status' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_TINYINT, 1),
             ]
         )->execute();
 
