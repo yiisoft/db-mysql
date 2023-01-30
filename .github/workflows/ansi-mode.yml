@@ -71,7 +71,7 @@ jobs:
         run: composer self-update
 
       - name: Set environment variables pull request linux.
-        uses: yiisoft/actions/db/subpackage-install/environment-linux@db-composite-reusable
+        uses: yiisoft/actions/db/environment-linux@db-composite-reusable
 
       - name: Install db.
         uses: yiisoft/actions/db/subpackage-install@db-composite-reusable
