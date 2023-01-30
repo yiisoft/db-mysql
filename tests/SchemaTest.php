@@ -475,4 +475,30 @@ final class SchemaTest extends CommonSchemaTest
             ],
         ]);
     }
+
+    public function testTinyInt1()
+    {
+        $db = $this->getConnection(true);
+        $tableName = '{{%tinyint}}';
+
+        if ($db->getTableSchema($tableName)) {
+            $db->createCommand()->dropTable($tableName)->execute();
+        }
+
+        $db->createCommand()->createTable(
+            $tableName,
+            [
+                'id' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_PK),
+                'bool_col' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_BOOLEAN),
+                'status' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_TINYINT, 1),
+            ]
+        )->execute();
+
+        $status = 2;
+        $insertedRow = $db->createCommand()->insertWithReturningPks($tableName, ['status' => $status, 'bool_col' => true]);
+        $selectedRow = $db->createCommand('SELECT * FROM ' . $tableName . ' WHERE id=:id', ['id' => $insertedRow['id']])->queryOne();
+
+        $this->assertEquals($status, $selectedRow['status']);
+        $this->assertEquals(true, $selectedRow['bool_col']);
+    }
 }

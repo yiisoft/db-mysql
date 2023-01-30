@@ -188,7 +188,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                     ],
                     'bool_col' => [
                         'type' => 'boolean',
-                        'dbType' => 'tinyint(1)',
+                        'dbType' => 'bit(1)',
                         'phpType' => 'boolean',
                         'primaryKey' => false,
                         'allowNull' => false,
@@ -199,10 +199,10 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'scale' => null,
                         'defaultValue' => null,
                     ],
-                    'bool_col2' => [
-                        'type' => 'boolean',
+                    'tiny_col' => [
+                        'type' => 'tinyint',
                         'dbType' => 'tinyint(1)',
-                        'phpType' => 'boolean',
+                        'phpType' => 'integer',
                         'primaryKey' => false,
                         'allowNull' => true,
                         'autoIncrement' => false,
@@ -210,7 +210,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'size' => 1,
                         'precision' => 1,
                         'scale' => null,
-                        'defaultValue' => true,
+                        'defaultValue' => 2,
                     ],
                     'ts_default' => [
                         'type' => 'timestamp',
@@ -294,9 +294,9 @@ final class SchemaProvider extends AbstractSchemaProvider
             [
                 [
                     'bit_col_1' => [
-                        'type' => 'integer',
+                        'type' => 'boolean',
                         'dbType' => 'bit(1)',
-                        'phpType' => 'integer',
+                        'phpType' => 'boolean',
                         'primaryKey' => false,
                         'allowNull' => false,
                         'autoIncrement' => false,
@@ -304,12 +304,12 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'size' => 1,
                         'precision' => 1,
                         'scale' => null,
-                        'defaultValue' => 0,
+                        'defaultValue' => null,
                     ],
                     'bit_col_2' => [
-                        'type' => 'integer',
+                        'type' => 'boolean',
                         'dbType' => 'bit(1)',
-                        'phpType' => 'integer',
+                        'phpType' => 'boolean',
                         'primaryKey' => false,
                         'allowNull' => true,
                         'autoIncrement' => false,
@@ -317,7 +317,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'size' => 1,
                         'precision' => 1,
                         'scale' => null,
-                        'defaultValue' => 1,
+                        'defaultValue' => true,
                     ],
                     'bit_col_3' => [
                         'type' => 'integer',
