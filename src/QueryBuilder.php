@@ -17,26 +17,6 @@ use function array_merge;
 final class QueryBuilder extends AbstractQueryBuilder
 {
     /**
-     * Defines a FULLTEXT index type for {@see createIndex()}.
-     */
-    public const INDEX_FULLTEXT = 'FULLTEXT';
-
-    /**
-     * Defines a SPATIAL index type for {@see createIndex()}.
-     */
-    public const INDEX_SPATIAL = 'SPATIAL';
-
-    /**
-     * Defines a B-tree index method for {@see createIndex()}.
-     */
-    public const INDEX_B_TREE = 'btree';
-
-    /**
-     * Defines a hash index method for {@see createIndex()}.
-     */
-    public const INDEX_HASH = 'hash';
-
-    /**
      * @psalm-var string[] $typeMap Mapping from abstract column types (keys) to physical column types (values).
      */
     protected array $typeMap = [
