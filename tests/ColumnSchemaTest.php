@@ -12,6 +12,7 @@ use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
  * @group mysql
@@ -44,10 +45,10 @@ final class ColumnSchemaTest extends TestCase
     {
         $columnSchema = new ColumnSchema();
 
-        $columnSchema->dbType('json');
-        $columnSchema->type('json');
+        $columnSchema->dbType(SchemaInterface::TYPE_JSON);
+        $columnSchema->type(SchemaInterface::TYPE_JSON);
 
-        $this->assertEquals(new JsonExpression('{"a":1}', 'json'), $columnSchema->dbTypeCast('{"a":1}'));
+        $this->assertEquals(new JsonExpression('{"a":1}', SchemaInterface::TYPE_JSON), $columnSchema->dbTypeCast('{"a":1}'));
     }
 
     /**
@@ -57,7 +58,7 @@ final class ColumnSchemaTest extends TestCase
     {
         $columnSchema = new ColumnSchema();
 
-        $columnSchema->type('json');
+        $columnSchema->type(SchemaInterface::TYPE_JSON);
 
         $this->assertSame(['a' => 1], $columnSchema->phpTypeCast('{"a":1}'));
     }

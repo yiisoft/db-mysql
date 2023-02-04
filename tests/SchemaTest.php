@@ -14,9 +14,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\ColumnSchema;
-use Yiisoft\Db\Mysql\QueryBuilder;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\Assert;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -455,21 +455,21 @@ final class SchemaTest extends CommonSchemaTest
         return array_merge(parent::withIndexDataProvider(), [
             [
                 'indexType' => null,
-                'indexMethod' => QueryBuilder::INDEX_HASH,
+                'indexMethod' => SchemaInterface::INDEX_HASH,
                 'columnType' => 'varchar(16)',
             ],
             [
                 'indexType' => null,
-                'indexMethod' => QueryBuilder::INDEX_B_TREE,
+                'indexMethod' => SchemaInterface::INDEX_BTREE,
                 'columnType' => 'varchar(16)',
             ],
             [
-                'indexType' => QueryBuilder::INDEX_FULLTEXT,
+                'indexType' => SchemaInterface::INDEX_FULLTEXT,
                 'indexMethod' => null,
                 'columnType' => 'varchar(16)',
             ],
             [
-                'indexType' => QueryBuilder::INDEX_SPATIAL,
+                'indexType' => SchemaInterface::INDEX_SPATIAL,
                 'indexMethod' => null,
                 'columnType' => 'GEOMETRY NOT NULL',
             ],
@@ -488,9 +488,9 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->createTable(
             $tableName,
             [
-                'id' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_PK),
-                'bool_col' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_BOOLEAN),
-                'status' => $db->getSchema()->createColumnSchemaBuilder(Schema::TYPE_TINYINT, 1),
+                'id' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_PK),
+                'bool_col' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_BOOLEAN),
+                'status' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_TINYINT, 1),
             ]
         )->execute();
 

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
  * @group mysql
@@ -28,8 +29,8 @@ final class CommandJSONTest extends TestCase
 
         $command = $db->createCommand();
         $command->createTable('json', [
-            'id' => Schema::TYPE_PK,
-            'data' => Schema::TYPE_JSON,
+            'id' => SchemaInterface::TYPE_PK,
+            'data' => SchemaInterface::TYPE_JSON,
         ])->execute();
 
         $this->assertTrue($db->getTableSchema('json') !== null);
