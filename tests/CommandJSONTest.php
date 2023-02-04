@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\SchemaInterface;
 
