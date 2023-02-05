@@ -109,7 +109,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'defaultValue' => null,
                     ],
                     'char_col_mediumtext' => [
-                        'type' => 'text',
+                        'type' => 'mediumtext',
                         'dbType' => 'mediumtext',
                         'phpType' => 'string',
                         'primaryKey' => false,
