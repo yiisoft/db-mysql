@@ -153,6 +153,8 @@ CREATE TABLE `type` (
   `char_col` char(100) NOT NULL,
   `char_col2` varchar(100) DEFAULT 'something',
   `char_col3` text,
+  `char_col_mediumtext` mediumtext,
+  `char_col_longtext` longtext,
   `enum_col` enum('a', 'B', 'c,D'),
   `float_col` double(4,3) NOT NULL,
   `float_col2` double DEFAULT '1.23',
