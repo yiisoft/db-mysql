@@ -163,7 +163,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                     'numeric_col' => [
                         'type' => 'decimal',
                         'dbType' => 'decimal(5,2)',
-                        'phpType' => 'string',
+                        'phpType' => 'double',
                         'primaryKey' => false,
                         'allowNull' => true,
                         'autoIncrement' => false,
@@ -171,7 +171,7 @@ final class SchemaProvider extends AbstractSchemaProvider
                         'size' => 5,
                         'precision' => 5,
                         'scale' => 2,
-                        'defaultValue' => '33.22',
+                        'defaultValue' => 33.22,
                     ],
                     'time' => [
                         'type' => 'timestamp',
