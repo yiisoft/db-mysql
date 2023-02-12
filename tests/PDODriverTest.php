@@ -29,7 +29,7 @@ final class PDODriverTest extends TestCase
 
         $pdoDriver = new PDODriver('mysql:host=127.0.0.1;dbname=yiitest;port=3306', 'root', '');
         $newCharset = 'latin1';
-        $pdoDriver->setCharset($newCharset);
+        $pdoDriver->charset($newCharset);
         $pdo = $pdoDriver->createConnection();
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
 
