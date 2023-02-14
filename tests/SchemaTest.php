@@ -165,7 +165,7 @@ final class SchemaTest extends CommonSchemaTest
         $command = $db->createCommand();
         $schema = $db->getSchema();
 
-        $oldMySQL = (
+        $oldMySQL = !(
             version_compare($db->getServerVersion(), '8.0.0', '>') &&
             !str_contains($db->getServerVersion(), 'MariaDB')
         );
