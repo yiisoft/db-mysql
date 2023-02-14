@@ -543,7 +543,7 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
-            } elseif (!empty($info['extra'])) {
+            } elseif (!empty($info['extra']) && !empty($info['default'])) {
                 $column->defaultValue(new Expression($info['default']));
             } elseif (isset($type) && $type === 'bit' && $column->getType() !== self::TYPE_BOOLEAN) {
                 $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
