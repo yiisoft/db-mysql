@@ -193,6 +193,19 @@ final class Schema extends AbstractSchema
 
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
+            // Chapter 1: cruthes for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
+            $columnsExtra = [];
+            if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
+                $columnsExtra = $this->db->createCommand(
+                    'SELECT `COLUMN_NAME` as COLUMN_NAME,`COLUMN_DEFAULT` as COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName',
+                    [
+                        ':schemaName' => $table->getSchemaName(),
+                        ':tableName' => $table->getName(),
+                    ]
+                )->queryAll();
+                $columnsExtra = ArrayHelper::index($columnsExtra, 'COLUMN_NAME');
+            }
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -213,6 +226,14 @@ final class Schema extends AbstractSchema
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
+
+            // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+            $defaultValue = $columnsExtra[$info['field']]['COLUMN_DEFAULT'] ?? '';
+            if (empty($info['extra']) && !empty($defaultValue)) {
+                if (!str_starts_with($defaultValue, '\'')) {
+                    $info['extra'] = 'DEFAULT_GENERATED';
+                }
+            }
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
@@ -516,15 +537,14 @@ final class Schema extends AbstractSchema
              *
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
-            if (!empty($info['extra'])) {
-                var_dump($info['extra']);
-                $column->defaultValue(new Expression($info['default']));
-            } elseif (
+            if (
                 in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
+            } elseif (!empty($info['extra'])) {
+                $column->defaultValue(new Expression($info['default']));
             } elseif (isset($type) && $type === 'bit' && $column->getType() !== self::TYPE_BOOLEAN) {
                 $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
