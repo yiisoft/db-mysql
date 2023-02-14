@@ -170,24 +170,30 @@ final class SchemaTest extends CommonSchemaTest
             !str_contains($db->getServerVersion(), 'MariaDB')
         );
 
-        $sql = <<<SQL
-        CREATE TABLE IF NOT EXISTS `datetime_test`  (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            `simple_col` varchar(40) DEFAULT 'uuid()',
-            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-        SQL;
+        if ($oldMySQL) {
+            $sql = <<<SQL
+            CREATE TABLE IF NOT EXISTS `datetime_test`  (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `simple_col` varchar(40) DEFAULT 'uuid()',
+                `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+            SQL;
+        } else {
+            $sql = <<<SQL
+            CREATE TABLE IF NOT EXISTS `datetime_test`  (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `simple_col` varchar(40) DEFAULT 'uuid()',
+                `uuid_col` varchar(40) DEFAULT (uuid()),
+                `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+            SQL;
+        }
 
         $command->setSql($sql)->execute();
-
-        if (!$oldMySQL) {
-            $db
-                ->createCommand()
-                ->addColumn('datetime_test', 'uuid_col', 'varchar(40) DEFAULT (uuid())')
-                ->execute();
-        }
 
         $schema = $schema->getTableSchema('datetime_test');
 
