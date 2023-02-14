@@ -517,6 +517,7 @@ final class Schema extends AbstractSchema
              * See details here: https://mariadb.com/kb/en/library/now/#description
              */
             if (!empty($info['extra'])) {
+                var_dump($info['extra']);
                 $column->defaultValue(new Expression($info['default']));
             } elseif (
                 in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
