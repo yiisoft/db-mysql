@@ -526,7 +526,7 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
         if (!$column->isPrimaryKey()) {
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
             $columnCategory = $this->createColumnSchemaBuilder($column->getType(), $column->getSize())->getCategoryMap()[$column->getType()] ?? '';
-            $defaultValue = $info['extra_default_value'];
+            $defaultValue = $info['extra_default_value'] ?? '';
             if (empty($info['extra']) && !empty($defaultValue) && $columnCategory === ColumnSchemaBuilder::CATEGORY_STRING) {
                 if (!str_starts_with($defaultValue, '\'')) {
                     $info['extra'] = 'DEFAULT_GENERATED';
