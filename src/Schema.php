@@ -226,14 +226,7 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
-
-            // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
-            $defaultValue = $columnsExtra[$info['field']]['COLUMN_DEFAULT'] ?? '';
-            if (empty($info['extra']) && !empty($defaultValue)) {
-                if (!str_starts_with($defaultValue, '\'')) {
-                    $info['extra'] = 'DEFAULT_GENERATED';
-                }
-            }
+            $info['extra_default_value'] = $columnsExtra[$info['field']]['COLUMN_DEFAULT'] ?? '';
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
@@ -531,6 +524,14 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
         $column->phpType($this->getColumnPhpType($column));
 
         if (!$column->isPrimaryKey()) {
+            // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+            $columnCategory = $this->createColumnSchemaBuilder($column->getType(), $column->getSize())->getCategoryMap()[$column->getType()] ?? '';
+            $defaultValue = $info['extra_default_value'];
+            if (empty($info['extra']) && !empty($defaultValue) && $columnCategory === ColumnSchemaBuilder::CATEGORY_STRING) {
+                if (!str_starts_with($defaultValue, '\'')) {
+                    $info['extra'] = 'DEFAULT_GENERATED';
+                }
+            }
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
              * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
