@@ -66,10 +66,10 @@ jobs:
         run: composer self-update
 
       - name: Set environment variables pull request linux.
-        uses: yiisoft/actions/db/environment-linux@master
+        uses: yiisoft/actions/db/environment-linux@tests
 
       - name: Install db.
-        uses: yiisoft/actions/db/subpackage-install@master
+        uses: yiisoft/actions/db/subpackage-install@tests
         with:
           BRANCH_NAME: ${{ github.head_ref }}
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}

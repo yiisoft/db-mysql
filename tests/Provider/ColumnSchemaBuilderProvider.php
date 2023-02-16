@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Tests\Provider\AbstractColumnSchemaBuilderProvider;
 
-final class ColumnSchemaBuilderProvider extends AbstractColumnSchemaBuilderProvider
+final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\ColumnSchemaBuilderProvider
 {
     public function types(): array
     {

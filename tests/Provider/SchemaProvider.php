@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Tests\Provider\AbstractSchemaProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
-final class SchemaProvider extends AbstractSchemaProvider
+final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
     use TestTrait;
 
