@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
-use Yiisoft\Db\Tests\Provider\AbstractQuoterProvider;
-
-final class QuoterProvider extends AbstractQuoterProvider
+final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
 {
     /**
      * @return string[][]
