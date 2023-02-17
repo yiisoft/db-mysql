@@ -8,7 +8,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
 
 final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\ColumnSchemaBuilderProvider
 {
-    public function types(): array
+    public static function types(): array
     {
         $types = parent::types();
 

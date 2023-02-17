@@ -17,7 +17,7 @@ final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
     use TestTrait;
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaBuilderProvider::types();
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaBuilderProvider::types
      */
     public function testCustomTypes(string $expected, string $type, int|null $length, array $calls): void
     {
