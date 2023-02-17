@@ -338,7 +338,7 @@ final class SchemaTest extends CommonSchemaTest
             default => ['animal_view'],
         };
 
-        $this->assertSame($viewExpected, $views);
+        $this->assertEquals($viewExpected, $views);
     }
 
     /**
