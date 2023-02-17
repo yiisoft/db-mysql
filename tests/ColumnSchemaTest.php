@@ -24,7 +24,7 @@ final class ColumnSchemaTest extends TestCase
     use TestTrait;
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaProvider::bigIntValue()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaProvider::bigIntValue
      *
      * @throws Exception
      * @throws Throwable
