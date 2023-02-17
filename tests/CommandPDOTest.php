@@ -15,27 +15,4 @@ use Yiisoft\Db\Tests\Common\CommonCommandPDOTest;
 final class CommandPDOTest extends CommonCommandPDOTest
 {
     use TestTrait;
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandPDOProvider::bindParam()
-     */
-    public function testBindParam(
-        string $field,
-        string $name,
-        mixed $value,
-        int $dataType,
-        int|null $length,
-        mixed $driverOptions,
-        array $expected,
-    ): void {
-        parent::testBindParam($field, $name, $value, $dataType, $length, $driverOptions, $expected);
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandPDOProvider::bindParamsNonWhere()
-     */
-    public function testBindParamsNonWhere(string $sql): void
-    {
-        parent::testBindParamsNonWhere($sql);
-    }
 }
