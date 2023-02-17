@@ -22,6 +22,7 @@ use Yiisoft\Db\Tests\Support\Assert;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 use function version_compare;
+use function sort;
 
 /**
  * @group mysql
@@ -333,12 +334,15 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
+
+        sort($views);
+
         $viewExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
             true => ['animal_view', 'user'],
             default => ['animal_view'],
         };
 
-        $this->assertEquals($viewExpected, $views);
+        $this->assertSame($viewExpected, $views);
     }
 
     /**
