@@ -9,7 +9,7 @@ final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
     /**
      * @return string[][]
      */
-    public function columnNames(): array
+    public static function columnNames(): array
     {
         return [
             ['*', '*'],
@@ -25,7 +25,7 @@ final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
     /**
      * @return string[][]
      */
-    public function simpleColumnNames(): array
+    public static function simpleColumnNames(): array
     {
         return [
             ['test', '`test`', 'test'],
@@ -37,7 +37,7 @@ final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
     /**
      * @return string[][]
      */
-    public function simpleTableNames(): array
+    public static function simpleTableNames(): array
     {
         return [
             ['test', 'test', ],
@@ -48,7 +48,7 @@ final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
         ];
     }
 
-    public function tableNameParts(): array
+    public static function tableNameParts(): array
     {
         return [
             ['', ''],
