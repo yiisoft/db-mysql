@@ -15,13 +15,10 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 {
     use TestTrait;
 
-    protected string $likeEscapeCharSql = '';
-    protected array $likeParameterReplacements = [];
+    protected static string $driverName = 'mysql';
 
-    public function buildCondition(): array
+    public static function buildCondition(): array
     {
-        $db = $this->getConnection();
-
         $buildCondition = parent::buildCondition();
 
         return array_merge(
@@ -69,7 +66,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                     [
                         '=',
                         'jsoncol',
-                        new JsonExpression((new Query($db))->select('params')->from('user')->where(['id' => 1])),
+                        new JsonExpression((new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1])),
                     ],
                     '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
                     [':qp0' => 1],
@@ -79,7 +76,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                         '=',
                         'jsoncol',
                         new JsonExpression(
-                            (new Query($db))->select('params')->from('user')->where(['id' => 1]),
+                            (new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1]),
                             'jsonb'
                         ),
                     ],
@@ -103,7 +100,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         );
     }
 
-    public function insert(): array
+    public static function insert(): array
     {
         $insert = parent::insert();
 
@@ -114,7 +111,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $insert;
     }
 
-    public function upsert(): array
+    public static function upsert(): array
     {
         $concreteData = [
             'regular values' => [

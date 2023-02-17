@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Closure;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -51,7 +50,7 @@ final class CommandTest extends CommonCommandTest
         $command = $db->createCommand();
         $command->alterColumn('{{customer}}', 'email', 'text')->execute();
         $schema = $db->getSchema();
-        $columns = $schema->getTableSchema('{{customer}}')->getColumns();
+        $columns = $schema->getTableSchema('{{customer}}')?->getColumns();
 
         $this->assertArrayHasKey('email', $columns);
         $this->assertSame('text', $columns['email']->getDbType());
@@ -59,12 +58,17 @@ final class CommandTest extends CommonCommandTest
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testBatchInsert(
         string $table,
         array $columns,
         array $values,
-        Closure $expected,
+        string $expected,
         array $expectedParams = [],
         int $insertedRow = 1
     ): void {
@@ -94,26 +98,36 @@ final class CommandTest extends CommonCommandTest
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
-    public function testGetRawSql(string $sql, array $params, Closure $expectedRawSql): void
+    public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpdate(
         string $table,
         array $columns,
         array|string $conditions,
         array $params,
-        Closure $expected
+        string $expected
     ): void {
         parent::testUpdate($table, $columns, $conditions, $params, $expected);
     }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::upsert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpsert(array $firstData, array $secondData): void
     {
