@@ -158,17 +158,40 @@ final class SchemaTest extends CommonSchemaTest
     {
         $db = $this->getConnection();
 
+        if ($db->getTableSchema('{{%datetime_test}}', true) !== null) {
+            $db->createCommand('DROP TABLE `datetime_test`')->execute();
+        }
+
         $command = $db->createCommand();
         $schema = $db->getSchema();
 
-        $sql = <<<SQL
-        CREATE TABLE  IF NOT EXISTS `datetime_test`  (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-        SQL;
+        $oldMySQL = !(
+            version_compare($db->getServerVersion(), '8.0.0', '>') &&
+            !str_contains($db->getServerVersion(), 'MariaDB')
+        );
+
+        if ($oldMySQL) {
+            $sql = <<<SQL
+            CREATE TABLE IF NOT EXISTS `datetime_test`  (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `simple_col` varchar(40) DEFAULT 'uuid()',
+                `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+            SQL;
+        } else {
+            $sql = <<<SQL
+            CREATE TABLE IF NOT EXISTS `datetime_test`  (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `simple_col` varchar(40) DEFAULT 'uuid()',
+                `uuid_col` varchar(40) DEFAULT (uuid()),
+                `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+            SQL;
+        }
 
         $command->setSql($sql)->execute();
 
@@ -177,11 +200,26 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertNotNull($schema);
 
         $dt = $schema->getColumn('dt');
-
         $this->assertNotNull($dt);
-
         $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
+
+        if (!$oldMySQL) {
+            $uuid = $schema->getColumn('uuid_col');
+            $this->assertNotNull($uuid);
+            $this->assertInstanceOf(Expression::class, $uuid->getDefaultValue());
+            $this->assertEquals('uuid()', (string)$uuid->getDefaultValue());
+        }
+
+        $simple = $schema->getColumn('simple_col');
+        $this->assertNotNull($simple);
+        $this->assertNotInstanceOf(Expression::class, $simple->getDefaultValue());
+        $this->assertEquals('uuid()', (string) $simple->getDefaultValue());
+
+        $ts = $schema->getColumn('ts');
+        $this->assertNotNull($ts);
+        $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP', (string) $ts->getDefaultValue());
     }
 
     /**

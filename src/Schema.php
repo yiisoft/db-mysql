@@ -14,6 +14,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
@@ -67,6 +68,7 @@ use function trim;
  *   key: string,
  *   default: string|null,
  *   extra: string,
+ *   extra_default_value: string|null,
  *   privileges: string,
  *   comment: string
  * }
@@ -193,6 +195,26 @@ final class Schema extends AbstractSchema
 
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
+            // Chapter 1: cruthes for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
+            $columnsExtra = [];
+            if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
+                /** @psalm-var array[] $columnsExtra */
+                $columnsExtra = $this->db->createCommand(
+                    <<<SQL
+                    SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName
+                    SQL ,
+                    [
+                        ':schemaName' => $table->getSchemaName(),
+                        ':tableName' => $table->getName(),
+                    ]
+                )->queryAll();
+                /** @psalm-var array<string, string>  $cols */
+                foreach ($columnsExtra as $cols) {
+                    $columnsExtra[$cols['name']] = $cols['default_value'];
+                }
+            }
         } catch (Exception $e) {
             $previous = $e->getPrevious();
 
@@ -213,6 +235,8 @@ final class Schema extends AbstractSchema
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
+
+            $info['extra_default_value'] = $columnsExtra[(string) $info['field']] ?? '';
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
@@ -510,6 +534,21 @@ final class Schema extends AbstractSchema
         $column->phpType($this->getColumnPhpType($column));
 
         if (!$column->isPrimaryKey()) {
+            // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+            /** @var string $columnCategory */
+            $columnCategory = $this->createColumnSchemaBuilder(
+                $column->getType(),
+                $column->getSize()
+            )->getCategoryMap()[$column->getType()] ?? '';
+            $defaultValue = $info['extra_default_value'] ?? '';
+            if (
+                empty($info['extra']) &&
+                !empty($defaultValue) &&
+                $columnCategory === AbstractColumnSchemaBuilder::CATEGORY_STRING
+                && !str_starts_with($defaultValue, '\'')
+            ) {
+                $info['extra'] = 'DEFAULT_GENERATED';
+            }
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
              * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
@@ -522,6 +561,8 @@ final class Schema extends AbstractSchema
             ) {
                 $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
                     ? '(' . $matches[1] . ')' : '')));
+            } elseif (!empty($info['extra']) && !empty($info['default'])) {
+                $column->defaultValue(new Expression($info['default']));
             } elseif (isset($type) && $type === 'bit' && $column->getType() !== self::TYPE_BOOLEAN) {
                 $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
             } else {
