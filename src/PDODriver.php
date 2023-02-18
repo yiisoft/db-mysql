@@ -12,6 +12,7 @@ final class PDODriver extends AbstractPDODriver
     public function createConnection(): PDO
     {
         $this->attributes += [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+
         if (PHP_VERSION_ID >= 80100) {
             $this->attributes += [PDO::ATTR_STRINGIFY_FETCHES => true];
         }
@@ -20,6 +21,10 @@ final class PDODriver extends AbstractPDODriver
 
         if ($this->charset !== null) {
             $pdo->exec('SET NAMES ' . $pdo->quote($this->charset));
+        }
+
+        if (!str_contains($this->dsn, 'charset') && $this->charset === null) {
+            $pdo->exec('SET NAMES ' . $pdo->quote('utf8mb4'));
         }
 
         return $pdo;
