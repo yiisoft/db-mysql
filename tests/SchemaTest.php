@@ -177,7 +177,7 @@ final class SchemaTest extends CommonSchemaTest
         ];
         if (!$oldMySQL) {
             $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true];
-            $columnsData['uuid_col'] = ['varchar(40) DEFAULT uuid()', 'uuid()', true];
+            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', 'uuid()', true];
         }
 
         $columns = [];
@@ -189,7 +189,7 @@ final class SchemaTest extends CommonSchemaTest
             $db->createCommand()->dropTable($tableName)->execute();
         }
 
-        $db->createCommand()->createTable($tableName, $columns)->execute();
+        $db->createCommand()->createTable($tableName, $columns, 'ENGINE=InnoDB DEFAULT CHARSET=utf8')->execute();
 
         $tableSchema = $db->getTableSchema($tableName);
         $this->assertNotNull($tableSchema);
