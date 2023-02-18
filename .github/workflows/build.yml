@@ -82,7 +82,7 @@ jobs:
         uses: yiisoft/actions/db/environment-linux@master
 
       - name: Install db.
-        uses: yiisoft/actions/db/subpackage-install@master
+        uses: yiisoft/actions/db/subpackage-install@fix-push
         with:
           BRANCH_NAME: ${{ github.head_ref }}
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
