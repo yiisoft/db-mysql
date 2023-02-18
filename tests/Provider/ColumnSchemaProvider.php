@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 final class ColumnSchemaProvider
 {
-    public function bigIntValue(): array
+    public static function bigIntValue(): array
     {
         return [
             ['8817806877'],

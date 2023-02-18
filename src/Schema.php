@@ -364,10 +364,10 @@ final class Schema extends AbstractSchema
     {
         $sql = match ($schema) {
             '' => <<<SQL
-            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema != 'sys'
+            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema != 'sys' order by table_name
             SQL,
             default => <<<SQL
-            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema = '$schema'
+            SELECT table_name as view FROM information_schema.tables WHERE table_type LIKE 'VIEW' AND table_schema = '$schema' order by table_name
             SQL,
         };
 
