@@ -177,9 +177,8 @@ final class SchemaTest extends CommonSchemaTest
             'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
         ];
         if ($oldMySQL) {
-            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', '(uuid())', true];
+            $columnsData['uuid_col'] = ['varchar(40) DEFAULT uuid()', 'uuid()', true];
         }
-
 
         $columns = [];
         foreach ($columnsData as $column => $columnData) {
@@ -192,7 +191,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $db->createCommand()->createTable($tableName, $columns)->execute();
 
-        $tableSchema = $db->getTableSchema('datetime_test');
+        $tableSchema = $db->getTableSchema($tableName);
         $this->assertNotNull($tableSchema);
 
         foreach ($tableSchema->getColumns() as $column) {
