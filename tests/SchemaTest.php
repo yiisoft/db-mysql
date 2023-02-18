@@ -176,7 +176,7 @@ final class SchemaTest extends CommonSchemaTest
             'ts4' => ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true],
             'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
         ];
-        if ($oldMySQL) {
+        if (!$oldMySQL) {
             $columnsData['uuid_col'] = ['varchar(40) DEFAULT uuid()', 'uuid()', true];
         }
 
