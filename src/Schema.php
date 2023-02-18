@@ -199,9 +199,11 @@ final class Schema extends AbstractSchema
             $columnsExtra = [];
             if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
                 /** @psalm-var array[] $columnsExtra */
-                $columnsExtra = $this->db->createCommand(
-                    'SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName',
+                $columnsExtra = $this->db->createCommand(<<<SQL
+                    SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName
+                    SQL ,
                     [
                         ':schemaName' => $table->getSchemaName(),
                         ':tableName' => $table->getName(),
@@ -534,7 +536,9 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
             /** @var string $columnCategory */
             $columnCategory = $this->createColumnSchemaBuilder(
-                $column->getType(), $column->getSize())->getCategoryMap()[$column->getType()] ?? '';
+                    $column->getType(),
+                    $column->getSize()
+                )->getCategoryMap()[$column->getType()] ?? '';
             $defaultValue = $info['extra_default_value'] ?? '';
             if (
                 empty($info['extra']) &&
