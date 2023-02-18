@@ -14,6 +14,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
+use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
@@ -67,6 +68,7 @@ use function trim;
  *   key: string,
  *   default: string|null,
  *   extra: string,
+ *   extra_default_value: string|null,
  *   privileges: string,
  *   comment: string
  * }
@@ -196,15 +198,19 @@ final class Schema extends AbstractSchema
             // Chapter 1: cruthes for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
             $columnsExtra = [];
             if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
+                /** @psalm-var array[] $columnsExtra */
                 $columnsExtra = $this->db->createCommand(
-                    'SELECT `COLUMN_NAME` as COLUMN_NAME,`COLUMN_DEFAULT` as COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS
+                    'SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName',
                     [
                         ':schemaName' => $table->getSchemaName(),
                         ':tableName' => $table->getName(),
                     ]
                 )->queryAll();
-                $columnsExtra = ArrayHelper::index($columnsExtra, 'COLUMN_NAME');
+                /** @psalm-var array<string, string>  $cols */
+                foreach ($columnsExtra as $cols) {
+                    $columnsExtra[$cols['name']] = $cols['default_value'];
+                }
             }
         } catch (Exception $e) {
             $previous = $e->getPrevious();
@@ -226,7 +232,8 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
             $info = $this->normalizeRowKeyCase($info, false);
-            $info['extra_default_value'] = $columnsExtra[$info['field']]['COLUMN_DEFAULT'] ?? '';
+
+            $info['extra_default_value'] = $columnsExtra[(string) $info['field']] ?? '';
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
@@ -525,12 +532,17 @@ WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableNa
 
         if (!$column->isPrimaryKey()) {
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
-            $columnCategory = $this->createColumnSchemaBuilder($column->getType(), $column->getSize())->getCategoryMap()[$column->getType()] ?? '';
+            /** @var string $columnCategory */
+            $columnCategory = $this->createColumnSchemaBuilder(
+                $column->getType(), $column->getSize())->getCategoryMap()[$column->getType()] ?? '';
             $defaultValue = $info['extra_default_value'] ?? '';
-            if (empty($info['extra']) && !empty($defaultValue) && $columnCategory === ColumnSchemaBuilder::CATEGORY_STRING) {
-                if (!str_starts_with($defaultValue, '\'')) {
-                    $info['extra'] = 'DEFAULT_GENERATED';
-                }
+            if (
+                empty($info['extra']) &&
+                !empty($defaultValue) &&
+                $columnCategory === AbstractColumnSchemaBuilder::CATEGORY_STRING
+                && !str_starts_with($defaultValue, '\'')
+            ) {
+                $info['extra'] = 'DEFAULT_GENERATED';
             }
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
