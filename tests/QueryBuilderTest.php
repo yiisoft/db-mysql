@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use Generator;
+use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -98,7 +99,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addForeignKey()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addForeignKey
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testAddForeignKey(
         string $name,
@@ -114,7 +120,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addPrimaryKey()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addPrimaryKey
      */
     public function testAddPrimaryKey(string $name, string $table, array|string $columns, string $expected): void
     {
@@ -122,7 +128,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addUnique()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addUnique
      */
     public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
     {
@@ -130,7 +136,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testBatchInsert(string $table, array $columns, iterable|Generator $rows, string $expected): void
     {
@@ -138,7 +149,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildCondition()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildCondition
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testBuildCondition(
         array|ExpressionInterface|string $condition,
@@ -149,7 +165,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeCondition()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeCondition
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testBuildLikeCondition(
         array|ExpressionInterface $condition,
@@ -160,7 +181,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFrom()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFrom
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testBuildWithFrom(mixed $table, string $expectedSql, array $expectedParams = []): void
     {
@@ -193,7 +219,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildWhereExists()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildWhereExists
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testBuildWithWhereExists(string $cond, string $expectedQuerySql): void
     {
@@ -248,7 +279,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::delete()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::delete
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testDelete(string $table, array|string $condition, string $expectedSQL, array $expectedParams): void
     {
@@ -269,6 +305,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     /**
      * Test for issue https://github.com/yiisoft/yii2/issues/15500
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testDefaultValues(): void
     {
@@ -382,12 +423,17 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             DROP INDEX `test_uq_constraint` ON `test_uq`
             SQL,
-            $qb->dropUnique('test_uq_constraint', 'test_uq', ['int1']),
+            $qb->dropUnique('test_uq_constraint', 'test_uq'),
         );
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testInsert(
         string $table,
@@ -400,7 +446,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertWithReturningPks()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertWithReturningPks
      */
     public function testInsertWithReturningPks(
         string $table,
@@ -421,6 +467,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     /**
      * @link https://github.com/yiisoft/yii2/issues/14663
+     *
+     * @throws Exception
+     * @throws \Exception
+     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
+     * @throws NotSupportedException
      */
     public function testInsertInteger()
     {
@@ -474,6 +526,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     /**
      * @throws Exception
      * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testResetSequence(): void
     {
@@ -535,7 +588,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::update()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::update
+     *
+     * @throws Exception
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpdate(
         string $table,
@@ -548,7 +605,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert
+     *
+     * @throws Exception
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpsert(
         string $table,
@@ -561,7 +622,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert
+     *
+     * @throws Exception
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpsertExecute(
         string $table,

@@ -18,7 +18,7 @@ trait TestTrait
     {
         $db = new ConnectionPDO(
             new PDODriver($this->getDsn(), 'root', ''),
-            DbHelper::getSchemaCache()
+            DbHelper::getSchemaCache(),
         );
 
         if ($fixture) {
@@ -26,6 +26,16 @@ trait TestTrait
         }
 
         return $db;
+    }
+
+    protected static function getDb(): ConnectionPDOInterface
+    {
+        $dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
+
+        return new ConnectionPDO(
+            new PDODriver($dsn, 'root', ''),
+            DbHelper::getSchemaCache(),
+        );
     }
 
     protected function getDsn(): string

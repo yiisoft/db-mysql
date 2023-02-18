@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Tests\Provider\AbstractSchemaProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
-final class SchemaProvider extends AbstractSchemaProvider
+final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
     use TestTrait;
 
-    public function columns(): array
+    public static function columns(): array
     {
         return [
             [
@@ -288,7 +287,7 @@ final class SchemaProvider extends AbstractSchemaProvider
         ];
     }
 
-    public function columnsTypeBit(): array
+    public static function columnsTypeBit(): array
     {
         return [
             [
@@ -376,7 +375,7 @@ final class SchemaProvider extends AbstractSchemaProvider
         ];
     }
 
-    public function constraints(): array
+    public static function constraints(): array
     {
         $constraints = parent::constraints();
 
@@ -389,7 +388,7 @@ final class SchemaProvider extends AbstractSchemaProvider
         return $constraints;
     }
 
-    public function tableSchemaWithDbSchemes(): array
+    public static function tableSchemaWithDbSchemes(): array
     {
         return [
             ['animal', 'animal',],

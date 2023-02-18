@@ -50,14 +50,19 @@ final class CommandTest extends CommonCommandTest
         $command = $db->createCommand();
         $command->alterColumn('{{customer}}', 'email', 'text')->execute();
         $schema = $db->getSchema();
-        $columns = $schema->getTableSchema('{{customer}}')->getColumns();
+        $columns = $schema->getTableSchema('{{customer}}')?->getColumns();
 
         $this->assertArrayHasKey('email', $columns);
         $this->assertSame('text', $columns['email']->getDbType());
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testBatchInsert(
         string $table,
@@ -87,7 +92,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -99,7 +104,12 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpdate(
         string $table,
@@ -112,7 +122,12 @@ final class CommandTest extends CommonCommandTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::upsert()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::upsert
+     *
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
      */
     public function testUpsert(array $firstData, array $secondData): void
     {

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
-use Yiisoft\Db\Tests\Provider\AbstractQuoterProvider;
-
-final class QuoterProvider extends AbstractQuoterProvider
+final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
 {
     /**
      * @return string[][]
      */
-    public function columnNames(): array
+    public static function columnNames(): array
     {
         return [
             ['*', '*'],
@@ -27,7 +25,7 @@ final class QuoterProvider extends AbstractQuoterProvider
     /**
      * @return string[][]
      */
-    public function simpleColumnNames(): array
+    public static function simpleColumnNames(): array
     {
         return [
             ['test', '`test`', 'test'],
@@ -39,7 +37,7 @@ final class QuoterProvider extends AbstractQuoterProvider
     /**
      * @return string[][]
      */
-    public function simpleTableNames(): array
+    public static function simpleTableNames(): array
     {
         return [
             ['test', 'test', ],
@@ -50,7 +48,7 @@ final class QuoterProvider extends AbstractQuoterProvider
         ];
     }
 
-    public function tableNameParts(): array
+    public static function tableNameParts(): array
     {
         return [
             ['', ''],

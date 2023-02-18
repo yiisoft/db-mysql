@@ -97,7 +97,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns
      *
      * @throws Exception
      */
@@ -142,7 +142,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit
      */
     public function testColumnSchemaWithTypeBit(array $columns): void
     {
@@ -294,7 +294,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeChar()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeChar
      */
     public function testGetStringFieldsSize(
         string $columnName,
@@ -371,6 +371,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
+
         $viewExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
             true => ['animal_view', 'user'],
             default => ['animal_view'],
@@ -380,7 +381,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      */
@@ -390,7 +391,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      */
@@ -400,7 +401,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
      *
      * @throws Exception
      */
@@ -410,7 +411,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::tableSchemaWithDbSchemes()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::tableSchemaWithDbSchemes
      */
     public function testTableSchemaWithDbSchemes(
         string $tableName,
