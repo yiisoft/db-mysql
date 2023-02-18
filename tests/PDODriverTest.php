@@ -6,8 +6,10 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Db\Mysql\ConnectionPDO;
 use Yiisoft\Db\Mysql\PDODriver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group mysql
@@ -34,5 +36,18 @@ final class PDODriverTest extends TestCase
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
 
         $this->assertEqualsIgnoringCase($newCharset, array_values($charset)[1]);
+    }
+
+    public function testCharsetDefault(): void
+    {
+        $db = new ConnectionPDO(
+            new PDODriver('mysql:host=127.0.0.1;dbname=yiitest;port=3306', 'root', ''),
+            DbHelper::getSchemaCache(),
+        );
+
+        $db->open();
+        $command = $db->createCommand();
+
+        $this->assertSame('utf8mb4', $command->setSql('SELECT @@character_set_client')->queryScalar());
     }
 }

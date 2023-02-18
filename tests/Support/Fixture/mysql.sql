@@ -41,21 +41,21 @@ CREATE TABLE `constraints`
 (
   `id` integer not null,
   `field1` varchar(255)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `quoter` (
    `id` int(11) NOT NULL AUTO_INCREMENT,
    `name` varchar(16) NOT NULL,
    `description` varchar(128) NOT NULL,
    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `customer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -66,13 +66,13 @@ CREATE TABLE `customer` (
   `profile_id` int(11),
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_customer_profile_id` FOREIGN KEY (`profile_id`) REFERENCES `profile` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `category` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `item` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -81,7 +81,7 @@ CREATE TABLE `item` (
   PRIMARY KEY (`id`),
   KEY `FK_item_category_id` (`category_id`),
   CONSTRAINT `FK_item_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -90,7 +90,7 @@ CREATE TABLE `order` (
   `total` decimal(10,0) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_order_customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `order_with_null_fk` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -98,7 +98,7 @@ CREATE TABLE `order_with_null_fk` (
   `created_at` int(11) NOT NULL,
   `total` decimal(10,0) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `order_item` (
   `order_id` int(11) NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE `order_item` (
   KEY `FK_order_item_item_id` (`item_id`),
   CONSTRAINT `FK_order_item_order_id` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE CASCADE,
   CONSTRAINT `FK_order_item_item_id` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `order_item_with_null_fk` (
@@ -117,7 +117,7 @@ CREATE TABLE `order_item_with_null_fk` (
   `item_id` int(11),
   `quantity` int(11) NOT NULL,
   `subtotal` decimal(10,0) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `composite_fk` (
   `id` int(11) NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE `composite_fk` (
   `item_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_composite_fk_order_item` FOREIGN KEY (`order_id`,`item_id`) REFERENCES `order_item` (`order_id`,`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE null_values (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -134,7 +134,7 @@ CREATE TABLE null_values (
   `var3` INT DEFAULT NULL,
   `stringcol` VARCHAR (32) DEFAULT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `negative_default_values` (
   `tinyint_col` tinyint default '-123',
@@ -143,7 +143,7 @@ CREATE TABLE `negative_default_values` (
   `bigint_col` bigint default '-123',
   `float_col` double default '-12345.6789',
   `numeric_col` decimal(5,2) default '-33.22'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `type` (
   `int_col` integer NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE `type` (
   `ts_default` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `bit_col` BIT(8) NOT NULL DEFAULT b'10000010',
   `json_col` json
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `type_bit` (
   `bit_col_1` BIT(1) NOT NULL,
@@ -173,26 +173,26 @@ CREATE TABLE `type_bit` (
   `bit_col_4` BIT(32) DEFAULT b'10000010',
   `bit_col_5` BIT(64) NOT NULL,
   `bit_col_6` BIT(64) DEFAULT b'10000010'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `animal` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `default_pk` (
   `id` INT NOT NULL DEFAULT 5,
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `notauto_pk` (
   `id_1` INTEGER,
   `id_2` INTEGER,
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id_1`, `id_2`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `document` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -200,7 +200,7 @@ CREATE TABLE `document` (
   `content` TEXT,
   `version` INT(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `comment` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -208,13 +208,13 @@ CREATE TABLE `comment` (
   `replace_comment` VARCHAR(255) COMMENT 'comment',
   `delete_comment` VARCHAR(128) NOT NULL COMMENT 'comment',
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `department` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   title VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `employee` (
   `id` INT(11) NOT NULL,
@@ -222,7 +222,7 @@ CREATE TABLE `employee` (
   `first_name` VARCHAR(255) NOT NULL,
   `last_name` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`, `department_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `dossier` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -230,25 +230,25 @@ CREATE TABLE `dossier` (
   `employee_id` INT(11) NOT NULL,
   `summary` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `storage` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `data` JSON NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `alpha` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `string_identifier` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `beta` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `alpha_string_identifier` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE VIEW `animal_view` AS SELECT * FROM `animal`;
 
@@ -332,7 +332,7 @@ CREATE TABLE `bit_values` (
   `id`      INT(11) NOT NULL AUTO_INCREMENT,
   `val` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `bit_values` (id, val) VALUES (1, b'0'), (2, b'1');
 
@@ -345,7 +345,7 @@ CREATE TABLE `T_constraints_1`
     `C_default` INT NOT NULL DEFAULT 0,
     CONSTRAINT `CN_unique` UNIQUE (`C_unique`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
 
 CREATE TABLE `T_constraints_2`
 (
@@ -357,7 +357,7 @@ CREATE TABLE `T_constraints_2`
     CONSTRAINT `CN_constraints_2_multi` UNIQUE (`C_index_2_1`, `C_index_2_2`),
     CONSTRAINT `CN_pk` PRIMARY KEY (`C_id_1`, `C_id_2`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
 
 CREATE INDEX `CN_constraints_2_single` ON `T_constraints_2` (`C_index_1`);
 
@@ -368,7 +368,7 @@ CREATE TABLE `T_constraints_3`
     `C_fk_id_2` INT NOT NULL,
     CONSTRAINT `CN_constraints_3` FOREIGN KEY (`C_fk_id_1`, `C_fk_id_2`) REFERENCES `T_constraints_2` (`C_id_1`, `C_id_2`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
 
 CREATE TABLE `T_constraints_4`
 (
@@ -377,7 +377,7 @@ CREATE TABLE `T_constraints_4`
     `C_col_2` INT NOT NULL,
     CONSTRAINT `CN_constraints_4` UNIQUE (`C_col_1`, `C_col_2`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
 
 CREATE TABLE `T_upsert`
 (
@@ -391,9 +391,9 @@ CREATE TABLE `T_upsert`
     `profile_id` INT NULL,
     UNIQUE (`email`, `recovery_email`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
 
 CREATE TABLE `T_upsert_1` (
   `a` int(11) NOT NULL,
   PRIMARY KEY (`a`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
