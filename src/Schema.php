@@ -546,7 +546,7 @@ final class Schema extends AbstractSchema
                 !empty($defaultValue) &&
                 in_array($columnCategory, [
                     AbstractColumnSchemaBuilder::CATEGORY_STRING,
-                    AbstractColumnSchemaBuilder::CATEGORY_TIME
+                    AbstractColumnSchemaBuilder::CATEGORY_TIME,
                 ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {
