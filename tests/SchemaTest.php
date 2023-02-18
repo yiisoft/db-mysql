@@ -173,10 +173,10 @@ final class SchemaTest extends CommonSchemaTest
             'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
             'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
             'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts4' => ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true],
             'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
         ];
         if (!$oldMySQL) {
+            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true];
             $columnsData['uuid_col'] = ['varchar(40) DEFAULT uuid()', 'uuid()', true];
         }
 
