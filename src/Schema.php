@@ -544,7 +544,10 @@ final class Schema extends AbstractSchema
             if (
                 empty($info['extra']) &&
                 !empty($defaultValue) &&
-                $columnCategory === AbstractColumnSchemaBuilder::CATEGORY_STRING
+                in_array($columnCategory, [
+                    AbstractColumnSchemaBuilder::CATEGORY_STRING,
+                    AbstractColumnSchemaBuilder::CATEGORY_TIME,
+                ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {
                 $info['extra'] = 'DEFAULT_GENERATED';
