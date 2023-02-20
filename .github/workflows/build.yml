@@ -93,17 +93,8 @@ jobs:
       - name: Install dependencies with composer.
         run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
 
-      - name: Run tests with phpunit with code coverage mysql-57.
-        if: matrix.mysql == 'mysql:5.7'
-        run: vendor/bin/phpunit --exclude-group mysql-80 --coverage-clover=coverage.xml --colors=always
-
-      - name: Run tests with phpunit with code coverage mysql-80.
-        if: matrix.mysql == 'mysql:latest'
+      - name: Run tests with phpunit with code coverage.
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always
-
-      - name: Run tests with phpunit with code coverage mariadb.
-        if: matrix.mysql != 'mysql:5.7' && ${{ matrix.mysql }} != 'mysql:latest'
-        run: vendor/bin/phpunit --exclude-group mysql-80 --coverage-clover=coverage.xml --colors=always
 
       - name: Upload coverage to Codecov.
         uses: codecov/codecov-action@v3

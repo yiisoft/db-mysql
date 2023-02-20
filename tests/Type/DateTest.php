@@ -15,16 +15,15 @@ use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
  *
 * @link https://dev.mysql.com/doc/refman/8.0/en/date-and-time-types.html
  */
-final class Date80Test extends TestCase
+final class DateTest extends TestCase
 {
     use TestTrait;
 
     public function testDefaultValue(): void
     {
-        $this->setFixture('date80.sql');
+        $this->setFixture('date.sql');
 
         $db = $this->getConnection(true);
-
         $tableSchema = $db->getSchema()->getTableSchema('date_default');
 
         $this->assertSame('date', $tableSchema->getColumn('Mydate')->getDbType());
@@ -35,7 +34,12 @@ final class Date80Test extends TestCase
         $this->assertSame('string', $tableSchema->getColumn('Mytimestamp')->getPhpType());
         $this->assertSame('time', $tableSchema->getColumn('Mytime')->getDbType());
         $this->assertSame('string', $tableSchema->getColumn('Mytime')->getPhpType());
-        $this->assertSame('year', $tableSchema->getColumn('Myyear')->getDbType());
+
+        if (str_contains($this->getConnection()->getServerVersion(), '8.0')) {
+            $this->assertSame('year', $tableSchema->getColumn('Myyear')->getDbType());
+        } else {
+            $this->assertSame('year(4)', $tableSchema->getColumn('Myyear')->getDbType());
+        }
 
         $command = $db->createCommand();
         $command->insert('date_default', [])->execute();
@@ -57,9 +61,47 @@ final class Date80Test extends TestCase
         );
     }
 
-    public function testDefaultValueExpressions(): void
+    public function testDefaultValueExpressions57(): void
     {
+        $this->setFixture('date57.sql');
+
+        $db = $this->getConnection(true);
+
+        $command = $db->createCommand();
+        $command->insert('date_default_expressions57', [])->execute();
+
+        $this->assertInstanceOf(
+            DateTime::class,
+            DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $command->setSql(
+                    <<<SQL
+                    SELECT Mydatetime FROM date_default_expressions57 WHERE id = 1
+                    SQL,
+                )->queryScalar(),
+            ),
+        );
+        $this->assertInstanceOf(
+            DateTime::class,
+            DateTime::createFromFormat(
+                'Y-m-d H:i:s',
+                $command->setSql(
+                    <<<SQL
+                    SELECT Mytimestamp FROM date_default_expressions57 WHERE id = 1
+                    SQL,
+                )->queryScalar(),
+            ),
+        );
+    }
+
+    public function testDefaultValueExpressions80(): void
+    {
+        if (str_contains($this->getConnection()->getServerVersion(), '5.7')) {
+            $this->markTestSkipped('This test is only for MySQL 8.0+');
+        }
+
         $this->setFixture('date80.sql');
+
         $db = $this->getConnection(true);
 
         $command = $db->createCommand();
@@ -114,7 +156,7 @@ final class Date80Test extends TestCase
 
     public function testValue(): void
     {
-        $this->setFixture('date80.sql');
+        $this->setFixture('date.sql');
 
         $db = $this->getConnection(true);
         $command = $db->createCommand();
