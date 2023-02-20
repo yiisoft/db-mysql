@@ -95,7 +95,7 @@ jobs:
 
       - name: Run tests with phpunit with code coverage mysql-57.
         if: ${{ matrix.mysql }} == 'mysql:5.7'
-        run: vendor/bin/phpunit --exclude mysql-80 --coverage-clover=coverage.xml --colors=always
+        run: vendor/bin/phpunit --exclude-group mysql-80 --coverage-clover=coverage.xml --colors=always
 
       - name: Run tests with phpunit with code coverage mysql 5.7.
         if: ${{ matrix.mysql }} != 'mysql:5.7'
