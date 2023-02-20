@@ -75,7 +75,7 @@ final class DateTest extends TestCase
         $this->assertSame(
             [
                 'id' => '1',
-                'Mydate' => date('Y-m-d', strtotime(date('Y-m-d') . "2 year")),
+                'Mydate' => date('Y-m-d', strtotime(date('Y-m-d') . '2 year')),
                 'Myyear' => date('Y'),
             ],
             $command->setSql(
