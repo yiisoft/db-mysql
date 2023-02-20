@@ -16,7 +16,7 @@ use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
  *
 * @link https://dev.mysql.com/doc/refman/8.0/en/date-and-time-types.html
  */
-final class DateTest extends TestCase
+final class Date80Test extends TestCase
 {
     use TestTrait;
 
