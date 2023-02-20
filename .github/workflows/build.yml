@@ -97,9 +97,13 @@ jobs:
         if: ${{ matrix.mysql }} == 'mysql:5.7'
         run: vendor/bin/phpunit --exclude-group mysql-80 --coverage-clover=coverage.xml --colors=always
 
-      - name: Run tests with phpunit with code coverage mysql 5.7.
-        if: ${{ matrix.mysql }} != 'mysql:5.7'
+      - name: Run tests with phpunit with code coverage mysql-80.
+        if: ${{ matrix.mysql }} == 'mysql:latest'
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always
+
+      - name: Run tests with phpunit with code coverage mariadb.
+        if: ${{ matrix.mysql }} != 'mysql:5.7' && ${{ matrix.mysql }} != 'mysql:latest'
+        run: vendor/bin/phpunit --exclude-group mysql-80 --coverage-clover=coverage.xml --colors=always
 
       - name: Upload coverage to Codecov.
         uses: codecov/codecov-action@v3
