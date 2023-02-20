@@ -21,7 +21,7 @@ final class DateTest extends TestCase
 
     public function testDefaultValue(): void
     {
-        $this->setFixture('date.sql');
+        $this->setFixture('Type/date.sql');
 
         $db = $this->getConnection(true);
         $tableSchema = $db->getSchema()->getTableSchema('date_default');
@@ -63,7 +63,7 @@ final class DateTest extends TestCase
 
     public function testDefaultValueExpressions57(): void
     {
-        $this->setFixture('date57.sql');
+        $this->setFixture('Type/date57.sql');
 
         $db = $this->getConnection(true);
 
@@ -100,12 +100,12 @@ final class DateTest extends TestCase
             $this->markTestSkipped('This test is only for MySQL 8.0+');
         }
 
-        $this->setFixture('date80.sql');
+        $this->setFixture('Type/date80.sql');
 
         $db = $this->getConnection(true);
 
         $command = $db->createCommand();
-        $command->insert('date_default_expressions', [])->execute();
+        $command->insert('date_default_expressions80', [])->execute();
 
         $this->assertSame(
             [
@@ -115,7 +115,7 @@ final class DateTest extends TestCase
             ],
             $command->setSql(
                 <<<SQL
-                SELECT id, Mydate, Myyear FROM date_default_expressions WHERE id = 1
+                SELECT id, Mydate, Myyear FROM date_default_expressions80 WHERE id = 1
                 SQL
             )->queryOne()
         );
@@ -125,7 +125,7 @@ final class DateTest extends TestCase
                 'Y-m-d H:i:s',
                 $command->setSql(
                     <<<SQL
-                    SELECT Mydatetime FROM date_default_expressions WHERE id = 1
+                    SELECT Mydatetime FROM date_default_expressions80 WHERE id = 1
                     SQL,
                 )->queryScalar(),
             ),
@@ -136,7 +136,7 @@ final class DateTest extends TestCase
                 'Y-m-d H:i:s',
                 $command->setSql(
                     <<<SQL
-                    SELECT Mytimestamp FROM date_default_expressions WHERE id = 1
+                    SELECT Mytimestamp FROM date_default_expressions80 WHERE id = 1
                     SQL,
                 )->queryScalar(),
             ),
@@ -147,7 +147,7 @@ final class DateTest extends TestCase
                 'H:i:s',
                 $command->setSql(
                     <<<SQL
-                    SELECT Mytime FROM date_default_expressions WHERE id = 1
+                    SELECT Mytime FROM date_default_expressions80 WHERE id = 1
                     SQL,
                 )->queryScalar(),
             ),
@@ -156,7 +156,7 @@ final class DateTest extends TestCase
 
     public function testValue(): void
     {
-        $this->setFixture('date.sql');
+        $this->setFixture('Type/date.sql');
 
         $db = $this->getConnection(true);
         $command = $db->createCommand();
