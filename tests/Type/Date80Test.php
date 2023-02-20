@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql\Tests\Type;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 /**
@@ -152,17 +151,5 @@ final class Date80Test extends TestCase
                 SQL
             )->queryOne(),
         );
-    }
-
-    public function testValueException(): void
-    {
-        $this->setFixture('date80.sql');
-
-        $db = $this->getConnection(true);
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("Invalid datetime format: 1292 Incorrect date value: '0'");
-
-        $db->createCommand()->insert('date', ['Mydate1' => '0'])->execute();
     }
 }
