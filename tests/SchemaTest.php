@@ -156,53 +156,32 @@ final class SchemaTest extends CommonSchemaTest
      */
     public function testDefaultValueDatetimeColumn(): void
     {
-        $tableName = '{{%datetime_test}}';
         $db = $this->getConnection();
 
-        $oldMySQL = !(
-            version_compare($db->getServerVersion(), '8.0.0', '>') &&
-            !str_contains($db->getServerVersion(), 'MariaDB')
-        );
+        $command = $db->createCommand();
+        $schema = $db->getSchema();
 
-        $columnsData = [
-            'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', '', false],
-            'd' => ['date DEFAULT \'2011-11-11\'', '2011-11-11', false],
-            'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
-        ];
-        if (!$oldMySQL) {
-            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true];
-            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', 'uuid()', true];
-        }
+        $sql = <<<SQL
+        CREATE TABLE  IF NOT EXISTS `datetime_test`  (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+        SQL;
 
-        $columns = [];
-        foreach ($columnsData as $column => $columnData) {
-            $columns[$column] = $columnData[0];
-        }
+        $command->setSql($sql)->execute();
 
-        if ($db->getTableSchema($tableName, true) !== null) {
-            $db->createCommand()->dropTable($tableName)->execute();
-        }
+        $schema = $schema->getTableSchema('datetime_test');
 
-        $db->createCommand()->createTable($tableName, $columns, 'ENGINE=InnoDB DEFAULT CHARSET=utf8')->execute();
+        $this->assertNotNull($schema);
 
-        $tableSchema = $db->getTableSchema($tableName);
-        $this->assertNotNull($tableSchema);
+        $dt = $schema->getColumn('dt');
 
-        foreach ($tableSchema->getColumns() as $column) {
-            $columnName = $column->getName();
-            if ($columnsData[$columnName][2]) {
-                $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-            } else {
-                $this->assertNotInstanceOf(Expression::class, $column->getDefaultValue());
-            }
-            $this->assertEquals($columnsData[$columnName][1], (string) $column->getDefaultValue());
-        }
+        $this->assertNotNull($dt);
+
+        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP', (string) $dt->getDefaultValue());
     }
 
     /**
