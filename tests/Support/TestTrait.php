@@ -13,6 +13,7 @@ use Yiisoft\Db\Tests\Support\DbHelper;
 trait TestTrait
 {
     private string $dsn = '';
+    private string $fixture = 'mysql.sql';
 
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
@@ -22,7 +23,7 @@ trait TestTrait
         );
 
         if ($fixture) {
-            DbHelper::loadFixture($db, __DIR__ . '/Fixture/mysql.sql');
+            DbHelper::loadFixture($db, __DIR__ . "/Fixture/$this->fixture");
         }
 
         return $db;
@@ -55,5 +56,10 @@ trait TestTrait
     protected function setDsn(string $dsn): void
     {
         $this->dsn = $dsn;
+    }
+
+    protected function setFixture(string $fixture): void
+    {
+        $this->fixture = $fixture;
     }
 }
