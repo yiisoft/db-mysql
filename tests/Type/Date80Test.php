@@ -10,7 +10,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 /**
- * @group mssql
+ * @group mysql-80
  *
  * @psalm-suppress PropertyNotSetInConstructor
  *
@@ -22,7 +22,7 @@ final class DateTest extends TestCase
 
     public function testDefaultValue(): void
     {
-        $this->setFixture('date.sql');
+        $this->setFixture('date80.sql');
 
         $db = $this->getConnection(true);
 
@@ -36,12 +36,7 @@ final class DateTest extends TestCase
         $this->assertSame('string', $tableSchema->getColumn('Mytimestamp')->getPhpType());
         $this->assertSame('time', $tableSchema->getColumn('Mytime')->getDbType());
         $this->assertSame('string', $tableSchema->getColumn('Mytime')->getPhpType());
-
-        if ($db->getName() === 'mysql' && $db->getServerVersion() >= '8.0.0') {
-            $this->assertSame('year', $tableSchema->getColumn('Myyear')->getDbType());
-        } else {
-            $this->assertSame('year(4)', $tableSchema->getColumn('Myyear')->getDbType());
-        }
+        $this->assertSame('year', $tableSchema->getColumn('Myyear')->getDbType());
 
         $command = $db->createCommand();
         $command->insert('date_default', [])->execute();
@@ -65,8 +60,7 @@ final class DateTest extends TestCase
 
     public function testDefaultValueExpressions(): void
     {
-        $this->setFixture('date.sql');
-
+        $this->setFixture('date80.sql');
         $db = $this->getConnection(true);
 
         $command = $db->createCommand();
@@ -121,10 +115,9 @@ final class DateTest extends TestCase
 
     public function testValue(): void
     {
-        $this->setFixture('date.sql');
+        $this->setFixture('date80.sql');
 
         $db = $this->getConnection(true);
-
         $command = $db->createCommand();
         $command->insert('date', [
             'Mydate1' => '2007-05-08',
@@ -163,12 +156,13 @@ final class DateTest extends TestCase
 
     public function testValueException(): void
     {
-        $this->setFixture('date.sql');
+        $this->setFixture('date80.sql');
 
         $db = $this->getConnection(true);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("Invalid datetime format: 1292 Incorrect date value: '0'");
+
         $db->createCommand()->insert('date', ['Mydate1' => '0'])->execute();
     }
 }
