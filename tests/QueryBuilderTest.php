@@ -413,6 +413,20 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
     }
 
+    public function testDropTable(): void
+    {
+        $db = $this->getConnection();
+
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame(
+            <<<SQL
+            DROP TABLE IF EXISTS `customer`
+            SQL,
+            $qb->dropTable('customer'),
+        );
+    }
+
     public function testDropUnique(): void
     {
         $db = $this->getConnection();

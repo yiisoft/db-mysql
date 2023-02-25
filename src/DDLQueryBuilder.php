@@ -212,4 +212,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 
         return $result;
     }
+
+    public function dropTable(string $table): string
+    {
+        return 'DROP TABLE IF EXISTS ' . $this->quoter->quoteTableName($table);
+    }
 }
