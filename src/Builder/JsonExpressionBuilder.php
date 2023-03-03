@@ -19,7 +19,7 @@ use Yiisoft\Json\Json;
 use function count;
 
 /**
- * The class JsonExpressionBuilder builds {@see JsonExpression} for Mysql database.
+ * JsonExpressionBuilder builds {@see `Yiisoft\Db\Expression\JsonExpression`} for Mysql, MariaDb Server.
  */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
@@ -30,13 +30,17 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
     }
 
     /**
-     * @throws Exception|InvalidArgumentException|InvalidConfigException|JsonException|NotSupportedException
+     * @throws Exception
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
+     * @throws JsonException
+     * @throws NotSupportedException
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
         /**
-         * @var JsonExpression $expression
-         * @var mixed|QueryInterface $value
+         * @psalm-var JsonExpression $expression
+         * @psalm-var mixed|QueryInterface $value
          */
         $value = $expression->getValue();
 
