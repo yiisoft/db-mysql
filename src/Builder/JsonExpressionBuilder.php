@@ -19,7 +19,7 @@ use Yiisoft\Json\Json;
 use function count;
 
 /**
- * JsonExpressionBuilder builds {@see `Yiisoft\Db\Expression\JsonExpression`} for Mysql, MariaDb Server.
+ * Builds {@see `Yiisoft\Db\Expression\JsonExpression`} for Mysql, MariaDb Server.
  */
 final class JsonExpressionBuilder implements ExpressionBuilderInterface
 {
