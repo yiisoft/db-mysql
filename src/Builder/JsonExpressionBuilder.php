@@ -35,13 +35,12 @@ final class JsonExpressionBuilder implements ExpressionBuilderInterface
      * @throws InvalidConfigException
      * @throws JsonException
      * @throws NotSupportedException
+     *
+     * @psalm-param JsonExpression $expression
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
-        /**
-         * @psalm-var JsonExpression $expression
-         * @psalm-var mixed|QueryInterface $value
-         */
+        /** @psalm-var mixed|QueryInterface $value */
         $value = $expression->getValue();
 
         if ($value instanceof QueryInterface) {
