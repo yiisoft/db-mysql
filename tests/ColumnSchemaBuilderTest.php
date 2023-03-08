@@ -36,7 +36,7 @@ final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
         }
 
         $result = $db->createCommand()->createTable($tableName, [
-            'id' => (new ColumnSchemaBuilder('pk'))->comment('test comment')
+            'id' => (new ColumnSchemaBuilder('pk'))->comment('test comment'),
         ])->execute();
 
         $this->assertIsInt($result);
