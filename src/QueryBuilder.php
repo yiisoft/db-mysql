@@ -9,8 +9,6 @@ use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
-use function array_merge;
-
 /**
  * Implements the MySQL, MariaDb Server specific query builder.
  */
