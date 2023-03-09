@@ -12,7 +12,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use function array_merge;
 
 /**
- * The class QueryBuilder is the query builder for Mysql databases.
+ * Implements the MySQL, MariaDb Server specific query builder.
  */
 final class QueryBuilder extends AbstractQueryBuilder
 {
@@ -39,47 +39,28 @@ final class QueryBuilder extends AbstractQueryBuilder
         SchemaInterface::TYPE_BOOLEAN => 'bit(1)',
         SchemaInterface::TYPE_MONEY => 'decimal(19,4)',
         SchemaInterface::TYPE_JSON => 'json',
+        SchemaInterface::TYPE_DATETIME => 'datetime(0)',
+        SchemaInterface::TYPE_TIMESTAMP => 'timestamp(0)',
+        SchemaInterface::TYPE_TIME => 'time(0)',
     ];
-    private DDLQueryBuilder $ddlBuilder;
-    private DMLQueryBuilder $dmlBuilder;
-    private DQLQueryBuilder $dqlBuilder;
 
     public function __construct(
         QuoterInterface $quoter,
         SchemaInterface $schema,
     ) {
-        $this->ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
-        $this->dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
-        $this->dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
-        parent::__construct($quoter, $schema, $this->ddlBuilder, $this->dmlBuilder, $this->dqlBuilder);
+        $ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
+        $dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
+        $dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
+        parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder);
     }
 
     public function getColumnType(ColumnSchemaBuilderInterface|string $type): string
     {
-        $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
-
         if ($type instanceof ColumnSchemaBuilderInterface && $type->getType() === SchemaInterface::TYPE_JSON) {
             $type->check('[[{name}]] is null or json_valid([[{name}]])');
             $type = SchemaInterface::TYPE_JSON;
         }
 
         return parent::getColumnType($type);
-    }
-
-    /**
-     * Returns the map for default time type.
-     *
-     * If the version of MySQL is lower than 5.6.4, then the types will be without fractional seconds, otherwise with
-     * fractional seconds.
-     *
-     * @psalm-return array<string, string>
-     */
-    private function defaultTimeTypeMap(): array
-    {
-        return [
-            SchemaInterface::TYPE_DATETIME => 'datetime(0)',
-            SchemaInterface::TYPE_TIMESTAMP => 'timestamp(0)',
-            SchemaInterface::TYPE_TIME => 'time(0)',
-        ];
     }
 }
