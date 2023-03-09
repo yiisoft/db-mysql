@@ -7,9 +7,7 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Schema\AbstractTableSchema;
 
 /**
- * The class TableSchema represents the metadata of a database table.
- *
- * @property array $columnNames List of column names. This property is read-only.
+ * Implements the MySQL, MariaDb Server specific table schema.
  */
 final class TableSchema extends AbstractTableSchema
 {

@@ -6,6 +6,12 @@ namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Schema\Quoter as BaseQuoter;
 
+use function is_string;
+use function str_replace;
+
+/**
+ * Implements the MySQL, MariaDb Server quoting and unquoting methods.
+ */
 final class Quoter extends BaseQuoter
 {
     public function quoteValue(mixed $value): mixed

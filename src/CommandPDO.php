@@ -11,6 +11,10 @@ use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
 use Yiisoft\Db\Exception\ConvertException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
+/**
+ * Implements a database command that can be executed against a PDO (PHP Data Object) database connection for MySQL,
+ * MariaDb Server.
+ */
 final class CommandPDO extends AbstractCommandPDO
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
@@ -25,8 +29,8 @@ final class CommandPDO extends AbstractCommandPDO
 
         $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
-
         $result = [];
+
         foreach ($tablePrimaryKeys as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
                 $result[$name] = $this->db->getLastInsertID((string) $tableSchema?->getSequenceName());
