@@ -38,83 +38,11 @@ The package could be installed via composer:
 composer require yiisoft/db-mysql
 ```
 
-### Config with [Yii Framework]
+## Usage 
 
-The configuration with [DI container](https://github.com/yiisoft/di) of [Yii Framework].
+For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 
-Also you can use any DI container which implements [PSR-11](https://www.php-fig.org/psr/psr-11/).
-
-db.php
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Mysql\ConnectionPDO;
-use Yiisoft\Db\Mysql\PDODriver;
-
-/** @var array $params */
-
-return [
-    ConnectionInterface::class => [
-        'class' => ConnectionPDO::class,
-        '__construct()' => [
-            'driver' => new PDODriver(
-                $params['yiisoft/db-mysql']['dsn'],
-                $params['yiisoft/db-mysql']['username'],
-                $params['yiisoft/db-mysql']['password'],
-            ),
-        ]
-    ]
-];
-```
-
-params.php
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Db\Mysql\Dsn;
-
-return [
-    'yiisoft/db-mysql' => [
-        'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString(),
-        'username' => 'user',
-        'password' => 'password',
-    ]
-];
-```
-
-### Config without [Yii Framework]
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Cache\ArrayCache;
-use Yiisoft\Cache\Cache;
-use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Mysql\ConnectionPDO;
-use Yiisoft\Db\Mysql\Dsn;
-use Yiisoft\Db\Mysql\PDODriver;
-
-// Or any other PSR-16 cache implementation.
-$arrayCache = new ArrayCache();
-
-// Or any other PSR-6 cache implementation.
-$cache = new Cache($arrayCache); 
-$dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
-
-// Or any other PDO driver.
-$pdoDriver = new PDODriver($dsn, 'user', 'password'); 
-$schemaCache = new SchemaCache($cache);
-$db = new ConnectionPDO($pdoDriver, $schemaCache);
-```
+[Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/en/getting-started.md) to learn about usage.
 
 ### Unit testing
 
