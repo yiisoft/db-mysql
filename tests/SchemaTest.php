@@ -13,6 +13,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Mysql\Column;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -510,9 +511,9 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->createTable(
             $tableName,
             [
-                'id' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_PK),
-                'bool_col' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_BOOLEAN),
-                'status' => $db->getSchema()->createColumnSchemaBuilder(SchemaInterface::TYPE_TINYINT, 1),
+                'id' => new Column(SchemaInterface::TYPE_PK),
+                'bool_col' => new Column(SchemaInterface::TYPE_BOOLEAN),
+                'status' => new Column(SchemaInterface::TYPE_TINYINT, 1),
             ]
         )->execute();
 
