@@ -51,7 +51,7 @@ final class Column extends AbstractColumn
             return '';
         }
 
-        return ' COMMENT ' . (new Quoter('`', '`'))->quoteValue($this->getComment());
+        return ' COMMENT ' . (string) (new Quoter('`', '`'))->quoteValue($this->getComment());
     }
 
     public function asString(): string
