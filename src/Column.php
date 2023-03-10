@@ -27,13 +27,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
  */
 final class Column extends AbstractColumn
 {
-    /**
-     *  @psalm-param string[]|int[]|int|string|null $length column size or precision definition.
-     */
-    public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
-    {
-        parent::__construct($type, $length);
-    }
+    private QuoterInterface|null $quoter = null;
 
     /**
      * Builds the unsigned string for column. Defaults to unsupported.
@@ -54,8 +48,11 @@ final class Column extends AbstractColumn
      */
     protected function buildCommentString(): string
     {
-        return $this->getComment() !== null ? ' COMMENT '
-            . (string) $this->quoter->quoteValue($this->getComment()) : '';
+        if ($this->getComment() === null) {
+            return '';
+        }
+
+        return ' COMMENT ' . (new Quoter('`', '`'))->quoteValue($this->getComment());
     }
 
     public function asString(): string

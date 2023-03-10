@@ -14,7 +14,6 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
-use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
@@ -129,6 +128,11 @@ final class Schema extends AbstractSchema
         'varbinary' => self::TYPE_BINARY,
         'json' => self::TYPE_JSON,
     ];
+
+    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
+    {
+        return (new Column($type, $length));
+    }
 
     /**
      * Returns all unique indexes for the given table.
@@ -529,14 +533,17 @@ final class Schema extends AbstractSchema
         if (!$column->isPrimaryKey()) {
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
             /** @var string $columnCategory */
-            $columnCategory = (new Column($column->getType(), $column->getSize()))->getCategoryMap()[$column->getType()] ?? '';
+            $columnCategory = $this->createColumn(
+                $column->getType(),
+                $column->getSize()
+            )->getCategoryMap()[$column->getType()] ?? '';
             $defaultValue = $info['extra_default_value'] ?? '';
             if (
                 empty($info['extra']) &&
                 !empty($defaultValue) &&
                 in_array($columnCategory, [
-                    AbstractColumn::CATEGORY_STRING,
-                    AbstractColumn::CATEGORY_TIME,
+                    AbstractColumnSchemaBuilder::CATEGORY_STRING,
+                    AbstractColumnSchemaBuilder::CATEGORY_TIME,
                 ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {
