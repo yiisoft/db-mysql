@@ -137,7 +137,7 @@ final class Schema extends AbstractSchema
 
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
     {
-        return (new Column($type, $length));
+        return new Column($type, $length);
     }
 
     /**
