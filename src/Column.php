@@ -11,7 +11,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 
 /**
  * It's a utility that provides a convenient way to create column schema for use with {@see `\Yiisoft\Db\Mysql\Schema`}
- * for MySQL and MariaDB.
+ * for MySQL, MariaDb Server.
  *
  * It provides methods for specifying the properties of a column, such as its type, size, default value, and whether it
  * is nullable or not. It also provides a method for creating a column schema based on the specified properties.
@@ -42,7 +42,7 @@ final class Column extends AbstractColumn
     /**
      * Builds the comment specification for the column.
      *
-     * @throws Exception|InvalidConfigException
+     * @throws Exception
      *
      * @return string a string containing the COMMENT keyword and the comment itself.
      */

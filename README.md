@@ -24,13 +24,13 @@ It is used in [Yii Framework] but can be used separately.
 [![StyleCI](https://github.styleci.io/repos/145220107/shield?branch=master)](https://github.styleci.io/repos/145220107?branch=master)
 [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
-### Support version
+## Support version
 
 |     PHP     |Mysql/MariaDb|  CI-Actions
 |:-----------:|:-----------:|:------------:|
 | **8.0-8.2** |**5.7-8.0**/**10.4-10.10**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![ansi-mode](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml)
 
-### Installation
+## Installation
 
 The package could be installed via composer:
 
@@ -38,83 +38,13 @@ The package could be installed via composer:
 composer require yiisoft/db-mysql
 ```
 
-### Config with [Yii Framework]
+## Usage 
 
-The configuration with [DI container](https://github.com/yiisoft/di) of [Yii Framework].
+For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 
-Also you can use any DI container which implements [PSR-11](https://www.php-fig.org/psr/psr-11/).
+[Check the documentation docs](https://github.com/yiisoft/db/blob/master/docs/en/getting-started.md) to learn about usage.
 
-db.php
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Mysql\ConnectionPDO;
-use Yiisoft\Db\Mysql\PDODriver;
-
-/** @var array $params */
-
-return [
-    ConnectionInterface::class => [
-        'class' => ConnectionPDO::class,
-        '__construct()' => [
-            'driver' => new PDODriver(
-                $params['yiisoft/db-mysql']['dsn'],
-                $params['yiisoft/db-mysql']['username'],
-                $params['yiisoft/db-mysql']['password'],
-            ),
-        ]
-    ]
-];
-```
-
-params.php
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Db\Mysql\Dsn;
-
-return [
-    'yiisoft/db-mysql' => [
-        'dsn' => (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString(),
-        'username' => 'user',
-        'password' => 'password',
-    ]
-];
-```
-
-### Config without [Yii Framework]
-
-```php
-<?php
-
-declare(strict_types=1);
-
-use Yiisoft\Cache\ArrayCache;
-use Yiisoft\Cache\Cache;
-use Yiisoft\Db\Cache\SchemaCache;
-use Yiisoft\Db\Mysql\ConnectionPDO;
-use Yiisoft\Db\Mysql\Dsn;
-use Yiisoft\Db\Mysql\PDODriver;
-
-// Or any other PSR-16 cache implementation.
-$arrayCache = new ArrayCache();
-
-// Or any other PSR-6 cache implementation.
-$cache = new Cache($arrayCache); 
-$dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
-
-// Or any other PDO driver.
-$pdoDriver = new PDODriver($dsn, 'user', 'password'); 
-$schemaCache = new SchemaCache($cache);
-$db = new ConnectionPDO($pdoDriver, $schemaCache);
-```
+## Testing
 
 ### Unit testing
 
@@ -159,11 +89,11 @@ To run the checker, execute the following command:
 ./vendor/bin/composer-require-checker
 ```
 
-### Support the project
+## Support the project
 
 [![Open Collective](https://img.shields.io/badge/Open%20Collective-sponsor-7eadf1?logo=open%20collective&logoColor=7eadf1&labelColor=555555)](https://opencollective.com/yiisoft)
 
-### Follow updates
+## Follow updates
 
 [![Official website](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](https://www.yiiframework.com/)
 [![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/yiiframework)
@@ -171,7 +101,7 @@ To run the checker, execute the following command:
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
 
-### License
+## License
 
 The Yii DataBase MySQL Extension is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.

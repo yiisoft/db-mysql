@@ -15,6 +15,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
 use Yiisoft\Db\Schema\AbstractSchema;
+use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
@@ -36,7 +37,8 @@ use function strtolower;
 use function trim;
 
 /**
- * The class Schema is the class for retrieving metadata from a Mysql database (version 5.7 and above).
+ * Implements the Mysql, Mariadb Server specific schema, supporting Mysql Server 5.7, Mariadb Server 10.4 and higher
+ * versions.
  *
  * @psalm-type ColumnArray = array{
  *   table_schema: string,
@@ -96,7 +98,11 @@ use function trim;
  */
 final class Schema extends AbstractSchema
 {
-    /** @var array<array-key, string> $typeMap */
+    /**
+     * @var array Mapping from physical column types (keys) to abstract column types (values).
+     *
+     * @psalm-var string[]
+     */
     private array $typeMap = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_INTEGER,
@@ -146,20 +152,18 @@ final class Schema extends AbstractSchema
      * ]
      * ```
      *
-     * @param TableSchemaInterface $table the table metadata.
+     * @param TableSchemaInterface $table The table metadata.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return array all unique indexes for the given table.
+     * @return array All unique indexes for the given table.
      */
     public function findUniqueIndexes(TableSchemaInterface $table): array
     {
         $sql = $this->getCreateTableSql($table);
-
         $uniqueIndexes = [];
-
         $regexp = '/UNIQUE KEY\s+[`"](.+)[`"]\s*\(([`"].+[`"])+\)/mi';
 
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
@@ -178,12 +182,12 @@ final class Schema extends AbstractSchema
     /**
      * Collects the metadata of table columns.
      *
-     * @param TableSchemaInterface $table the table metadata.
+     * @param TableSchemaInterface $table The table metadata.
      *
      * @throws Exception
-     * @throws Throwable if DB query fails.
+     * @throws Throwable If DB query fails.
      *
-     * @return bool whether the table exists in the database.
+     * @return bool Whether the table exists in the database.
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
@@ -207,7 +211,7 @@ final class Schema extends AbstractSchema
                         ':tableName' => $table->getName(),
                     ]
                 )->queryAll();
-                /** @psalm-var array<string, string>  $cols */
+                /** @psalm-var string[] $cols */
                 foreach ($columnsExtra as $cols) {
                     $columnsExtra[$cols['name']] = $cols['default_value'];
                 }
@@ -217,9 +221,9 @@ final class Schema extends AbstractSchema
 
             if ($previous && str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
                 /**
-                 * table does not exist.
+                 * The table doesn't exist.
                  *
-                 * https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
+                 * @link https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
                  */
                 return false;
             }
@@ -256,7 +260,7 @@ final class Schema extends AbstractSchema
     /**
      * Collects the foreign key column details for the given table.
      *
-     * @param TableSchemaInterface $table the table metadata.
+     * @param TableSchemaInterface $table The table metadata.
      *
      * @throws Exception
      * @throws InvalidConfigException
@@ -301,7 +305,7 @@ final class Schema extends AbstractSchema
         $table->foreignKeys([]);
 
         /**
-         * @var array{referenced_table_name: string, columns: array} $constraint
+         * @psalm-var array{referenced_table_name: string, columns: array} $constraint
          */
         foreach ($constraints as $name => $constraint) {
             $table->foreignKey(
@@ -354,16 +358,17 @@ final class Schema extends AbstractSchema
     /**
      * Returns all table names in the database.
      *
-     * This method should be overridden by child classes in order to support this feature because the default
-     * implementation simply throws an exception.
+     * This method should be overridden by child classes to support this feature because the default implementation
+     * simply throws an exception.
      *
-     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
+     * @param string $schema The schema of the tables.
+     * Defaults to empty string, meaning the current or default schema.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return array All table names in the database. The names have NO schema name prefix.
+     * @return array All tables name in the database. The names have NO schema name prefix.
      */
     protected function findTableNames(string $schema = ''): array
     {
@@ -405,9 +410,9 @@ final class Schema extends AbstractSchema
     /**
      * Returns the cache key for the specified table name.
      *
-     * @param string $name the table name.
+     * @param string $name The table name.
      *
-     * @return array the cache key.
+     * @return array The cache key.
      */
     protected function getCacheKey(string $name): array
     {
@@ -419,7 +424,7 @@ final class Schema extends AbstractSchema
      *
      * This allows {@see refresh()} to invalidate all cached table schemas.
      *
-     * @return string the cache tag name.
+     * @return string The cache tag name.
      */
     protected function getCacheTag(): string
     {
@@ -429,20 +434,20 @@ final class Schema extends AbstractSchema
     /**
      * Gets the CREATE TABLE sql string.
      *
-     * @param TableSchemaInterface $table the table metadata.
+     * @param TableSchemaInterface $table The table metadata.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return string $sql the result of 'SHOW CREATE TABLE'.
+     * @return string $sql The result of 'SHOW CREATE TABLE'.
      */
     protected function getCreateTableSql(TableSchemaInterface $table): string
     {
         $tableName = $table->getFullName() ?? '';
 
         try {
-            /** @var array<array-key, string> $row */
+            /** @psalm-var array<array-key, string> $row */
             $row = $this->db->createCommand(
                 'SHOW CREATE TABLE ' . $this->db->getQuoter()->quoteTableName($tableName)
             )->queryOne();
@@ -463,11 +468,11 @@ final class Schema extends AbstractSchema
     /**
      * Loads the column information into a {@see ColumnSchemaInterface} object.
      *
-     * @param array $info column information.
+     * @param array $info The column information.
      *
      * @throws JsonException
      *
-     * @return ColumnSchemaInterface the column schema object.
+     * @return ColumnSchemaInterface The column schema object.
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
@@ -532,23 +537,25 @@ final class Schema extends AbstractSchema
 
         if (!$column->isPrimaryKey()) {
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
-            /** @var string $columnCategory */
+            /** @psalm-var string $columnCategory */
             $columnCategory = $this->createColumn(
                 $column->getType(),
                 $column->getSize()
             )->getCategoryMap()[$column->getType()] ?? '';
             $defaultValue = $info['extra_default_value'] ?? '';
+
             if (
                 empty($info['extra']) &&
                 !empty($defaultValue) &&
                 in_array($columnCategory, [
-                    AbstractColumnSchemaBuilder::CATEGORY_STRING,
-                    AbstractColumnSchemaBuilder::CATEGORY_TIME,
+                    AbstractColumn::CATEGORY_STRING,
+                    AbstractColumn::CATEGORY_TIME,
                 ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {
                 $info['extra'] = 'DEFAULT_GENERATED';
             }
+
             /**
              * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
              * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
@@ -578,11 +585,11 @@ final class Schema extends AbstractSchema
     /**
      * Loads all check constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws NotSupportedException
      *
-     * @return array check constraints for the given table.
+     * @return array Check constraints for the given table.
      */
     protected function loadTableChecks(string $tableName): array
     {
@@ -602,7 +609,7 @@ final class Schema extends AbstractSchema
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return array|Constraint|null (Constraint|ForeignKeyConstraint)[]|Constraint|null constraints.
+     * @psalm-return Constraint[]|ForeignKeyConstraint[]|Constraint|null
      */
     private function loadTableConstraints(string $tableName, string $returnType): array|Constraint|null
     {
@@ -658,13 +665,12 @@ final class Schema extends AbstractSchema
         SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
-
         $constraints = $this->db->createCommand($sql, [
             ':schemaName' => $resolvedName->getSchemaName(),
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
-        /** @var array<array-key, array> $constraints */
+        /** @psalm-var array[][] $constraints */
         $constraints = $this->normalizeRowKeyCase($constraints, true);
         $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
 
@@ -675,8 +681,8 @@ final class Schema extends AbstractSchema
         ];
 
         /**
-         * @var string $type
-         * @var array $names
+         * @psalm-var string $type
+         * @psalm-var array $names
          */
         foreach ($constraints as $type => $names) {
             /**
@@ -718,11 +724,11 @@ final class Schema extends AbstractSchema
     /**
      * Loads all default value constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws NotSupportedException
      *
-     * @return array default value constraints for the given table.
+     * @return array Default value constraints for the given table.
      */
     protected function loadTableDefaultValues(string $tableName): array
     {
@@ -732,31 +738,30 @@ final class Schema extends AbstractSchema
     /**
      * Loads all foreign keys for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return array foreign keys for the given table.
+     * @return array Foreign keys for the given table.
      */
     protected function loadTableForeignKeys(string $tableName): array
     {
         $tableForeignKeys = $this->loadTableConstraints($tableName, self::FOREIGN_KEYS);
-
         return is_array($tableForeignKeys) ? $tableForeignKeys : [];
     }
 
     /**
      * Loads all indexes for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return IndexConstraint[] indexes for the given table.
+     * @return IndexConstraint[] Indexes for the given table.
      */
     protected function loadTableIndexes(string $tableName): array
     {
@@ -775,13 +780,12 @@ final class Schema extends AbstractSchema
         SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
-
         $indexes = $this->db->createCommand($sql, [
             ':schemaName' => $resolvedName->getSchemaName(),
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
-        /** @var array[] $indexes */
+        /** @psalm-var array[] $indexes */
         $indexes = $this->normalizeRowKeyCase($indexes, true);
         $indexes = ArrayHelper::index($indexes, null, ['name']);
         $result = [];
@@ -807,30 +811,29 @@ final class Schema extends AbstractSchema
     /**
      * Loads a primary key for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return Constraint|null primary key for the given table, `null` if the table has no primary key.*
+     * @return Constraint|null Primary key for the given table, `null` if the table has no primary key.*
      */
     protected function loadTablePrimaryKey(string $tableName): Constraint|null
     {
         $tablePrimaryKey = $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
-
         return $tablePrimaryKey instanceof Constraint ? $tablePrimaryKey : null;
     }
 
     /**
      * Loads the metadata for the specified table.
      *
-     * @param string $name table name.
+     * @param string $name The table name.
      *
      * @throws Exception
      * @throws Throwable
      *
-     * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table does not exist.
+     * @return TableSchemaInterface|null DBMS-dependent table metadata, `null` if the table doesn't exist.
      */
     protected function loadTableSchema(string $name): TableSchemaInterface|null
     {
@@ -850,39 +853,34 @@ final class Schema extends AbstractSchema
     /**
      * Loads all unique constraints for the given table.
      *
-     * @param string $tableName table name.
+     * @param string $tableName The table name.
      *
      * @throws Exception
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return array unique constraints for the given table.
+     * @return array Unique constraints for the given table.
      */
     protected function loadTableUniques(string $tableName): array
     {
         $tableUniques = $this->loadTableConstraints($tableName, self::UNIQUES);
-
         return is_array($tableUniques) ? $tableUniques : [];
     }
 
     /**
      * Resolves the table name and schema name (if any).
      *
-     * @param string $name the table name.
+     * @param string $name The table name.
      *
-     * {@see TableSchemaInterface}
+     * @see TableSchemaInterface
      */
     protected function resolveTableName(string $name): TableSchemaInterface
     {
         $resolvedName = new TableSchema();
 
-        $parts = array_reverse(
-            $this->db->getQuoter()->getTableNameParts($name)
-        );
-
+        $parts = array_reverse($this->db->getQuoter()->getTableNameParts($name));
         $resolvedName->name($parts[0] ?? '');
         $resolvedName->schemaName($parts[1] ?? $this->defaultSchema);
-
         $resolvedName->fullName(
             $resolvedName->getSchemaName() !== $this->defaultSchema ?
             implode('.', array_reverse($parts)) : $resolvedName->getName()
@@ -906,19 +904,21 @@ final class Schema extends AbstractSchema
      * Creates a column schema for the database.
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
-     *
-     * @return ColumnSchema column schema instance.
      */
     private function createColumnSchema(): ColumnSchema
     {
         return new ColumnSchema();
     }
 
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws Throwable
+     */
     private function getJsonColumns(TableSchemaInterface $table): array
     {
         $sql = $this->getCreateTableSql($table);
         $result = [];
-
         $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
 
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
