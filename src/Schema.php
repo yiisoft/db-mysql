@@ -134,7 +134,7 @@ final class Schema extends AbstractSchema
         string $type,
         array|int|string $length = null
     ): ColumnSchemaBuilderInterface {
-        return new ColumnSchemaBuilder($type, $length, $this->db->getQuoter());
+        return (new ColumnSchemaBuilder($type, $length))->setQuoter($this->db->getQuoter());
     }
 
     /**

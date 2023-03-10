@@ -58,6 +58,10 @@ final class QueryBuilder extends AbstractQueryBuilder
     {
         $this->typeMap = array_merge($this->typeMap, $this->defaultTimeTypeMap());
 
+        if ($type instanceof ColumnSchemaBuilder) {
+            $type->setQuoter($this->quoter());
+        }
+
         if ($type instanceof ColumnSchemaBuilderInterface && $type->getType() === SchemaInterface::TYPE_JSON) {
             $type->check('[[{name}]] is null or json_valid([[{name}]])');
             $type = SchemaInterface::TYPE_JSON;

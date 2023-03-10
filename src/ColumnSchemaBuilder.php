@@ -14,13 +14,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
  */
 final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
 {
-    /**
-     *  @psalm-param string[]|int[]|int|string|null $length column size or precision definition.
-     */
-    public function __construct(string $type, array|int|string|null $length, private QuoterInterface $quoter)
-    {
-        parent::__construct($type, $length);
-    }
+    private QuoterInterface|null $quoter = null;
 
     /**
      * Builds the unsigned string for column. Defaults to unsupported.
@@ -41,6 +35,10 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildCommentString(): string
     {
+        if ($this->quoter === null) {
+            throw new InvalidConfigException('Quoter not setted.');
+        }
+
         return $this->getComment() !== null ? ' COMMENT '
             . (string) $this->quoter->quoteValue($this->getComment()) : '';
     }
@@ -54,5 +52,11 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
         };
 
         return $this->buildCompleteString($format);
+    }
+
+    public function setQuoter(QuoterInterface $quoter): self
+    {
+        $this->quoter = $quoter;
+        return $this;
     }
 }
