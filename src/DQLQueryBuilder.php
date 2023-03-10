@@ -13,6 +13,9 @@ use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use function array_merge;
 use function ctype_digit;
 
+/**
+ * Implements a DQL (Data Query Language) SQL statements for MySQL, MariaDb Server.
+ */
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
     public function buildLimit(ExpressionInterface|int|null $limit, ExpressionInterface|int|null $offset): string
@@ -27,10 +30,10 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             }
         } elseif ($this->hasOffset($offset)) {
             /**
-             * limit is not optional in MySQL.
+             * Limit isn't optional in MySQL.
              *
-             * http://stackoverflow.com/a/271650/1106908
-             * http://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
+             * @link http://stackoverflow.com/a/271650/1106908
+             * @link http://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
             $sql = 'LIMIT ' .
                 ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset) .
@@ -49,7 +52,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
      */
     protected function hasLimit(mixed $limit): bool
     {
-        /** In MySQL limit argument must be non-negative integer constant */
+        /** In MySQL limit argument must be a non-negative integer constant */
         return ctype_digit((string) $limit);
     }
 
@@ -62,16 +65,17 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
      */
     protected function hasOffset(mixed $offset): bool
     {
-        /** In MySQL offset argument must be non-negative integer constant */
+        /** In MySQL offset argument must be a non-negative integer constant */
         $offset = (string) $offset;
         return ctype_digit($offset) && $offset !== '0';
     }
 
     /**
-     * Contains array of default expression builders. Extend this method and override it, if you want to change default
-     * expression builders for this query builder.
+     * Has an array of default expression builders.
      *
-     * See {@see ExpressionBuilder} docs for details.
+     * Extend this method and override it if you want to change default expression builders for this query builder.
+     *
+     * {@see ExpressionBuilder} docs for details.
      */
     protected function defaultExpressionBuilders(): array
     {
