@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Exception;
+use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\QuoterInterface;
 
