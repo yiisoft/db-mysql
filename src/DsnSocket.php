@@ -7,10 +7,9 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Connection\AbstractDsnSocket;
 
 /**
- * The Dsn class is typically used to parse a DSN string, which is a string that contains all the necessary information
- * to connect to a database, such as the database driver, unix socket, database name, options.
+ * Implement a Data Source Name (DSN) with unix socket for an MySQL, MariaDb Server.
  *
- * It also allows you to access individual components of the DSN, such as the driver or the database name.
+ * @link https://www.php.net/manual/en/ref.pdo-mysql.connection.php
  */
 final class DsnSocket extends AbstractDsnSocket
 {

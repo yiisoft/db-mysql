@@ -13,13 +13,14 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use function json_decode;
 
 /**
- * Represents the metadata of a column in a database table for Mysql, MariaDb Server. It provides information about the
- * column's name, type, size, precision, and other details.
+ * Represents the metadata of a column in a database table for MySQL, MariaDb Server.
  *
- * Is used to store and retrieve metadata about a column in a database table. It is typically used in conjunction with
- * the TableSchema class, which represents the metadata of a database table as a whole.
+ * It provides information about the column's name, type, size, precision, and other details.
  *
- * Here is an example of how the ColumnSchema class might be used:
+ * Is used to store and retrieve metadata about a column in a database table. It's typically used in conjunction with
+ * the {@see TableSchema}, which represents the metadata of a database table as a whole.
+ *
+ * The following code shows how to use:
  *
  * ```php
  * use Yiisoft\Db\Mysql\ColumnSchema;
@@ -40,11 +41,11 @@ final class ColumnSchema extends AbstractColumnSchema
     /**
      * Converts the input value according to {@see phpType} after retrieval from the database.
      *
-     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it will not be converted.
+     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
      *
      * @param mixed $value The value to be converted.
      *
-     * @throws JsonException If the value cannot be decoded.
+     * @throws JsonException If the value can't be decoded.
      *
      * @return mixed The converted value.
      */
@@ -64,7 +65,7 @@ final class ColumnSchema extends AbstractColumnSchema
     /**
      * Converts the input value according to {@see type} and {@see dbType} for use in a db query.
      *
-     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it will not be converted.
+     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
      *
      * @param mixed $value The value to be converted.
      *

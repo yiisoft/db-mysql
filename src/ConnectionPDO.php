@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use PDO;
+use Exception;
 use Psr\Log\LogLevel;
 use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
 use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
- * Database connection class prefilled for MySQL Server.
- * The class Connection represents a connection to a database via [PDO](https://secure.php.net/manual/en/book.pdo.php).
+ * Implements a connection to a database via PDO (PHP Data Objects) for MySQL, MariaDb Server.
+ *
+ * @link https://www.php.net/manual/en/ref.pdo-mysql.php
  */
 final class ConnectionPDO extends AbstractConnectionPDO
 {
@@ -29,10 +28,10 @@ final class ConnectionPDO extends AbstractConnectionPDO
                 'Closing DB connection: ' . $this->driver->getDsn() . ' ' . __METHOD__,
             );
 
-            // Solution for close connections from https://stackoverflow.com/questions/18277233/pdo-closing-connection
+            // Solution for close connections {@link https://stackoverflow.com/questions/18277233/pdo-closing-connection}
             try {
                 $this->pdo->query('KILL CONNECTION_ID()');
-            } catch (\Exception) {
+            } catch (Exception) {
             }
 
             $this->pdo = null;
@@ -64,9 +63,6 @@ final class ConnectionPDO extends AbstractConnectionPDO
         return new TransactionPDO($this);
     }
 
-    /**
-     * @throws Exception|InvalidConfigException
-     */
     public function getQueryBuilder(): QueryBuilderInterface
     {
         if ($this->queryBuilder === null) {

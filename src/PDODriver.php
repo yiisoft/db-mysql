@@ -7,6 +7,11 @@ namespace Yiisoft\Db\Mysql;
 use PDO;
 use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
 
+/**
+ * Implements the MySQL, MariaDb Server driver based on the PDO (PHP Data Objects) extension.
+ *
+ * @link https://www.php.net/manual/en/ref.pdo-mysql.php
+ */
 final class PDODriver extends AbstractPDODriver
 {
     public function createConnection(): PDO

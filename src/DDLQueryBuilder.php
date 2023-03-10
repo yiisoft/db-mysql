@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql;
 
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
@@ -17,6 +16,9 @@ use function preg_match;
 use function preg_replace;
 use function trim;
 
+/**
+ * Implements a (Data Definition Language) SQL statements for MySQL, MariaDb Server.
+ */
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
     public function __construct(
@@ -36,7 +38,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws Exception|Throwable
+     * @throws Throwable
      */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
@@ -73,9 +75,6 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return $alterSql;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function addCommentOnTable(string $table, string $comment): string
     {
         return 'ALTER TABLE '
@@ -84,18 +83,11 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . (string) $this->quoter->quoteValue($comment);
     }
 
-    /**
-     * @throws NotSupportedException
-     */
     public function addDefaultValue(string $name, string $table, string $column, mixed $value): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidArgumentException
-     */
     public function createIndex(
         string $name,
         string $table,
@@ -124,7 +116,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws Exception|Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     public function dropCommentFromColumn(string $table, string $column): string
     {
@@ -139,9 +132,6 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return $this->addCommentOnTable($table, '');
     }
 
-    /**
-     * @throws NotSupportedException
-     */
     public function dropDefaultValue(string $name, string $table): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
@@ -175,7 +165,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 
         $columnDefinition = $this->getColumnDefinition($table, $oldName);
 
-        /* try to give back a SQL anyway */
+        /* try to give back an SQL anyway */
         return "ALTER TABLE $quotedTable CHANGE "
             . $this->quoter->quoteColumnName($oldName) . ' '
             . $this->quoter->quoteColumnName($newName)
@@ -185,17 +175,16 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     /**
      * Gets column definition.
      *
-     * @param string $table table name.
-     * @param string $column column name.
+     * @param string $table The table name.
+     * @param string $column The column name.
      *
-     * @throws Throwable in case when table does not contain column.
+     * @throws Throwable In case when table doesn't contain a column.
      *
-     * @return string the column definition.
+     * @return string The column definition.
      */
     public function getColumnDefinition(string $table, string $column): string
     {
         $result = '';
-
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
