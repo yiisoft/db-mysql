@@ -14,10 +14,10 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
-use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
 use Yiisoft\Db\Schema\AbstractSchema;
+use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
-use Yiisoft\Db\Schema\ColumnSchemaBuilderInterface;
+use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_map;
@@ -135,11 +135,9 @@ final class Schema extends AbstractSchema
         'json' => self::TYPE_JSON,
     ];
 
-    public function createColumnSchemaBuilder(
-        string $type,
-        array|int|string $length = null
-    ): ColumnSchemaBuilderInterface {
-        return (new ColumnSchemaBuilder($type, $length))->setQuoter($this->db->getQuoter());
+    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
+    {
+        return new Column($type, $length);
     }
 
     /**
@@ -540,7 +538,7 @@ final class Schema extends AbstractSchema
         if (!$column->isPrimaryKey()) {
             // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
             /** @psalm-var string $columnCategory */
-            $columnCategory = $this->createColumnSchemaBuilder(
+            $columnCategory = $this->createColumn(
                 $column->getType(),
                 $column->getSize()
             )->getCategoryMap()[$column->getType()] ?? '';
@@ -550,8 +548,8 @@ final class Schema extends AbstractSchema
                 empty($info['extra']) &&
                 !empty($defaultValue) &&
                 in_array($columnCategory, [
-                    AbstractColumnSchemaBuilder::CATEGORY_STRING,
-                    AbstractColumnSchemaBuilder::CATEGORY_TIME,
+                    AbstractColumn::CATEGORY_STRING,
+                    AbstractColumn::CATEGORY_TIME,
                 ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {

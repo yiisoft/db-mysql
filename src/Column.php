@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Schema\AbstractColumnSchemaBuilder;
+use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\QuoterInterface;
 
 /**
@@ -19,13 +18,13 @@ use Yiisoft\Db\Schema\QuoterInterface;
  * For example, the following code creates a column schema for an integer column:
  *
  * ```php
- * $column = (new ColumnSchemaBuilder(SchemaInterface::TYPE_INTEGER))->notNull()->defaultValue(0);
+ * $column = (new Column(SchemaInterface::TYPE_INTEGER))->notNull()->defaultValue(0);
  * ```
  *
  * Provides a fluent interface, which means that the methods can be chained together to create a column schema with
  * many properties in a single line of code.
  */
-final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
+final class Column extends AbstractColumn
 {
     private QuoterInterface|null $quoter = null;
 
@@ -48,12 +47,11 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
      */
     protected function buildCommentString(): string
     {
-        if ($this->quoter === null) {
-            throw new InvalidConfigException('Quoter not setted.');
+        if ($this->getComment() === null) {
+            return '';
         }
 
-        return $this->getComment() !== null ? ' COMMENT '
-            . (string) $this->quoter->quoteValue($this->getComment()) : '';
+        return ' COMMENT ' . (string) (new Quoter('`', '`'))->quoteValue($this->getComment());
     }
 
     public function asString(): string
@@ -65,11 +63,5 @@ final class ColumnSchemaBuilder extends AbstractColumnSchemaBuilder
         };
 
         return $this->buildCompleteString($format);
-    }
-
-    public function setQuoter(QuoterInterface $quoter): self
-    {
-        $this->quoter = $quoter;
-        return $this;
     }
 }
