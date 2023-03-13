@@ -40,6 +40,9 @@ final class QueryBuilder extends AbstractQueryBuilder
         SchemaInterface::TYPE_DATETIME => 'datetime(0)',
         SchemaInterface::TYPE_TIMESTAMP => 'timestamp(0)',
         SchemaInterface::TYPE_TIME => 'time(0)',
+        SchemaInterface::TYPE_UUID => 'binary(16)',
+        SchemaInterface::TYPE_UUID_PK => 'binary(16) PRIMARY KEY',
+        SchemaInterface::TYPE_UUID_PK_SEQ => 'binary(16) PRIMARY KEY NOT NULL DEFAULT (UUID_TO_BIN(UUID()))',
     ];
 
     public function __construct(
