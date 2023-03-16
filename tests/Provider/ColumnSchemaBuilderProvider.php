@@ -56,8 +56,6 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
         $types['uuid pk not null with default'][0] = '`column` binary(16) PRIMARY KEY NOT NULL DEFAULT (UUID_TO_BIN(UUID()))';
         $types['uuid pk not null with default'][3] = [['notNull'], ['defaultExpression', '(UUID_TO_BIN(UUID()))']];
 
-        $types['uuid pk sequence'][0] = '`column` binary(16) PRIMARY KEY NOT NULL DEFAULT (UUID_TO_BIN(UUID()))';
-
         return $types;
     }
 }
