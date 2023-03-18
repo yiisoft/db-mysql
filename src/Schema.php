@@ -902,6 +902,7 @@ final class Schema extends AbstractSchema
      *
      * @param string $name Name of the column.
      * @param string $type Type of the column.
+     *
      * @return ColumnSchema
      */
     private function createColumnSchema(string $name, string $type): ColumnSchema
