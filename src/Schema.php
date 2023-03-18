@@ -473,7 +473,7 @@ final class Schema extends AbstractSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->createColumnSchema($info['field'], self::TYPE_STRING);
+        $column = $this->createColumnSchema($info['field']);
 
         /** @psalm-var ColumnInfoArray $info */
         $column->allowNull($info['null'] === 'YES');
@@ -482,6 +482,7 @@ final class Schema extends AbstractSchema
         $column->comment($info['comment']);
         $column->dbType($info['type']);
         $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
+        $column->type(self::TYPE_STRING);
 
         $extra = $info['extra'];
 
@@ -901,13 +902,11 @@ final class Schema extends AbstractSchema
      * This method may be overridden by child classes to create a DBMS-specific column schema.
      *
      * @param string $name Name of the column.
-     * @param string $type Type of the column.
-     *
      * @return ColumnSchema
      */
-    private function createColumnSchema(string $name, string $type): ColumnSchema
+    private function createColumnSchema(string $name): ColumnSchema
     {
-        return new ColumnSchema($name, $type);
+        return new ColumnSchema($name);
     }
 
     /**
