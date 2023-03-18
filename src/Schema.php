@@ -473,13 +473,14 @@ final class Schema extends AbstractSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->createColumnSchema($info['field'], self::TYPE_STRING, $info['type']);
+        $column = $this->createColumnSchema($info['field'], self::TYPE_STRING);
 
         /** @psalm-var ColumnInfoArray $info */
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
+        $column->dbType($info['type']);
         $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
 
         $extra = $info['extra'];
@@ -901,13 +902,11 @@ final class Schema extends AbstractSchema
      *
      * @param string $name Name of the column.
      * @param string $type Type of the column.
-     * @param string $dbType DB type of the column.
-     *
      * @return ColumnSchema
      */
-    private function createColumnSchema(string $name, string $type, string $dbType): ColumnSchema
+    private function createColumnSchema(string $name, string $type): ColumnSchema
     {
-        return new ColumnSchema($name, $type, $dbType);
+        return new ColumnSchema($name, $type);
     }
 
     /**
