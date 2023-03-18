@@ -60,7 +60,6 @@ use function trim;
  *   is_pkey: bool|null,
  *   dimension: int
  * }
- *
  * @psalm-type ColumnInfoArray = array{
  *   field: string,
  *   type: string,
@@ -73,14 +72,12 @@ use function trim;
  *   privileges: string,
  *   comment: string
  * }
- *
  * @psalm-type RowConstraint = array{
  *   constraint_name: string,
  *   column_name: string,
  *   referenced_table_name: string,
  *   referenced_column_name: string
  * }
- *
  * @psalm-type ConstraintArray = array<
  *   array-key,
  *   array {
