@@ -240,6 +240,7 @@ final class Schema extends AbstractSchema
                 $info['type'] = self::TYPE_JSON;
             }
 
+            /** @psalm-var ColumnInfoArray $info */
             $column = $this->loadColumnSchema($info);
             $table->columns($column->getName(), $column);
 
@@ -470,9 +471,13 @@ final class Schema extends AbstractSchema
      * @throws JsonException
      *
      * @return ColumnSchemaInterface The column schema object.
+     *
+     * @psalm-param ColumnInfoArray $info The column information.
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
+        $dbType = $info['type'] ?? '';
+
         $column = $this->createColumnSchema($info['field']);
 
         /** @psalm-var ColumnInfoArray $info */
@@ -480,8 +485,8 @@ final class Schema extends AbstractSchema
         $column->primaryKey(str_contains($info['key'], 'PRI'));
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
-        $column->dbType($info['type']);
-        $column->unsigned(stripos($column->getDbType(), 'unsigned') !== false);
+        $column->dbType($dbType);
+        $column->unsigned(stripos($dbType, 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
         $extra = $info['extra'];
@@ -491,7 +496,7 @@ final class Schema extends AbstractSchema
         }
         $column->extra(trim($extra));
 
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $column->getDbType(), $matches)) {
+        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $dbType, $matches)) {
             $type = strtolower($matches[1]);
 
             if (isset($this->typeMap[$type])) {
