@@ -25,7 +25,7 @@ final class ColumnSchemaBuilderTest extends CommonColumnSchemaBuilderTest
     }
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaBuilderProvider::createColumnTypes()
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaBuilderProvider::createColumnTypes
      */
     public function testCreateColumnTypes(string $expected, string $type, ?int $length, array $calls): void
     {

@@ -473,10 +473,9 @@ final class Schema extends AbstractSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $column = $this->createColumnSchema();
+        $column = $this->createColumnSchema($info['field']);
 
         /** @psalm-var ColumnInfoArray $info */
-        $column->name($info['field']);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
@@ -901,10 +900,14 @@ final class Schema extends AbstractSchema
      * Creates a column schema for the database.
      *
      * This method may be overridden by child classes to create a DBMS-specific column schema.
+     *
+     * @param string $name Name of the column.
+     *
+     * @return ColumnSchema
      */
-    private function createColumnSchema(): ColumnSchema
+    private function createColumnSchema(string $name): ColumnSchema
     {
-        return new ColumnSchema();
+        return new ColumnSchema($name);
     }
 
     /**

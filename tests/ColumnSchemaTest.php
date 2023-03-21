@@ -43,7 +43,7 @@ final class ColumnSchemaTest extends TestCase
 
     public function testDbTypeCastJson(): void
     {
-        $columnSchema = new ColumnSchema();
+        $columnSchema = new ColumnSchema('json');
 
         $columnSchema->dbType(SchemaInterface::TYPE_JSON);
         $columnSchema->type(SchemaInterface::TYPE_JSON);
@@ -56,7 +56,7 @@ final class ColumnSchemaTest extends TestCase
      */
     public function testPhpTypeCastJson(): void
     {
-        $columnSchema = new ColumnSchema();
+        $columnSchema = new ColumnSchema('json');
 
         $columnSchema->type(SchemaInterface::TYPE_JSON);
 
