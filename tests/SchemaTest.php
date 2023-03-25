@@ -456,7 +456,7 @@ final class SchemaTest extends CommonSchemaTest
         $db = $this->getConnection();
 
         $this->createTableForIndexAndConstraintTests($db, $tableName, $columnName);
-        $db->createCommand()->addPrimaryKey($constraintName, $tableName, $columnName)->execute();
+        $db->createCommand()->addPrimaryKey($tableName, $constraintName, $columnName)->execute();
 
         $constraints = $db->getSchema()->getTablePrimaryKey($tableName, true);
 
@@ -464,7 +464,7 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertEquals('', $constraints->getName());
         $this->assertEquals([$columnName], $constraints->getColumnNames());
 
-        $db->createCommand()->dropPrimaryKey($constraintName, $tableName)->execute();
+        $db->createCommand()->dropPrimaryKey($tableName, $constraintName)->execute();
 
         $constraints = $db->getSchema()->getTablePrimaryKey($tableName, true);
 
