@@ -37,7 +37,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
 
-        $qb->addCheck('customer', 'id', 'id > 0');
+        $qb->addCheck('id', 'customer', 'id > 0');
     }
 
     /**
@@ -95,7 +95,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.');
 
-        $qb->addDefaultValue('CN_pk', 'T_constraints_1', 'C_default', 1);
+        $qb->addDefaultValue('T_constraints_1', 'CN_pk', 'C_default', 1);
     }
 
     /**
@@ -300,7 +300,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropCheck is not supported by MySQL.');
 
-        $qb->dropCheck('CN_check', 'T_constraints_1');
+        $qb->dropCheck('T_constraints_1', 'CN_check');
     }
 
     /**
@@ -382,7 +382,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropDefaultValue is not supported by MySQL.');
 
-        $qb->dropDefaultValue('CN_pk', 'T_constraints_1');
+        $qb->dropDefaultValue('T_constraints_1', 'CN_pk');
     }
 
     public function testDropForeignKey(): void
@@ -395,7 +395,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             ALTER TABLE `T_constraints_3` DROP FOREIGN KEY `CN_constraints_3`
             SQL,
-            $qb->dropForeignKey('CN_constraints_3', 'T_constraints_3'),
+            $qb->dropForeignKey('T_constraints_3', 'CN_constraints_3'),
         );
     }
 
@@ -409,7 +409,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             ALTER TABLE `T_constraints_1` DROP PRIMARY KEY
             SQL,
-            $qb->dropPrimaryKey('CN_pk', 'T_constraints_1'),
+            $qb->dropPrimaryKey('T_constraints_1', 'CN_pk'),
         );
     }
 
@@ -423,7 +423,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             <<<SQL
             DROP INDEX `test_uq_constraint` ON `test_uq`
             SQL,
-            $qb->dropUnique('test_uq_constraint', 'test_uq'),
+            $qb->dropUnique('test_uq', 'test_uq_constraint'),
         );
     }
 
