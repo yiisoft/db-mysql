@@ -17,7 +17,7 @@ use function preg_replace;
 use function trim;
 
 /**
- * Implements a (Data Definition Language) SQL statements for MySQL, MariaDb Server.
+ * Implements a (Data Definition Language) SQL statements for MySQL, MariaDB.
  */
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {

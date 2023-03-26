@@ -8,7 +8,7 @@ use PDO;
 use Yiisoft\Db\Driver\PDO\AbstractPDODriver;
 
 /**
- * Implements the MySQL, MariaDb Server driver based on the PDO (PHP Data Objects) extension.
+ * Implements the MySQL, MariaDB driver based on the PDO (PHP Data Objects) extension.
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.php
  */
@@ -28,7 +28,7 @@ final class PDODriver extends AbstractPDODriver
             $pdo->exec('SET NAMES ' . $pdo->quote($this->charset));
         }
 
-        if (!str_contains($this->dsn, 'charset') && $this->charset === null) {
+        if ($this->charset === null && !str_contains($this->dsn, 'charset')) {
             $pdo->exec('SET NAMES ' . $pdo->quote('utf8mb4'));
         }
 
