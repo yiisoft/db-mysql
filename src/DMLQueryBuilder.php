@@ -13,9 +13,6 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 use function implode;
 use function reset;
@@ -25,14 +22,6 @@ use function reset;
  */
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    public function __construct(
-        QueryBuilderInterface $queryBuilder,
-        private QuoterInterface $quoter,
-        private SchemaInterface $schema
-    ) {
-        parent::__construct($queryBuilder, $quoter, $schema);
-    }
-
     /**
      * @throws Exception
      * @throws NotSupportedException
