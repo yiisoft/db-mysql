@@ -8,9 +8,6 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
-use Yiisoft\Db\Schema\QuoterInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 use function preg_match;
 use function preg_replace;
@@ -21,14 +18,6 @@ use function trim;
  */
 final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 {
-    public function __construct(
-        private QueryBuilderInterface $queryBuilder,
-        private QuoterInterface $quoter,
-        private SchemaInterface $schema
-    ) {
-        parent::__construct($queryBuilder, $quoter, $schema);
-    }
-
     /**
      * @throws NotSupportedException
      */
@@ -185,7 +174,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     public function getColumnDefinition(string $table, string $column): string
     {
         $result = '';
-        $sql = $this->schema->getTableSchema($table)?->getCreateSql();
+        $sql = $this->schema?->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
             return '';
