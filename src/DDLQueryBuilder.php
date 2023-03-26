@@ -174,7 +174,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     public function getColumnDefinition(string $table, string $column): string
     {
         $result = '';
-        $sql = $this->schema?->getTableSchema($table)?->getCreateSql();
+        $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
             return '';
