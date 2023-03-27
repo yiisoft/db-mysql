@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Connection\AbstractDsn;
 
 /**
- * Implement a Data Source Name (DSN) for an MySQL, MariaDb Server.
+ * Implement a Data Source Name (DSN) for an MySQL, MariaDB.
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.connection.php
  */

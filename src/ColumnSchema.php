@@ -13,11 +13,11 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use function json_decode;
 
 /**
- * Represents the metadata of a column in a database table for MySQL, MariaDb Server.
+ * Represents the metadata of a column in a database table for MySQL, MariaDB.
  *
  * It provides information about the column's name, type, size, precision, and other details.
  *
- * Is used to store and retrieve metadata about a column in a database table. It's typically used in conjunction with
+ * It's used to store and retrieve metadata about a column in a database table, typically in conjunction with
  * the {@see TableSchema}, which represents the metadata of a database table as a whole.
  *
  * The following code shows how to use:
@@ -43,7 +43,7 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
      *
-     * @param mixed $value The value to be converted.
+     * @param mixed $value The value to convert.
      *
      * @throws JsonException If the value can't be decoded.
      *
@@ -67,7 +67,7 @@ final class ColumnSchema extends AbstractColumnSchema
      *
      * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
      *
-     * @param mixed $value The value to be converted.
+     * @param mixed $value The value to convert.
      *
      * @return mixed The converted value. This may also be an array containing the value as the first element and the
      * PDO type as the second element.
