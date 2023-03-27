@@ -37,8 +37,7 @@ use function strtolower;
 use function trim;
 
 /**
- * Implements the Mysql, Mariadb Server specific schema, supporting Mysql Server 5.7, Mariadb Server 10.4 and higher
- * versions.
+ * Implements MySQL, MariaDB specific schema, supporting MySQL Server 5.7, MariaDB Server 10.4 and higher.
  *
  * @psalm-type ColumnArray = array{
  *   table_schema: string,
@@ -193,7 +192,7 @@ final class Schema extends AbstractSchema
 
         try {
             $columns = $this->db->createCommand($sql)->queryAll();
-            // Chapter 1: cruthes for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
+            // Chapter 1: crutches for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
             $columnsExtra = [];
             if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
                 /** @psalm-var array[] $columnsExtra */
@@ -430,7 +429,7 @@ final class Schema extends AbstractSchema
     }
 
     /**
-     * Gets the CREATE TABLE sql string.
+     * Gets the `CREATE TABLE` SQL string.
      *
      * @param TableSchemaInterface $table The table metadata.
      *
@@ -438,7 +437,7 @@ final class Schema extends AbstractSchema
      * @throws InvalidConfigException
      * @throws Throwable
      *
-     * @return string $sql The result of 'SHOW CREATE TABLE'.
+     * @return string $sql The result of `SHOW CREATE TABLE`.
      */
     protected function getCreateTableSql(TableSchemaInterface $table): string
     {
@@ -521,10 +520,10 @@ final class Schema extends AbstractSchema
                         $column->scale((int) $values[1]);
                     }
 
-                    if ($column->getSize() === 1 && $type === 'bit') {
-                        $column->type(self::TYPE_BOOLEAN);
-                    } elseif ($type === 'bit') {
-                        if ($column->getSize() > 32) {
+                    if ($type === 'bit') {
+                        if ($column->getSize() === 1) {
+                            $column->type(self::TYPE_BOOLEAN);
+                        } elseif ($column->getSize() > 32) {
                             $column->type(self::TYPE_BIGINT);
                         } elseif ($column->getSize() === 32) {
                             $column->type(self::TYPE_INTEGER);
@@ -537,7 +536,7 @@ final class Schema extends AbstractSchema
         $column->phpType($this->getColumnPhpType($column));
 
         if (!$column->isPrimaryKey()) {
-            // Chapter 2: cruthes for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+            // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
             /** @psalm-var string $columnCategory */
             $columnCategory = $this->createColumn(
                 $column->getType(),

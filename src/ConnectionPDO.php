@@ -14,7 +14,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
- * Implements a connection to a database via PDO (PHP Data Objects) for MySQL, MariaDb Server.
+ * Implements a connection to a database via PDO (PHP Data Objects) for MySQL, MariaDB.
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.php
  */

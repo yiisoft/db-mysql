@@ -10,7 +10,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
- * Implements the MySQL, MariaDb Server specific query builder.
+ * Implements MySQL, MariaDB specific query builder.
  */
 final class QueryBuilder extends AbstractQueryBuilder
 {
