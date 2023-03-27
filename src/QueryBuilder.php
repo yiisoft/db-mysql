@@ -10,7 +10,7 @@ use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
- * Implements the MySQL, MariaDb Server specific query builder.
+ * Implements MySQL, MariaDB specific query builder.
  */
 final class QueryBuilder extends AbstractQueryBuilder
 {
@@ -50,7 +50,7 @@ final class QueryBuilder extends AbstractQueryBuilder
     ) {
         $ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
         $dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
-        $dqlBuilder = new DQLQueryBuilder($this, $quoter, $schema);
+        $dqlBuilder = new DQLQueryBuilder($this, $quoter);
         parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder);
     }
 

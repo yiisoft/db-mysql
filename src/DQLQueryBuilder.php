@@ -14,7 +14,7 @@ use function array_merge;
 use function ctype_digit;
 
 /**
- * Implements a DQL (Data Query Language) SQL statements for MySQL, MariaDb Server.
+ * Implements a DQL (Data Query Language) SQL statements for MySQL, MariaDB.
  */
 final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
