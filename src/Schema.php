@@ -548,8 +548,8 @@ final class Schema extends AbstractSchema
                 empty($info['extra']) &&
                 !empty($defaultValue) &&
                 in_array($columnCategory, [
-                    AbstractColumn::CATEGORY_STRING,
-                    AbstractColumn::CATEGORY_TIME,
+                    AbstractColumn::TYPE_CATEGORY_STRING,
+                    AbstractColumn::TYPE_CATEGORY_TIME,
                 ], true)
                 && !str_starts_with($defaultValue, '\'')
             ) {
