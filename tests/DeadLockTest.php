@@ -113,7 +113,7 @@ final class DeadLockTest extends TestCase
              * PARENT
              * nothing to do
              */
-        } catch (\Exception | Throwable $e) {
+        } catch (\Exception|Throwable $e) {
             /* wait all children */
             while (-1 !== pcntl_wait($status)) {
                 /* nothing to do */
@@ -245,7 +245,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 1: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception | Throwable $e) {
+        } catch (\Exception|Throwable $e) {
             $this->log(
                 'child 1: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
@@ -324,7 +324,7 @@ final class DeadLockTest extends TestCase
             $this->log("child 2: ! sql error $sqlError: $driverError: $driverMessage");
 
             return 1;
-        } catch (\Exception | Throwable $e) {
+        } catch (\Exception|Throwable $e) {
             $this->log(
                 'child 2: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
                 . $e->getTraceAsString() . '>>'
