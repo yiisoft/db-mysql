@@ -25,13 +25,15 @@ jobs:
   psalm:
     name: PHP ${{ matrix.php }}
 
+    env:
+      COMPOSER_ROOT_VERSION: dev-master
+
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
 
         php:
           - '8.0'
