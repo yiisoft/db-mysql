@@ -44,7 +44,7 @@ final class CommandPDO extends AbstractCommandPDO
         return $result;
     }
 
-    public function queryBuilder(): QueryBuilderInterface
+    protected function getQueryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
     }
