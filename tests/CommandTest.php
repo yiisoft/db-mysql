@@ -140,7 +140,7 @@ final class CommandTest extends CommonCommandTest
 
     public function testShowDatabases(): void
     {
-        $dsn = new Dsn('mysql', '127.0.0.1',);
+        $dsn = new Dsn('mysql', '127.0.0.1', );
         $db = new ConnectionPDO(new PDODriver($dsn->asString(), 'root', ''), DbHelper::getSchemaCache());
 
         $command = $db->createCommand();
