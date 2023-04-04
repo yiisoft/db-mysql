@@ -29,12 +29,12 @@ final class DsnTest extends TestCase
 
     public function testAsStringWithDatabaseNameWithEmptyString(): void
     {
-        $this->assertSame('mysql:host=localhost;port=3306', (new Dsn('mysql', 'localhost'))->asString());
+        $this->assertSame('mysql:host=localhost;port=3306', (new Dsn('mysql', 'localhost', ''))->asString());
     }
 
     public function testAsStringWithDatabaseNameWithNull(): void
     {
-        $this->assertSame('mysql:host=localhost;port=3306', (new Dsn('mysql', 'localhost'))->asString());
+        $this->assertSame('mysql:host=localhost;port=3306', (new Dsn('mysql', 'localhost', null))->asString());
     }
 
     public function testAsStringWithOptions(): void
