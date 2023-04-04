@@ -43,13 +43,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    public function testGetName(): void
-    {
-        $db = $this->getConnection();
-
-        $this->assertEquals('mysql', $db->getName());
-    }
-
     /**
      * @throws Exception
      * @throws InvalidConfigException
