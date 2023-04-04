@@ -8,8 +8,12 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Mysql\ConnectionPDO;
+use Yiisoft\Db\Mysql\Dsn;
+use Yiisoft\Db\Mysql\PDODriver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
+use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group mysql
@@ -132,5 +136,16 @@ final class CommandTest extends CommonCommandTest
     public function testUpsert(array $firstData, array $secondData): void
     {
         parent::testUpsert($firstData, $secondData);
+    }
+
+    public function testShowDatabases(): void
+    {
+        $dsn = new Dsn('mysql', '127.0.0.1',);
+        $db = new ConnectionPDO(new PDODriver($dsn->asString(), 'root', ''), DbHelper::getSchemaCache());
+
+        $command = $db->createCommand();
+
+        $this->assertSame('mysql:host=127.0.0.1;port=3306', $db->getDriver()->getDsn());
+        $this->assertSame(['yiitest'], $command->showDatabases());
     }
 }
