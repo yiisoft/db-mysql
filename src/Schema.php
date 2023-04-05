@@ -14,7 +14,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Helper\ArrayHelper;
+use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
@@ -672,7 +672,7 @@ final class Schema extends PdoAbstractSchema
 
         /** @psalm-var array[][] $constraints */
         $constraints = $this->normalizeRowKeyCase($constraints, true);
-        $constraints = ArrayHelper::index($constraints, null, ['type', 'name']);
+        $constraints = DbArrayHelper::index($constraints, null, ['type', 'name']);
 
         $result = [
             self::PRIMARY_KEY => null,
@@ -693,21 +693,21 @@ final class Schema extends PdoAbstractSchema
                 switch ($type) {
                     case 'PRIMARY KEY':
                         $result[self::PRIMARY_KEY] = (new Constraint())
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'));
+                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'));
                         break;
                     case 'FOREIGN KEY':
                         $result[self::FOREIGN_KEYS][] = (new ForeignKeyConstraint())
                             ->foreignSchemaName($constraint[0]['foreign_table_schema'])
                             ->foreignTableName($constraint[0]['foreign_table_name'])
-                            ->foreignColumnNames(ArrayHelper::getColumn($constraint, 'foreign_column_name'))
+                            ->foreignColumnNames(DbArrayHelper::getColumn($constraint, 'foreign_column_name'))
                             ->onDelete($constraint[0]['on_delete'])
                             ->onUpdate($constraint[0]['on_update'])
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
                             ->name($name);
                         break;
                     case 'UNIQUE':
                         $result[self::UNIQUES][] = (new Constraint())
-                            ->columnNames(ArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
                             ->name($name);
                         break;
                 }
@@ -787,7 +787,7 @@ final class Schema extends PdoAbstractSchema
 
         /** @psalm-var array[] $indexes */
         $indexes = $this->normalizeRowKeyCase($indexes, true);
-        $indexes = ArrayHelper::index($indexes, null, ['name']);
+        $indexes = DbArrayHelper::index($indexes, null, ['name']);
         $result = [];
 
         /**
@@ -800,7 +800,7 @@ final class Schema extends PdoAbstractSchema
             $ic->primary((bool) $index[0]['index_is_primary']);
             $ic->unique((bool) $index[0]['index_is_unique']);
             $ic->name($name !== 'PRIMARY' ? $name : null);
-            $ic->columnNames(ArrayHelper::getColumn($index, 'column_name'));
+            $ic->columnNames(DbArrayHelper::getColumn($index, 'column_name'));
 
             $result[] = $ic;
         }
