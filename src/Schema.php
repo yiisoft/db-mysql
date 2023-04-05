@@ -9,15 +9,15 @@ use Throwable;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Driver\PDO\PdoAbstractSchema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\ArrayHelper;
-use Yiisoft\Db\Schema\AbstractSchema;
 use Yiisoft\Db\Schema\Builder\AbstractColumn;
-use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
+use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_map;
@@ -92,7 +92,7 @@ use function trim;
  *   }
  * >
  */
-final class Schema extends AbstractSchema
+final class Schema extends PdoAbstractSchema
 {
     /**
      * @var array Mapping from physical column types (keys) to abstract column types (values).
@@ -413,7 +413,7 @@ final class Schema extends AbstractSchema
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([self::class], $this->db->getCacheKey(), [$this->getRawTableName($name)]);
+        return array_merge([self::class], $this->generateCacheKey(), [$this->getRawTableName($name)]);
     }
 
     /**
@@ -425,7 +425,7 @@ final class Schema extends AbstractSchema
      */
     protected function getCacheTag(): string
     {
-        return md5(serialize(array_merge([self::class], $this->db->getCacheKey())));
+        return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
     }
 
     /**
