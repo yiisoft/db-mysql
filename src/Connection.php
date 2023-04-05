@@ -18,7 +18,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.php
  */
-final class ConnectionPDO extends AbstractConnectionPDO
+final class Connection extends AbstractConnectionPDO
 {
     public function close(): void
     {
@@ -41,7 +41,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
 
     public function createCommand(string $sql = null, array $params = []): CommandPDOInterface
     {
-        $command = new CommandPDO($this);
+        $command = new Command($this);
 
         if ($sql !== null) {
             $command->setSql($sql);
@@ -60,7 +60,7 @@ final class ConnectionPDO extends AbstractConnectionPDO
 
     public function createTransaction(): TransactionInterface
     {
-        return new TransactionPDO($this);
+        return new Transaction($this);
     }
 
     public function getQueryBuilder(): QueryBuilderInterface

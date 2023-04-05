@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Support;
 
 use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
-use Yiisoft\Db\Mysql\ConnectionPDO;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\Dsn;
-use Yiisoft\Db\Mysql\PDODriver;
+use Yiisoft\Db\Mysql\Driver;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
@@ -16,7 +16,7 @@ trait TestTrait
 
     protected function getConnection(bool $fixture = false): ConnectionPDOInterface
     {
-        $db = new ConnectionPDO(new PDODriver($this->getDsn(), 'root', ''), DbHelper::getSchemaCache());
+        $db = new Connection(new Driver($this->getDsn(), 'root', ''), DbHelper::getSchemaCache());
 
         if ($fixture) {
             DbHelper::loadFixture($db, __DIR__ . '/Fixture/mysql.sql');
@@ -29,7 +29,7 @@ trait TestTrait
     {
         $dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
 
-        return new ConnectionPDO(new PDODriver($dsn, 'root', ''), DbHelper::getSchemaCache());
+        return new Connection(new Driver($dsn, 'root', ''), DbHelper::getSchemaCache());
     }
 
     protected function getDsn(): string
