@@ -8,9 +8,9 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Mysql\ConnectionPDO;
+use Yiisoft\Db\Mysql\PdoConnection;
 use Yiisoft\Db\Mysql\Dsn;
-use Yiisoft\Db\Mysql\PDODriver;
+use Yiisoft\Db\Mysql\PdoDriver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -141,7 +141,7 @@ final class CommandTest extends CommonCommandTest
     public function testShowDatabases(): void
     {
         $dsn = new Dsn('mysql', '127.0.0.1', );
-        $db = new ConnectionPDO(new PDODriver($dsn->asString(), 'root', ''), DbHelper::getSchemaCache());
+        $db = new PdoConnection(new PdoDriver($dsn->asString(), 'root', ''), DbHelper::getSchemaCache());
 
         $command = $db->createCommand();
 
