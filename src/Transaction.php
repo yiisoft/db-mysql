@@ -9,6 +9,6 @@ use Yiisoft\Db\Driver\PDO\AbstractTransactionPDO;
 /**
  * Implements the MySQL, MariaDB specific transaction.
  */
-final class PdoTransaction extends AbstractTransactionPDO
+final class Transaction extends AbstractTransactionPDO
 {
 }

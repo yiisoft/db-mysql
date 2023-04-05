@@ -15,7 +15,7 @@ use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for MySQL,
  * MariaDB.
  */
-final class PdoCommand extends AbstractCommandPDO
+final class Command extends AbstractCommandPDO
 {
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {
