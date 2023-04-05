@@ -44,6 +44,15 @@ final class CommandPDO extends AbstractCommandPDO
         return $result;
     }
 
+    public function showDatabases(): array
+    {
+        $sql = <<<SQL
+        SHOW DATABASES WHERE `Database` NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')
+        SQL;
+
+        return $this->setSql($sql)->queryColumn();
+    }
+
     protected function getQueryBuilder(): QueryBuilderInterface
     {
         return $this->db->getQueryBuilder();
