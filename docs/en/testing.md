@@ -4,7 +4,7 @@
 
 All our packages have github actions by default, so you can test your [contribution](https://github.com/yiisoft/db-mysql/blob/master/.github/CONTRIBUTING.md) in the cloud.
 
-**Note:** Recomended pull request in draft mode until all tests pass.
+> Note: Recomended pull request in draft mode until all tests pass.
 
 ## Docker image
 
