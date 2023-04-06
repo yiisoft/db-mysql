@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use Throwable;
-use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
+use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidCallException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Common\CommonConnectionPDOTest;
+use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 
 /**
  * @group mysql
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ConnectionPDOTest extends CommonConnectionPDOTest
+final class PdoConnectionTest extends CommonPdoConnectionTest
 {
     use TestTrait;
 
@@ -96,7 +96,7 @@ final class ConnectionPDOTest extends CommonConnectionPDOTest
     public function testTransactionAutocommit()
     {
         $db = $this->getConnection(true);
-        $db->transaction(function (ConnectionPDOInterface $db) {
+        $db->transaction(function (PdoConnectionInterface $db) {
             $this->assertTrue($db->getTransaction()->isActive());
 
             // create table will cause the transaction to be implicitly committed

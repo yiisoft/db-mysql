@@ -14,7 +14,7 @@ use Yiisoft\Db\Schema\SchemaInterface;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class CommandJSONTest extends TestCase
+final class JsonCommandTest extends TestCase
 {
     use TestTrait;
 

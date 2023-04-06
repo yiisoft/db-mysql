@@ -6,8 +6,8 @@ namespace Yiisoft\Db\Mysql;
 
 use Exception;
 use Psr\Log\LogLevel;
-use Yiisoft\Db\Driver\PDO\AbstractConnectionPDO;
-use Yiisoft\Db\Driver\PDO\CommandPDOInterface;
+use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
+use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -18,7 +18,7 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.php
  */
-final class Connection extends AbstractConnectionPDO
+final class Connection extends AbstractPdoConnection
 {
     public function close(): void
     {
@@ -39,7 +39,7 @@ final class Connection extends AbstractConnectionPDO
         }
     }
 
-    public function createCommand(string $sql = null, array $params = []): CommandPDOInterface
+    public function createCommand(string $sql = null, array $params = []): PdoCommandInterface
     {
         $command = new Command($this);
 
