@@ -1,5 +1,11 @@
 # Testing
 
+## Github actions
+
+All our packages have github actions by default, so you can test your [contribution](https://github.com/yiisoft/db-mysql/blob/master/.github/CONTRIBUTING.md) in the cloud.
+
+**Note:** Recomended pull request in draft mode until all tests pass.
+
 ## Docker image
 
 For greater ease it is recommended to use docker containers, for this you can use the [docker-compose.yml](https://docs.docker.com/compose/compose-file/) file that is in the docs folder.
