@@ -7,9 +7,8 @@ namespace Yiisoft\Db\Mysql\Tests;
 use ReflectionException;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
-use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Constraint;
-use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
+use Yiisoft\Db\Driver\Pdo\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -19,7 +18,6 @@ use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\SchemaInterface;
-use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\Assert;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
@@ -30,7 +28,7 @@ use function version_compare;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class SchemaTest extends CommonSchemaTest
+final class SchemaTest extends \Yiisoft\Db\Tests\Common\CommonSchemaTest
 {
     use TestTrait;
 
@@ -407,7 +405,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $commandMock = $this->createMock(CommandInterface::class);
         $commandMock->method('queryAll')->willReturn([]);
-        $mockDb = $this->createMock(ConnectionPDOInterface::class);
+        $mockDb = $this->createMock(ConnectionInterface::class);
         $mockDb->method('getQuoter')->willReturn($db->getQuoter());
         $mockDb
             ->method('createCommand')
@@ -524,16 +522,5 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->assertEquals($status, $selectedRow['status']);
         $this->assertEquals(true, $selectedRow['bool_col']);
-    }
-
-    public function testNotConnectionPDO(): void
-    {
-        $db = $this->createMock(ConnectionInterface::class);
-        $schema = new Schema($db, DbHelper::getSchemaCache());
-
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Only PDO connections are supported.');
-
-        $schema->refreshTableSchema('customer');
     }
 }

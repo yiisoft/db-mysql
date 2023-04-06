@@ -25,9 +25,48 @@ name: Composer require checker
 
 jobs:
   composer-require-checker:
-    uses: yiisoft/actions/.github/workflows/composer-require-checker.yml@master
-    with:
-      os: >-
-        ['ubuntu-latest']
-      php: >-
-        ['8.0', '8.1']
+    name: PHP ${{ matrix.php }}
+
+    env:
+      COMPOSER_ROOT_VERSION: dev-master
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+
+        php:
+          - 8.0
+          - 8.1
+          - 8.2
+
+    steps:
+      - name: Checkout.
+        uses: actions/checkout@v3
+
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Update composer.
+        run: composer self-update
+
+      - name: Set environment variables pull request linux.
+        uses: yiisoft/actions/db/environment-linux@master
+
+      - name: Install db.
+        uses: yiisoft/actions/db/subpackage-install@master
+        with:
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+          CURRENT_PACKAGE: db
+          FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
+          WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
+
+      - name: Check dependencies.
+        run: vendor/bin/composer-require-checker
