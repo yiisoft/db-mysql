@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Support;
 
-use Yiisoft\Db\Driver\PDO\ConnectionPDOInterface;
+use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Mysql\Dsn;
 use Yiisoft\Db\Mysql\Driver;
+use Yiisoft\Db\Mysql\Dsn;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 trait TestTrait
 {
     private string $dsn = '';
 
-    protected function getConnection(bool $fixture = false): ConnectionPDOInterface
+    protected function getConnection(bool $fixture = false): PdoConnectionInterface
     {
         $db = new Connection(new Driver($this->getDsn(), 'root', ''), DbHelper::getSchemaCache());
 
@@ -25,7 +25,7 @@ trait TestTrait
         return $db;
     }
 
-    protected static function getDb(): ConnectionPDOInterface
+    protected static function getDb(): PdoConnectionInterface
     {
         $dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
 
