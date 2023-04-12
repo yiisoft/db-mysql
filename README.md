@@ -5,17 +5,22 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px">
     </a>
-    <h1 align="center">Yii DataBase MySQL Extension</h1>
+    <h1 align="center">MySQL driver for Yii Database</h1>
     <br>
 </p>
 
-Yii Database MySQL Extension is a database extension for the [Yii Framework] that allows developers to access and interact with [MySQL] and [MariaDb] databases. It provides a set of classes and methods for connecting to a [MySQL] and [MariaDb] database, executing SQL queries, and managing data within the database. The extension is designed to be easy to use and integrate into Yii-based applications, and supports a wide range of [MySQL], [MariaDb] features and functions. It also includes support for transactions, database schema management, and error handling.
+MySQL driver for [Yii Database](https://github.com/yiisoft/db) allows developers to access and interact with [MySQL]
+and [MariaDb] databases.
+It provides a set of classes and methods for connecting to a [MySQL] and [MariaDb] database,
+executing SQL queries, and managing data within the database.
+The package is designed to be easy to use and integrate,
+and supports a wide range of [MySQL], [MariaDb] features and functions.
+It also includes support for transactions, database schema management, and error handling.
 
 It is used in [Yii Framework] but can be used separately.
 
 [MariaDB]: https://mariadb.org/
 [MySQL]: https://www.mysql.com/
-[Yii Framework]: https://www.yiiframework.com/
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v/stable.png)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads.png)](https://packagist.org/packages/yiisoft/db-mysql)
