@@ -24,7 +24,7 @@ jobs:
     name: PHP ${{ matrix.php }}-${{ matrix.os }}
 
     env:
-      COMPOSER_ROOT_VERSION: dev-master
+      COMPOSER_ROOT_VERSION: 1.0.0
       EXTENSIONS: json, pdo, pdo_mysql
 
     runs-on: ${{ matrix.os }}
