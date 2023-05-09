@@ -5,7 +5,7 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px">
     </a>
-    <h1 align="center">MySQL driver for Yii Database</h1>
+    <h1 align="center">MySQL and MariaDB driver for Yii Database</h1>
     <br>
 </p>
 
