@@ -167,7 +167,7 @@ CREATE TABLE `type` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `type_bit` (
-  `bit_col_1` BIT(1) NOT NULL,
+  `bit_col_1` BIT(1) NOT NULL DEFAULT b'0',
   `bit_col_2` BIT(1) DEFAULT b'1',
   `bit_col_3` BIT(32) NOT NULL,
   `bit_col_4` BIT(32) DEFAULT b'10000010',

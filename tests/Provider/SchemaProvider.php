@@ -303,7 +303,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'size' => 1,
                         'precision' => 1,
                         'scale' => null,
-                        'defaultValue' => null,
+                        'defaultValue' => false,
                     ],
                     'bit_col_2' => [
                         'type' => 'boolean',
@@ -329,7 +329,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'size' => 32,
                         'precision' => 32,
                         'scale' => null,
-                        'defaultValue' => 0,
+                        'defaultValue' => null,
                     ],
                     'bit_col_4' => [
                         'type' => 'integer',
@@ -355,7 +355,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'size' => 64,
                         'precision' => 64,
                         'scale' => null,
-                        'defaultValue' => 0,
+                        'defaultValue' => null,
                     ],
                     'bit_col_6' => [
                         'type' => 'bigint',

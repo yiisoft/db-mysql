@@ -488,13 +488,6 @@ final class Schema extends AbstractPdoSchema
         $column->unsigned(stripos($dbType, 'unsigned') !== false);
         $column->type(self::TYPE_STRING);
 
-        $extra = $info['extra'];
-
-        if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $extra = strtoupper(substr($extra, 18));
-        }
-        $column->extra(trim($extra));
-
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $dbType, $matches)) {
             $type = strtolower($matches[1]);
 
@@ -533,53 +526,56 @@ final class Schema extends AbstractPdoSchema
             }
         }
 
-        $column->phpType($this->getColumnPhpType($column));
-
-        if (!$column->isPrimaryKey()) {
-            // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
-            /** @psalm-var string $columnCategory */
-            $columnCategory = $this->createColumn(
+        // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+        if (
+            empty($info['extra'])
+            && !empty($info['extra_default_value'])
+            && !str_starts_with($info['extra_default_value'], '\'')
+            && in_array($this->createColumn(
                 $column->getType(),
                 $column->getSize()
-            )->getCategoryMap()[$column->getType()] ?? '';
-            $defaultValue = $info['extra_default_value'] ?? '';
+            )->getCategoryMap()[$column->getType()], [
+                AbstractColumn::TYPE_CATEGORY_STRING,
+                AbstractColumn::TYPE_CATEGORY_TIME,
+            ], true)
+        ) {
+            $info['extra'] = 'DEFAULT_GENERATED';
+        }
 
-            if (
-                empty($info['extra']) &&
-                !empty($defaultValue) &&
-                in_array($columnCategory, [
-                    AbstractColumn::TYPE_CATEGORY_STRING,
-                    AbstractColumn::TYPE_CATEGORY_TIME,
-                ], true)
-                && !str_starts_with($defaultValue, '\'')
-            ) {
-                $info['extra'] = 'DEFAULT_GENERATED';
-            }
+        $column->extra($info['extra']);
+        $column->phpType($this->getColumnPhpType($column));
+        $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
 
-            /**
-             * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed
-             * as CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
-             *
-             * See details here: https://mariadb.com/kb/en/library/now/#description
-             */
-            if (
-                in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
-                && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', (string) $info['default'], $matches)
-            ) {
-                $column->defaultValue(new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1])
-                    ? '(' . $matches[1] . ')' : '')));
-            } elseif (!empty($info['extra']) && !empty($info['default'])) {
-                $column->defaultValue(new Expression($info['default']));
-            } elseif (isset($type) && $type === 'bit' && $column->getType() !== self::TYPE_BOOLEAN) {
-                $column->defaultValue(bindec(trim((string) $info['default'], 'b\'')));
-            } else {
-                $column->defaultValue($column->phpTypecast($info['default']));
-            }
-        } elseif ($info['default'] !== null) {
-            $column->defaultValue($column->phpTypecast($info['default']));
+        if (str_starts_with($column->getExtra(), 'DEFAULT_GENERATED')) {
+            $column->extra(trim(strtoupper(substr($column->getExtra(), 18))));
         }
 
         return $column;
+    }
+
+    /**
+     * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
+     *
+     * @param string|null $defaultValue The default value retrieved from the database.
+     * @param ColumnSchemaInterface $columnSchema The column schema object.
+     *
+     * @return mixed The normalized default value.
+     */
+    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $columnSchema): mixed
+    {
+        return match (true) {
+            $defaultValue === null
+                => null,
+            $columnSchema->isPrimaryKey()
+                => $columnSchema->phpTypecast($defaultValue),
+            !empty($columnSchema->getExtra())
+                && str_starts_with($columnSchema->getExtra(), 'DEFAULT_GENERATED')
+                    => new Expression($defaultValue),
+            str_starts_with(strtolower($columnSchema->getDbType()), 'bit')
+                => $columnSchema->phpTypecast(bindec(trim($defaultValue, "b'"))),
+            default
+                => $columnSchema->phpTypecast($defaultValue),
+        };
     }
 
     /**

@@ -61,13 +61,14 @@ final class SchemaTest extends CommonSchemaTest
             'key' => '',
             'default' => 'current_timestamp()',
             'extra' => '',
+            'extra_default_value' => 'current_timestamp()',
             'privileges' => 'select,insert,update,references',
             'comment' => '',
         ]]);
 
         $this->assertInstanceOf(ColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
+        $this->assertEquals('current_timestamp()', $column->getDefaultValue());
     }
 
     /**
