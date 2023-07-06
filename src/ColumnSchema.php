@@ -39,6 +39,29 @@ use function json_decode;
 final class ColumnSchema extends AbstractColumnSchema
 {
     /**
+     * Converts the input value according to {@see type} and {@see dbType} for use in a db query.
+     *
+     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
+     *
+     * @param mixed $value The value to convert.
+     *
+     * @return mixed The converted value. This may also be an array containing the value as the first element and the
+     * PDO type as the second element.
+     */
+    public function dbTypecast(mixed $value): mixed
+    {
+        return match (true) {
+            $value === null,
+            $value instanceof ExpressionInterface
+                => $value,
+            $this->getType() === SchemaInterface::TYPE_JSON
+                => new JsonExpression($value, $this->getDbType()),
+            default
+            => parent::dbTypecast($value),
+        };
+    }
+
+    /**
      * Converts the input value according to {@see phpType} after retrieval from the database.
      *
      * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
@@ -58,30 +81,6 @@ final class ColumnSchema extends AbstractColumnSchema
                 => json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR),
             default
             => parent::phpTypecast($value),
-        };
-    }
-
-    /**
-     * Converts the input value according to {@see type} and {@see dbType} for use in a db query.
-     *
-     * If the value is `null` or an {@see \Yiisoft\Db\Expression\Expression}, it won't be converted.
-     *
-     * @param mixed $value The value to convert.
-     *
-     * @return mixed The converted value. This may also be an array containing the value as the first element and the
-     * PDO type as the second element.
-     */
-    public function dbTypecast(mixed $value): mixed
-    {
-        return match (true) {
-            $value === null
-                => null,
-            $value instanceof ExpressionInterface
-                => $value,
-            $this->getType() === SchemaInterface::TYPE_JSON
-                => new JsonExpression($value, $this->getDbType()),
-            default
-            => parent::dbTypecast($value),
         };
     }
 }
