@@ -535,7 +535,7 @@ final class Schema extends AbstractPdoSchema
             && in_array($this->createColumn(
                 $column->getType(),
                 $column->getSize()
-            )->getCategoryMap()[$column->getType()], [
+            )->getCategoryMap()[$column->getType()] ?? null, [
                 AbstractColumn::TYPE_CATEGORY_STRING,
                 AbstractColumn::TYPE_CATEGORY_TIME,
             ], true)
@@ -573,7 +573,7 @@ final class Schema extends AbstractPdoSchema
                 self::TYPE_TIMESTAMP,
                 self::TYPE_DATETIME,
                 self::TYPE_DATE,
-                self::TYPE_TIME
+                self::TYPE_TIME,
             ], true)
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
                     => new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')),
