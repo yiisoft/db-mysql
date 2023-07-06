@@ -527,8 +527,9 @@ final class Schema extends AbstractPdoSchema
         }
 
         // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
+        $extra = $info['extra'];
         if (
-            empty($info['extra'])
+            empty($extra)
             && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
             && in_array($this->createColumn(
@@ -539,15 +540,15 @@ final class Schema extends AbstractPdoSchema
                 AbstractColumn::TYPE_CATEGORY_TIME,
             ], true)
         ) {
-            $info['extra'] = 'DEFAULT_GENERATED';
+            $extra = 'DEFAULT_GENERATED';
         }
 
-        $column->extra($info['extra']);
+        $column->extra($extra);
         $column->phpType($this->getColumnPhpType($column));
         $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
 
-        if (str_starts_with($column->getExtra(), 'DEFAULT_GENERATED')) {
-            $column->extra(trim(strtoupper(substr($column->getExtra(), 18))));
+        if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
+            $column->extra(trim(strtoupper(substr($extra, 18))));
         }
 
         return $column;
@@ -568,13 +569,21 @@ final class Schema extends AbstractPdoSchema
                 => null,
             $columnSchema->isPrimaryKey()
                 => $columnSchema->phpTypecast($defaultValue),
+            in_array($columnSchema->getType(), [
+                self::TYPE_TIMESTAMP,
+                self::TYPE_DATETIME,
+                self::TYPE_DATE,
+                self::TYPE_TIME
+            ], true)
+                && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
+                    => new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')),
             !empty($columnSchema->getExtra())
-                && str_starts_with($columnSchema->getExtra(), 'DEFAULT_GENERATED')
+                && !empty($defaultValue)
                     => new Expression($defaultValue),
-            str_starts_with(strtolower($columnSchema->getDbType()), 'bit')
+            str_starts_with(strtolower((string) $columnSchema->getDbType()), 'bit')
                 => $columnSchema->phpTypecast(bindec(trim($defaultValue, "b'"))),
             default
-                => $columnSchema->phpTypecast($defaultValue),
+            => $columnSchema->phpTypecast($defaultValue),
         };
     }
 

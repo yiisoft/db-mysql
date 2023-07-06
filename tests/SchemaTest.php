@@ -68,7 +68,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->assertInstanceOf(ColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-        $this->assertEquals('current_timestamp()', $column->getDefaultValue());
+        $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
     }
 
     /**

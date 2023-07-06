@@ -57,7 +57,7 @@ final class ColumnSchema extends AbstractColumnSchema
             $this->getType() === SchemaInterface::TYPE_JSON
                 => json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR),
             default
-                => parent::phpTypecast($value),
+            => parent::phpTypecast($value),
         };
     }
 
@@ -81,7 +81,7 @@ final class ColumnSchema extends AbstractColumnSchema
             $this->getType() === SchemaInterface::TYPE_JSON
                 => new JsonExpression($value, $this->getDbType()),
             default
-                => parent::dbTypecast($value),
+            => parent::dbTypecast($value),
         };
     }
 }
