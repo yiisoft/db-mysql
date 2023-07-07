@@ -558,18 +558,18 @@ final class Schema extends AbstractPdoSchema
      * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
      *
      * @param string|null $defaultValue The default value retrieved from the database.
-     * @param ColumnSchemaInterface $columnSchema The column schema object.
+     * @param ColumnSchemaInterface $column The column schema object.
      *
      * @return mixed The normalized default value.
      */
-    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $columnSchema): mixed
+    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
     {
         return match (true) {
             $defaultValue === null
                 => null,
-            $columnSchema->isPrimaryKey()
-                => $columnSchema->phpTypecast($defaultValue),
-            in_array($columnSchema->getType(), [
+            $column->isPrimaryKey()
+                => $column->phpTypecast($defaultValue),
+            in_array($column->getType(), [
                 self::TYPE_TIMESTAMP,
                 self::TYPE_DATETIME,
                 self::TYPE_DATE,
@@ -577,13 +577,13 @@ final class Schema extends AbstractPdoSchema
             ], true)
                 && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
                     => new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')),
-            !empty($columnSchema->getExtra())
+            !empty($column->getExtra())
                 && !empty($defaultValue)
                     => new Expression($defaultValue),
-            str_starts_with(strtolower((string) $columnSchema->getDbType()), 'bit')
-                => $columnSchema->phpTypecast(bindec(trim($defaultValue, "b'"))),
+            str_starts_with(strtolower((string) $column->getDbType()), 'bit')
+                => $column->phpTypecast(bindec(trim($defaultValue, "b'"))),
             default
-            => $columnSchema->phpTypecast($defaultValue),
+            => $column->phpTypecast($defaultValue),
         };
     }
 
