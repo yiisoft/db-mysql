@@ -475,7 +475,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $dbType = $info['type'] ?? '';
+        $dbType = $info['type'];
 
         $column = $this->createColumnSchema($info['field']);
 
