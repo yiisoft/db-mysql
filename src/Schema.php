@@ -532,12 +532,9 @@ final class Schema extends AbstractPdoSchema
             empty($extra)
             && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
-            && in_array($this->createColumn(
-                $column->getType(),
-                $column->getSize()
-            )->getCategoryMap()[$column->getType()] ?? null, [
-                AbstractColumn::TYPE_CATEGORY_STRING,
-                AbstractColumn::TYPE_CATEGORY_TIME,
+            && in_array($column->getType(), [
+                self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
+                self::TYPE_DATETIME, self::TYPE_TIMESTAMP, self::TYPE_TIME, self::TYPE_DATE,
             ], true)
         ) {
             $extra = 'DEFAULT_GENERATED';
