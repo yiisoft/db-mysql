@@ -15,7 +15,6 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Schema\Builder\AbstractColumn;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
