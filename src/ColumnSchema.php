@@ -52,12 +52,10 @@ final class ColumnSchema extends AbstractColumnSchema
     public function phpTypecast(mixed $value): mixed
     {
         return match (true) {
-            $value === null
-                => null,
+            $value === null => null,
             $this->getType() === SchemaInterface::TYPE_JSON
                 => json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR),
-            default
-            => parent::phpTypecast($value),
+            default => parent::phpTypecast($value),
         };
     }
 
@@ -74,13 +72,11 @@ final class ColumnSchema extends AbstractColumnSchema
     public function dbTypecast(mixed $value): mixed
     {
         return match (true) {
-            $value === null,
-            $value instanceof ExpressionInterface
-                => $value,
+            $value === null => null,
+            $value instanceof ExpressionInterface => $value,
             $this->getType() === SchemaInterface::TYPE_JSON
                 => new JsonExpression($value, $this->getDbType()),
-            default
-            => parent::dbTypecast($value),
+            default => parent::dbTypecast($value),
         };
     }
 }
