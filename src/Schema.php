@@ -32,6 +32,7 @@ use function preg_match_all;
 use function preg_match;
 use function serialize;
 use function stripos;
+use function strtolower;
 use function trim;
 
 /**
@@ -487,7 +488,7 @@ final class Schema extends AbstractPdoSchema
         $column->type(self::TYPE_STRING);
 
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $dbType, $matches)) {
-            $type = $matches[1];
+            $type = strtolower($matches[1]);
 
             if (isset($this->typeMap[$type])) {
                 $column->type($this->typeMap[$type]);
@@ -570,7 +571,7 @@ final class Schema extends AbstractPdoSchema
 
             !empty($column->getExtra()) && !empty($defaultValue) => new Expression($defaultValue),
 
-            str_starts_with((string) $column->getDbType(), 'bit')
+            str_starts_with(strtolower((string) $column->getDbType()), 'bit')
                 => $column->phpTypecast(bindec(trim($defaultValue, "b'"))),
 
             default => $column->phpTypecast($defaultValue),
