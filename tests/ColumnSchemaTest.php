@@ -92,6 +92,7 @@ final class ColumnSchemaTest extends TestCase
 
         $intColPhpType = $tableSchema->getColumn('int_col')?->phpTypecast($query['int_col']);
         $charColPhpType = $tableSchema->getColumn('char_col')?->phpTypecast($query['char_col']);
+        $charCol3PhpType = $tableSchema->getColumn('char_col')?->phpTypecast($query['char_col3']);
         $floatColPhpType = $tableSchema->getColumn('float_col')?->phpTypecast($query['float_col']);
         $blobColPhpType = $tableSchema->getColumn('blob_col')?->phpTypecast($query['blob_col']);
         $timePhpType = $tableSchema->getColumn('time')?->phpTypecast($query['time']);
@@ -101,6 +102,7 @@ final class ColumnSchemaTest extends TestCase
 
         $this->assertSame(1, $intColPhpType);
         $this->assertSame(str_repeat('x', 100), $charColPhpType);
+        $this->assertNull($charCol3PhpType);
         $this->assertSame(1.234, $floatColPhpType);
         $this->assertSame("\x10\x11\x12", $blobColPhpType);
         $this->assertSame('2023-07-11 14:50:23', $timePhpType);
