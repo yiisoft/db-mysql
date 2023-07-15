@@ -51,12 +51,15 @@ final class ColumnSchema extends AbstractColumnSchema
      */
     public function phpTypecast(mixed $value): mixed
     {
-        return match (true) {
-            $value === null => null,
-            $this->getType() === SchemaInterface::TYPE_JSON
-                => json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR),
-            default => parent::phpTypecast($value),
-        };
+        if ($value === null) {
+            return null;
+        }
+
+        if ($this->getType() === SchemaInterface::TYPE_JSON) {
+            return json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        return parent::phpTypecast($value);
     }
 
     /**
@@ -71,12 +74,14 @@ final class ColumnSchema extends AbstractColumnSchema
      */
     public function dbTypecast(mixed $value): mixed
     {
-        return match (true) {
-            $value === null => null,
-            $value instanceof ExpressionInterface => $value,
-            $this->getType() === SchemaInterface::TYPE_JSON
-                => new JsonExpression($value, $this->getDbType()),
-            default => parent::dbTypecast($value),
-        };
+        if ($value === null || $value instanceof ExpressionInterface) {
+            return $value;
+        }
+
+        if ($this->getType() === SchemaInterface::TYPE_JSON) {
+            return new JsonExpression($value, $this->getDbType());
+        }
+
+        return parent::dbTypecast($value);
     }
 }

@@ -561,25 +561,20 @@ final class Schema extends AbstractPdoSchema
     private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
     {
         return match (true) {
-            $defaultValue === null
-                => null,
-            $column->isPrimaryKey()
-                => $column->phpTypecast($defaultValue),
-            in_array($column->getType(), [
-                self::TYPE_TIMESTAMP,
-                self::TYPE_DATETIME,
-                self::TYPE_DATE,
-                self::TYPE_TIME,
-            ], true)
-                && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
-                    => new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')),
-            !empty($column->getExtra())
-                && !empty($defaultValue)
-                    => new Expression($defaultValue),
+            $defaultValue === null => null,
+
+            $column->isPrimaryKey() => $column->phpTypecast($defaultValue),
+
+            in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
+            && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
+                => new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : '')),
+
+            !empty($column->getExtra()) && !empty($defaultValue) => new Expression($defaultValue),
+
             str_starts_with(strtolower((string) $column->getDbType()), 'bit')
                 => $column->phpTypecast(bindec(trim($defaultValue, "b'"))),
-            default
-            => $column->phpTypecast($defaultValue),
+
+            default => $column->phpTypecast($defaultValue),
         };
     }
 
