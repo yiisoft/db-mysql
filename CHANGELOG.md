@@ -2,7 +2,7 @@
 
 ## 1.0.1 under development
 
-- no changes in this release.
+- Enh #295: Typecast refactoring (@Tigrov)
 
 ## 1.0.0 April 12, 2023
 

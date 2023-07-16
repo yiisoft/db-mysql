@@ -61,6 +61,7 @@ final class SchemaTest extends CommonSchemaTest
             'key' => '',
             'default' => 'current_timestamp()',
             'extra' => '',
+            'extra_default_value' => 'current_timestamp()',
             'privileges' => 'select,insert,update,references',
             'comment' => '',
         ]]);
