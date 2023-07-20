@@ -14,6 +14,8 @@ use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\SchemaInterface;
 
+use function str_repeat;
+
 /**
  * @group mysql
  *
@@ -92,7 +94,7 @@ final class ColumnSchemaTest extends TestCase
 
         $intColPhpType = $tableSchema->getColumn('int_col')?->phpTypecast($query['int_col']);
         $charColPhpType = $tableSchema->getColumn('char_col')?->phpTypecast($query['char_col']);
-        $charCol3PhpType = $tableSchema->getColumn('char_col')?->phpTypecast($query['char_col3']);
+        $charCol3PhpType = $tableSchema->getColumn('char_col3')?->phpTypecast($query['char_col3']);
         $floatColPhpType = $tableSchema->getColumn('float_col')?->phpTypecast($query['float_col']);
         $blobColPhpType = $tableSchema->getColumn('blob_col')?->phpTypecast($query['blob_col']);
         $timePhpType = $tableSchema->getColumn('time')?->phpTypecast($query['time']);
