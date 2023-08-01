@@ -53,14 +53,4 @@ final class QueryBuilder extends AbstractQueryBuilder
         $dqlBuilder = new DQLQueryBuilder($this, $quoter);
         parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder);
     }
-
-    public function getColumnType(ColumnInterface|string $type): string
-    {
-        if ($type instanceof ColumnInterface && $type->getType() === SchemaInterface::TYPE_JSON) {
-            $type->check('[[{name}]] is null or json_valid([[{name}]])');
-            $type = SchemaInterface::TYPE_JSON;
-        }
-
-        return parent::getColumnType($type);
-    }
 }
