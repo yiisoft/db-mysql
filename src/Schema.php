@@ -541,6 +541,7 @@ final class Schema extends AbstractPdoSchema
 
         $column->extra($extra);
         $column->phpType($this->getColumnPhpType($column));
+        $column->dateTimeFormat($this->getDateTimeFormat($column));
         $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
@@ -558,7 +559,7 @@ final class Schema extends AbstractPdoSchema
      *
      * @return mixed The normalized default value.
      */
-    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
+    private function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
     {
         if ($defaultValue === null) {
             return null;
@@ -568,11 +569,10 @@ final class Schema extends AbstractPdoSchema
             return $column->phpTypecast($defaultValue);
         }
 
-        if (
-            in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
-            && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
-        ) {
-            return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
+        if ($column->getDateTimeFormat() !== null) {
+            $value = preg_replace('/^current_timestamp(?:(\(\d+\))|\(\))?/i', 'CURRENT_TIMESTAMP$1', $defaultValue, 1);
+
+            return date_create_immutable($value) ?: new Expression($value);
         }
 
         if (!empty($column->getExtra()) && !empty($defaultValue)) {

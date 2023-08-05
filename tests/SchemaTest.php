@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use DateTimeImmutable;
 use ReflectionException;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
@@ -68,7 +69,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->assertInstanceOf(ColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
+        $this->assertEquals(new Expression('CURRENT_TIMESTAMP'), $column->getDefaultValue());
     }
 
     /**
@@ -168,19 +169,19 @@ final class SchemaTest extends CommonSchemaTest
         );
 
         $columnsData = [
-            'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', '', false],
-            'd' => ['date DEFAULT \'2011-11-11\'', '2011-11-11', false],
-            'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
+            'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', null, false],
+            'd' => ['date DEFAULT \'2011-11-11\'', new DateTimeImmutable('2011-11-11'), false],
+            'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP'), true],
+            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', new DateTimeImmutable('2011-11-11 00:00:00'), false],
+            'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP'), true],
+            'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP'), true],
+            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', new DateTimeImmutable('2011-11-11 00:00:00'), false],
+            'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP'), true],
+            'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', new Expression('uuid()'), false],
         ];
         if (!$oldMySQL) {
-            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', '(curdate() + interval 2 year)', true];
-            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', 'uuid()', true];
+            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', new Expression('(curdate() + interval 2 year)'), true];
+            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', new Expression('uuid()'), true];
         }
 
         $columns = [];
@@ -204,7 +205,7 @@ final class SchemaTest extends CommonSchemaTest
             } else {
                 $this->assertNotInstanceOf(Expression::class, $column->getDefaultValue());
             }
-            $this->assertEquals($columnsData[$columnName][1], (string) $column->getDefaultValue());
+            $this->assertEquals($columnsData[$columnName][1], $column->getDefaultValue());
         }
     }
 
@@ -234,17 +235,12 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertNotNull($schema);
 
         $dt = $schema->getColumn('dt');
-
         $this->assertNotNull($dt);
-
-        $this->assertInstanceOf(Expression::class, $dt->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP(2)', (string) $dt->getDefaultValue());
+        $this->assertEquals(new Expression('CURRENT_TIMESTAMP(2)'), $dt->getDefaultValue());
 
         $ts = $schema->getColumn('ts');
-
         $this->assertNotNull($ts);
-        $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
+        $this->assertEquals(new Expression('CURRENT_TIMESTAMP(3)'), $ts->getDefaultValue());
     }
 
     public function testGetSchemaChecks(): void
