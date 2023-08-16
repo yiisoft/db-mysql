@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\QueryBuilder\AbstractQueryBuilder;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
@@ -52,15 +51,5 @@ final class QueryBuilder extends AbstractQueryBuilder
         $dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
         $dqlBuilder = new DQLQueryBuilder($this, $quoter);
         parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder);
-    }
-
-    public function getColumnType(ColumnInterface|string $type): string
-    {
-        if ($type instanceof ColumnInterface && $type->getType() === SchemaInterface::TYPE_JSON) {
-            $type->check('[[{name}]] is null or json_valid([[{name}]])');
-            $type = SchemaInterface::TYPE_JSON;
-        }
-
-        return parent::getColumnType($type);
     }
 }
