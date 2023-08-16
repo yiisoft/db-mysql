@@ -2,7 +2,7 @@
 
 ## 1.0.2 under development
 
-- no changes in this release.
+- Chg #297: Remove `QueryBuilder::getColumnType()` child method as legacy code (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
