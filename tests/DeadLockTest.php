@@ -169,7 +169,6 @@ final class DeadLockTest extends TestCase
      * 3. Waits few seconds.
      * 4. `UPDATE` the test row.
      *
-     *
      * @return int Exit code. In case of deadlock exit code is {@see CHILD_EXIT_CODE_DEADLOCK}. In case of success exit
      * code is 0. Other codes means an error.
      */
