@@ -18,6 +18,7 @@ use Yiisoft\Db\Mysql\Column;
 use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\Assert;
@@ -536,5 +537,24 @@ final class SchemaTest extends CommonSchemaTest
         $this->expectExceptionMessage('Only PDO connections are supported.');
 
         $schema->refreshTableSchema('customer');
+    }
+
+    public function testInsertDefaultValues()
+    {
+        $db = $this->getConnection(true);
+        $command = $db->createCommand();
+
+        $command->insert('negative_default_values', [])->execute();
+
+        $row = (new Query($db))->select('*')->from('negative_default_values')->one();
+
+        $this->assertSame([
+            'tinyint_col' => '-123',
+            'smallint_col' => '-123',
+            'int_col' => '-123',
+            'bigint_col' => '-123',
+            'float_col' => '-12345.6789',
+            'numeric_col' => '-33.22',
+        ], $row);
     }
 }
