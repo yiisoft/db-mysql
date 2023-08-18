@@ -9,13 +9,13 @@ use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
+use function current;
 use function implode;
-use function reset;
+use function str_replace;
 
 /**
  * Implements a DML (Data Manipulation Language) SQL statements for MySQL, MariaDB.
@@ -50,8 +50,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
             return 'ALTER TABLE ' . $tableName . ' AUTO_INCREMENT=' . $value . ';';
         }
 
-        $pk = $tableSchema->getPrimaryKey();
-        $key = (string) reset($pk);
+        $key = $tableSchema->getPrimaryKey()[0];
 
         return "SET @new_autoincrement_value := (SELECT MAX(`$key`) + 1 FROM $tableName);
 SET @sql = CONCAT('ALTER TABLE $tableName AUTO_INCREMENT =', @new_autoincrement_value);
@@ -67,12 +66,7 @@ EXECUTE autoincrement_stmt";
     ): string {
         $insertSql = $this->insert($table, $insertColumns, $params);
 
-        /** @psalm-var array $uniqueNames */
-        [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns(
-            $table,
-            $insertColumns,
-            $updateColumns,
-        );
+        [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
 
         if (empty($uniqueNames)) {
             return $insertSql;
@@ -80,11 +74,9 @@ EXECUTE autoincrement_stmt";
 
         if ($updateColumns === true) {
             $updateColumns = [];
-            /** @psalm-var string $name */
-            foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression(
-                    'VALUES(' . $this->quoter->quoteColumnName($name) . ')'
-                );
+            /** @psalm-var string[] $updateNames */
+            foreach ($updateNames as $quotedName) {
+                $updateColumns[$quotedName] = new Expression('VALUES(' . $quotedName . ')');
             }
         }
 
@@ -92,10 +84,6 @@ EXECUTE autoincrement_stmt";
             return str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insertSql);
         }
 
-        /**
-         *  @psalm-var array<array-key, string> $updates
-         *  @psalm-var array<string, ExpressionInterface|string> $updateColumns
-         */
         [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
 
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
@@ -115,7 +103,8 @@ EXECUTE autoincrement_stmt";
      * @throws InvalidConfigException
      * @throws NotSupportedException
      *
-     * @return array Array of column names, placeholders, values, and params.
+     * @return array Array of quoted column names, placeholders, values, and params.
+     * @psalm-return array{0: string[], 1: string[], 2: string, 3: array}
      */
     protected function prepareInsertValues(string $table, QueryInterface|array $columns, array $params = []): array
     {
@@ -143,6 +132,7 @@ EXECUTE autoincrement_stmt";
             }
         }
 
+        /** @psalm-var array{0: string[], 1: string[], 2: string, 3: array} */
         return [$names, $placeholders, $values, $params];
     }
 }
