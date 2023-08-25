@@ -546,7 +546,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $command->insert('negative_default_values', [])->execute();
 
-        $row = (new Query($db))->select([])->from('negative_default_values')->one();
+        $row = (new Query($db))->from('negative_default_values')->one();
 
         $this->assertSame([
             'tinyint_col' => '-123',
