@@ -108,7 +108,7 @@ EXECUTE autoincrement_stmt";
     protected function prepareInsertValues(string $table, QueryInterface|array $columns, array $params = []): array
     {
         if (empty($columns)) {
-            return [[], [], ' VALUES ()', []];
+            return [[], [], 'VALUES ()', []];
         }
 
         return parent::prepareInsertValues($table, $columns, $params);
