@@ -320,7 +320,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         // Primary key columns should have NULL as value
         $this->assertSame(
             <<<SQL
-            INSERT INTO `null_values` (`id`) VALUES (NULL)
+            INSERT INTO `null_values` VALUES ()
             SQL,
             $qb->insert('null_values', []),
         );
@@ -328,7 +328,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         // Non-primary key columns should have DEFAULT as value
         $this->assertSame(
             <<<SQL
-            INSERT INTO `negative_default_values` (`tinyint_col`) VALUES (DEFAULT)
+            INSERT INTO `negative_default_values` VALUES ()
             SQL,
             $qb->insert('negative_default_values', []),
         );

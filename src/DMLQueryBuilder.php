@@ -119,30 +119,10 @@ EXECUTE autoincrement_stmt";
      */
     protected function prepareInsertValues(string $table, QueryInterface|array $columns, array $params = []): array
     {
-        /**
-         * @psalm-var array $names
-         * @psalm-var array $placeholders
-         */
-        [$names, $placeholders, $values, $params] = parent::prepareInsertValues($table, $columns, $params);
-
-        if (!$columns instanceof QueryInterface && empty($names)) {
-            $tableSchema = $this->schema->getTableSchema($table);
-
-            if ($tableSchema !== null) {
-                if (!empty($tableSchema->getPrimaryKey())) {
-                    $columns = $tableSchema->getPrimaryKey();
-                    $defaultValue = 'NULL';
-                } else {
-                    $columns = [current($tableSchema->getColumns())->getName()];
-                    $defaultValue = 'DEFAULT';
-                }
-                foreach ($columns as $name) {
-                    $names[] = $this->quoter->quoteColumnName($name);
-                    $placeholders[] = $defaultValue;
-                }
-            }
+        if (empty($columns)) {
+            return [[], [], ' VALUES ()', []];
         }
 
-        return [$names, $placeholders, $values, $params];
+        return parent::prepareInsertValues($table, $columns, $params);
     }
 }
