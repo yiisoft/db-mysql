@@ -52,8 +52,7 @@ final class ColumnSchemaTest extends TestCase
     {
         $columnSchema = new JsonColumnSchema('json');
 
-        $this->assertSame('{"a":1}', $columnSchema->dbTypecast('{"a":1}'));
-        $this->assertEquals(new JsonExpression(['a' => 1], SchemaInterface::TYPE_JSON), $columnSchema->dbTypecast(['a' => 1]));
+        $this->assertEquals(new JsonExpression('{"a":1}', SchemaInterface::TYPE_JSON), $columnSchema->dbTypeCast('{"a":1}'));
     }
 
     /**
