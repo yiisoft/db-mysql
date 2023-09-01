@@ -124,6 +124,11 @@ final class SchemaTest extends CommonSchemaTest
                 $columns['int_col2']['size'] = null;
                 $columns['int_col2']['precision'] = null;
 
+                // bigunsigned_col Mysql 8.0.17+.
+                $columns['bigunsigned_col']['dbType'] = 'bigint unsigned';
+                $columns['bigunsigned_col']['size'] = null;
+                $columns['bigunsigned_col']['precision'] = null;
+
                 // tinyint_col Mysql 8.0.17+.
                 $columns['tinyint_col']['dbType'] = 'tinyint';
                 $columns['tinyint_col']['size'] = null;
