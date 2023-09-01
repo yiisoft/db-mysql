@@ -13,6 +13,10 @@ use Yiisoft\Db\Schema\SchemaInterface;
 use function json_decode;
 
 /**
+ * @deprecated Use the following class for specific type:
+ * `StringColumnSchema`, `IntegerColumnSchema`, `BigIntColumnSchema`, `DoubleColumnSchema`, `BooleanColumnSchema`,
+ * `BinaryColumnSchema`, `JsonColumnSchema`
+ *
  * Represents the metadata of a column in a database table for MySQL, MariaDB.
  *
  * It provides information about the column's name, type, size, precision, and other details.
@@ -35,6 +39,9 @@ use function json_decode;
  * $column->autoIncrement(true);
  * $column->primaryKey(true);
  * ```
+ *
+ * @psalm-suppress DeprecatedInterface
+ * @psalm-suppress DeprecatedClass
  */
 final class ColumnSchema extends AbstractColumnSchema
 {
@@ -59,6 +66,7 @@ final class ColumnSchema extends AbstractColumnSchema
             return json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR);
         }
 
+        /** @psalm-suppress DeprecatedClass */
         return parent::phpTypecast($value);
     }
 
@@ -82,6 +90,7 @@ final class ColumnSchema extends AbstractColumnSchema
             return new JsonExpression($value, $this->getDbType());
         }
 
+        /** @psalm-suppress DeprecatedClass */
         return parent::dbTypecast($value);
     }
 }

@@ -15,10 +15,10 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column;
-use Yiisoft\Db\Mysql\ColumnSchema;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Schema\Column\StringColumnSchema;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\Assert;
@@ -67,7 +67,7 @@ final class SchemaTest extends CommonSchemaTest
             'comment' => '',
         ]]);
 
-        $this->assertInstanceOf(ColumnSchema::class, $column);
+        $this->assertInstanceOf(StringColumnSchema::class, $column);
         $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
     }
@@ -96,7 +96,7 @@ final class SchemaTest extends CommonSchemaTest
             'comment' => '',
         ]]);
 
-        $this->assertInstanceOf(ColumnSchema::class, $column);
+        $this->assertInstanceOf(StringColumnSchema::class, $column);
         $this->assertEquals(null, $column->getDefaultValue());
     }
 
