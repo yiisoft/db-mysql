@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use JsonException;
-use PHPUnit\Framework\TestCase;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Expression\JsonExpression;
@@ -18,6 +17,7 @@ use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
 use Yiisoft\Db\Schema\Column\JsonColumnSchema;
 use Yiisoft\Db\Schema\Column\StringColumnSchema;
 use Yiisoft\Db\Schema\SchemaInterface;
+use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
 
 use function str_repeat;
 
@@ -26,7 +26,7 @@ use function str_repeat;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ColumnSchemaTest extends TestCase
+final class ColumnSchemaTest extends CommonColumnSchemaTest
 {
     use TestTrait;
 
