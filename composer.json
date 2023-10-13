@@ -38,8 +38,7 @@
         "vimeo/psalm": "^4.3|^5.6",
         "yiisoft/aliases": "^2.0",
         "yiisoft/log-target-file": "^2.0",
-        "yiisoft/cache": "^2.0",
-        "yiisoft/cache-file": "^2.0",
+        "yiisoft/cache-file": "^3.1",
         "yiisoft/var-dumper": "^1.5"
     },
     "autoload": {
