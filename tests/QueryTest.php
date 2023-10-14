@@ -81,4 +81,32 @@ final class QueryTest extends CommonQueryTest
         $this->assertContains('3', $result);
         $this->assertNotContains('1', $result);
     }
+
+    public function testWithQuery()
+    {
+        $db = $this->getConnection();
+
+        if (
+            !str_contains($db->getServerVersion(), 'MariaDB')
+            && version_compare($db->getServerVersion(), '8.0.0', '<')
+        ) {
+            self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
+        }
+
+        parent::testWithQuery();
+    }
+
+    public function testWithQueryRecursive()
+    {
+        $db = $this->getConnection();
+
+        if (
+            !str_contains($db->getServerVersion(), 'MariaDB')
+            && version_compare($db->getServerVersion(), '8.0.0', '<')
+        ) {
+            self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
+        }
+
+        parent::testWithQueryRecursive();
+    }
 }
