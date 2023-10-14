@@ -47,7 +47,6 @@ build:
         override:
           - composer self-update
           - composer require yiisoft/db:dev-master --no-interaction --no-progress --optimize-autoloader --ansi
-          - composer update --no-interaction --no-progress --optimize-autoloader --ansi
 
       tests:
         override:
