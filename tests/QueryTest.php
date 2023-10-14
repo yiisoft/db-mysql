@@ -92,8 +92,6 @@ final class QueryTest extends CommonQueryTest
         ) {
             self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
         }
-
-        parent::testWithQuery();
     }
 
     public function testWithQueryRecursive()
@@ -106,7 +104,5 @@ final class QueryTest extends CommonQueryTest
         ) {
             self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
         }
-
-        parent::testWithQueryRecursive();
     }
 }

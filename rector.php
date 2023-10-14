@@ -6,7 +6,6 @@ use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
 use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Set\ValueObject\LevelSetList;
-use Yiisoft\Db\Mysql\Tests\QueryTest;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
