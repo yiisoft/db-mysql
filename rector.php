@@ -23,5 +23,6 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->skip([
         ClosureToArrowFunctionRector::class,
+        QueryTest::class,
     ]);
 };
