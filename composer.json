@@ -26,7 +26,6 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "psr/log": "^2.0|^3.0",
-        "yiisoft/db": "^1.0",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
@@ -37,8 +36,9 @@
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.3|^5.6",
         "yiisoft/aliases": "^2.0",
-        "yiisoft/log-target-file": "^2.0",
         "yiisoft/cache-file": "^3.1",
+        "yiisoft/db": "dev-master",
+        "yiisoft/log-target-file": "^2.0",
         "yiisoft/var-dumper": "^1.5"
     },
     "autoload": {
