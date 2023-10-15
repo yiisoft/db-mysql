@@ -29,5 +29,3 @@ jobs:
         ['ubuntu-latest']
       php: >-
         ['8.0']
-      composer-command:
-        composer require --dev yiisoft/db:dev-master --no-interaction --no-progress --optimize-autoloader --ansi
