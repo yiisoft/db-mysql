@@ -10,7 +10,12 @@ use Rector\Set\ValueObject\LevelSetList;
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
         __DIR__ . '/src',
-        __DIR__ . '/tests',
+        /**
+         * Disabled ./tests directory due to PR #307
+         *
+         * @link https://github.com/yiisoft/db-mysql/commit/a434897691304378edfd787ecee8ad80338aa200
+         */
+        // __DIR__ . '/tests',
     ]);
 
     // register a single rule
