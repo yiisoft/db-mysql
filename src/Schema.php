@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use JsonException;
 use Throwable;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
@@ -16,7 +15,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
-use Yiisoft\Db\Schema\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_map;
@@ -38,26 +37,6 @@ use function trim;
 /**
  * Implements MySQL, MariaDB specific schema, supporting MySQL Server 5.7, MariaDB Server 10.4 and higher.
  *
- * @psalm-type ColumnArray = array{
- *   table_schema: string,
- *   table_name: string,
- *   column_name: string,
- *   data_type: string,
- *   type_type: string|null,
- *   character_maximum_length: int,
- *   column_comment: string|null,
- *   modifier: int,
- *   is_nullable: bool,
- *   column_default: mixed,
- *   is_autoinc: bool,
- *   sequence_name: string|null,
- *   enum_values: array<array-key, float|int|string>|string|null,
- *   numeric_precision: int|null,
- *   numeric_scale: int|null,
- *   size: string|null,
- *   is_pkey: bool|null,
- *   dimension: int
- * }
  * @psalm-type ColumnInfoArray = array{
  *   field: string,
  *   type: string,
@@ -68,7 +47,11 @@ use function trim;
  *   extra: string,
  *   extra_default_value: string|null,
  *   privileges: string,
- *   comment: string
+ *   comment: string,
+ *   enum_values?: string[],
+ *   size?: int,
+ *   precision?: int,
+ *   scale?: int,
  * }
  * @psalm-type RowConstraint = array{
  *   constraint_name: string,
@@ -194,8 +177,7 @@ final class Schema extends AbstractPdoSchema
             // Chapter 1: crutches for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
             $columnsExtra = [];
             if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
-                /** @psalm-var array[] $columnsExtra */
-                $columnsExtra = $this->db->createCommand(
+                $rows = $this->db->createCommand(
                     <<<SQL
                     SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value
                     FROM INFORMATION_SCHEMA.COLUMNS
@@ -207,7 +189,7 @@ final class Schema extends AbstractPdoSchema
                     ]
                 )->queryAll();
                 /** @psalm-var string[] $cols */
-                foreach ($columnsExtra as $cols) {
+                foreach ($rows as $cols) {
                     $columnsExtra[$cols['name']] = $cols['default_value'];
                 }
             }
@@ -230,15 +212,15 @@ final class Schema extends AbstractPdoSchema
 
         /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
+            /** @psalm-var ColumnInfoArray $info */
             $info = $this->normalizeRowKeyCase($info, false);
 
-            $info['extra_default_value'] = $columnsExtra[(string) $info['field']] ?? '';
+            $info['extra_default_value'] = $columnsExtra[$info['field']] ?? '';
 
             if (in_array($info['field'], $jsonColumns, true)) {
                 $info['type'] = self::TYPE_JSON;
             }
 
-            /** @psalm-var ColumnInfoArray $info */
             $column = $this->loadColumnSchema($info);
             $table->column($column->getName(), $column);
 
@@ -466,64 +448,26 @@ final class Schema extends AbstractPdoSchema
      *
      * @param array $info The column information.
      *
-     * @throws JsonException
-     *
      * @return ColumnSchemaInterface The column schema object.
      *
      * @psalm-param ColumnInfoArray $info The column information.
      */
-    protected function loadColumnSchema(array $info): ColumnSchemaInterface
+    private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $dbType = $info['type'];
-
-        $column = $this->createColumnSchema($info['field']);
-
+        $type = $this->getColumnType($dbType, $info);
+        $isUnsigned = stripos($dbType, 'unsigned') !== false;
         /** @psalm-var ColumnInfoArray $info */
+        $column = $this->createColumnSchema($type, $info['field'], unsigned: $isUnsigned);
+        $column->enumValues($info['enum_values'] ?? null);
+        $column->size($info['size'] ?? null);
+        $column->precision($info['precision'] ?? null);
+        $column->scale($info['scale'] ?? null);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
         $column->comment($info['comment']);
         $column->dbType($dbType);
-        $column->unsigned(stripos($dbType, 'unsigned') !== false);
-        $column->type(self::TYPE_STRING);
-
-        if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $dbType, $matches)) {
-            $type = strtolower($matches[1]);
-
-            if (isset($this->typeMap[$type])) {
-                $column->type($this->typeMap[$type]);
-            }
-
-            if (!empty($matches[2])) {
-                if ($type === 'enum') {
-                    preg_match_all("/'[^']*'/", $matches[2], $values);
-
-                    foreach ($values[0] as $i => $value) {
-                        $values[$i] = trim($value, "'");
-                    }
-
-                    $column->enumValues($values);
-                } else {
-                    $values = explode(',', $matches[2]);
-                    $column->precision((int) $values[0]);
-                    $column->size((int) $values[0]);
-
-                    if (isset($values[1])) {
-                        $column->scale((int) $values[1]);
-                    }
-
-                    if ($type === 'bit') {
-                        if ($column->getSize() === 1) {
-                            $column->type(self::TYPE_BOOLEAN);
-                        } elseif ($column->getSize() > 32) {
-                            $column->type(self::TYPE_BIGINT);
-                        } elseif ($column->getSize() === 32) {
-                            $column->type(self::TYPE_INTEGER);
-                        }
-                    }
-                }
-            }
-        }
 
         // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
         $extra = $info['extra'];
@@ -531,7 +475,7 @@ final class Schema extends AbstractPdoSchema
             empty($extra)
             && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
-            && in_array($column->getType(), [
+            && in_array($type, [
                 self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
                 self::TYPE_DATETIME, self::TYPE_TIMESTAMP, self::TYPE_TIME, self::TYPE_DATE,
             ], true)
@@ -540,7 +484,7 @@ final class Schema extends AbstractPdoSchema
         }
 
         $column->extra($extra);
-        $column->phpType($this->getColumnPhpType($column));
+        $column->phpType($this->getColumnPhpType($type));
         $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
@@ -548,6 +492,45 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $column;
+    }
+
+    /**
+     * Get the abstract data type for the database data type.
+     *
+     * @param string $dbType The database data type
+     * @param array $info Column information.
+     *
+     * @return string The abstract data type.
+     */
+    private function getColumnType(string $dbType, array &$info): string
+    {
+        preg_match('/^(\w*)(?:\(([^)]+)\))?/', $dbType, $matches);
+        $dbType = strtolower($matches[1]);
+
+        if (!empty($matches[2])) {
+            if ($dbType === 'enum') {
+                preg_match_all("/'([^']*)'/", $matches[2], $values);
+                $info['enum_values'] = $values[1];
+            } else {
+                $values = explode(',', $matches[2], 2);
+                $info['size'] = (int) $values[0];
+                $info['precision'] = (int) $values[0];
+
+                if (isset($values[1])) {
+                    $info['scale'] = (int) $values[1];
+                }
+
+                if ($dbType === 'bit') {
+                    return match (true) {
+                        $info['size'] === 1 => self::TYPE_BOOLEAN,
+                        $info['size'] > 32 => self::TYPE_BIGINT,
+                        default => self::TYPE_INTEGER,
+                    };
+                }
+            }
+        }
+
+        return $this->typeMap[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
@@ -902,18 +885,6 @@ final class Schema extends AbstractPdoSchema
     {
         $sql = $this->getCreateTableSql($table);
         $table->createSql($sql);
-    }
-
-    /**
-     * Creates a column schema for the database.
-     *
-     * This method may be overridden by child classes to create a DBMS-specific column schema.
-     *
-     * @param string $name Name of the column.
-     */
-    private function createColumnSchema(string $name): ColumnSchema
-    {
-        return new ColumnSchema($name);
     }
 
     /**
