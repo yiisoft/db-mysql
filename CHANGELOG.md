@@ -4,6 +4,7 @@
 
 - Chg #297: Remove `QueryBuilder::getColumnType()` child method as legacy code (@Tigrov)
 - Enh #300: Refactor insert default values (@Tigrov)
+- Bug #302: Refactor `DMLQueryBuilder`, related with yiisoft/db#746 (@Tigrov)
 
 ## 1.0.1 July 24, 2023
 
