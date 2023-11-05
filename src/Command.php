@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use PDOException;
-use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
-use Yiisoft\Db\Exception\ConvertException;
-use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for MySQL,
