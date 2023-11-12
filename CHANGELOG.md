@@ -1,5 +1,9 @@
 # MySQL driver for Yii Database Change Log
 
+## 1.1.1 under development
+
+- no changes in this release.
+
 ## 1.1.0 November 12, 2023
 
 - Chg #297: Remove `QueryBuilder::getColumnType()` child method as legacy code (@Tigrov)
