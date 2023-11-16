@@ -2,7 +2,7 @@
 
 ## 1.1.1 under development
 
-- no changes in this release.
+- Enh #312: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
 
 ## 1.1.0 November 12, 2023
 
