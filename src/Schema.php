@@ -94,11 +94,11 @@ use function trim;
 final class Schema extends AbstractPdoSchema
 {
     /**
-     * @var array Mapping from physical column types (keys) to abstract column types (values).
+     * Mapping from physical column types (keys) to abstract column types (values).
      *
-     * @psalm-var string[]
+     * @var string[]
      */
-    private array $typeMap = [
+    private const TYPE_MAP = [
         'tinyint' => self::TYPE_TINYINT,
         'bit' => self::TYPE_INTEGER,
         'smallint' => self::TYPE_SMALLINT,
@@ -490,8 +490,8 @@ final class Schema extends AbstractPdoSchema
         if (preg_match('/^(\w+)(?:\(([^)]+)\))?/', $dbType, $matches)) {
             $type = strtolower($matches[1]);
 
-            if (isset($this->typeMap[$type])) {
-                $column->type($this->typeMap[$type]);
+            if (isset(self::TYPE_MAP[$type])) {
+                $column->type(self::TYPE_MAP[$type]);
             }
 
             if (!empty($matches[2])) {
