@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use DateTimeImmutable;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
@@ -172,10 +173,10 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'scale' => 2,
                         'defaultValue' => 33.22,
                     ],
-                    'time' => [
+                    'timestamp_col' => [
                         'type' => 'timestamp',
                         'dbType' => 'timestamp',
-                        'phpType' => 'string',
+                        'phpType' => 'DateTimeInterface',
                         'primaryKey' => false,
                         'allowNull' => false,
                         'autoIncrement' => false,
@@ -183,7 +184,50 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         'size' => null,
                         'precision' => null,
                         'scale' => null,
-                        'defaultValue' => '2002-01-01 00:00:00',
+                        'defaultValue' => new DateTimeImmutable('2002-01-01 00:00:00'),
+                        'dateTimeFormat' => 'Y-m-d H:i:s',
+                    ],
+                    'datetime_col' => [
+                        'type' => 'datetime',
+                        'dbType' => 'datetime(3)',
+                        'phpType' => 'DateTimeInterface',
+                        'primaryKey' => false,
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 3,
+                        'precision' => 3,
+                        'scale' => null,
+                        'defaultValue' => new DateTimeImmutable('2023-06-11 15:24:11.123'),
+                        'dateTimeFormat' => 'Y-m-d H:i:s.v',
+                    ],
+                    'date_col' => [
+                        'type' => 'date',
+                        'dbType' => 'date',
+                        'phpType' => 'DateTimeInterface',
+                        'primaryKey' => false,
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => null,
+                        'precision' => null,
+                        'scale' => null,
+                        'defaultValue' => new DateTimeImmutable('2023-06-11'),
+                        'dateTimeFormat' => 'Y-m-d',
+                    ],
+                    'time_col' => [
+                        'type' => 'time',
+                        'dbType' => 'time(6)',
+                        'phpType' => 'DateTimeInterface',
+                        'primaryKey' => false,
+                        'allowNull' => false,
+                        'autoIncrement' => false,
+                        'enumValues' => null,
+                        'size' => 6,
+                        'precision' => 6,
+                        'scale' => null,
+                        'defaultValue' => new DateTimeImmutable('15:24:11.123456'),
+                        'dateTimeFormat' => 'H:i:s.u',
                     ],
                     'bool_col' => [
                         'type' => 'boolean',
@@ -214,7 +258,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'ts_default' => [
                         'type' => 'timestamp',
                         'dbType' => 'timestamp',
-                        'phpType' => 'string',
+                        'phpType' => 'DateTimeInterface',
                         'primaryKey' => false,
                         'allowNull' => false,
                         'autoIncrement' => false,
