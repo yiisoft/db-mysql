@@ -3,7 +3,7 @@
 ## 1.1.1 under development
 
 - Enh #312: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
-- Bug #314: Fix `Command::insertWithReturningPks()` method (@Tigrov)
+- Bug #314: Fix `Command::insertWithReturningPks()` method when empty values (@Tigrov)
 
 ## 1.1.0 November 12, 2023
 
