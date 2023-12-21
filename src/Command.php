@@ -18,11 +18,12 @@ final class Command extends AbstractPdoCommand
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
         $this->setSql($sql)->bindValues($params);
 
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
+
         if (!$this->execute()) {
             return false;
         }
 
-        $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
         $result = [];
 
