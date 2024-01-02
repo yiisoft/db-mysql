@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Exception;
-use Psr\Log\LogLevel;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
 use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
+use Yiisoft\Db\Logger\Context\ConnectionContext;
+use Yiisoft\Db\Logger\DbLoggerEvent;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
@@ -23,10 +24,7 @@ final class Connection extends AbstractPdoConnection
     public function close(): void
     {
         if ($this->pdo !== null) {
-            $this->logger?->log(
-                LogLevel::DEBUG,
-                'Closing DB connection: ' . $this->driver->getDsn() . ' ' . __METHOD__,
-            );
+            $this->logger?->log(DbLoggerEvent::CONNECTION_END, new ConnectionContext(__METHOD__, $this->getDriver()->getDsn()));
 
             // Solution for close connections {@link https://stackoverflow.com/questions/18277233/pdo-closing-connection}
             try {
