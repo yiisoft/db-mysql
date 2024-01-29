@@ -53,7 +53,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . $this->quoter->quoteColumnName($column)
             . ' '
             . $this->quoter->quoteColumnName($column)
-            . ($definition === '' ? '' : ' ' . $definition)
+            . (empty($definition) ? '' : ' ' . $definition)
             . ' COMMENT '
             . (string) $this->quoter->quoteValue($comment);
 
@@ -84,9 +84,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $indexType = null,
         string $indexMethod = null
     ): string {
-        return 'CREATE ' . ($indexType !== null ? $indexType . ' ' : '') . 'INDEX '
+        return 'CREATE ' . (!empty($indexType) ? $indexType . ' ' : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
-            . ($indexMethod !== null ? " USING $indexMethod" : '')
+            . (!empty($indexMethod) ? " USING $indexMethod" : '')
             . ' ON ' . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
@@ -175,7 +175,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     {
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
-        if ($sql === null) {
+        if (empty($sql)) {
             return '';
         }
 

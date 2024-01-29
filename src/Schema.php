@@ -66,7 +66,7 @@ use function trim;
  *   key: string,
  *   default: string|null,
  *   extra: string,
- *   extra_default_value: string,
+ *   extra_default_value: string|null,
  *   privileges: string,
  *   comment: string
  * }
@@ -529,7 +529,7 @@ final class Schema extends AbstractPdoSchema
         $extra = $info['extra'];
         if (
             empty($extra)
-            && $info['extra_default_value'] !== ''
+            && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
             && in_array($column->getType(), [
                 self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
@@ -575,7 +575,7 @@ final class Schema extends AbstractPdoSchema
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if ($defaultValue !== '' && $column->getExtra() !== '') {
+        if (!empty($defaultValue) && !empty($column->getExtra())) {
             return new Expression($defaultValue);
         }
 
