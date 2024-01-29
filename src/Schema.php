@@ -66,7 +66,7 @@ use function trim;
  *   key: string,
  *   default: string|null,
  *   extra: string,
- *   extra_default_value: string|null,
+ *   extra_default_value: string,
  *   privileges: string,
  *   comment: string
  * }
@@ -161,7 +161,7 @@ final class Schema extends AbstractPdoSchema
         $uniqueIndexes = [];
         $regexp = '/UNIQUE KEY\s+[`"](.+)[`"]\s*\(([`"].+[`"])+\)/mi';
 
-        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
                 $indexColumns = array_map('trim', preg_split('/[`"],[`"]/', trim($match[2], '`"')));
@@ -529,7 +529,7 @@ final class Schema extends AbstractPdoSchema
         $extra = $info['extra'];
         if (
             empty($extra)
-            && !empty($info['extra_default_value'])
+            && $info['extra_default_value'] !== ''
             && !str_starts_with($info['extra_default_value'], '\'')
             && in_array($column->getType(), [
                 self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
@@ -575,7 +575,7 @@ final class Schema extends AbstractPdoSchema
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if (!empty($column->getExtra()) && !empty($defaultValue)) {
+        if ($defaultValue !== '' && $column->getExtra() !== '') {
             return new Expression($defaultValue);
         }
 
@@ -927,7 +927,7 @@ final class Schema extends AbstractPdoSchema
         $result = [];
         $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
 
-        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $result[] = $match[1];
             }

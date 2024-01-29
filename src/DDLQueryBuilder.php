@@ -53,7 +53,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . $this->quoter->quoteColumnName($column)
             . ' '
             . $this->quoter->quoteColumnName($column)
-            . (empty($definition) ? '' : ' ' . $definition)
+            . ($definition === '' ? '' : ' ' . $definition)
             . ' COMMENT '
             . (string) $this->quoter->quoteValue($comment);
 
@@ -84,7 +84,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $indexType = null,
         string $indexMethod = null
     ): string {
-        return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
+        return 'CREATE ' . ($indexType !== null ? "$indexType " : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
             . ($indexMethod !== null ? " USING $indexMethod" : '')
             . ' ON ' . $this->quoter->quoteTableName($table)
@@ -173,21 +173,18 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      */
     public function getColumnDefinition(string $table, string $column): string
     {
-        $result = '';
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
-        if (empty($sql)) {
+        if ($sql === null) {
             return '';
         }
 
-        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches)) {
-            foreach ($matches[2] as $i => $c) {
-                if ($c === $column) {
-                    $result = $matches[3][$i];
-                }
-            }
+        $quotedColumn = preg_quote($column, '/');
+
+        if (preg_match("/^\s*([`\"])$quotedColumn\\1\s+(.*?),?$/m", $sql, $matches) !== 1) {
+            return '';
         }
 
-        return $result;
+        return $matches[2];
     }
 }

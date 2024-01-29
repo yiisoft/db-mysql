@@ -79,6 +79,7 @@ EXECUTE autoincrement_stmt";
             }
         }
 
+        /** @psalm-suppress RiskyTruthyFalsyComparison */
         if (empty($updateColumns)) {
             return str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insertSql);
         }
@@ -107,7 +108,7 @@ EXECUTE autoincrement_stmt";
      */
     protected function prepareInsertValues(string $table, QueryInterface|array $columns, array $params = []): array
     {
-        if (empty($columns)) {
+        if ($columns === []) {
             return [[], [], 'VALUES ()', []];
         }
 
