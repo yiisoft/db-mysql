@@ -525,6 +525,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test'),
         );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Column "non_exist_column" does not exist in table "alpha".');
+        $qb->renameColumn('alpha', 'non_exist_column', 'new_column');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Table "non_exist_table" does not exist.');
+        $qb->renameColumn('non_exist_table', 'non_exist_column', 'new_column');
     }
 
     /**

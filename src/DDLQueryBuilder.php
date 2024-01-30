@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use InvalidArgumentException;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -176,13 +177,13 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
-            return '';
+            throw new InvalidArgumentException("Table \"$table\" does not exist.");
         }
 
         $quotedColumn = preg_quote($column, '/');
 
         if (preg_match("/^\s*([`\"])$quotedColumn\\1\s+(.*?),?$/m", $sql, $matches) !== 1) {
-            return '';
+            throw new InvalidArgumentException("Column \"$column\" does not exist in table \"$table\".");
         }
 
         return $matches[2];
