@@ -36,6 +36,9 @@ jobs:
           - ubuntu-latest
 
         php:
+          - '8.0'
+          - '8.1'
+          - '8.2'
           - '8.3'
 
     steps:
@@ -68,4 +71,9 @@ jobs:
         run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
 
       - name: Static analysis.
+        if: ${{ matrix.php != '8.0' }}
         run: vendor/bin/psalm --config=${{ inputs.psalm-config }} --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
+
+      - name: Static analysis.
+        if: ${{ matrix.php == '8.0' }}
+        run: vendor/bin/psalm --config=psalm4.xml --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
