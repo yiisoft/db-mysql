@@ -4,6 +4,7 @@
 
 - Enh #312: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
 - Bug #314: Fix `Command::insertWithReturningPks()` method for empty values (@Tigrov)
+- Enh #319: Minor refactoring of `DDLQueryBuilder` and `Schema` (@Tigrov)
 - Enh #320: Minor refactoring of `DDLQueryBuilder::getColumnDefinition()` method (@Tigrov)
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
 
