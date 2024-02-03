@@ -10,6 +10,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 
 use function preg_match;
+use function preg_quote;
 use function preg_replace;
 use function trim;
 
@@ -171,23 +172,20 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      *
      * @return string The column definition.
      */
-    public function getColumnDefinition(string $table, string $column): string
+    private function getColumnDefinition(string $table, string $column): string
     {
-        $result = '';
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
             return '';
         }
 
-        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches) > 0) {
-            foreach ($matches[2] as $i => $c) {
-                if ($c === $column) {
-                    $result = $matches[3][$i];
-                }
-            }
+        $quotedColumn = preg_quote($column, '/');
+
+        if (preg_match("/^\s*([`\"])$quotedColumn\\1\s+(.*?),?$/m", $sql, $matches) !== 1) {
+            return '';
         }
 
-        return $result;
+        return $matches[2];
     }
 }
