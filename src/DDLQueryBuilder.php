@@ -84,9 +84,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $indexType = null,
         string $indexMethod = null
     ): string {
-        return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
+        return 'CREATE ' . (!empty($indexType) ? $indexType . ' ' : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
-            . ($indexMethod !== null ? " USING $indexMethod" : '')
+            . (!empty($indexMethod) ? " USING $indexMethod" : '')
             . ' ON ' . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
@@ -180,7 +180,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             return '';
         }
 
-        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches)) {
+        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches) > 0) {
             foreach ($matches[2] as $i => $c) {
                 if ($c === $column) {
                     $result = $matches[3][$i];
