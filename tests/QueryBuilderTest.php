@@ -516,7 +516,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testRenameColumn(): void
     {
         $db = $this->getConnection();
-
         $qb = $db->getQueryBuilder();
 
         $this->assertSame(
@@ -524,6 +523,20 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             ALTER TABLE `alpha` CHANGE `string_identifier` `string_identifier_test` varchar(255) NOT NULL
             SQL,
             $qb->renameColumn('alpha', 'string_identifier', 'string_identifier_test'),
+        );
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `alpha` CHANGE `non_exist_column` `new_column`
+            SQL,
+            $qb->renameColumn('alpha', 'non_exist_column', 'new_column'),
+        );
+
+        $this->assertSame(
+            <<<SQL
+            ALTER TABLE `non_exist_table` CHANGE `non_exist_column` `new_column`
+            SQL,
+            $qb->renameColumn('non_exist_table', 'non_exist_column', 'new_column'),
         );
     }
 
