@@ -10,7 +10,6 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 
 use function preg_match;
-use function preg_quote;
 use function preg_replace;
 use function trim;
 
