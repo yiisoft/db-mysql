@@ -410,10 +410,12 @@ final class Schema extends AbstractPdoSchema
      * @param string $name The table name.
      *
      * @return array The cache key.
+     *
+     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([self::class], $this->generateCacheKey(), [$this->db->getQuoter()->getRawTableName($name)]);
+        return array_merge([self::class], $this->generateCacheKey(), [$this->getRawTableName($name)]);
     }
 
     /**
