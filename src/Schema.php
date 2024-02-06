@@ -161,7 +161,7 @@ final class Schema extends AbstractPdoSchema
         $uniqueIndexes = [];
         $regexp = '/UNIQUE KEY\s+[`"](.+)[`"]\s*\(([`"].+[`"])+\)/mi';
 
-        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
                 $indexColumns = array_map('trim', preg_split('/[`"],[`"]/', trim($match[2], '`"')));
@@ -575,7 +575,7 @@ final class Schema extends AbstractPdoSchema
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if (!empty($column->getExtra()) && !empty($defaultValue)) {
+        if (!empty($defaultValue) && !empty($column->getExtra())) {
             return new Expression($defaultValue);
         }
 
@@ -927,7 +927,7 @@ final class Schema extends AbstractPdoSchema
         $result = [];
         $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
 
-        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $result[] = $match[1];
             }
