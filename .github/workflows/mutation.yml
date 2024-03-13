@@ -35,7 +35,6 @@ jobs:
           - ubuntu-latest
 
         php:
-          - 8.0
           - 8.1
 
     services:
@@ -82,6 +81,6 @@ jobs:
 
       - name: Run infection.
         run: |
-          vendor/bin/roave-infection-static-analysis-plugin -j2 --ignore-msi-with-no-mutations --only-covered
+          vendor/bin/roave-infection-static-analysis-plugin --threads=2 --ignore-msi-with-no-mutations --only-covered
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
