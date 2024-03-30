@@ -1,11 +1,15 @@
 # MySQL driver for Yii Database Change Log
 
-## 1.1.1 under development
+## 1.2.1 under development
+
+- no changes in this release.
+
+## 1.2.0 March 21, 2024
 
 - Enh #312: Change property `Schema::$typeMap` to constant `Schema::TYPE_MAP` (@Tigrov)
-- Bug #314: Fix `Command::insertWithReturningPks()` method for empty values (@Tigrov)
-- Enh #319: Minor refactoring of `DDLQueryBuilder` and `Schema` (@Tigrov)
 - Enh #318: Resolve deprecated methods (@Tigrov)
+- Enh #319: Minor refactoring of `DDLQueryBuilder` and `Schema` (@Tigrov)
+- Bug #314: Fix `Command::insertWithReturningPks()` method for empty values (@Tigrov)
 
 ## 1.1.0 November 12, 2023
 
