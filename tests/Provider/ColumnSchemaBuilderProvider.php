@@ -10,6 +10,9 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
 {
     protected static string $driverName = 'mysql';
 
+    /**
+     * @return array
+     */
     public static function types(): array
     {
         $types = parent::types();
@@ -39,6 +42,9 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
         );
     }
 
+    /**
+     * @return array
+     */
     public static function createColumnTypes(): array
     {
         $types = parent::createColumnTypes();

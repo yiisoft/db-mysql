@@ -14,6 +14,9 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoDriver;
  */
 final class Driver extends AbstractPdoDriver
 {
+    /**
+     * @return PDO
+     */
     public function createConnection(): PDO
     {
         $this->attributes += [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
@@ -35,6 +38,9 @@ final class Driver extends AbstractPdoDriver
         return $pdo;
     }
 
+    /**
+     * @return string
+     */
     public function getDriverName(): string
     {
         return 'mysql';

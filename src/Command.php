@@ -12,6 +12,17 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
  */
 final class Command extends AbstractPdoCommand
 {
+    /**
+     * @param string $table
+     * @param array $columns
+     * @return bool|array
+     * @throws \Throwable
+     * @throws \Yiisoft\Db\Exception\Exception
+     * @throws \Yiisoft\Db\Exception\InvalidArgumentException
+     * @throws \Yiisoft\Db\Exception\InvalidCallException
+     * @throws \Yiisoft\Db\Exception\InvalidConfigException
+     * @throws \Yiisoft\Db\Exception\NotSupportedException
+     */
     public function insertWithReturningPks(string $table, array $columns): bool|array
     {
         $params = [];
@@ -29,7 +40,7 @@ final class Command extends AbstractPdoCommand
 
         foreach ($tablePrimaryKeys as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
-                $result[$name] = $this->db->getLastInsertID((string) $tableSchema?->getSequenceName());
+                $result[$name] = $this->db->getLastInsertID((string)$tableSchema?->getSequenceName());
                 continue;
             }
 
@@ -40,6 +51,11 @@ final class Command extends AbstractPdoCommand
         return $result;
     }
 
+    /**
+     * @return array
+     * @throws \Throwable
+     * @throws \Yiisoft\Db\Exception\Exception
+     */
     public function showDatabases(): array
     {
         $sql = <<<SQL

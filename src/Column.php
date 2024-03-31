@@ -51,6 +51,9 @@ final class Column extends AbstractColumn
         return ' COMMENT ' . (string) (new Quoter('`', '`'))->quoteValue($this->getComment());
     }
 
+    /**
+     * @return string
+     */
     public function asString(): string
     {
         $format = match ($this->getTypeCategory()) {

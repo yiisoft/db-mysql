@@ -9,6 +9,7 @@ use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidCallException;
 use Yiisoft\Db\Exception\InvalidConfigException;
+use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 
@@ -93,18 +94,23 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
         $this->assertSame('0', $db->getLastInsertID());
     }
 
-    public function testTransactionAutocommit()
+    /**
+     * @return void
+     * @throws Throwable
+     */
+    public function testTransactionAutocommit(): void
     {
         $db = $this->getConnection(true);
-        $db->transaction(function (PdoConnectionInterface $db) {
-            $this->assertTrue($db->getTransaction()->isActive());
+        $db->transaction(
+            function (PdoConnectionInterface $db) {
+                $this->assertTrue($db->getTransaction()->isActive());
 
-            // create table will cause the transaction to be implicitly committed
-            // (see https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html)
-            $name = 'test_implicit_transaction_table';
-            $db->createCommand()->createTable($name, ['id' => 'pk'])->execute();
-            $db->createCommand()->dropTable($name)->execute();
-        });
+                // create table will cause the transaction to be implicitly committed
+                // (see https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html)
+                $name = 'test_implicit_transaction_table';
+                $db->createCommand()->createTable($name, ['id' => 'pk'])->execute();
+                $db->createCommand()->dropTable($name)->execute();
+            });
         // If we made it this far without an error, then everything's working
     }
 }

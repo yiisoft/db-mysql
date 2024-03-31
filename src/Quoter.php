@@ -14,6 +14,10 @@ use function str_replace;
  */
 final class Quoter extends BaseQuoter
 {
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
     public function quoteValue(mixed $value): mixed
     {
         if (!is_string($value)) {

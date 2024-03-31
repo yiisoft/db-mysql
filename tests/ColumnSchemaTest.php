@@ -65,6 +65,14 @@ final class ColumnSchemaTest extends TestCase
         $this->assertSame(['a' => 1], $columnSchema->phpTypeCast('{"a":1}'));
     }
 
+    /**
+     * @return void
+     * @throws Exception
+     * @throws Throwable
+     * @throws \Yiisoft\Db\Exception\InvalidArgumentException
+     * @throws \Yiisoft\Db\Exception\InvalidConfigException
+     * @throws \Yiisoft\Db\Exception\NotSupportedException
+     */
     public function testPhpTypeCast(): void
     {
         $db = $this->getConnection(true);

@@ -51,6 +51,9 @@ final class QuoterTest extends AbstractQuoterTest
         parent::testQuoteTableName($tableName, $expected);
     }
 
+    /**
+     * @return void
+     */
     public function testQuoteValue(): void
     {
         $db = $this->getConnection();

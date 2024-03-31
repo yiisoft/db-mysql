@@ -71,7 +71,7 @@ final class QueryTest extends CommonQueryTest
 
         $query = (new Query($db))->from('customer')->select('id')->orderBy('id');
 
-        /* In MySQL limit and offset arguments must both be non negative integer constant */
+        /* In MySQL limit and offset arguments must both be non-negative integer constant */
         $query->limit(new Expression('2'))->offset(new Expression('1'));
 
         $result = $query->column();
@@ -82,7 +82,12 @@ final class QueryTest extends CommonQueryTest
         $this->assertNotContains('1', $result);
     }
 
-    public function testWithQuery()
+    /**
+     * @return void
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testWithQuery(): void
     {
         $db = $this->getConnection();
 
@@ -96,7 +101,12 @@ final class QueryTest extends CommonQueryTest
         parent::testWithQuery();
     }
 
-    public function testWithQueryRecursive()
+    /**
+     * @return void
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function testWithQueryRecursive():  void
     {
         $db = $this->getConnection();
 

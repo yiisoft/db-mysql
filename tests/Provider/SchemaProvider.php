@@ -11,6 +11,9 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
     use TestTrait;
 
+    /**
+     * @return array
+     */
     public static function columns(): array
     {
         return [
@@ -375,6 +378,9 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function constraints(): array
     {
         $constraints = parent::constraints();
@@ -388,6 +394,9 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         return $constraints;
     }
 
+    /**
+     * @return array[]
+     */
     public static function tableSchemaWithDbSchemes(): array
     {
         return [

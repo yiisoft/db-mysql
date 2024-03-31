@@ -502,7 +502,15 @@ final class SchemaTest extends CommonSchemaTest
         ]);
     }
 
-    public function testTinyInt1()
+    /**
+     * @return void
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
+     * @throws \Yiisoft\Db\Exception\InvalidCallException
+     */
+    public function testTinyInt1(): void
     {
         $db = $this->getConnection(true);
         $tableName = '{{%tinyint}}';
@@ -528,6 +536,11 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertEquals(true, $selectedRow['bool_col']);
     }
 
+    /**
+     * @return void
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
     public function testNotConnectionPDO(): void
     {
         $db = $this->createMock(ConnectionInterface::class);
@@ -539,7 +552,15 @@ final class SchemaTest extends CommonSchemaTest
         $schema->refresh();
     }
 
-    public function testInsertDefaultValues()
+    /**
+     * @return void
+     * @throws Exception
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     * @throws Throwable
+     * @throws \Yiisoft\Db\Exception\InvalidArgumentException
+     */
+    public function testInsertDefaultValues(): void
     {
         $db = $this->getConnection(true);
         $command = $db->createCommand();

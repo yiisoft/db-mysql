@@ -20,6 +20,9 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  */
 final class Connection extends AbstractPdoConnection
 {
+    /**
+     * @return void
+     */
     public function close(): void
     {
         if ($this->pdo !== null) {
@@ -39,6 +42,11 @@ final class Connection extends AbstractPdoConnection
         }
     }
 
+    /**
+     * @param string|null $sql
+     * @param array $params
+     * @return PdoCommandInterface
+     */
     public function createCommand(string $sql = null, array $params = []): PdoCommandInterface
     {
         $command = new Command($this);
@@ -63,6 +71,9 @@ final class Connection extends AbstractPdoConnection
         return new Transaction($this);
     }
 
+    /**
+     * @return QueryBuilderInterface
+     */
     public function getQueryBuilder(): QueryBuilderInterface
     {
         if ($this->queryBuilder === null) {
@@ -75,6 +86,9 @@ final class Connection extends AbstractPdoConnection
         return $this->queryBuilder;
     }
 
+    /**
+     * @return QuoterInterface
+     */
     public function getQuoter(): QuoterInterface
     {
         if ($this->quoter === null) {
@@ -84,6 +98,9 @@ final class Connection extends AbstractPdoConnection
         return $this->quoter;
     }
 
+    /**
+     * @return SchemaInterface
+     */
     public function getSchema(): SchemaInterface
     {
         if ($this->schema === null) {

@@ -27,7 +27,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 {
     use TestTrait;
 
-    public function testAddcheck(): void
+    /**
+     * @return void
+     */
+    public function testAddCheck(): void
     {
         $db = $this->getConnection();
 
@@ -40,7 +43,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
+     * @return void
      * @throws Exception
+     * @throws InvalidConfigException
      */
     public function testAddCommentOnColumn(): void
     {
@@ -65,6 +70,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
+     * @return void
      * @throws Exception
      */
     public function testAddCommentOnTable(): void
@@ -83,7 +89,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /**
+     * @return void
      * @throws Exception
+     * @throws NotSupportedException
      */
     public function testAddDefaultValue(): void
     {

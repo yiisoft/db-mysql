@@ -19,7 +19,10 @@ final class QueryBuilderJsonTest extends TestCase
 {
     use TestTrait;
 
-    public function testAlterColumn()
+    /**
+     * @return void
+     */
+    public function testAlterColumn(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
         $columnSchemaBuilder = new Column(SchemaInterface::TYPE_JSON);
@@ -33,7 +36,10 @@ final class QueryBuilderJsonTest extends TestCase
         );
     }
 
-    public function testAddColumn()
+    /**
+     * @return void
+     */
+    public function testAddColumn(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
         $columnSchemaBuilder = new Column(SchemaInterface::TYPE_JSON);
@@ -47,7 +53,10 @@ final class QueryBuilderJsonTest extends TestCase
         );
     }
 
-    public function testCreateTable()
+    /**
+     * @return void
+     */
+    public function testCreateTable(): void
     {
         $qb = $this->getConnection()->getQueryBuilder();
         $columnSchemaBuilder = new Column(SchemaInterface::TYPE_JSON);
@@ -63,7 +72,14 @@ final class QueryBuilderJsonTest extends TestCase
         );
     }
 
-    public function testInsertAndSelect()
+    /**
+     * @return void
+     * @throws \Yiisoft\Db\Exception\Exception
+     * @throws \Yiisoft\Db\Exception\InvalidArgumentException
+     * @throws \Yiisoft\Db\Exception\InvalidConfigException
+     * @throws \Yiisoft\Db\Exception\NotSupportedException
+     */
+    public function testInsertAndSelect(): void
     {
         $db = $this->getConnection(true);
 
@@ -77,7 +93,14 @@ final class QueryBuilderJsonTest extends TestCase
         );
     }
 
-    public function testInsertJsonExpresionAndSelect()
+    /**
+     * @return void
+     * @throws \Yiisoft\Db\Exception\Exception
+     * @throws \Yiisoft\Db\Exception\InvalidArgumentException
+     * @throws \Yiisoft\Db\Exception\InvalidConfigException
+     * @throws \Yiisoft\Db\Exception\NotSupportedException
+     */
+    public function testInsertJsonExpressionAndSelect(): void
     {
         $db = $this->getConnection(true);
 
