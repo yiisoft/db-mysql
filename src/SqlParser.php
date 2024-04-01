@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Syntax\SqlParser as BaseSqlParser;
+use Yiisoft\Db\Syntax\AbstractSqlParser;
 
-final class SqlParser extends BaseSqlParser
+final class SqlParser extends AbstractSqlParser
 {
     public function getNextPlaceholder(int|null &$position = null): string|null
     {
