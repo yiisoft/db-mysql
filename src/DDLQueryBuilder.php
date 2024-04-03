@@ -168,9 +168,8 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @param string $table The table name.
      * @param string $column The column name.
      *
-     * @throws Throwable In case when table doesn't contain a column.
-     *
-     * @return string The column definition.
+     * @return string The column definition or empty string in case when schema does not contain the table
+     * or the table doesn't contain the column.
      */
     private function getColumnDefinition(string $table, string $column): string
     {
