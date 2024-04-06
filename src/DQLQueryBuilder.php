@@ -32,8 +32,8 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             /**
              * Limit isn't optional in MySQL.
              *
-             * @link http://stackoverflow.com/a/271650/1106908
-             * @link http://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
+             * @link https://stackoverflow.com/a/271650/1106908
+             * @link https://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
             $sql = 'LIMIT ' .
                 ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset) .
