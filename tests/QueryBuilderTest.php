@@ -653,4 +653,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         parent::testUpsertExecute($table, $insertColumns, $updateColumns);
     }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::selectScalar */
+    public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
+    {
+        parent::testSelectScalar($columns, $expected);
+    }
 }
