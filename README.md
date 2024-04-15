@@ -39,11 +39,11 @@ It is used in [Yii Framework] but can be used separately.
 
 The package could be installed via composer:
 
-```php
+```shell
 composer require yiisoft/db-mysql
 ```
 
-## Usage 
+## Usage
 
 For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 
