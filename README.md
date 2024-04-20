@@ -47,18 +47,16 @@ composer require yiisoft/db-mysql
 
 English:
 
-- For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md)
-- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage
+- For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
+- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
 Portuguese - Brazil:
 
-- For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/mysql.md)
-- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) to learn about usage
+- Para configurar a conexão com Mysql, MariaDb leia [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/mysql.md).
+- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
 
 Testing:
 
-- [English](docs/guide/en/testing.md)
-- [Portuguese - Brazil](docs/guide/pt-BR/testing.md)
 - More information can be found in the [Internals.](docs/internals.md)
 
 ## Support
@@ -80,7 +78,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 
 ## License
 
-The Yii Access is free software. It is released under the terms of the BSD License.
+The Yii DataBase Mysql, MariaDb Extension is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
