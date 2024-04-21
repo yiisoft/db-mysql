@@ -50,14 +50,14 @@ English:
 - For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 - [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
-Portuguese - Brazil:
+Português - Brasil:
 
 - Para configurar a conexão com Mysql, MariaDb leia [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/mysql.md).
 - [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
 
 Testing:
 
-- More information can be found in the [Internals.](docs/internals.md)
+- [Internals](docs/internals.md)
 
 ## Support
 
