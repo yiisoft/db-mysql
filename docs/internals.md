@@ -17,7 +17,7 @@ For running the docker containers you can use the following command:
 
 MySQL 8.0.
 
-```dockerfile
+```shell
 docker compose up -d
 ```
 
