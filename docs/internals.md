@@ -23,7 +23,7 @@ docker compose up -d
 
 MariaDB 10.11.
 
-```dockerfile
+```shell
 docker compose -f docker-compose-mariadb.yml up -d
 ```
 
