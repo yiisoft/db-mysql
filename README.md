@@ -47,7 +47,7 @@ composer require yiisoft/db-mysql
 
 English:
 
-- For config connection to Mysql, MariaDb database check [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
+- [Connection config for MySQL and MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 - [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
 
 Português - Brasil:
