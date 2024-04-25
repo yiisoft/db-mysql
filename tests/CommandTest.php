@@ -120,9 +120,10 @@ final class CommandTest extends CommonCommandTest
         array $columns,
         array|string $conditions,
         array $params,
-        string $expected
+        array $expectedValues,
+        int $expectedCount,
     ): void {
-        parent::testUpdate($table, $columns, $conditions, $params, $expected);
+        parent::testUpdate($table, $columns, $conditions, $params, $expectedValues, $expectedCount);
     }
 
     /**

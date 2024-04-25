@@ -10,6 +10,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\QueryBuilder\AbstractDDLQueryBuilder;
 
 use function preg_match;
+use function preg_quote;
 use function preg_replace;
 use function trim;
 
@@ -84,9 +85,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $indexType = null,
         string $indexMethod = null
     ): string {
-        return 'CREATE ' . ($indexType ? ($indexType . ' ') : '') . 'INDEX '
+        return 'CREATE ' . (!empty($indexType) ? $indexType . ' ' : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
-            . ($indexMethod !== null ? " USING $indexMethod" : '')
+            . (!empty($indexMethod) ? " USING $indexMethod" : '')
             . ' ON ' . $this->quoter->quoteTableName($table)
             . ' (' . $this->queryBuilder->buildColumns($columns) . ')';
     }
@@ -167,27 +168,23 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      * @param string $table The table name.
      * @param string $column The column name.
      *
-     * @throws Throwable In case when table doesn't contain a column.
-     *
-     * @return string The column definition.
+     * @return string The column definition or empty string in case when schema does not contain the table
+     * or the table doesn't contain the column.
      */
-    public function getColumnDefinition(string $table, string $column): string
+    private function getColumnDefinition(string $table, string $column): string
     {
-        $result = '';
         $sql = $this->schema->getTableSchema($table)?->getCreateSql();
 
         if (empty($sql)) {
             return '';
         }
 
-        if (preg_match_all('/^\s*([`"])(.*?)\\1\s+(.*?),?$/m', $sql, $matches)) {
-            foreach ($matches[2] as $i => $c) {
-                if ($c === $column) {
-                    $result = $matches[3][$i];
-                }
-            }
+        $quotedColumn = preg_quote($column, '/');
+
+        if (preg_match("/^\s*([`\"])$quotedColumn\\1\s+(.*?),?$/m", $sql, $matches) !== 1) {
+            return '';
         }
 
-        return $result;
+        return $matches[2];
     }
 }
