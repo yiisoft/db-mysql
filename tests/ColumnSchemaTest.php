@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use JsonException;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
@@ -16,7 +14,6 @@ use Yiisoft\Db\Schema\Column\DoubleColumnSchema;
 use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
 use Yiisoft\Db\Schema\Column\JsonColumnSchema;
 use Yiisoft\Db\Schema\Column\StringColumnSchema;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
 
 use function str_repeat;
@@ -46,23 +43,6 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $query = (new Query($db))->from('negative_default_values')->one();
 
         $this->assertSame($bigint, $query['bigint_col']);
-    }
-
-    public function testDbTypeCastJson(): void
-    {
-        $columnSchema = new JsonColumnSchema('json');
-
-        $this->assertEquals(new JsonExpression('{"a":1}', SchemaInterface::TYPE_JSON), $columnSchema->dbTypeCast('{"a":1}'));
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public function testPhpTypeCastJson(): void
-    {
-        $columnSchema = new JsonColumnSchema('json');
-
-        $this->assertSame(['a' => 1], $columnSchema->phpTypecast('{"a":1}'));
     }
 
     public function testPhpTypeCast(): void

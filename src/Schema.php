@@ -461,7 +461,8 @@ final class Schema extends AbstractPdoSchema
         $type = $this->getColumnType($dbType, $info);
         $isUnsigned = stripos($dbType, 'unsigned') !== false;
         /** @psalm-var ColumnInfoArray $info */
-        $column = $this->createColumnSchema($type, $info['field'], unsigned: $isUnsigned);
+        $column = $this->createColumnSchema($type, unsigned: $isUnsigned);
+        $column->name($info['field']);
         $column->enumValues($info['enum_values'] ?? null);
         $column->size($info['size'] ?? null);
         $column->precision($info['precision'] ?? null);
@@ -533,7 +534,7 @@ final class Schema extends AbstractPdoSchema
             }
         }
 
-        return $this->TYPE_MAP[$dbType] ?? self::TYPE_STRING;
+        return self::TYPE_MAP[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
