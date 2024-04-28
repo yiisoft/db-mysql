@@ -45,21 +45,9 @@ composer require yiisoft/db-mysql
 
 ## Documentation
 
-English:
-
-- [Connection config for MySQL and MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
-- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
-
-Português - Brasil:
-
-- Para configurar a conexão com Mysql, MariaDb leia [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/mysql.md).
-- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
-
-Testing:
-
+- [Connection config for MySQL and MariaDb](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/mysql.md).
+- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
 - [Internals](docs/internals.md)
-
-## Support
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
 You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
@@ -74,7 +62,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 [![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/yiiframework)
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
-[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+[![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/chat)
 
 ## License
 
