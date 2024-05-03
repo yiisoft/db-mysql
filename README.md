@@ -31,8 +31,8 @@ It is used in [Yii Framework] but can be used separately.
 
 ## Support version
 
-|     PHP     |Mysql/MariaDb|  CI-Actions
-|:-----------:|:-----------:|:------------:|
+| PHP | Mysql/MariaDb | CI-Actions
+|-----------|-----------|------------|
 | **8.0-8.2** |**5.7-8.0**/**10.4-10.10**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![ansi-mode](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml)
 
 ## Installation
@@ -45,24 +45,19 @@ composer require yiisoft/db-mysql
 
 ## Documentation
 
-English:
-
 - [Connection config for MySQL and MariaDb](https://github.com/yiisoft/db/blob/master/docs/en/connection/mysql.md).
 - [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/en/README.md) to learn about usage.
-
-Português - Brasil:
-
-- Para configurar a conexão com Mysql, MariaDb leia [Connecting MySQL/MariaDb](https://github.com/yiisoft/db/blob/master/docs/pt-BR/connection/mysql.md).
-- [Confira a documentação](https://github.com/yiisoft/db/blob/master/docs/pt-BR/README.md) para aprender como usar.
-
-Testing:
-
 - [Internals](docs/internals.md)
-
-## Support
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
 You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
+
+## License
+
+The Yii DataBase MySQL, MariaDb Extension is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
 
 ## Support the project
 
@@ -75,10 +70,3 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
-
-## License
-
-The Yii DataBase MySQL, MariaDb Extension is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
