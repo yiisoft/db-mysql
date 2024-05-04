@@ -29,9 +29,7 @@ docker compose -f docker-compose-mariadb.yml up -d
 
 ## Unit testing
 
-The package is tested with [PHPUnit](https://phpunit.de/).
-
-The following steps are required to run the tests:
+The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
 
 1. Run the docker container for the dbms.
 2. Install the dependencies of the project with composer.
