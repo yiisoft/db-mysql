@@ -26,7 +26,7 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "psr/log": "^2.0|^3.0",
-        "yiisoft/db": "^1.2",
+        "yiisoft/db": "dev-master",
         "yiisoft/json": "^1.0"
     },
     "require-dev": {
