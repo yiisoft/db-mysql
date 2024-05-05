@@ -226,7 +226,7 @@ final class Schema extends AbstractPdoSchema
             $table->column($info['field'], $column);
 
             if ($column->isPrimaryKey()) {
-                $table->primaryKey($column->getName());
+                $table->primaryKey($info['field']);
                 if ($column->isAutoIncrement()) {
                     $table->sequenceName('');
                 }
