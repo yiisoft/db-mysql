@@ -144,12 +144,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
      */
     public function testBatchInsert(
         string $table,
-        array $columns,
         iterable $rows,
+        array $columns,
         string $expected,
         array $expectedParams = [],
     ): void {
-        parent::testBatchInsert($table, $columns, $rows, $expected, $expectedParams);
+        parent::testBatchInsert($table, $rows, $columns, $expected, $expectedParams);
     }
 
     /**
