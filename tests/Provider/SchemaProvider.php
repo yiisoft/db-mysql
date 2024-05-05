@@ -45,7 +45,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'bigunsigned_col' => [
                         'type' => 'bigint',
                         'dbType' => 'bigint(20) unsigned',
-                        'phpType' => 'integer',
+                        'phpType' => 'string',
                         'primaryKey' => false,
                         'allowNull' => true,
                         'autoIncrement' => false,

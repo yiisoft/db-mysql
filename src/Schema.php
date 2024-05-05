@@ -223,7 +223,7 @@ final class Schema extends AbstractPdoSchema
             }
 
             $column = $this->loadColumnSchema($info);
-            $table->column($column->getName(), $column);
+            $table->column($info['field'], $column);
 
             if ($column->isPrimaryKey()) {
                 $table->primaryKey($column->getName());
@@ -488,7 +488,6 @@ final class Schema extends AbstractPdoSchema
         }
 
         $column->extra($extra);
-        $column->phpType($this->getColumnPhpType($type));
         $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {

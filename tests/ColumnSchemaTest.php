@@ -85,7 +85,7 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $jsonColPhpType = $tableSchema->getColumn('json_col')?->phpTypecast($query['json_col']);
 
         $this->assertSame(1, $intColPhpType);
-        $this->assertSame(1234567890, $bigUnsignedColPhpType);
+        $this->assertSame('1234567890', $bigUnsignedColPhpType);
         $this->assertSame(str_repeat('x', 100), $charColPhpType);
         $this->assertNull($charCol3PhpType);
         $this->assertSame(1.234, $floatColPhpType);
