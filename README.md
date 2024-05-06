@@ -37,7 +37,7 @@ It is used in [Yii Framework] but can be used separately.
 
 ## Installation
 
-The package could be installed via composer:
+The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
 composer require yiisoft/db-mysql
