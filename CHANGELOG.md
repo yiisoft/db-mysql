@@ -5,6 +5,7 @@
 - Enh #320: Minor refactoring of `DDLQueryBuilder::getColumnDefinition()` method (@Tigrov)
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
 - Enh #321: Implement `SqlParser` and `ExpressionBuilder` driver classes (@Tigrov)
+- Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
