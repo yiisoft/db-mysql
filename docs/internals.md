@@ -10,18 +10,18 @@ All our packages have github actions by default, so you can test your [contribut
 
 For greater ease it is recommended to use docker containers, for this you can use the [docker-compose.yml](https://docs.docker.com/compose/compose-file/) file that is in the docs folder.
 
-1. [MySQL 8](../../../docker-compose.yml)
-2. [MariaDB 10.11](../../../docker-compose-mariadb.yml)
+1. [MySQL 8](../docker-compose.yml)
+2. [MariaDB 10.11](../docker-compose-mariadb.yml)
 
 For running the docker containers you can use the following command:
 
-MySQL 8.0.
+MySQL:
 
 ```shell
 docker compose up -d
 ```
 
-MariaDB 10.11.
+MariaDB:
 
 ```shell
 docker compose -f docker-compose-mariadb.yml up -d
@@ -56,7 +56,7 @@ The code is statically analyzed with [Psalm](https://psalm.dev/). To run static 
 ./vendor/bin/psalm
 ```
 
-## Rector
+## Code style
 
 Use [Rector](https://github.com/rectorphp/rector) to make codebase follow some specific rules or
 use either newest or any specific version of PHP:
@@ -65,7 +65,7 @@ use either newest or any specific version of PHP:
 ./vendor/bin/rector
 ```
 
-## Composer require checker
+## Dependencies
 
 This package uses [composer-require-checker](https://github.com/maglnet/ComposerRequireChecker) to check if all dependencies are correctly defined in `composer.json`.
 
