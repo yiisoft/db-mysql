@@ -56,7 +56,7 @@ final class ColumnSchema extends AbstractColumnSchema
         }
 
         if ($this->getType() === SchemaInterface::TYPE_JSON) {
-            return json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR);
+            return is_array($value) ? $value : json_decode((string) $value, true, 512, JSON_THROW_ON_ERROR);
         }
 
         return parent::phpTypecast($value);
