@@ -70,13 +70,13 @@ final class CommandTest extends CommonCommandTest
      */
     public function testBatchInsert(
         string $table,
-        array $columns,
         iterable $values,
+        array $columns,
         string $expected,
         array $expectedParams = [],
         int $insertedRow = 1
     ): void {
-        parent::testBatchInsert($table, $columns, $values, $expected, $expectedParams, $insertedRow);
+        parent::testBatchInsert($table, $values, $columns, $expected, $expectedParams, $insertedRow);
     }
 
     public function testDropCheck(): void
