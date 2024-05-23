@@ -27,7 +27,7 @@ The package is designed to be easy to use and integrate,
 and supports a wide range of [MySQL], [MariaDB] features and functions.
 It also includes support for transactions, database schema management, and error handling.
 
-It is used in [Yii Framework] but can be used separately.
+It is used in [Yii Framework](https://www.yiiframework.com/) but can be used separately.
 
 [MariaDB]: https://mariadb.org/
 [MySQL]: https://www.mysql.com/
