@@ -5,9 +5,6 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px" alt="MySQL">
     </a>
-    <a href="https://www.mariadb.com/" target="_blank">
-        <img src="https://mariadb.com/wp-content/uploads/2019/11/mariadb-logo-vertical_blue.svg" height="80px" alt="MariaDB">
-    </a>
     <h1 align="center">Yii Database MySQL and MariaDB driver</h1>
     <br>
 </p>
