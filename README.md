@@ -45,8 +45,9 @@ composer require yiisoft/db-mysql
 
 ## Documentation
 
-- [Connection config for MySQL and MariaDB](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/mysql.md).
-- [Check the documentation](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
+[Check the documentation](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage
+
+- [Connection config for MySQL and MariaDB](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/mysql.md)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
