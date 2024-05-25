@@ -5,9 +5,6 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px" alt="MySQL">
     </a>
-    <a href="https://www.mariadb.com/" target="_blank">
-        <img src="https://mariadb.com/wp-content/uploads/2019/11/mariadb-logo-vertical_blue.svg" height="80px" alt="MariaDB">
-    </a>
     <h1 align="center">Yii Database MySQL and MariaDB driver</h1>
     <br>
 </p>
@@ -27,7 +24,7 @@ The package is designed to be easy to use and integrate,
 and supports a wide range of [MySQL], [MariaDB] features and functions.
 It also includes support for transactions, database schema management, and error handling.
 
-It is used in [Yii Framework] but can be used separately.
+It is used in [Yii Framework](https://www.yiiframework.com/) but can be used separately.
 
 [MariaDB]: https://mariadb.org/
 [MySQL]: https://www.mysql.com/
