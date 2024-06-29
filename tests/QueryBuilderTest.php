@@ -683,7 +683,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
-    public function testOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
 
@@ -704,7 +704,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
-    public function testOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
 
