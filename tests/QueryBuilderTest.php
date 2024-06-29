@@ -666,7 +666,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection();
 
         if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
-            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
         $qb = $db->getQueryBuilder();
@@ -686,7 +688,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection();
 
         if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
-            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
         $count = (new Query($db))
@@ -705,7 +709,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection();
 
         if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
-            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
         $count = (new Query($db))
