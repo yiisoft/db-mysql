@@ -664,6 +664,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlapsConditionBuilder(): void
     {
         $db = $this->getConnection();
+
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+        }
+
         $qb = $db->getQueryBuilder();
 
         $params = [];
@@ -680,6 +685,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     {
         $db = $this->getConnection();
 
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+        }
+
         $count = (new Query($db))
             ->from('json_type')
             ->where(new JsonOverlapsCondition('json_col', $values))
@@ -694,6 +703,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
+
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS function.');
+        }
 
         $count = (new Query($db))
             ->from('json_type')
