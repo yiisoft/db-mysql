@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS `T_constraints_2` CASCADE;
 DROP TABLE IF EXISTS `T_constraints_1` CASCADE;
 DROP TABLE IF EXISTS `T_upsert` CASCADE;
 DROP TABLE IF EXISTS `T_upsert_1`;
+DROP TABLE IF EXISTS `json_type` CASCADE;
 
 CREATE TABLE `constraints`
 (
@@ -251,6 +252,12 @@ CREATE TABLE `beta` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `json_type` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `json_col` JSON,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE VIEW `animal_view` AS SELECT * FROM `animal`;
 
 INSERT INTO `animal` (`type`) VALUES ('yiiunit\data\ar\Cat');
@@ -324,6 +331,11 @@ INSERT INTO `beta` (id, alpha_string_identifier) VALUES (5, '2');
 INSERT INTO `beta` (id, alpha_string_identifier) VALUES (6, '2b');
 INSERT INTO `beta` (id, alpha_string_identifier) VALUES (7, '2b');
 INSERT INTO `beta` (id, alpha_string_identifier) VALUES (8, '02');
+
+INSERT INTO `json_type` (json_col) VALUES (null);
+INSERT INTO `json_type` (json_col) VALUES ('[]');
+INSERT INTO `json_type` (json_col) VALUES ('[1,2,3,null]');
+INSERT INTO `json_type` (json_col) VALUES ('[3,4,5]');
 
 /* bit test, see https://github.com/yiisoft/yii2/issues/9006 */
 

@@ -13,6 +13,7 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
 use function str_contains;
@@ -658,5 +659,49 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
         parent::testSelectScalar($columns, $expected);
+    }
+
+    public function testJsonOverlapsConditionBuilder(): void
+    {
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+
+        $params = [];
+        $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
+
+        $this->assertSame('JSON_OVERLAPS(`column`, :qp0)', $sql);
+        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+
+        $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    public function testOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
+    {
+        $db = $this->getConnection();
+
+        $count = (new Query($db))
+            ->from('json_type')
+            ->where(new JsonOverlapsCondition('json_col', $values))
+            ->count();
+
+        $this->assertSame($expectedCount, $count);
+
+        $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    public function testOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    {
+        $db = $this->getConnection();
+
+        $count = (new Query($db))
+            ->from('json_type')
+            ->where(['json overlaps', 'json_col', $values])
+            ->count();
+
+        $this->assertSame($expectedCount, $count);
+
+        $db->close();
     }
 }
