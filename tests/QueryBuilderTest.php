@@ -9,6 +9,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -677,6 +678,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
 
         $this->assertSame('JSON_OVERLAPS(`column`, :qp0)', $sql);
+        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+
+        // Test column as Expression
+        $params = [];
+        $sql = $qb->buildExpression(new JsonOverlapsCondition(new Expression('column'), [1, 2, 3]), $params);
+
+        $this->assertSame('JSON_OVERLAPS(column, :qp0)', $sql);
         $this->assertSame([':qp0' => '[1,2,3]'], $params);
 
         $db->close();
