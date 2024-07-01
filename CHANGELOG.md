@@ -6,7 +6,7 @@
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
 - Enh #321: Implement `SqlParser` and `ExpressionBuilder` driver classes (@Tigrov)
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
-- Enh #342: Add json overlaps condition builder (@Tigrov)
+- Enh #342: Add JSON overlaps condition builder (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

@@ -21,7 +21,7 @@ final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilde
     /**
      * Build SQL for {@see JsonOverlapsCondition}.
      *
-     * @param JsonOverlapsCondition $expression the {@see JsonOverlapsCondition} to be built.
+     * @param JsonOverlapsCondition $expression The {@see JsonOverlapsCondition} to be built.
      *
      * @throws Exception
      * @throws InvalidArgumentException
