@@ -9,10 +9,12 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
 use function str_contains;
@@ -658,5 +660,75 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
         parent::testSelectScalar($columns, $expected);
+    }
+
+    public function testJsonOverlapsConditionBuilder(): void
+    {
+        $db = $this->getConnection();
+
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
+        }
+
+        $qb = $db->getQueryBuilder();
+
+        $params = [];
+        $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
+
+        $this->assertSame('JSON_OVERLAPS(`column`, :qp0)', $sql);
+        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+
+        // Test column as Expression
+        $params = [];
+        $sql = $qb->buildExpression(new JsonOverlapsCondition(new Expression('column'), [1, 2, 3]), $params);
+
+        $this->assertSame('JSON_OVERLAPS(column, :qp0)', $sql);
+        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+
+        $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
+    {
+        $db = $this->getConnection();
+
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
+        }
+
+        $count = (new Query($db))
+            ->from('json_type')
+            ->where(new JsonOverlapsCondition('json_col', $values))
+            ->count();
+
+        $this->assertSame($expectedCount, $count);
+
+        $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    {
+        $db = $this->getConnection();
+
+        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+            self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
+        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+            self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
+        }
+
+        $count = (new Query($db))
+            ->from('json_type')
+            ->where(['json overlaps', 'json_col', $values])
+            ->count();
+
+        $this->assertSame($expectedCount, $count);
+
+        $db->close();
     }
 }

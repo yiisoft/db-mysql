@@ -50,4 +50,13 @@ trait TestTrait
     {
         $this->dsn = $dsn;
     }
+
+    public static function setUpBeforeClass(): void
+    {
+        $db = self::getDb();
+
+        DbHelper::loadFixture($db, __DIR__ . '/Fixture/mysql.sql');
+
+        $db->close();
+    }
 }
