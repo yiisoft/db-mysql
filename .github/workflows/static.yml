@@ -1,23 +1,18 @@
 on:
   pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
+    paths:
+      - 'src/**'
+      - '.github/workflows/static.yml'
+      - 'psalm*.xml'
+      - 'composer.json'
 
   push:
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-      - '.gitattributes'
-      - 'infection.json.dist'
-      - 'phpunit.xml.dist'
+    branches: ['master']
+    paths:
+      - 'src/**'
+      - '.github/workflows/static.yml'
+      - 'psalm*.xml'
+      - 'composer.json'
 
 name: static analysis
 
