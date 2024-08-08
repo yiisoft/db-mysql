@@ -84,7 +84,7 @@ final class Schema extends AbstractPdoSchema
      */
     private const TYPE_MAP = [
         'tinyint' => self::TYPE_TINYINT,
-        'bit' => self::TYPE_INTEGER,
+        'bit' => self::TYPE_BIT,
         'smallint' => self::TYPE_SMALLINT,
         'mediumint' => self::TYPE_INTEGER,
         'int' => self::TYPE_INTEGER,
@@ -523,12 +523,8 @@ final class Schema extends AbstractPdoSchema
                     $info['scale'] = (int) $values[1];
                 }
 
-                if ($dbType === 'bit') {
-                    return match (true) {
-                        $info['size'] === 1 => self::TYPE_BOOLEAN,
-                        $info['size'] > 32 => self::TYPE_BIGINT,
-                        default => self::TYPE_INTEGER,
-                    };
+                if ($dbType === 'bit' && $info['size'] === 1) {
+                    return self::TYPE_BOOLEAN;
                 }
             }
         }
