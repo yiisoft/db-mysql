@@ -25,7 +25,6 @@ use function array_map;
 use function array_merge;
 use function array_values;
 use function bindec;
-use function explode;
 use function in_array;
 use function is_string;
 use function ksort;
