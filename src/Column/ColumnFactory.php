@@ -13,6 +13,8 @@ class ColumnFactory extends \Yiisoft\Db\Schema\Column\ColumnFactory
      * Mapping from physical column types (keys) to abstract column types (values).
      *
      * @var string[]
+     *
+     * @psalm-suppress MissingClassConstType
      */
     private const TYPE_MAP = [
         'bit' => SchemaInterface::TYPE_BIT,
