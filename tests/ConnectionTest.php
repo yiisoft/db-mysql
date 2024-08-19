@@ -130,7 +130,7 @@ final class ConnectionTest extends CommonConnectionTest
     {
         $db = $this->getConnection();
 
-        $db->createCommand("SET session wait_timeout=1")->execute();
+        $db->createCommand('SET session wait_timeout=1')->execute();
 
         sleep(1);
 
