@@ -92,6 +92,8 @@ final class ConnectionTest extends CommonConnectionTest
 
         /* should not be any exception so far */
         $this->assertTrue(true);
+
+        $db->close();
     }
 
     /**
@@ -119,5 +121,23 @@ final class ConnectionTest extends CommonConnectionTest
         )->queryScalar();
 
         $this->assertSame('1', $profilesCount, 'profile should be inserted in transaction shortcut');
+
+        $db->close();
+    }
+
+    /** Issue #348 https://github.com/yiisoft/db-mysql/issues/348 */
+    public function testRestartConnectionOnTimeout(): void
+    {
+        $db = $this->getConnection();
+
+        $db->createCommand("SET session wait_timeout=1")->execute();
+
+        sleep(1);
+
+        $result = $db->createCommand("SELECT '1'")->queryScalar();
+
+        $this->assertSame('1', $result);
+
+        $db->close();
     }
 }
