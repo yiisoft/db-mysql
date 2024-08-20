@@ -125,12 +125,12 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /** Issue #348 https://github.com/yiisoft/db-mysql/issues/348 */
+    /** @link https://github.com/yiisoft/db-mysql/issues/348 */
     public function testRestartConnectionOnTimeout(): void
     {
         $db = $this->getConnection();
 
-        $db->createCommand('SET session wait_timeout=1')->execute();
+        $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
         sleep(1);
 
