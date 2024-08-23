@@ -19,85 +19,81 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
     public static function buildCondition(): array
     {
-        $buildCondition = parent::buildCondition();
-
-        return array_merge(
-            $buildCondition,
+        return [
+            ...parent::buildCondition(),
             [
-                [
-                    ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
-                    '[[jsoncol]] = :qp0', [':qp0' => '{"lang":"uk","country":"UA"}'],
-                ],
-                [
-                    ['=', 'jsoncol', new JsonExpression([false])],
-                    '[[jsoncol]] = :qp0', [':qp0' => '[false]'],
-                ],
-                'object with type. Type is ignored for MySQL' => [
-                    ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
-                    '[[prices]] = :qp0', [':qp0' => '{"seeds":15,"apples":25}'],
-                ],
-                'nested json' => [
-                    [
-                        '=',
-                        'data',
-                        new JsonExpression(
-                            [
-                                'user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'],
-                                'props' => ['mood' => 'good'],
-                            ]
-                        ),
-                    ],
-                    '[[data]] = :qp0',
-                    [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}'],
-                ],
-                'null value' => [
-                    ['=', 'jsoncol', new JsonExpression(null)],
-                    '[[jsoncol]] = :qp0', [':qp0' => 'null'],
-                ],
-                'null as array value' => [
-                    ['=', 'jsoncol', new JsonExpression([null])],
-                    '[[jsoncol]] = :qp0', [':qp0' => '[null]'],
-                ],
-                'null as object value' => [
-                    ['=', 'jsoncol', new JsonExpression(['nil' => null])],
-                    '[[jsoncol]] = :qp0', [':qp0' => '{"nil":null}'],
-                ],
-                'query' => [
-                    [
-                        '=',
-                        'jsoncol',
-                        new JsonExpression((new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1])),
-                    ],
-                    '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
-                    [':qp0' => 1],
-                ],
-                'query with type, that is ignored in MySQL' => [
-                    [
-                        '=',
-                        'jsoncol',
-                        new JsonExpression(
-                            (new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1]),
-                            'jsonb'
-                        ),
-                    ],
-                    '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
-                ],
-                'nested and combined json expression' => [
-                    [
-                        '=',
-                        'jsoncol',
-                        new JsonExpression(
-                            new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])
-                        ),
-                    ],
-                    '[[jsoncol]] = :qp0', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
-                ],
-                'search by property in JSON column (issue #15838)' => [
-                    ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
-                    "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
-                ],
+                ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
+                '[[jsoncol]] = :qp0', [':qp0' => '{"lang":"uk","country":"UA"}'],
             ],
-        );
+            [
+                ['=', 'jsoncol', new JsonExpression([false])],
+                '[[jsoncol]] = :qp0', [':qp0' => '[false]'],
+            ],
+            'object with type. Type is ignored for MySQL' => [
+                ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
+                '[[prices]] = :qp0', [':qp0' => '{"seeds":15,"apples":25}'],
+            ],
+            'nested json' => [
+                [
+                    '=',
+                    'data',
+                    new JsonExpression(
+                        [
+                            'user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'],
+                            'props' => ['mood' => 'good'],
+                        ]
+                    ),
+                ],
+                '[[data]] = :qp0',
+                [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}'],
+            ],
+            'null value' => [
+                ['=', 'jsoncol', new JsonExpression(null)],
+                '[[jsoncol]] = :qp0', [':qp0' => 'null'],
+            ],
+            'null as array value' => [
+                ['=', 'jsoncol', new JsonExpression([null])],
+                '[[jsoncol]] = :qp0', [':qp0' => '[null]'],
+            ],
+            'null as object value' => [
+                ['=', 'jsoncol', new JsonExpression(['nil' => null])],
+                '[[jsoncol]] = :qp0', [':qp0' => '{"nil":null}'],
+            ],
+            'query' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression((new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1])),
+                ],
+                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
+                [':qp0' => 1],
+            ],
+            'query with type, that is ignored in MySQL' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression(
+                        (new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1]),
+                        'jsonb'
+                    ),
+                ],
+                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
+            ],
+            'nested and combined json expression' => [
+                [
+                    '=',
+                    'jsoncol',
+                    new JsonExpression(
+                        new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])
+                    ),
+                ],
+                '[[jsoncol]] = :qp0', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
+            ],
+            'search by property in JSON column (issue #15838)' => [
+                ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
+                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
+            ],
+        ];
     }
 
     public static function insert(): array

@@ -483,7 +483,8 @@ final class SchemaTest extends CommonSchemaTest
 
     public function withIndexDataProvider(): array
     {
-        return array_merge(parent::withIndexDataProvider(), [
+        return [
+            ...parent::withIndexDataProvider(),
             [
                 'indexType' => null,
                 'indexMethod' => SchemaInterface::INDEX_HASH,
@@ -504,7 +505,7 @@ final class SchemaTest extends CommonSchemaTest
                 'indexMethod' => null,
                 'columnType' => 'GEOMETRY NOT NULL',
             ],
-        ]);
+        ];
     }
 
     public function testTinyInt1()

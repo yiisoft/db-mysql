@@ -18,25 +18,23 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
         $types[1][0] = 'integer(10) UNSIGNED';
         $types[2][0] = 'integer(10) COMMENT \'test\'';
 
-        return array_merge(
-            $types,
-            [
-                ['integer UNSIGNED', SchemaInterface::TYPE_INTEGER, null, [['unsigned']]],
+        return [
+            ...$types,
+            ['integer UNSIGNED', SchemaInterface::TYPE_INTEGER, null, [['unsigned']]],
 
-                /**
-                 * {@link https://github.com/yiisoft/yii2/issues/11945}, real test against database.
-                 */
+            /**
+             * {@link https://github.com/yiisoft/yii2/issues/11945}, real test against database.
+             */
+            [
+                'string(50) NOT NULL COMMENT \'Property name\' COLLATE ascii_general_ci',
+                SchemaInterface::TYPE_STRING, 50,
                 [
-                    'string(50) NOT NULL COMMENT \'Property name\' COLLATE ascii_general_ci',
-                    SchemaInterface::TYPE_STRING, 50,
-                    [
-                        ['comment', 'Property name'],
-                        ['append', 'COLLATE ascii_general_ci'],
-                        ['notNull'],
-                    ],
+                    ['comment', 'Property name'],
+                    ['append', 'COLLATE ascii_general_ci'],
+                    ['notNull'],
                 ],
             ],
-        );
+        ];
     }
 
     public static function createColumnTypes(): array
