@@ -13,7 +13,6 @@ use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 
-use function array_merge;
 use function ctype_digit;
 
 /**
@@ -82,13 +81,11 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
      */
     protected function defaultExpressionBuilders(): array
     {
-        return array_merge(
-            parent::defaultExpressionBuilders(),
-            [
-                JsonExpression::class => JsonExpressionBuilder::class,
-                JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
-                Expression::class => ExpressionBuilder::class,
-            ]
-        );
+        return [
+            ...parent::defaultExpressionBuilders(),
+            JsonExpression::class => JsonExpressionBuilder::class,
+            JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
+            Expression::class => ExpressionBuilder::class,
+        ];
     }
 }

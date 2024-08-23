@@ -22,7 +22,6 @@ use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_change_key_case;
 use function array_map;
-use function array_merge;
 use function array_values;
 use function bindec;
 use function in_array;
@@ -117,7 +116,7 @@ final class Schema extends AbstractPdoSchema
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
-                $indexColumns = array_map('trim', preg_split('/[`"],[`"]/', trim($match[2], '`"')));
+                $indexColumns = array_map(trim(...), preg_split('/[`"],[`"]/', trim($match[2], '`"')));
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }
@@ -256,13 +255,7 @@ final class Schema extends AbstractPdoSchema
          * @psalm-var array{referenced_table_name: string, columns: array} $constraint
          */
         foreach ($constraints as $name => $constraint) {
-            $table->foreignKey(
-                $name,
-                array_merge(
-                    [$constraint['referenced_table_name']],
-                    $constraint['columns']
-                ),
-            );
+            $table->foreignKey($name, [$constraint['referenced_table_name'], ...$constraint['columns']]);
         }
     }
 
@@ -361,12 +354,10 @@ final class Schema extends AbstractPdoSchema
      * @param string $name The table name.
      *
      * @return array The cache key.
-     *
-     * @psalm-suppress DeprecatedMethod
      */
     protected function getCacheKey(string $name): array
     {
-        return array_merge([self::class], $this->generateCacheKey(), [$this->db->getQuoter()->getRawTableName($name)]);
+        return [self::class, ...$this->generateCacheKey(), $this->db->getQuoter()->getRawTableName($name)];
     }
 
     /**
@@ -378,7 +369,7 @@ final class Schema extends AbstractPdoSchema
      */
     protected function getCacheTag(): string
     {
-        return md5(serialize(array_merge([self::class], $this->generateCacheKey())));
+        return md5(serialize([self::class, ...$this->generateCacheKey()]));
     }
 
     /**
@@ -585,7 +576,7 @@ final class Schema extends AbstractPdoSchema
         ])->queryAll();
 
         /** @psalm-var array[][] $constraints */
-        $constraints = array_map('array_change_key_case', $constraints);
+        $constraints = array_map(array_change_key_case(...), $constraints);
         $constraints = DbArrayHelper::index($constraints, null, ['type', 'name']);
 
         $result = [
@@ -700,7 +691,7 @@ final class Schema extends AbstractPdoSchema
         ])->queryAll();
 
         /** @psalm-var array[] $indexes */
-        $indexes = array_map('array_change_key_case', $indexes);
+        $indexes = array_map(array_change_key_case(...), $indexes);
         $indexes = DbArrayHelper::index($indexes, null, ['name']);
         $result = [];
 

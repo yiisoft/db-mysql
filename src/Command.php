@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
+use Yiisoft\Db\Exception\IntegrityException;
+
+use function str_starts_with;
 
 /**
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for MySQL,
@@ -38,6 +41,22 @@ final class Command extends AbstractPdoCommand
         }
 
         return $result;
+    }
+
+    protected function queryInternal(int $queryMode): mixed
+    {
+        try {
+            return parent::queryInternal($queryMode);
+        } catch (IntegrityException $e) {
+            if (str_starts_with($e->getMessage(), 'SQLSTATE[HY000]: General error: 2006 ')) {
+                $this->db->close();
+                $this->cancel();
+
+                return parent::queryInternal($queryMode);
+            }
+
+            throw $e;
+        }
     }
 
     public function showDatabases(): array
