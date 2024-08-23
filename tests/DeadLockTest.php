@@ -347,7 +347,7 @@ final class DeadLockTest extends TestCase
      */
     private function setErrorHandler(): void
     {
-        set_error_handler(static function ($errno, $errstr, $errfile, $errline) {
+        set_error_handler(static function ($errno, $errstr, $errfile, $errline): never {
             throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
         });
     }
