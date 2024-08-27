@@ -10,6 +10,7 @@
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 - Enh #347: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - Bug #349: Restore connection if closed by connection timeout (@Tigrov)
+- Enh #346: Implement `ColumnFactory` class (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

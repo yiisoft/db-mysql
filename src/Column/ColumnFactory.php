@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Column;
 
+use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
-class ColumnFactory extends \Yiisoft\Db\Schema\Column\ColumnFactory
+class ColumnFactory extends AbstractColumnFactory
 {
     /**
      * Mapping from physical column types (keys) to abstract column types (values).
