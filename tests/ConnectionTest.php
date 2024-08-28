@@ -132,7 +132,7 @@ final class ConnectionTest extends CommonConnectionTest
 
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
-        sleep(2);
+        sleep(1);
 
         $result = $db->createCommand("SELECT '1'")->queryScalar();
 
