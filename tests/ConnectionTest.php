@@ -147,8 +147,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db = $this->getConnection();
         $db->beginTransaction();
 
-        $db->getPDO()->errorCode();
-
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
         sleep(1);
