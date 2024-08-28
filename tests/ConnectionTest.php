@@ -8,6 +8,7 @@ use PDO;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -139,5 +140,22 @@ final class ConnectionTest extends CommonConnectionTest
         $this->assertSame('1', $result);
 
         $db->close();
+    }
+
+    public function testNotRestartConnectionOnTimeoutInTransaction(): void
+    {
+        $db = $this->getConnection();
+        $db->beginTransaction();
+
+        $db->getPDO()->errorCode();
+
+        $db->createCommand('SET SESSION wait_timeout = 1')->execute();
+
+        sleep(1);
+
+        $this->expectException(IntegrityException::class);
+        $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
+
+        $db->createCommand("SELECT '1'")->queryScalar();
     }
 }
