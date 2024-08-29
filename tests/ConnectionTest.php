@@ -133,7 +133,7 @@ final class ConnectionTest extends CommonConnectionTest
 
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
-        sleep(1);
+        sleep(2);
 
         $result = $db->createCommand("SELECT '1'")->queryScalar();
 
@@ -149,7 +149,7 @@ final class ConnectionTest extends CommonConnectionTest
 
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
-        sleep(1);
+        sleep(2);
 
         $this->expectException(IntegrityException::class);
         $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
