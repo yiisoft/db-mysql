@@ -135,7 +135,11 @@ final class ConnectionTest extends CommonConnectionTest
 
         sleep(2);
 
+        $previousErrorLevel = error_reporting(E_ALL & ~E_WARNING);
+
         $result = $db->createCommand("SELECT '1'")->queryScalar();
+
+        error_reporting($previousErrorLevel);
 
         $this->assertSame('1', $result);
 
@@ -154,6 +158,12 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectException(IntegrityException::class);
         $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
 
-        $db->createCommand("SELECT '1'")->queryScalar();
+        $previousErrorLevel = error_reporting(E_ALL & ~E_WARNING);
+
+        try {
+            $db->createCommand("SELECT '1'")->queryScalar();
+        } finally {
+            error_reporting($previousErrorLevel);
+        }
     }
 }
