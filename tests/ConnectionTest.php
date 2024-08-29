@@ -128,7 +128,6 @@ final class ConnectionTest extends CommonConnectionTest
     }
 
     /** @link https://github.com/yiisoft/db-mysql/issues/348 */
-    #[WithoutErrorHandler]
     public function testRestartConnectionOnTimeout(): void
     {
         $db = $this->getConnection();
@@ -144,7 +143,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    #[WithoutErrorHandler]
     public function testNotRestartConnectionOnTimeoutInTransaction(): void
     {
         $db = $this->getConnection();
