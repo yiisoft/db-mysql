@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
@@ -127,6 +128,7 @@ final class ConnectionTest extends CommonConnectionTest
     }
 
     /** @link https://github.com/yiisoft/db-mysql/issues/348 */
+    #[WithoutErrorHandler]
     public function testRestartConnectionOnTimeout(): void
     {
         $db = $this->getConnection();
@@ -135,17 +137,14 @@ final class ConnectionTest extends CommonConnectionTest
 
         sleep(2);
 
-        $previousErrorLevel = error_reporting(E_ALL & ~E_WARNING);
-
         $result = $db->createCommand("SELECT '1'")->queryScalar();
-
-        error_reporting($previousErrorLevel);
 
         $this->assertSame('1', $result);
 
         $db->close();
     }
 
+    #[WithoutErrorHandler]
     public function testNotRestartConnectionOnTimeoutInTransaction(): void
     {
         $db = $this->getConnection();
@@ -158,12 +157,6 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectException(IntegrityException::class);
         $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
 
-        $previousErrorLevel = error_reporting(E_ALL & ~E_WARNING);
-
-        try {
-            $db->createCommand("SELECT '1'")->queryScalar();
-        } finally {
-            error_reporting($previousErrorLevel);
-        }
+        $db->createCommand("SELECT '1'")->queryScalar();
     }
 }
