@@ -135,7 +135,7 @@ final class ConnectionTest extends CommonConnectionTest
 
         sleep(2);
 
-        $result = $db->createCommand("SELECT 1")->queryScalar();
+        $result = $db->createCommand('SELECT 1')->queryScalar();
 
         $this->assertSame('1', $result);
 
@@ -154,6 +154,6 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectException(IntegrityException::class);
         $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
 
-        $db->createCommand("SELECT 1")->queryScalar();
+        $db->createCommand('SELECT 1')->queryScalar();
     }
 }
