@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
