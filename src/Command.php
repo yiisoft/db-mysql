@@ -48,9 +48,12 @@ final class Command extends AbstractPdoCommand
         try {
             return parent::queryInternal($queryMode);
         } catch (IntegrityException $e) {
-            if (str_starts_with($e->getMessage(), 'SQLSTATE[HY000]: General error: 2006 ')) {
-                $this->db->close();
+            if (
+                str_starts_with($e->getMessage(), 'SQLSTATE[HY000]: General error: 2006 ')
+                && $this->db->getTransaction() === null
+            ) {
                 $this->cancel();
+                $this->db->close();
 
                 return parent::queryInternal($queryMode);
             }

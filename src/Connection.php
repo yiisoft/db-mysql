@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Exception;
 use Psr\Log\LogLevel;
+use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
 use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
@@ -30,8 +30,8 @@ final class Connection extends AbstractPdoConnection
 
             // Solution for close connections {@link https://stackoverflow.com/questions/18277233/pdo-closing-connection}
             try {
-                $this->pdo->query('KILL CONNECTION_ID()');
-            } catch (Exception) {
+                $this->pdo->exec('KILL CONNECTION_ID()');
+            } catch (Throwable) {
             }
 
             $this->pdo = null;

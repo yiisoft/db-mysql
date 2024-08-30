@@ -9,7 +9,7 @@
 - Enh #342: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
-- Bug #349: Restore connection if closed by connection timeout (@Tigrov)
+- Bug #349, #352: Restore connection if closed by connection timeout (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
