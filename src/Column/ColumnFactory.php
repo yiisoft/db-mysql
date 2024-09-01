@@ -8,7 +8,7 @@ use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 
-class ColumnFactory extends AbstractColumnFactory
+final class ColumnFactory extends AbstractColumnFactory
 {
     /**
      * Mapping from physical column types (keys) to abstract column types (values).
