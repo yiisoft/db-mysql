@@ -14,7 +14,9 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
+use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Schema\Builder\ColumnInterface;
+use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
@@ -22,7 +24,6 @@ use function array_change_key_case;
 use function array_map;
 use function array_values;
 use function bindec;
-use function explode;
 use function in_array;
 use function is_string;
 use function ksort;
@@ -76,46 +77,14 @@ use function trim;
  */
 final class Schema extends AbstractPdoSchema
 {
-    /**
-     * Mapping from physical column types (keys) to abstract column types (values).
-     *
-     * @var string[]
-     */
-    private const TYPE_MAP = [
-        'tinyint' => self::TYPE_TINYINT,
-        'bit' => self::TYPE_BIT,
-        'smallint' => self::TYPE_SMALLINT,
-        'mediumint' => self::TYPE_INTEGER,
-        'int' => self::TYPE_INTEGER,
-        'integer' => self::TYPE_INTEGER,
-        'bigint' => self::TYPE_BIGINT,
-        'float' => self::TYPE_FLOAT,
-        'double' => self::TYPE_DOUBLE,
-        'real' => self::TYPE_FLOAT,
-        'decimal' => self::TYPE_DECIMAL,
-        'numeric' => self::TYPE_DECIMAL,
-        'tinytext' => self::TYPE_TEXT,
-        'mediumtext' => self::TYPE_TEXT,
-        'longtext' => self::TYPE_TEXT,
-        'longblob' => self::TYPE_BINARY,
-        'blob' => self::TYPE_BINARY,
-        'text' => self::TYPE_TEXT,
-        'varchar' => self::TYPE_STRING,
-        'string' => self::TYPE_STRING,
-        'char' => self::TYPE_CHAR,
-        'datetime' => self::TYPE_DATETIME,
-        'year' => self::TYPE_DATE,
-        'date' => self::TYPE_DATE,
-        'time' => self::TYPE_TIME,
-        'timestamp' => self::TYPE_TIMESTAMP,
-        'enum' => self::TYPE_STRING,
-        'varbinary' => self::TYPE_BINARY,
-        'json' => self::TYPE_JSON,
-    ];
-
     public function createColumn(string $type, array|int|string $length = null): ColumnInterface
     {
         return new Column($type, $length);
+    }
+
+    public function getColumnFactory(): ColumnFactoryInterface
+    {
+        return new ColumnFactory();
     }
 
     /**
@@ -449,15 +418,9 @@ final class Schema extends AbstractPdoSchema
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
         $dbType = $info['type'];
-        $type = $this->getColumnType($dbType, $info);
-        $isUnsigned = stripos($dbType, 'unsigned') !== false;
         /** @psalm-var ColumnInfoArray $info */
-        $column = $this->createColumnSchema($type, unsigned: $isUnsigned);
+        $column = $this->getColumnFactory()->fromDefinition($dbType);
         $column->name($info['field']);
-        $column->enumValues($info['enum_values'] ?? null);
-        $column->size($info['size'] ?? null);
-        $column->precision($info['precision'] ?? null);
-        $column->scale($info['scale'] ?? null);
         $column->allowNull($info['null'] === 'YES');
         $column->primaryKey(str_contains($info['key'], 'PRI'));
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
@@ -470,7 +433,7 @@ final class Schema extends AbstractPdoSchema
             empty($extra)
             && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
-            && in_array($type, [
+            && in_array($column->getType(), [
                 self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
                 self::TYPE_DATETIME, self::TYPE_TIMESTAMP, self::TYPE_TIME, self::TYPE_DATE,
             ], true)
@@ -486,41 +449,6 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $column;
-    }
-
-    /**
-     * Get the abstract data type for the database data type.
-     *
-     * @param string $dbType The database data type
-     * @param array $info Column information.
-     *
-     * @return string The abstract data type.
-     */
-    private function getColumnType(string $dbType, array &$info): string
-    {
-        preg_match('/^(\w*)(?:\(([^)]+)\))?/', $dbType, $matches);
-        $dbType = strtolower($matches[1]);
-
-        if (!empty($matches[2])) {
-            if ($dbType === 'enum') {
-                preg_match_all("/'([^']*)'/", $matches[2], $values);
-                $info['enum_values'] = $values[1];
-            } else {
-                $values = explode(',', $matches[2], 2);
-                $info['size'] = (int) $values[0];
-                $info['precision'] = (int) $values[0];
-
-                if (isset($values[1])) {
-                    $info['scale'] = (int) $values[1];
-                }
-
-                if ($dbType === 'bit' && $info['size'] === 1) {
-                    return self::TYPE_BOOLEAN;
-                }
-            }
-        }
-
-        return self::TYPE_MAP[$dbType] ?? self::TYPE_STRING;
     }
 
     /**
