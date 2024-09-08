@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
 use Yiisoft\Db\Schema\Column\BitColumnSchema;
 use Yiisoft\Db\Schema\Column\BooleanColumnSchema;
@@ -18,35 +19,35 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         return [
             // db type, expected abstract type, expected instance of
-            ['bit', 'bit', BitColumnSchema::class],
-            ['tinyint', 'tinyint', IntegerColumnSchema::class],
-            ['smallint', 'smallint', IntegerColumnSchema::class],
-            ['mediumint', 'integer', IntegerColumnSchema::class],
-            ['int', 'integer', IntegerColumnSchema::class],
-            ['integer', 'integer', IntegerColumnSchema::class],
-            ['bigint', 'bigint', IntegerColumnSchema::class],
-            ['float', 'float', DoubleColumnSchema::class],
-            ['real', 'float', DoubleColumnSchema::class],
-            ['double', 'double', DoubleColumnSchema::class],
-            ['decimal', 'decimal', DoubleColumnSchema::class],
-            ['numeric', 'decimal', DoubleColumnSchema::class],
-            ['char', 'char', StringColumnSchema::class],
-            ['varchar', 'string', StringColumnSchema::class],
-            ['string', 'string', StringColumnSchema::class],
-            ['enum', 'string', StringColumnSchema::class],
-            ['tinytext', 'text', StringColumnSchema::class],
-            ['mediumtext', 'text', StringColumnSchema::class],
-            ['longtext', 'text', StringColumnSchema::class],
-            ['text', 'text', StringColumnSchema::class],
-            ['varbinary', 'binary', BinaryColumnSchema::class],
-            ['blob', 'binary', BinaryColumnSchema::class],
-            ['longblob', 'binary', BinaryColumnSchema::class],
-            ['year', 'date', StringColumnSchema::class],
-            ['date', 'date', StringColumnSchema::class],
-            ['time', 'time', StringColumnSchema::class],
-            ['datetime', 'datetime', StringColumnSchema::class],
-            ['timestamp', 'timestamp', StringColumnSchema::class],
-            ['json', 'json', JsonColumnSchema::class],
+            ['bit', ColumnType::BIT, BitColumnSchema::class],
+            ['tinyint', ColumnType::TINYINT, IntegerColumnSchema::class],
+            ['smallint', ColumnType::SMALLINT, IntegerColumnSchema::class],
+            ['mediumint', ColumnType::INTEGER, IntegerColumnSchema::class],
+            ['int', ColumnType::INTEGER, IntegerColumnSchema::class],
+            ['integer', ColumnType::INTEGER, IntegerColumnSchema::class],
+            ['bigint', ColumnType::BIGINT, IntegerColumnSchema::class],
+            ['float', ColumnType::FLOAT, DoubleColumnSchema::class],
+            ['real', ColumnType::FLOAT, DoubleColumnSchema::class],
+            ['double', ColumnType::DOUBLE, DoubleColumnSchema::class],
+            ['decimal', ColumnType::DECIMAL, DoubleColumnSchema::class],
+            ['numeric', ColumnType::DECIMAL, DoubleColumnSchema::class],
+            ['char', ColumnType::CHAR, StringColumnSchema::class],
+            ['varchar', ColumnType::STRING, StringColumnSchema::class],
+            ['string', ColumnType::STRING, StringColumnSchema::class],
+            ['enum', ColumnType::STRING, StringColumnSchema::class],
+            ['tinytext', ColumnType::TEXT, StringColumnSchema::class],
+            ['mediumtext', ColumnType::TEXT, StringColumnSchema::class],
+            ['longtext', ColumnType::TEXT, StringColumnSchema::class],
+            ['text', ColumnType::TEXT, StringColumnSchema::class],
+            ['varbinary', ColumnType::BINARY, BinaryColumnSchema::class],
+            ['blob', ColumnType::BINARY, BinaryColumnSchema::class],
+            ['longblob', ColumnType::BINARY, BinaryColumnSchema::class],
+            ['year', ColumnType::DATE, StringColumnSchema::class],
+            ['date', ColumnType::DATE, StringColumnSchema::class],
+            ['time', ColumnType::TIME, StringColumnSchema::class],
+            ['datetime', ColumnType::DATETIME, StringColumnSchema::class],
+            ['timestamp', ColumnType::TIMESTAMP, StringColumnSchema::class],
+            ['json', ColumnType::JSON, JsonColumnSchema::class],
         ];
     }
 
@@ -54,7 +55,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         $definitions = parent::definitions();
 
-        $definitions[] = ['bit(1)', 'boolean', BooleanColumnSchema::class, ['getSize' => 1]];
+        $definitions[] = ['bit(1)', ColumnType::BOOLEAN, BooleanColumnSchema::class, ['getSize' => 1]];
 
         return $definitions;
     }

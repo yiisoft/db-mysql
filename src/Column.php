@@ -17,7 +17,7 @@ use Yiisoft\Db\Schema\Builder\AbstractColumn;
  * For example, the following code creates a column schema for an integer column:
  *
  * ```php
- * $column = (new Column(SchemaInterface::TYPE_INTEGER))->notNull()->defaultValue(0);
+ * $column = (new Column(ColumnType::INTEGER))->notNull()->defaultValue(0);
  * ```
  *
  * Provides a fluent interface, which means that the methods can be chained together to create a column schema with
