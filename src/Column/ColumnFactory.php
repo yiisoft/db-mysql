@@ -73,4 +73,9 @@ final class ColumnFactory extends AbstractColumnFactory
 
         return $type;
     }
+
+    protected function isDbType(string $dbType): bool
+    {
+        return isset(self::TYPE_MAP[$dbType]);
+    }
 }
