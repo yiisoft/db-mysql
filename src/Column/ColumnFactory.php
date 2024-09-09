@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -48,20 +47,6 @@ final class ColumnFactory extends AbstractColumnFactory
         'timestamp' => ColumnType::TIMESTAMP,
         'json' => ColumnType::JSON,
     ];
-
-    public function fromDefinition(string $definition, array $info = []): ColumnSchemaInterface
-    {
-        if (str_starts_with($definition, 'enum(')) {
-            preg_match('/^enum\(([^)]+)\)\s*/', $definition, $matches);
-            preg_match_all("/'([^']*)'/", $matches[1], $values);
-
-            $info['enum_values'] = $values[1];
-
-            return $this->fromDbType('enum', $info);
-        }
-
-        return parent::fromDefinition($definition, $info);
-    }
 
     protected function getType(string $dbType, array $info = []): string
     {
