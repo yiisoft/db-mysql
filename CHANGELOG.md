@@ -11,6 +11,7 @@
 - Enh #346: Implement `ColumnFactory` class (@Tigrov)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - Bug #349, #352: Restore connection if closed by connection timeout (@Tigrov)
+- Enh #354: Separate column type constants (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
