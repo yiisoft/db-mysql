@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Throwable;
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
@@ -187,7 +188,7 @@ final class Schema extends AbstractPdoSchema
             $info['extra_default_value'] = $columnsExtra[$info['field']] ?? '';
 
             if (in_array($info['field'], $jsonColumns, true)) {
-                $info['type'] = self::TYPE_JSON;
+                $info['type'] = ColumnType::JSON;
             }
 
             $column = $this->loadColumnSchema($info);
@@ -434,8 +435,8 @@ final class Schema extends AbstractPdoSchema
             && !empty($info['extra_default_value'])
             && !str_starts_with($info['extra_default_value'], '\'')
             && in_array($column->getType(), [
-                self::TYPE_CHAR, self::TYPE_STRING, self::TYPE_TEXT,
-                self::TYPE_DATETIME, self::TYPE_TIMESTAMP, self::TYPE_TIME, self::TYPE_DATE,
+                ColumnType::CHAR, ColumnType::STRING, ColumnType::TEXT,
+                ColumnType::DATETIME, ColumnType::TIMESTAMP, ColumnType::TIME, ColumnType::DATE,
             ], true)
         ) {
             $extra = 'DEFAULT_GENERATED';
@@ -470,7 +471,7 @@ final class Schema extends AbstractPdoSchema
         }
 
         if (
-            in_array($column->getType(), [self::TYPE_TIMESTAMP, self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME], true)
+            in_array($column->getType(), [ColumnType::TIMESTAMP, ColumnType::DATETIME, ColumnType::DATE, ColumnType::TIME], true)
             && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
         ) {
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));

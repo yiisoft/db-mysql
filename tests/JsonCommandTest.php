@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Schema\SchemaInterface;
 
 /**
  * @group mysql
@@ -28,8 +29,8 @@ final class JsonCommandTest extends TestCase
 
         $command = $db->createCommand();
         $command->createTable('json', [
-            'id' => SchemaInterface::TYPE_PK,
-            'data' => SchemaInterface::TYPE_JSON,
+            'id' => PseudoType::PK,
+            'data' => ColumnType::JSON,
         ])->execute();
 
         $this->assertTrue($db->getTableSchema('json') !== null);

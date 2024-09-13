@@ -8,6 +8,8 @@ use ReflectionException;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
+use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
@@ -521,9 +523,9 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->createTable(
             $tableName,
             [
-                'id' => new Column(SchemaInterface::TYPE_PK),
-                'bool_col' => new Column(SchemaInterface::TYPE_BOOLEAN),
-                'status' => new Column(SchemaInterface::TYPE_TINYINT, 1),
+                'id' => new Column(PseudoType::PK),
+                'bool_col' => new Column(ColumnType::BOOLEAN),
+                'status' => new Column(ColumnType::TINYINT, 1),
             ]
         )->execute();
 
