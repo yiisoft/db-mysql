@@ -8,8 +8,9 @@ use Psr\Log\LogLevel;
 use Throwable;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
 use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
-use Yiisoft\Db\Mysql\Column\ColumnBuilder;
+use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
+use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\QuoterInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -64,9 +65,9 @@ final class Connection extends AbstractPdoConnection
         return new Transaction($this);
     }
 
-    public function getColumnBuilderClass(): string
+    public function getColumnFactory(): ColumnFactoryInterface
     {
-        return ColumnBuilder::class;
+        return new ColumnFactory();
     }
 
     public function getQueryBuilder(): QueryBuilderInterface
