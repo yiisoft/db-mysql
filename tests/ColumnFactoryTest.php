@@ -21,9 +21,23 @@ final class ColumnFactoryTest extends AbstractColumnFactoryTest
     }
 
     /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider::definitions */
-    public function testFromDefinition(string $definition, string $expectedType, string $expectedInstanceOf, array $expectedInfo = []): void
-    {
-        parent::testFromDefinition($definition, $expectedType, $expectedInstanceOf, $expectedInfo);
+    public function testFromDefinition(
+        string $definition,
+        string $expectedType,
+        string $expectedInstanceOf,
+        array $expectedMethodResults = []
+    ): void {
+        parent::testFromDefinition($definition, $expectedType, $expectedInstanceOf, $expectedMethodResults);
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider::pseudoTypes */
+    public function testFromPseudoType(
+        string $pseudoType,
+        string $expectedType,
+        string $expectedInstanceOf,
+        array $expectedMethodResults = []
+    ): void {
+        parent::testFromPseudoType($pseudoType, $expectedType, $expectedInstanceOf, $expectedMethodResults);
     }
 
     /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider::types */

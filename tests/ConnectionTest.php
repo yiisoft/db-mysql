@@ -11,6 +11,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
 use Yiisoft\Db\Transaction\TransactionInterface;
@@ -155,5 +156,12 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
 
         $db->createCommand('SELECT 1')->queryScalar();
+    }
+
+    public function testGetColumnFactory(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertInstanceOf(ColumnFactory::class, $db->getColumnFactory());
     }
 }

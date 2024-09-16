@@ -55,7 +55,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         $definitions = parent::definitions();
 
-        $definitions[] = ['bit(1)', ColumnType::BOOLEAN, BooleanColumnSchema::class, ['getSize' => 1]];
+        $definitions[] = ['bit(1)', ColumnType::BOOLEAN, BooleanColumnSchema::class, ['getDbType' => 'bit', 'getSize' => 1]];
 
         return $definitions;
     }
