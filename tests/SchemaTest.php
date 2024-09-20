@@ -141,6 +141,20 @@ final class SchemaTest extends CommonSchemaTest
                 $columns['id']['dbType'] = 'int';
                 $columns['id']['size'] = null;
             }
+
+            if ($tableName === 'T_constraints_1') {
+                $columns['C_id']['dbType'] = 'int';
+                $columns['C_id']['size'] = null;
+
+                $columns['C_not_null']['dbType'] = 'int';
+                $columns['C_not_null']['size'] = null;
+
+                $columns['C_unique']['dbType'] = 'int';
+                $columns['C_unique']['size'] = null;
+
+                $columns['C_default']['dbType'] = 'int';
+                $columns['C_default']['size'] = null;
+            }
         }
 
         parent::testColumnSchema($columns, $tableName);
