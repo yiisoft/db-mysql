@@ -119,33 +119,27 @@ final class SchemaTest extends CommonSchemaTest
                 // int_col Mysql 8.0.17+.
                 $columns['int_col']['dbType'] = 'int';
                 $columns['int_col']['size'] = null;
-                $columns['int_col']['precision'] = null;
 
                 // int_col2 Mysql 8.0.17+.
                 $columns['int_col2']['dbType'] = 'int';
                 $columns['int_col2']['size'] = null;
-                $columns['int_col2']['precision'] = null;
 
                 // bigunsigned_col Mysql 8.0.17+.
                 $columns['bigunsigned_col']['dbType'] = 'bigint unsigned';
                 $columns['bigunsigned_col']['size'] = null;
-                $columns['bigunsigned_col']['precision'] = null;
 
                 // tinyint_col Mysql 8.0.17+.
                 $columns['tinyint_col']['dbType'] = 'tinyint';
                 $columns['tinyint_col']['size'] = null;
-                $columns['tinyint_col']['precision'] = null;
 
                 // smallint_col Mysql 8.0.17+.
                 $columns['smallint_col']['dbType'] = 'smallint';
                 $columns['smallint_col']['size'] = null;
-                $columns['smallint_col']['precision'] = null;
             }
 
             if ($tableName === 'animal') {
                 $columns['id']['dbType'] = 'int';
                 $columns['id']['size'] = null;
-                $columns['id']['precision'] = null;
             }
         }
 

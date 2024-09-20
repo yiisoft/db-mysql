@@ -50,7 +50,6 @@ use function trim;
  *   comment: string,
  *   enum_values?: string[],
  *   size?: int,
- *   precision?: int,
  *   scale?: int,
  * }
  * @psalm-type RowConstraint = array{
@@ -416,10 +415,12 @@ final class Schema extends AbstractPdoSchema
         $dbType = $info['type'];
         /** @psalm-var ColumnInfoArray $info */
         $column = $columnFactory->fromDefinition($dbType);
+        /** @psalm-suppress DeprecatedMethod */
         $column->name($info['field']);
-        $column->allowNull($info['null'] === 'YES');
-        $column->primaryKey(str_contains($info['key'], 'PRI'));
+        $column->notNull($info['null'] !== 'YES');
+        $column->primaryKey($info['key'] === 'PRI');
         $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
+        $column->unique($info['key'] === 'UNI');
         $column->comment($info['comment']);
         $column->dbType($dbType);
 
