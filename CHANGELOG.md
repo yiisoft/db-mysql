@@ -13,6 +13,7 @@
 - Bug #349, #352: Restore connection if closed by connection timeout (@Tigrov)
 - Enh #354: Separate column type constants (@Tigrov)
 - Enh #355: Realize `ColumnBuilder` class (@Tigrov)
+- Enh #357: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
