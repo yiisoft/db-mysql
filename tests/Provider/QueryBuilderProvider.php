@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -173,5 +174,44 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         }
 
         return $upsert;
+    }
+
+    public static function buildColumnDefinition(): array
+    {
+        $values = parent::buildColumnDefinition();
+
+        $values[PseudoType::PK][0] = 'int PRIMARY KEY AUTO_INCREMENT';
+        $values[PseudoType::UPK][0] = 'int UNSIGNED PRIMARY KEY AUTO_INCREMENT';
+        $values[PseudoType::BIGPK][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
+        $values[PseudoType::UBIGPK][0] = 'bigint UNSIGNED PRIMARY KEY AUTO_INCREMENT';
+        $values[PseudoType::UUID_PK][0] = 'binary(16) PRIMARY KEY DEFAULT uuid_to_bin(uuid())';
+        $values[PseudoType::UUID_PK_SEQ][0] = 'binary(16) PRIMARY KEY DEFAULT uuid_to_bin(uuid())';
+        $values['primaryKey()'][0] = 'int PRIMARY KEY AUTO_INCREMENT';
+        $values['primaryKey(false)'][0] = 'int PRIMARY KEY';
+        $values['smallPrimaryKey()'][0] = 'smallint PRIMARY KEY AUTO_INCREMENT';
+        $values['bigPrimaryKey()'][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
+        $values['uuidPrimaryKey()'][0] = 'binary(16) PRIMARY KEY DEFAULT uuid_to_bin(uuid())';
+        $values['uuidPrimaryKey(false)'][0] = 'binary(16) PRIMARY KEY';
+        $values['boolean()'][0] = 'bit(1)';
+        $values['boolean(100)'][0] = 'bit(1)';
+        $values['integer()'][0] = 'int';
+        $values['integer(8)'][0] = 'int(8)';
+        $values['money()'][0] = 'decimal(19,4)';
+        $values['money(10)'][0] = 'decimal(10,4)';
+        $values['money(10,2)'][0] = 'decimal(10,2)';
+        $values['money(null)'][0] = 'decimal';
+        $values['binary()'][0] = 'blob';
+        $values['binary(1000)'][0] = 'blob(1000)';
+        $values['uuid()'][0] = 'binary(16)';
+        $values["comment('comment')"][0] = "varchar(255) COMMENT 'comment'";
+        $values["comment('')"][0] = "varchar(255) COMMENT ''";
+        $values['integer()->primaryKey()'][0] = 'int PRIMARY KEY';
+        $values["integer()->defaultValue('')"][0] = 'int';
+        $values['unsigned()'][0] = 'int UNSIGNED';
+        $values['integer(8)->scale(2)'][0] = 'int(8)';
+        $values['reference($reference)'][0] = 'int REFERENCES `ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
+        $values['reference($referenceWithSchema)'][0] = 'int REFERENCES `ref_schema`.`ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
+
+        return $values;
     }
 }

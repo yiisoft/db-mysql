@@ -15,6 +15,7 @@ use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
 use function str_contains;
@@ -730,5 +731,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($expectedCount, $count);
 
         $db->close();
+    }
+
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildColumnDefinition() */
+    public function testBuildColumnDefinition(string $expected, ColumnSchemaInterface|string $column): void
+    {
+        parent::testBuildColumnDefinition($expected, $column);
     }
 }
