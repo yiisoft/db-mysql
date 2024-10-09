@@ -210,6 +210,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['unsigned()'][0] = 'int UNSIGNED';
         $values['integer(8)->scale(2)'][0] = 'int(8)';
         $values['reference($reference)'][0] = 'int REFERENCES `ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
+        $values['reference($referenceWithSchema)'][0] = 'int REFERENCES `ref_schema`.`ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
 
         return $values;
     }
