@@ -206,6 +206,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values["comment('comment')"][0] = "varchar(255) COMMENT 'comment'";
         $values["comment('')"][0] = "varchar(255) COMMENT ''";
         $values['integer()->primaryKey()'][0] = 'int PRIMARY KEY';
+        $values["integer()->defaultValue('')"][0] = 'int';
         $values['unsigned()'][0] = 'int UNSIGNED';
         $values['integer(8)->scale(2)'][0] = 'int(8)';
         $values['reference($reference)'][0] = 'int REFERENCES `ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
