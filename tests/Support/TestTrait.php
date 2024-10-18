@@ -27,7 +27,7 @@ trait TestTrait
 
     protected static function getDb(): PdoConnectionInterface
     {
-        $dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
+        $dsn = (new Dsn(databaseName: 'yiitest', options: ['charset' => 'utf8mb4']))->asString();
 
         return new Connection(new Driver($dsn, 'root', ''), DbHelper::getSchemaCache());
     }
@@ -35,7 +35,7 @@ trait TestTrait
     protected function getDsn(): string
     {
         if ($this->dsn === '') {
-            $this->dsn = (new Dsn('mysql', '127.0.0.1', 'yiitest', '3306', ['charset' => 'utf8mb4']))->asString();
+            $this->dsn = (new Dsn(databaseName: 'yiitest', options: ['charset' => 'utf8mb4']))->asString();
         }
 
         return $this->dsn;
