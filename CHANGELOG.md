@@ -14,7 +14,8 @@
 - Enh #354: Separate column type constants (@Tigrov)
 - New #355: Realize `ColumnBuilder` class (@Tigrov)
 - Enh #357: Update according changes in `ColumnSchemaInterface` (@Tigrov)
-- New #358: Add `ColumnDefinitionBuilder` class (@Tigrov) 
+- New #358: Add `ColumnDefinitionBuilder` class (@Tigrov)
+- Enh #359: Refactor `Dsn` class (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
