@@ -64,5 +64,3 @@ jobs:
 
       - name: Check dependencies.
         run: vendor/bin/composer-require-checker
-        env:
-          ENVIRONMENT: ci
