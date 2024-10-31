@@ -141,12 +141,6 @@ final class CommandTest extends CommonCommandTest
 
     public function testShowDatabases(): void
     {
-        $dsn = new Dsn('mysql', '127.0.0.1', );
-        $db = new Connection(new Driver($dsn->asString(), 'root', ''), DbHelper::getSchemaCache());
-
-        $command = $db->createCommand();
-
-        $this->assertSame('mysql:host=127.0.0.1;port=3306', $db->getDriver()->getDsn());
-        $this->assertSame(['yiitest'], $command->showDatabases());
+        $this->assertSame([self::getDatabaseName()], static::getDb()->createCommand()->showDatabases());
     }
 }

@@ -86,6 +86,13 @@ jobs:
 
       - name: Run tests with phpunit with code coverage.
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always --display-warnings --display-deprecations
+        env:
+          ENVIRONMENT: ci
+          YII_MYSQL_DATABASE: yiitest
+          YII_MYSQL_HOST: 127.0.0.1
+          YII_MYSQL_PORT: 3306
+          YII_MYSQL_USER: root
+          YII_MYSQL_PASSWORD: ''
 
       - name: Upload coverage to Codecov.
         uses: codecov/codecov-action@v3
