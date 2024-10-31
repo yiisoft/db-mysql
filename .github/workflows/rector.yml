@@ -16,3 +16,5 @@ jobs:
         ['ubuntu-latest']
       php: >-
         ['8.3']
+    env:
+      ENVIRONMENT: ci
