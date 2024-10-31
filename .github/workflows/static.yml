@@ -66,3 +66,5 @@ jobs:
 
       - name: Static analysis.
         run: vendor/bin/psalm --config=${{ inputs.psalm-config }} --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
+        env:
+          ENVIRONMENT: ci
