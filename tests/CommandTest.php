@@ -8,12 +8,8 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Mysql\Dsn;
-use Yiisoft\Db\Mysql\Driver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group mysql
@@ -141,6 +137,6 @@ final class CommandTest extends CommonCommandTest
 
     public function testShowDatabases(): void
     {
-        $this->assertSame([self::getDatabaseName()], static::getDb()->createCommand()->showDatabases());
+        $this->assertSame([self::getDatabaseName()], self::getDb()->createCommand()->showDatabases());
     }
 }
