@@ -6,10 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Mysql\Driver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group mysql
@@ -40,7 +37,7 @@ final class PDODriverTest extends TestCase
 
     public function testCharsetDefault(): void
     {
-        $db = static::getDb();
+        $db = self::getDb();
         $db->open();
         $command = $db->createCommand();
 
