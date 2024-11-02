@@ -13,10 +13,9 @@ final class ColumnFactory extends AbstractColumnFactory
      * Mapping from physical column types (keys) to abstract column types (values).
      *
      * @var string[]
-     *
-     * @psalm-suppress MissingClassConstType
+     * @psalm-var array<string, ColumnType::*>
      */
-    private const TYPE_MAP = [
+    protected const TYPE_MAP = [
         'bit' => ColumnType::BIT,
         'tinyint' => ColumnType::TINYINT,
         'smallint' => ColumnType::SMALLINT,
@@ -50,17 +49,10 @@ final class ColumnFactory extends AbstractColumnFactory
 
     protected function getType(string $dbType, array $info = []): string
     {
-        $type = self::TYPE_MAP[$dbType] ?? ColumnType::STRING;
-
-        if ($type === ColumnType::BIT && isset($info['size']) && $info['size'] === 1) {
+        if ($dbType === 'bit' && isset($info['size']) && $info['size'] === 1) {
             return ColumnType::BOOLEAN;
         }
 
-        return $type;
-    }
-
-    protected function isDbType(string $dbType): bool
-    {
-        return isset(self::TYPE_MAP[$dbType]);
+        return parent::getType($dbType, $info);
     }
 }

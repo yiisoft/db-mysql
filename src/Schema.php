@@ -33,27 +33,26 @@ use function md5;
 use function preg_match_all;
 use function preg_match;
 use function serialize;
-use function stripos;
+use function str_contains;
+use function str_ireplace;
+use function str_starts_with;
 use function strtolower;
+use function substr;
 use function trim;
 
 /**
  * Implements MySQL, MariaDB specific schema, supporting MySQL Server 5.7, MariaDB Server 10.4 and higher.
  *
- * @psalm-type ColumnInfoArray = array{
- *   field: string,
- *   type: string,
- *   collation: string|null,
- *   null: string,
- *   key: string,
- *   default: string|null,
+ * @psalm-type ColumnArray = array{
+ *   column_name: string,
+ *   column_default: string|null,
+ *   is_nullable: string,
+ *   column_type: string,
+ *   column_key: string,
  *   extra: string,
- *   extra_default_value: string|null,
- *   privileges: string,
- *   comment: string,
- *   enum_values?: string[],
- *   size?: int,
- *   scale?: int,
+ *   column_comment: string,
+ *   schema: string,
+ *   table: string
  * }
  * @psalm-type RowConstraint = array{
  *   constraint_name: string,
@@ -140,63 +139,55 @@ final class Schema extends AbstractPdoSchema
      */
     protected function findColumns(TableSchemaInterface $table): bool
     {
-        $tableName = $table->getFullName() ?? '';
-        $sql = 'SHOW FULL COLUMNS FROM ' . $this->db->getQuoter()->quoteTableName($tableName);
+        $schemaName = $table->getSchemaName();
+        $tableName = $table->getName();
 
-        try {
-            $columns = $this->db->createCommand($sql)->queryAll();
-            // Chapter 1: crutches for MariaDB. {@see https://github.com/yiisoft/yii2/issues/19747}
-            $columnsExtra = [];
-            if (str_contains($this->db->getServerVersion(), 'MariaDB')) {
-                $rows = $this->db->createCommand(
-                    <<<SQL
-                    SELECT `COLUMN_NAME` as name,`COLUMN_DEFAULT` as default_value
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_SCHEMA = COALESCE(:schemaName, DATABASE()) AND TABLE_NAME = :tableName
-                    SQL ,
-                    [
-                        ':schemaName' => $table->getSchemaName(),
-                        ':tableName' => $table->getName(),
-                    ]
-                )->queryAll();
-                /** @psalm-var string[] $cols */
-                foreach ($rows as $cols) {
-                    $columnsExtra[$cols['name']] = $cols['default_value'];
-                }
-            }
-        } catch (Exception $e) {
-            $previous = $e->getPrevious();
+        $columns = $this->db->createCommand(<<<SQL
+            SELECT
+                `COLUMN_NAME`,
+                `COLUMN_DEFAULT`,
+                `IS_NULLABLE`,
+                `COLUMN_TYPE`,
+                `COLUMN_KEY`,
+                `EXTRA`,
+                `COLUMN_COMMENT`
+            FROM `INFORMATION_SCHEMA`.`COLUMNS`
+            WHERE `TABLE_SCHEMA` = COALESCE(:schemaName, DATABASE())
+                AND `TABLE_NAME` = :tableName
+            SQL,
+            [
+                ':schemaName' => $schemaName,
+                ':tableName' => $tableName,
+            ]
+        )->queryAll();
 
-            if ($previous && str_contains($previous->getMessage(), 'SQLSTATE[42S02')) {
-                /**
-                 * The table doesn't exist.
-                 *
-                 * @link https://dev.mysql.com/doc/refman/5.5/en/error-messages-server.html#error_er_bad_table_error
-                 */
-                return false;
-            }
-
-            throw $e;
+        if (empty($columns)) {
+            return false;
         }
 
         $jsonColumns = $this->getJsonColumns($table);
+        $isMariaDb = str_contains($this->db->getServerVersion(), 'MariaDB');
 
-        /** @psalm-var ColumnInfoArray $info */
         foreach ($columns as $info) {
-            /** @psalm-var ColumnInfoArray $info */
             $info = array_change_key_case($info);
 
-            $info['extra_default_value'] = $columnsExtra[$info['field']] ?? '';
+            $info['schema'] = $schemaName;
+            $info['table'] = $tableName;
 
-            if (in_array($info['field'], $jsonColumns, true)) {
-                $info['type'] = ColumnType::JSON;
+            if (in_array($info['column_name'], $jsonColumns, true)) {
+                $info['column_type'] = ColumnType::JSON;
             }
 
+            if ($isMariaDb && $info['column_default'] === 'NULL') {
+                $info['column_default'] = null;
+            }
+
+            /** @psalm-var ColumnArray $info */
             $column = $this->loadColumnSchema($info);
-            $table->column($info['field'], $column);
+            $table->column($info['column_name'], $column);
 
             if ($column->isPrimaryKey()) {
-                $table->primaryKey($info['field']);
+                $table->primaryKey($info['column_name']);
                 if ($column->isAutoIncrement()) {
                     $table->sequenceName('');
                 }
@@ -415,43 +406,28 @@ final class Schema extends AbstractPdoSchema
      *
      * @return ColumnSchemaInterface The column schema object.
      *
-     * @psalm-param ColumnInfoArray $info The column information.
+     * @psalm-param ColumnArray $info The column information.
      */
     private function loadColumnSchema(array $info): ColumnSchemaInterface
     {
-        $columnFactory = $this->getColumnFactory();
+        $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
 
-        $dbType = $info['type'];
-        /** @psalm-var ColumnInfoArray $info */
-        $column = $columnFactory->fromDefinition($dbType);
-        /** @psalm-suppress DeprecatedMethod */
-        $column->name($info['field']);
-        $column->notNull($info['null'] !== 'YES');
-        $column->primaryKey($info['key'] === 'PRI');
-        $column->autoIncrement(stripos($info['extra'], 'auto_increment') !== false);
-        $column->unique($info['key'] === 'UNI');
-        $column->comment($info['comment']);
-        $column->dbType($dbType);
+        $column = $this->getColumnFactory()->fromDefinition($info['column_type'], [
+            'autoIncrement' => $autoIncrement > 0,
+            'comment' => $info['column_comment'],
+            'extra' => $extra,
+            'name' => $info['column_name'],
+            'notNull' => $info['is_nullable'] !== 'YES',
+            'primaryKey' => $info['column_key'] === 'PRI',
+            'schema' => $info['schema'],
+            'table' => $info['table'],
+            'unique' => $info['column_key'] === 'UNI',
+        ]);
 
-        // Chapter 2: crutches for MariaDB {@see https://github.com/yiisoft/yii2/issues/19747}
-        $extra = $info['extra'];
-        if (
-            empty($extra)
-            && !empty($info['extra_default_value'])
-            && !str_starts_with($info['extra_default_value'], '\'')
-            && in_array($column->getType(), [
-                ColumnType::CHAR, ColumnType::STRING, ColumnType::TEXT,
-                ColumnType::DATETIME, ColumnType::TIMESTAMP, ColumnType::TIME, ColumnType::DATE,
-            ], true)
-        ) {
-            $extra = 'DEFAULT_GENERATED';
-        }
-
-        $column->extra($extra);
-        $column->defaultValue($this->normalizeDefaultValue($info['default'], $column));
+        $column->defaultValue($this->normalizeDefaultValue($info['column_default'], $column));
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $column->extra(trim(strtoupper(substr($extra, 18))));
+            $column->extra(trim(substr($extra, 18)));
         }
 
         return $column;
@@ -488,6 +464,10 @@ final class Schema extends AbstractPdoSchema
 
         if (str_starts_with(strtolower((string) $column->getDbType()), 'bit')) {
             return $column->phpTypecast(bindec(trim($defaultValue, "b'")));
+        }
+
+        if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
+            return $column->phpTypecast(substr($defaultValue, 1, -1));
         }
 
         return $column->phpTypecast($defaultValue);
@@ -820,7 +800,7 @@ final class Schema extends AbstractPdoSchema
     {
         $sql = $this->getCreateTableSql($table);
         $result = [];
-        $regexp = '/json_valid\([\`"](.+)[\`"]\s*\)/mi';
+        $regexp = '/json_valid\([`"](.+)[`"]\s*\)/mi';
 
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
