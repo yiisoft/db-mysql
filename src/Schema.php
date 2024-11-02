@@ -142,7 +142,8 @@ final class Schema extends AbstractPdoSchema
         $schemaName = $table->getSchemaName();
         $tableName = $table->getName();
 
-        $columns = $this->db->createCommand(<<<SQL
+        $columns = $this->db->createCommand(
+            <<<SQL
             SELECT
                 `COLUMN_NAME`,
                 `COLUMN_DEFAULT`,

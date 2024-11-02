@@ -115,7 +115,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     ],
                     'enum_col' => [
                         'type' => 'string',
-                        'dbType' => "enum",
+                        'dbType' => 'enum',
                         'phpType' => 'string',
                         'primaryKey' => false,
                         'notNull' => false,
