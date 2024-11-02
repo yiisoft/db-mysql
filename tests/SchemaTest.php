@@ -49,43 +49,28 @@ final class SchemaTest extends CommonSchemaTest
             !str_contains($db->getServerVersion(), 'MariaDB')
         ) {
             if ($tableName === 'type') {
-                // int_col Mysql 8.0.17+.
-                $columns['int_col']['dbType'] = 'int';
                 $columns['int_col']['size'] = null;
 
-                // int_col2 Mysql 8.0.17+.
-                $columns['int_col2']['dbType'] = 'int';
                 $columns['int_col2']['size'] = null;
 
-                // bigunsigned_col Mysql 8.0.17+.
-                $columns['bigunsigned_col']['dbType'] = 'bigint unsigned';
                 $columns['bigunsigned_col']['size'] = null;
 
-                // tinyint_col Mysql 8.0.17+.
-                $columns['tinyint_col']['dbType'] = 'tinyint';
                 $columns['tinyint_col']['size'] = null;
 
-                // smallint_col Mysql 8.0.17+.
-                $columns['smallint_col']['dbType'] = 'smallint';
                 $columns['smallint_col']['size'] = null;
             }
 
             if ($tableName === 'animal') {
-                $columns['id']['dbType'] = 'int';
                 $columns['id']['size'] = null;
             }
 
             if ($tableName === 'T_constraints_1') {
-                $columns['C_id']['dbType'] = 'int';
                 $columns['C_id']['size'] = null;
 
-                $columns['C_not_null']['dbType'] = 'int';
                 $columns['C_not_null']['size'] = null;
 
-                $columns['C_unique']['dbType'] = 'int';
                 $columns['C_unique']['size'] = null;
 
-                $columns['C_default']['dbType'] = 'int';
                 $columns['C_default']['size'] = null;
             }
         }
