@@ -155,6 +155,7 @@ final class Schema extends AbstractPdoSchema
             FROM `INFORMATION_SCHEMA`.`COLUMNS`
             WHERE `TABLE_SCHEMA` = COALESCE(:schemaName, DATABASE())
                 AND `TABLE_NAME` = :tableName
+            ORDER BY `ORDINAL_POSITION`
             SQL,
             [
                 ':schemaName' => $schemaName,
