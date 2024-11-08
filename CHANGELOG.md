@@ -8,7 +8,7 @@
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
 - New #342: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
-- New #346: Implement `ColumnFactory` class (@Tigrov)
+- New #346, #361: Implement `ColumnFactory` class (@Tigrov)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - Bug #349, #352: Restore connection if closed by connection timeout (@Tigrov)
 - Enh #354: Separate column type constants (@Tigrov)
@@ -16,6 +16,7 @@
 - Enh #357: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 - New #358: Add `ColumnDefinitionBuilder` class (@Tigrov)
 - Enh #359: Refactor `Dsn` class (@Tigrov)
+- Enh #361: Refactor `Schema::findColumns()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
