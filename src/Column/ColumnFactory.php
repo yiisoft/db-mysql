@@ -12,6 +12,7 @@ use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use function bindec;
 use function in_array;
 use function preg_match;
+use function str_starts_with;
 use function substr;
 use function trim;
 
@@ -79,6 +80,10 @@ final class ColumnFactory extends AbstractColumnFactory
 
     protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
     {
+        if ($defaultValue === '') {
+            return $column->phpTypecast($defaultValue);
+        }
+
         if (
             in_array($column->getType(), [ColumnType::TIMESTAMP, ColumnType::DATETIME, ColumnType::DATE, ColumnType::TIME], true)
             && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
@@ -90,12 +95,18 @@ final class ColumnFactory extends AbstractColumnFactory
             return new Expression($defaultValue);
         }
 
-        if ($column->getDbType() === 'bit') {
+        if (
+            in_array($column->getType(), [ColumnType::BOOLEAN, ColumnType::BIT], true)
+            && str_starts_with($defaultValue, "b'")
+        ) {
             return $column->phpTypecast(bindec(trim($defaultValue, "b'")));
         }
 
         if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
-            return $column->phpTypecast(substr($defaultValue, 1, -1));
+            $value = substr($defaultValue, 1, -1);
+            $value = str_replace("''", "'", $value);
+
+            return $column->phpTypecast($value);
         }
 
         return $column->phpTypecast($defaultValue);
