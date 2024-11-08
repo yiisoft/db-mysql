@@ -15,7 +15,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Column;
+use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -436,9 +436,9 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->createTable(
             $tableName,
             [
-                'id' => new Column(PseudoType::PK),
-                'bool_col' => new Column(ColumnType::BOOLEAN),
-                'status' => new Column(ColumnType::TINYINT, 1),
+                'id' => ColumnBuilder::primaryKey(),
+                'bool_col' => ColumnBuilder::boolean(),
+                'status' => ColumnBuilder::tinyint(),
             ]
         )->execute();
 

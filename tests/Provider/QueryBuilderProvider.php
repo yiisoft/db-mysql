@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
@@ -18,6 +19,13 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     use TestTrait;
 
     protected static string $driverName = 'mysql';
+
+    public static function alterColumn(): array
+    {
+        return [
+            [ColumnType::STRING, 'ALTER TABLE `foo1` CHANGE `bar` `bar` varchar(255)'],
+        ];
+    }
 
     public static function buildCondition(): array
     {
