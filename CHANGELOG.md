@@ -16,6 +16,7 @@
 - Enh #357: Update according changes in `ColumnSchemaInterface` (@Tigrov)
 - New #358: Add `ColumnDefinitionBuilder` class (@Tigrov)
 - Enh #359: Refactor `Dsn` class (@Tigrov)
+- Enh #361: Refactor `Schema::findColumns()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
