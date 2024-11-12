@@ -14,7 +14,6 @@ use function in_array;
 use function preg_match;
 use function str_starts_with;
 use function substr;
-use function trim;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -91,15 +90,8 @@ final class ColumnFactory extends AbstractColumnFactory
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if (!empty($defaultValue) && !empty($column->getExtra())) {
+        if (!empty($column->getExtra())) {
             return new Expression($defaultValue);
-        }
-
-        if (
-            in_array($column->getType(), [ColumnType::BOOLEAN, ColumnType::BIT], true)
-            && str_starts_with($defaultValue, "b'")
-        ) {
-            return $column->phpTypecast(bindec(trim($defaultValue, "b'")));
         }
 
         if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
@@ -107,6 +99,13 @@ final class ColumnFactory extends AbstractColumnFactory
             $value = str_replace("''", "'", $value);
 
             return $column->phpTypecast($value);
+        }
+
+        if (
+            str_starts_with($defaultValue, "b'")
+            && in_array($column->getType(), [ColumnType::BOOLEAN, ColumnType::BIT], true)
+        ) {
+            return $column->phpTypecast(bindec(substr($defaultValue, 2, -1)));
         }
 
         return $column->phpTypecast($defaultValue);
