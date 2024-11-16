@@ -13,7 +13,6 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoSchema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
@@ -25,18 +24,15 @@ use Yiisoft\Db\Schema\TableSchemaInterface;
 use function array_change_key_case;
 use function array_map;
 use function array_values;
-use function bindec;
 use function in_array;
 use function is_string;
 use function ksort;
 use function md5;
 use function preg_match_all;
-use function preg_match;
 use function serialize;
 use function str_contains;
 use function str_ireplace;
 use function str_starts_with;
-use function strtolower;
 use function substr;
 use function trim;
 
@@ -417,6 +413,7 @@ final class Schema extends AbstractPdoSchema
         $column = $this->getColumnFactory()->fromDefinition($info['column_type'], [
             'autoIncrement' => $autoIncrement > 0,
             'comment' => $info['column_comment'],
+            'defaultValueRaw' => $info['column_default'],
             'extra' => $extra,
             'name' => $info['column_name'],
             'notNull' => $info['is_nullable'] !== 'YES',
@@ -426,53 +423,11 @@ final class Schema extends AbstractPdoSchema
             'unique' => $info['column_key'] === 'UNI',
         ]);
 
-        $column->defaultValue($this->normalizeDefaultValue($info['column_default'], $column));
-
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
             $column->extra(trim(substr($extra, 18)));
         }
 
         return $column;
-    }
-
-    /**
-     * Converts column's default value according to {@see ColumnSchema::phpType} after retrieval from the database.
-     *
-     * @param string|null $defaultValue The default value retrieved from the database.
-     * @param ColumnSchemaInterface $column The column schema object.
-     *
-     * @return mixed The normalized default value.
-     */
-    private function normalizeDefaultValue(?string $defaultValue, ColumnSchemaInterface $column): mixed
-    {
-        if ($defaultValue === null) {
-            return null;
-        }
-
-        if ($column->isPrimaryKey()) {
-            return $column->phpTypecast($defaultValue);
-        }
-
-        if (
-            in_array($column->getType(), [ColumnType::TIMESTAMP, ColumnType::DATETIME, ColumnType::DATE, ColumnType::TIME], true)
-            && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
-        ) {
-            return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
-        }
-
-        if (!empty($defaultValue) && !empty($column->getExtra())) {
-            return new Expression($defaultValue);
-        }
-
-        if (str_starts_with(strtolower((string) $column->getDbType()), 'bit')) {
-            return $column->phpTypecast(bindec(trim($defaultValue, "b'")));
-        }
-
-        if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
-            return $column->phpTypecast(substr($defaultValue, 1, -1));
-        }
-
-        return $column->phpTypecast($defaultValue);
     }
 
     /**

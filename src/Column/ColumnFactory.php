@@ -5,7 +5,15 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+
+use function bindec;
+use function in_array;
+use function preg_match;
+use function str_starts_with;
+use function substr;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -54,5 +62,52 @@ final class ColumnFactory extends AbstractColumnFactory
         }
 
         return parent::getType($dbType, $info);
+    }
+
+    protected function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
+    {
+        if (
+            $defaultValue === null
+            || $column->isPrimaryKey()
+            || $column->isComputed()
+        ) {
+            return null;
+        }
+
+        return $this->normalizeNotNullDefaultValue($defaultValue, $column);
+    }
+
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
+    {
+        if ($defaultValue === '') {
+            return $column->phpTypecast($defaultValue);
+        }
+
+        if (
+            in_array($column->getType(), [ColumnType::TIMESTAMP, ColumnType::DATETIME, ColumnType::DATE, ColumnType::TIME], true)
+            && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
+        ) {
+            return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
+        }
+
+        if (!empty($column->getExtra())) {
+            return new Expression($defaultValue);
+        }
+
+        if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
+            $value = substr($defaultValue, 1, -1);
+            $value = str_replace("''", "'", $value);
+
+            return $column->phpTypecast($value);
+        }
+
+        if (
+            str_starts_with($defaultValue, "b'")
+            && in_array($column->getType(), [ColumnType::BOOLEAN, ColumnType::BIT], true)
+        ) {
+            return $column->phpTypecast(bindec(substr($defaultValue, 2, -1)));
+        }
+
+        return $column->phpTypecast($defaultValue);
     }
 }
