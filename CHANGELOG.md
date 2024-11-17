@@ -14,7 +14,7 @@
 - Enh #354: Separate column type constants (@Tigrov)
 - New #355: Realize `ColumnBuilder` class (@Tigrov)
 - Enh #357: Update according changes in `ColumnSchemaInterface` (@Tigrov)
-- New #358: Add `ColumnDefinitionBuilder` class (@Tigrov)
+- New #358, #365: Add `ColumnDefinitionBuilder` class (@Tigrov)
 - Enh #359: Refactor `Dsn` class (@Tigrov)
 - Enh #361, #362: Refactor `Schema::findColumns()` method (@Tigrov)
 - Enh #363: Refactor `Schema::normalizeDefaultValue()` method and move it to `ColumnFactory` class (@Tigrov)
