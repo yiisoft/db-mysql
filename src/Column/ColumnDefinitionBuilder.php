@@ -12,7 +12,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTO_INCREMENT';
 
-    protected const GENERATE_UUID_EXPRESSION = 'uuid_to_bin(uuid())';
+    protected const GENERATE_UUID_EXPRESSION = "unhex(replace(uuid(),'-',''))";
 
     protected const TYPES_WITH_SIZE = [
         'bit',
@@ -70,7 +70,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
     protected function getDbType(ColumnSchemaInterface $column): string
     {
         /** @psalm-suppress DocblockTypeContradiction */
-        return match ($column->getType()) {
+        $dbType = $column->getDbType() ?? match ($column->getType()) {
             ColumnType::BOOLEAN => 'bit(1)',
             ColumnType::BIT => 'bit',
             ColumnType::TINYINT => 'tinyint',
@@ -82,7 +82,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::DECIMAL => 'decimal',
             ColumnType::MONEY => 'decimal',
             ColumnType::CHAR => 'char',
-            ColumnType::STRING => 'varchar',
+            ColumnType::STRING => 'varchar(' . ($column->getSize() ?? 255) . ')',
             ColumnType::TEXT => 'text',
             ColumnType::BINARY => 'blob',
             ColumnType::UUID => 'binary(16)',
@@ -95,5 +95,11 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::JSON => 'json',
             default => 'varchar',
         };
+
+        if ($dbType === 'double' && $column->getSize() !== null) {
+            return 'double(' . $column->getSize() . ',' . ($column->getScale() ?? 0) . ')';
+        }
+
+        return $dbType;
     }
 }
