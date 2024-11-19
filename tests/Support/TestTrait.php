@@ -78,26 +78,51 @@ trait TestTrait
 
     private static function getDatabaseName(): string
     {
-        return getenv('YII_MYSQL_DATABASE');
+        if (self::isMariadb()) {
+            return getenv('YII_MARIADB_DATABASE') ?: '';
+        }
+
+        return getenv('YII_MYSQL_DATABASE') ?: '';
     }
 
     private static function getHost(): string
     {
-        return getenv('YII_MYSQL_HOST');
+        if (self::isMariadb()) {
+            return getenv('YII_MARIADB_HOST') ?: '';
+        }
+
+        return getenv('YII_MYSQL_HOST') ?: '';
     }
 
     private static function getPort(): string
     {
-        return getenv('YII_MYSQL_PORT');
+        if (self::isMariadb()) {
+            return getenv('YII_MARIADB_PORT') ?: '';
+        }
+
+        return getenv('YII_MYSQL_PORT') ?: '';
     }
 
     private static function getUsername(): string
     {
-        return getenv('YII_MYSQL_USER');
+        if (self::isMariadb()) {
+            return getenv('YII_MARIADB_USER') ?: '';
+        }
+
+        return getenv('YII_MYSQL_USER') ?: '';
     }
 
     private static function getPassword(): string
     {
-        return getenv('YII_MYSQL_PASSWORD');
+        if (self::isMariadb()) {
+            return getenv('YII_MARIADB_PASSWORD') ?: '';
+        }
+
+        return getenv('YII_MYSQL_PASSWORD') ?: '';
+    }
+
+    private static function isMariadb(): bool
+    {
+        return getenv('YII_MYSQL_TYPE') === 'mariadb';
     }
 }
