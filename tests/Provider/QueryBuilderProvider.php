@@ -209,6 +209,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values["check('')"][0] = 'int';
         $values['check(null)'][0] = 'int';
         $values['defaultValue($expression)'][0] = 'int DEFAULT (1 + 2)';
+        $values['defaultValue($emptyExpression)'][0] = 'int';
         $values["comment('comment')"][0] = "varchar(255) COMMENT 'comment'";
         $values["comment('')"][0] = "varchar(255) COMMENT ''";
         $values['integer()->primaryKey()'][0] = 'int PRIMARY KEY';
