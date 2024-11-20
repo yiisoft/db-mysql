@@ -56,7 +56,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
             . $this->quoter->quoteColumnName($column)
             . (empty($definition) ? '' : ' ' . $definition)
             . ' COMMENT '
-            . (string) $this->quoter->quoteValue($comment);
+            . $this->quoter->quoteValue($comment);
 
         if ($check === 1) {
             $alterSql .= ' ' . $checkMatches[0];
@@ -70,7 +70,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         return 'ALTER TABLE '
             . $this->quoter->quoteTableName($table)
             . ' COMMENT '
-            . (string) $this->quoter->quoteValue($comment);
+            . $this->quoter->quoteValue($comment);
     }
 
     public function addDefaultValue(string $table, string $name, string $column, mixed $value): string
