@@ -18,6 +18,7 @@
 - Enh #359: Refactor `Dsn` class (@Tigrov)
 - Enh #361, #362: Refactor `Schema::findColumns()` method (@Tigrov)
 - Enh #363: Refactor `Schema::normalizeDefaultValue()` method and move it to `ColumnFactory` class (@Tigrov)
+- Enh #366: Refactor `Quoter::quoteValue()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
