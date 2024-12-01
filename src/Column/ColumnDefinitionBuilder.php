@@ -12,7 +12,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTO_INCREMENT';
 
-    protected const GENERATE_UUID_EXPRESSION = "unhex(replace(uuid(),'-',''))";
+    protected const GENERATE_UUID_EXPRESSION = "(unhex(replace(uuid(),'-','')))";
 
     protected const TYPES_WITH_SIZE = [
         'bit',

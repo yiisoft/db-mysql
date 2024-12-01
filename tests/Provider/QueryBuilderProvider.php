@@ -193,13 +193,13 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values[PseudoType::UPK][0] = 'int UNSIGNED PRIMARY KEY AUTO_INCREMENT';
         $values[PseudoType::BIGPK][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
         $values[PseudoType::UBIGPK][0] = 'bigint UNSIGNED PRIMARY KEY AUTO_INCREMENT';
-        $values[PseudoType::UUID_PK][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
-        $values[PseudoType::UUID_PK_SEQ][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
+        $values[PseudoType::UUID_PK][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
+        $values[PseudoType::UUID_PK_SEQ][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
         $values['primaryKey()'][0] = 'int PRIMARY KEY AUTO_INCREMENT';
         $values['primaryKey(false)'][0] = 'int PRIMARY KEY';
         $values['smallPrimaryKey()'][0] = 'smallint PRIMARY KEY AUTO_INCREMENT';
         $values['bigPrimaryKey()'][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
-        $values['uuidPrimaryKey()'][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
+        $values['uuidPrimaryKey()'][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
         $values['uuidPrimaryKey(false)'][0] = 'binary(16) PRIMARY KEY';
         $values['boolean()'][0] = 'bit(1)';
         $values['boolean(100)'][0] = 'bit(1)';
