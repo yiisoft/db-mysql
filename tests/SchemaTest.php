@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use ReflectionException;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
@@ -21,10 +20,8 @@ use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Schema\Column\StringColumnSchema;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
-use Yiisoft\Db\Tests\Support\Assert;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
 use function version_compare;
@@ -37,71 +34,6 @@ use function version_compare;
 final class SchemaTest extends CommonSchemaTest
 {
     use TestTrait;
-
-    /**
-     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is displayed as
-     * CURRENT_TIMESTAMP up until MariaDB 10.2.2, and as current_timestamp() from MariaDB 10.2.3.
-     *
-     * {@link https://mariadb.com/kb/en/library/now/#description}
-     * {@link https://github.com/yiisoft/yii2/issues/15167}
-     *
-     * @throws ReflectionException
-     */
-    public function testAlternativeDisplayOfDefaultCurrentTimestampInMariaDB(): void
-    {
-        /**
-         * We do not have a real database MariaDB >= 10.2.3 for tests, so we emulate the information that database
-         * returns in response to the query `SHOW FULL COLUMNS FROM ...`
-         */
-        $db = $this->getConnection();
-
-        $schema = new Schema($db, DbHelper::getSchemaCache());
-
-        $column = Assert::invokeMethod($schema, 'loadColumnSchema', [[
-            'field' => 'emulated_MariaDB_field',
-            'type' => 'timestamp',
-            'collation' => null,
-            'null' => 'NO',
-            'key' => '',
-            'default' => 'current_timestamp()',
-            'extra' => '',
-            'extra_default_value' => 'current_timestamp()',
-            'privileges' => 'select,insert,update,references',
-            'comment' => '',
-        ]]);
-
-        $this->assertInstanceOf(StringColumnSchema::class, $column);
-        $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-        $this->assertEquals('CURRENT_TIMESTAMP', $column->getDefaultValue());
-    }
-
-    /**
-     * When displayed in the INFORMATION_SCHEMA.COLUMNS table, a default CURRENT TIMESTAMP is provided
-     * as NULL.
-     *
-     * @see https://github.com/yiisoft/yii2/issues/19047
-     */
-    public function testAlternativeDisplayOfDefaultCurrentTimestampAsNullInMariaDB(): void
-    {
-        $db = $this->getConnection();
-
-        $schema = new Schema($db, DbHelper::getSchemaCache());
-
-        $column = Assert::invokeMethod($schema, 'loadColumnSchema', [[
-            'field' => 'emulated_MariaDB_field',
-            'type' => 'timestamp',
-            'collation' => null,
-            'null' => 'NO',
-            'key' => '',
-            'default' => null,
-            'extra' => '',
-            'privileges' => 'select,insert,update,references',
-            'comment' => '',
-        ]]);
-
-        $this->assertInstanceOf(StringColumnSchema::class, $column);
-        $this->assertEquals(null, $column->getDefaultValue());
-    }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns
@@ -117,43 +49,28 @@ final class SchemaTest extends CommonSchemaTest
             !str_contains($db->getServerVersion(), 'MariaDB')
         ) {
             if ($tableName === 'type') {
-                // int_col Mysql 8.0.17+.
-                $columns['int_col']['dbType'] = 'int';
                 $columns['int_col']['size'] = null;
 
-                // int_col2 Mysql 8.0.17+.
-                $columns['int_col2']['dbType'] = 'int';
                 $columns['int_col2']['size'] = null;
 
-                // bigunsigned_col Mysql 8.0.17+.
-                $columns['bigunsigned_col']['dbType'] = 'bigint unsigned';
                 $columns['bigunsigned_col']['size'] = null;
 
-                // tinyint_col Mysql 8.0.17+.
-                $columns['tinyint_col']['dbType'] = 'tinyint';
                 $columns['tinyint_col']['size'] = null;
 
-                // smallint_col Mysql 8.0.17+.
-                $columns['smallint_col']['dbType'] = 'smallint';
                 $columns['smallint_col']['size'] = null;
             }
 
             if ($tableName === 'animal') {
-                $columns['id']['dbType'] = 'int';
                 $columns['id']['size'] = null;
             }
 
             if ($tableName === 'T_constraints_1') {
-                $columns['C_id']['dbType'] = 'int';
                 $columns['C_id']['size'] = null;
 
-                $columns['C_not_null']['dbType'] = 'int';
                 $columns['C_not_null']['size'] = null;
 
-                $columns['C_unique']['dbType'] = 'int';
                 $columns['C_unique']['size'] = null;
 
-                $columns['C_default']['dbType'] = 'int';
                 $columns['C_default']['size'] = null;
             }
         }
@@ -294,18 +211,6 @@ final class SchemaTest extends CommonSchemaTest
         $schema = $db->getSchema();
 
         $this->assertSame([self::getDatabaseName()], $schema->getSchemaNames());
-    }
-
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeChar
-     */
-    public function testGetStringFieldsSize(
-        string $columnName,
-        string $columnType,
-        int|null $columnSize,
-        string $columnDbType
-    ): void {
-        parent::testGetStringFieldsSize($columnName, $columnType, $columnSize, $columnDbType);
     }
 
     public function testGetTableChecks(): void

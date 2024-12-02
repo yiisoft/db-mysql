@@ -5,7 +5,15 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
+use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+
+use function bindec;
+use function in_array;
+use function preg_match;
+use function str_starts_with;
+use function substr;
 
 final class ColumnFactory extends AbstractColumnFactory
 {
@@ -13,10 +21,9 @@ final class ColumnFactory extends AbstractColumnFactory
      * Mapping from physical column types (keys) to abstract column types (values).
      *
      * @var string[]
-     *
-     * @psalm-suppress MissingClassConstType
+     * @psalm-var array<string, ColumnType::*>
      */
-    private const TYPE_MAP = [
+    protected const TYPE_MAP = [
         'bit' => ColumnType::BIT,
         'tinyint' => ColumnType::TINYINT,
         'smallint' => ColumnType::SMALLINT,
@@ -50,17 +57,57 @@ final class ColumnFactory extends AbstractColumnFactory
 
     protected function getType(string $dbType, array $info = []): string
     {
-        $type = self::TYPE_MAP[$dbType] ?? ColumnType::STRING;
-
-        if ($type === ColumnType::BIT && isset($info['size']) && $info['size'] === 1) {
+        if ($dbType === 'bit' && isset($info['size']) && $info['size'] === 1) {
             return ColumnType::BOOLEAN;
         }
 
-        return $type;
+        return parent::getType($dbType, $info);
     }
 
-    protected function isDbType(string $dbType): bool
+    protected function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
     {
-        return isset(self::TYPE_MAP[$dbType]);
+        if (
+            $defaultValue === null
+            || $column->isPrimaryKey()
+            || $column->isComputed()
+        ) {
+            return null;
+        }
+
+        return $this->normalizeNotNullDefaultValue($defaultValue, $column);
+    }
+
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
+    {
+        if ($defaultValue === '') {
+            return $column->phpTypecast($defaultValue);
+        }
+
+        if (
+            in_array($column->getType(), [ColumnType::TIMESTAMP, ColumnType::DATETIME, ColumnType::DATE, ColumnType::TIME], true)
+            && preg_match('/^current_timestamp(?:\((\d*)\))?$/i', $defaultValue, $matches) === 1
+        ) {
+            return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
+        }
+
+        if (!empty($column->getExtra())) {
+            return new Expression($defaultValue);
+        }
+
+        if ($defaultValue[0] === "'" && $defaultValue[-1] === "'") {
+            $value = substr($defaultValue, 1, -1);
+            $value = str_replace("''", "'", $value);
+
+            return $column->phpTypecast($value);
+        }
+
+        if (
+            str_starts_with($defaultValue, "b'")
+            && in_array($column->getType(), [ColumnType::BOOLEAN, ColumnType::BIT], true)
+        ) {
+            return $column->phpTypecast(bindec(substr($defaultValue, 2, -1)));
+        }
+
+        return $column->phpTypecast($defaultValue);
     }
 }
