@@ -44,7 +44,7 @@ final class JsonCommandTest extends TestCase
 
         $command = $db->createCommand();
         $command->insert('storage', ['data' => ['a' => 1, 'b' => 2]])->execute();
-        $rowExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+        $rowExpected = match (str_contains($db->getServerInfo()->getVersion(), 'MariaDB')) {
             true => '{"a":1,"b":2}',
             default => '{"a": 1, "b": 2}',
         };
@@ -65,7 +65,7 @@ final class JsonCommandTest extends TestCase
 
         $command = $db->createCommand();
         $command->insert('storage', ['data' => new JsonExpression(['a' => 1, 'b' => 2])])->execute();
-        $rowExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+        $rowExpected = match (str_contains($db->getServerInfo()->getVersion(), 'MariaDB')) {
             true => '{"a":1,"b":2}',
             default => '{"a": 1, "b": 2}',
         };
