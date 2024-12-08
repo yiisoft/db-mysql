@@ -43,10 +43,11 @@ final class SchemaTest extends CommonSchemaTest
     public function testColumnSchema(array $columns, string $tableName): void
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         if (
-            version_compare($db->getServerVersion(), '8.0.17', '>') &&
-            !str_contains($db->getServerVersion(), 'MariaDB')
+            version_compare($serverVersion, '8.0.17', '>') &&
+            !str_contains($serverVersion, 'MariaDB')
         ) {
             if ($tableName === 'type') {
                 $columns['int_col']['size'] = null;
@@ -95,10 +96,11 @@ final class SchemaTest extends CommonSchemaTest
     {
         $tableName = '{{%datetime_test}}';
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         $oldMySQL = !(
-            version_compare($db->getServerVersion(), '8.0.0', '>') &&
-            !str_contains($db->getServerVersion(), 'MariaDB')
+            version_compare($serverVersion, '8.0.0', '>') &&
+            !str_contains($serverVersion, 'MariaDB')
         );
 
         $columnsData = [
@@ -280,7 +282,7 @@ final class SchemaTest extends CommonSchemaTest
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
 
-        $viewExpected = match (str_contains($db->getServerVersion(), 'MariaDB')) {
+        $viewExpected = match (str_contains($db->getServerInfo()->getVersion(), 'MariaDB')) {
             true => ['animal_view', 'user'],
             default => ['animal_view'],
         };

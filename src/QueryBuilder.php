@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use Yiisoft\Db\Connection\ServerInfoInterface;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Mysql\Column\ColumnDefinitionBuilder;
@@ -46,15 +47,16 @@ final class QueryBuilder extends AbstractQueryBuilder
         PseudoType::UUID_PK => 'binary(16) PRIMARY KEY',
     ];
 
-    public function __construct(
-        QuoterInterface $quoter,
-        SchemaInterface $schema,
-    ) {
-        $ddlBuilder = new DDLQueryBuilder($this, $quoter, $schema);
-        $dmlBuilder = new DMLQueryBuilder($this, $quoter, $schema);
-        $dqlBuilder = new DQLQueryBuilder($this, $quoter);
-        $columnDefinitionBuilder = new ColumnDefinitionBuilder($this);
-
-        parent::__construct($quoter, $schema, $ddlBuilder, $dmlBuilder, $dqlBuilder, $columnDefinitionBuilder);
+    public function __construct(QuoterInterface $quoter, SchemaInterface $schema, ServerInfoInterface $serverInfo)
+    {
+        parent::__construct(
+            $quoter,
+            $schema,
+            $serverInfo,
+            new DDLQueryBuilder($this, $quoter, $schema),
+            new DMLQueryBuilder($this, $quoter, $schema),
+            new DQLQueryBuilder($this, $quoter),
+            new ColumnDefinitionBuilder($this),
+        );
     }
 }
