@@ -165,7 +165,7 @@ final class Schema extends AbstractPdoSchema
         }
 
         $jsonColumns = $this->getJsonColumns($table);
-        $isMariaDb = str_contains($this->db->getServerVersion(), 'MariaDB');
+        $isMariaDb = str_contains($this->db->getServerInfo()->getVersion(), 'MariaDB');
 
         foreach ($columns as $info) {
             $info = array_change_key_case($info);
