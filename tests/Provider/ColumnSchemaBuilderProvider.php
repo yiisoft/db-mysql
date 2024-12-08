@@ -36,24 +36,4 @@ final class ColumnSchemaBuilderProvider extends \Yiisoft\Db\Tests\Provider\Colum
             ],
         ];
     }
-
-    public static function createColumnTypes(): array
-    {
-        $types = parent::createColumnTypes();
-        $types['integer'][0] = '`column` int(11)';
-
-        $types['uuid'][0] = '`column` binary(16)';
-        $types['uuid not null'][0] = '`column` binary(16) NOT NULL';
-
-        $types['uuid with default'][0] = '`column` binary(16) DEFAULT (UUID_TO_BIN(\'875343b3-6bd0-4bec-81bb-aa68bb52d945\'))';
-        $types['uuid with default'][3] = [['defaultExpression', '(UUID_TO_BIN(\'875343b3-6bd0-4bec-81bb-aa68bb52d945\'))']];
-
-        $types['uuid pk'][0] = '`column` binary(16) PRIMARY KEY';
-        $types['uuid pk not null'][0] = '`column` binary(16) PRIMARY KEY NOT NULL';
-
-        $types['uuid pk not null with default'][0] = '`column` binary(16) PRIMARY KEY NOT NULL DEFAULT (UUID_TO_BIN(UUID()))';
-        $types['uuid pk not null with default'][3] = [['notNull'], ['defaultExpression', '(UUID_TO_BIN(UUID()))']];
-
-        return $types;
-    }
 }

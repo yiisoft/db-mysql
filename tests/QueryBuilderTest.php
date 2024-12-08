@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
@@ -11,6 +12,7 @@ use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
@@ -29,6 +31,11 @@ use function version_compare;
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
     use TestTrait;
+
+    public function getBuildColumnDefinitionProvider(): array
+    {
+        return QueryBuilderProvider::buildColumnDefinition();
+    }
 
     public function testAddcheck(): void
     {
@@ -136,6 +143,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
     {
         parent::testAddUnique($name, $table, $columns, $expected);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'alterColumn')]
+    public function testAlterColumn(string|ColumnSchemaInterface $type, string $expected): void
+    {
+        parent::testAlterColumn($type, $expected);
     }
 
     /**
@@ -266,11 +279,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame(
             <<<SQL
             CREATE TABLE `test` (
-            \t`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            \t`id` int PRIMARY KEY AUTO_INCREMENT,
             \t`name` varchar(255) NOT NULL,
             \t`email` varchar(255) NOT NULL,
-            \t`status` int(11) NOT NULL,
-            \t`created_at` datetime(0) NOT NULL
+            \t`status` integer NOT NULL,
+            \t`created_at` datetime NOT NULL
             )
             SQL,
             $qb->createTable(
