@@ -65,14 +65,11 @@ final class Connection extends AbstractPdoConnection
 
     public function getQueryBuilder(): QueryBuilderInterface
     {
-        if ($this->queryBuilder === null) {
-            $this->queryBuilder = new QueryBuilder(
-                $this->getQuoter(),
-                $this->getSchema(),
-            );
-        }
-
-        return $this->queryBuilder;
+        return $this->queryBuilder ??= new QueryBuilder(
+            $this->getQuoter(),
+            $this->getSchema(),
+            $this->getServerInfo(),
+        );
     }
 
     public function getQuoter(): QuoterInterface

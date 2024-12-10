@@ -85,10 +85,11 @@ final class QueryTest extends CommonQueryTest
     public function testWithQuery()
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         if (
-            !str_contains($db->getServerVersion(), 'MariaDB')
-            && version_compare($db->getServerVersion(), '8.0.0', '<')
+            !str_contains($serverVersion, 'MariaDB')
+            && version_compare($serverVersion, '8.0.0', '<')
         ) {
             self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
         }
@@ -99,10 +100,11 @@ final class QueryTest extends CommonQueryTest
     public function testWithQueryRecursive()
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         if (
-            !str_contains($db->getServerVersion(), 'MariaDB')
-            && version_compare($db->getServerVersion(), '8.0.0', '<')
+            !str_contains($serverVersion, 'MariaDB')
+            && version_compare($serverVersion, '8.0.0', '<')
         ) {
             self::markTestSkipped('CTE not supported in MySQL versions below 8.0.0');
         }
