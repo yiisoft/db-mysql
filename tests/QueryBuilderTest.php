@@ -48,17 +48,18 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testAddCommentOnColumn(): void
     {
         $db = $this->getConnection(true);
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         $qb = $db->getQueryBuilder();
         $sql = <<<SQL
         ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
         SQL;
 
-        if (!str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '8', '<')) {
+        if (!str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '8', '<')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL;
-        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
+        } elseif (str_contains($serverVersion, 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key.'
             SQL;
@@ -344,17 +345,18 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testDropCommentFromColumn(): void
     {
         $db = $this->getConnection(true);
+        $serverVersion = $db->getServerInfo()->getVersion();
 
         $qb = $db->getQueryBuilder();
         $sql = <<<SQL
         ALTER TABLE `customer` CHANGE `id` `id` int NOT NULL AUTO_INCREMENT COMMENT ''
         SQL;
 
-        if (!str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '8', '<')) {
+        if (!str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '8', '<')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
             SQL;
-        } elseif (str_contains($db->getServerVersion(), 'MariaDB')) {
+        } elseif (str_contains($serverVersion, 'MariaDB')) {
             $sql = <<<SQL
             ALTER TABLE `customer` CHANGE `id` `id` int(11) NOT NULL AUTO_INCREMENT COMMENT ''
             SQL;
@@ -666,10 +668,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlapsConditionBuilder(): void
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
-        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+        if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
-        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+        } elseif (version_compare($serverVersion, '8', '<')) {
             self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
@@ -695,10 +698,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
-        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+        if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
-        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+        } elseif (version_compare($serverVersion, '8', '<')) {
             self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
@@ -716,10 +720,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
+        $serverVersion = $db->getServerInfo()->getVersion();
 
-        if (str_contains($db->getServerVersion(), 'MariaDB') && version_compare($db->getServerVersion(), '10.9', '<')) {
+        if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
-        } elseif (version_compare($db->getServerVersion(), '8', '<')) {
+        } elseif (version_compare($serverVersion, '8', '<')) {
             self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
