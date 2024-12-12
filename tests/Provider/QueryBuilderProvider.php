@@ -229,6 +229,19 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $values[] = ["enum('a','b','c')", ColumnBuilder::string()->dbType("enum('a','b','c')")];
 
+        $db = self::getDb();
+        $serverVersion = $db->getServerInfo()->getVersion();
+        $db->close();
+
+        if (!str_contains($serverVersion, 'MariaDB')
+            && version_compare($serverVersion, '8', '<')
+        ) {
+            $values[PseudoType::UUID_PK][0] = 'binary(16) PRIMARY KEY';
+            $values[PseudoType::UUID_PK_SEQ][0] = 'binary(16) PRIMARY KEY';
+            $values['uuidPrimaryKey()'][0] = 'binary(16) PRIMARY KEY';
+            $values['defaultValue($expression)'] = ['int DEFAULT 3', ColumnBuilder::integer()->defaultValue(3)];
+        }
+
         return $values;
     }
 }
