@@ -102,19 +102,19 @@ final class SchemaTest extends CommonSchemaTest
         );
 
         $columnsData = [
-            'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', '', false],
-            'd' => ['date DEFAULT \'2011-11-11\'', '2011-11-11', false],
-            'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00', false],
-            'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP', true],
-            'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()', false],
+            'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', ''],
+            'd' => ['date DEFAULT \'2011-11-11\'', '2011-11-11'],
+            'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
+            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00'],
+            'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
+            'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
+            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00'],
+            'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
+            'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()'],
         ];
         if (!$oldMySQL) {
-            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', new Expression('(curdate() + interval 2 year)'), true];
-            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', new Expression('(uuid())'), true];
+            $columnsData['ts4'] = ['date DEFAULT (CURRENT_DATE + INTERVAL 2 YEAR)', new Expression('(curdate() + interval 2 year)')];
+            $columnsData['uuid_col'] = ['varchar(40) DEFAULT (uuid())', new Expression('(uuid())')];
         }
 
         $columns = [];
@@ -133,12 +133,7 @@ final class SchemaTest extends CommonSchemaTest
 
         foreach ($tableSchema->getColumns() as $column) {
             $columnName = $column->getName();
-            if ($columnsData[$columnName][2]) {
-                $this->assertInstanceOf(Expression::class, $column->getDefaultValue());
-            } else {
-                $this->assertNotInstanceOf(Expression::class, $column->getDefaultValue());
-            }
-            $this->assertEquals($columnsData[$columnName][1], (string) $column->getDefaultValue());
+            $this->assertEquals($columnsData[$columnName][1], $column->getDefaultValue());
         }
     }
 
