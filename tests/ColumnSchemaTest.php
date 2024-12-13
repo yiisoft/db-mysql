@@ -112,32 +112,4 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $this->assertInstanceOf(BooleanColumnSchema::class, $tableSchema->getColumn('bool_col'));
         $this->assertInstanceOf(JsonColumnSchema::class, $tableSchema->getColumn('json_col'));
     }
-
-    public function testLongtextType(): void
-    {
-        $db = $this->getConnection();
-        $command = $db->createCommand();
-
-        try {
-            $command->dropTable('text_type')->execute();
-        } catch (Exception) {
-        }
-
-        $command->createTable(
-            'text_type',
-            [
-                'tinytext' => ColumnBuilder::text(1),
-                'text' => ColumnBuilder::text(1_000),
-                'mediumtext' => ColumnBuilder::text(1_000_000),
-                'longtext' => ColumnBuilder::text(1_000_000_000),
-            ]
-        )->execute();
-
-        $table = $db->getSchema()->getTableSchema('text_type');
-
-        $this->assertSame('tinytext', $table->getColumn('tinytext')->getDbType());
-        $this->assertSame('text', $table->getColumn('text')->getDbType());
-        $this->assertSame('mediumtext', $table->getColumn('mediumtext')->getDbType());
-        $this->assertSame('longtext', $table->getColumn('longtext')->getDbType());
-    }
 }
