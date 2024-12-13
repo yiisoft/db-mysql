@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
