@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\JsonExpression;
@@ -18,6 +19,13 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     use TestTrait;
 
     protected static string $driverName = 'mysql';
+
+    public static function alterColumn(): array
+    {
+        return [
+            [ColumnType::STRING, 'ALTER TABLE `foo1` CHANGE `bar` `bar` varchar(255)'],
+        ];
+    }
 
     public static function buildCondition(): array
     {
@@ -185,13 +193,13 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values[PseudoType::UPK][0] = 'int UNSIGNED PRIMARY KEY AUTO_INCREMENT';
         $values[PseudoType::BIGPK][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
         $values[PseudoType::UBIGPK][0] = 'bigint UNSIGNED PRIMARY KEY AUTO_INCREMENT';
-        $values[PseudoType::UUID_PK][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
-        $values[PseudoType::UUID_PK_SEQ][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
+        $values[PseudoType::UUID_PK][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
+        $values[PseudoType::UUID_PK_SEQ][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
         $values['primaryKey()'][0] = 'int PRIMARY KEY AUTO_INCREMENT';
         $values['primaryKey(false)'][0] = 'int PRIMARY KEY';
         $values['smallPrimaryKey()'][0] = 'smallint PRIMARY KEY AUTO_INCREMENT';
         $values['bigPrimaryKey()'][0] = 'bigint PRIMARY KEY AUTO_INCREMENT';
-        $values['uuidPrimaryKey()'][0] = "binary(16) PRIMARY KEY DEFAULT unhex(replace(uuid(),'-',''))";
+        $values['uuidPrimaryKey()'][0] = "binary(16) PRIMARY KEY DEFAULT (unhex(replace(uuid(),'-','')))";
         $values['uuidPrimaryKey(false)'][0] = 'binary(16) PRIMARY KEY';
         $values['boolean()'][0] = 'bit(1)';
         $values['boolean(100)'][0] = 'bit(1)';
@@ -220,6 +228,21 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['reference($referenceWithSchema)'][0] = 'int REFERENCES `ref_schema`.`ref_table` (`id`) ON DELETE CASCADE ON UPDATE CASCADE';
 
         $values[] = ["enum('a','b','c')", ColumnBuilder::string()->dbType("enum('a','b','c')")];
+
+        $db = self::getDb();
+        $serverVersion = $db->getServerInfo()->getVersion();
+        $db->close();
+
+        if (!str_contains($serverVersion, 'MariaDB')
+            && version_compare($serverVersion, '8', '<')
+        ) {
+            $values[PseudoType::UUID_PK][0] = 'binary(16) PRIMARY KEY';
+            $values[PseudoType::UUID_PK_SEQ][0] = 'binary(16) PRIMARY KEY';
+            $values['uuidPrimaryKey()'][0] = 'binary(16) PRIMARY KEY';
+            $values['defaultValue($expression)'] = ['int DEFAULT 3', ColumnBuilder::integer()->defaultValue(3)];
+            $values['timestamp(6)'] = ['timestamp(6) DEFAULT CURRENT_TIMESTAMP(6)', ColumnBuilder::timestamp(6)->defaultValue(new Expression('CURRENT_TIMESTAMP(6)'))];
+            $values['timestamp(null)'] = ['timestamp DEFAULT CURRENT_TIMESTAMP', ColumnBuilder::timestamp(null)->defaultValue(new Expression('CURRENT_TIMESTAMP'))];
+        }
 
         return $values;
     }

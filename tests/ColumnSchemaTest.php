@@ -98,7 +98,7 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $db->close();
     }
 
-    public function testColumnSchemaInstance()
+    public function testColumnSchemaInstance(): void
     {
         $db = $this->getConnection(true);
         $schema = $db->getSchema();
