@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
@@ -110,5 +111,34 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $this->assertInstanceOf(BinaryColumnSchema::class, $tableSchema->getColumn('blob_col'));
         $this->assertInstanceOf(BooleanColumnSchema::class, $tableSchema->getColumn('bool_col'));
         $this->assertInstanceOf(JsonColumnSchema::class, $tableSchema->getColumn('json_col'));
+    }
+
+    public function testLongtextType(): void
+    {
+        $db = $this->getConnection();
+        $command = $db->createCommand();
+
+        try {
+            $command->dropTable('text_type')->execute();
+        } catch (Exception) {
+        }
+
+        $command->createTable(
+            'text_type',
+            [
+                'tinytext' => ColumnBuilder::text(85),
+                'text' => ColumnBuilder::text(21_845),
+                'mediumtext' => ColumnBuilder::text(5_592_405),
+                'longtext' => ColumnBuilder::text(4_294_967_295),
+            ],
+            'ENGINE=InnoDB DEFAULT CHARSET=utf8'
+        )->execute();
+
+        $table = $db->getSchema()->getTableSchema('text_type');
+
+        $this->assertSame('tinytext', $table->getColumn('tinytext')->getDbType());
+        $this->assertSame('text', $table->getColumn('text')->getDbType());
+        $this->assertSame('mediumtext', $table->getColumn('mediumtext')->getDbType());
+        $this->assertSame('longtext', $table->getColumn('longtext')->getDbType());
     }
 }
