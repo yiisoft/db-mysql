@@ -126,12 +126,11 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $command->createTable(
             'text_type',
             [
-                'tinytext' => ColumnBuilder::text(85),
-                'text' => ColumnBuilder::text(21_845),
-                'mediumtext' => ColumnBuilder::text(5_592_405),
+                'tinytext' => ColumnBuilder::text(63),
+                'text' => ColumnBuilder::text(16_383),
+                'mediumtext' => ColumnBuilder::text(4_194_303),
                 'longtext' => ColumnBuilder::text(4_294_967_295),
             ],
-            'ENGINE=InnoDB DEFAULT CHARSET=utf8'
         )->execute();
 
         $table = $db->getSchema()->getTableSchema('text_type');
