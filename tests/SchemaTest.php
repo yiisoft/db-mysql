@@ -212,7 +212,7 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema = $db->getSchema();
 
-        $this->assertSame(['yiitest'], $schema->getSchemaNames());
+        $this->assertSame([self::getDatabaseName()], $schema->getSchemaNames());
     }
 
     public function testGetTableChecks(): void
@@ -233,7 +233,7 @@ final class SchemaTest extends CommonSchemaTest
         $db = $this->getConnection(true);
 
         $schema = $db->getSchema();
-        $tablesNames = $schema->getTableNames('yiitest');
+        $tablesNames = $schema->getTableNames(self::getDatabaseName());
 
         $expectedTableNames = [
             'alpha',
