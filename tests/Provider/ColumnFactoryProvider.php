@@ -76,6 +76,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             [ColumnType::STRING, "'str''ing'", "str'ing"],
             [ColumnType::TIMESTAMP, 'CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
             [ColumnType::TIMESTAMP, 'current_timestamp(3)', new Expression('CURRENT_TIMESTAMP(3)')],
+            [ColumnType::INTEGER, '(1 + 2)', new Expression('(1 + 2)')],
         ];
     }
 }

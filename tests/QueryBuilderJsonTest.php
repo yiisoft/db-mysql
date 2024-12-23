@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\Mysql\Column;
+use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 /**
@@ -22,8 +21,8 @@ final class QueryBuilderJsonTest extends TestCase
     public function testAlterColumn()
     {
         $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(ColumnType::JSON);
-        $sql = $qb->alterColumn('storage', 'id', $columnSchemaBuilder);
+        $column = ColumnBuilder::json();
+        $sql = $qb->alterColumn('storage', 'id', $column);
 
         $this->assertStringEndsWith(
             <<<SQL
@@ -36,8 +35,8 @@ final class QueryBuilderJsonTest extends TestCase
     public function testAddColumn()
     {
         $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(ColumnType::JSON);
-        $sql = $qb->addColumn('storage', 'abc', $columnSchemaBuilder->asString());
+        $column = ColumnBuilder::json();
+        $sql = $qb->addColumn('storage', 'abc', $column);
 
         $this->assertSame(
             <<<SQL
@@ -50,8 +49,8 @@ final class QueryBuilderJsonTest extends TestCase
     public function testCreateTable()
     {
         $qb = $this->getConnection()->getQueryBuilder();
-        $columnSchemaBuilder = new Column(ColumnType::JSON);
-        $sql = $qb->createTable('storage', ['abc' => $columnSchemaBuilder]);
+        $column = ColumnBuilder::json();
+        $sql = $qb->createTable('storage', ['abc' => $column]);
 
         $this->assertSame(
             <<<SQL
@@ -66,7 +65,6 @@ final class QueryBuilderJsonTest extends TestCase
     public function testInsertAndSelect()
     {
         $db = $this->getConnection(true);
-
         $qb = $db->getQueryBuilder();
 
         $this->assertSame(
@@ -80,9 +78,7 @@ final class QueryBuilderJsonTest extends TestCase
     public function testInsertJsonExpresionAndSelect()
     {
         $db = $this->getConnection(true);
-
         $qb = $db->getQueryBuilder();
-
 
         $this->assertSame(
             <<<SQL
