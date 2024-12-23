@@ -90,7 +90,10 @@ final class ColumnFactory extends AbstractColumnFactory
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if (!empty($column->getExtra())) {
+        if (!empty($column->getExtra())
+            || $defaultValue[0] === '('
+            && !in_array($column->getType(), [ColumnType::CHAR, ColumnType::STRING, ColumnType::TEXT, ColumnType::BINARY], true)
+        ) {
             return new Expression($defaultValue);
         }
 

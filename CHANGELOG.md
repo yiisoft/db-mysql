@@ -20,6 +20,7 @@
 - Enh #363: Refactor `Schema::normalizeDefaultValue()` method and move it to `ColumnFactory` class (@Tigrov)
 - Enh #366: Refactor `Quoter::quoteValue()` method (@Tigrov)
 - Chg #368: Update `QueryBuilder` constructor (@Tigrov)
+- Enh #367: Use `ColumnDefinitionBuilder` to generate table column SQL representation (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
