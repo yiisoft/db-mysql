@@ -16,7 +16,6 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
@@ -73,13 +72,6 @@ use function trim;
  */
 final class Schema extends AbstractPdoSchema
 {
-    /** @deprecated Use {@see ColumnBuilder} instead. Will be removed in 2.0. */
-    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
-    {
-        /** @psalm-suppress DeprecatedClass */
-        return new Column($type, $length);
-    }
-
     public function getColumnFactory(): ColumnFactoryInterface
     {
         return new ColumnFactory();
