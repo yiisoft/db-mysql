@@ -38,7 +38,7 @@ final class SchemaTest extends CommonSchemaTest
      *
      * @throws Exception
      */
-    public function testColumnSchema(array $columns, string $tableName): void
+    public function testColumns(array $columns, string $tableName): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
@@ -74,15 +74,15 @@ final class SchemaTest extends CommonSchemaTest
             }
         }
 
-        parent::testColumnSchema($columns, $tableName);
+        parent::testColumns($columns, $tableName);
     }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit
      */
-    public function testColumnSchemaWithTypeBit(array $columns): void
+    public function testColumnWithTypeBit(array $columns): void
     {
-        $this->columnSchema($columns, 'type_bit');
+        $this->assertTableColumns($columns, 'type_bit');
     }
 
     /**
