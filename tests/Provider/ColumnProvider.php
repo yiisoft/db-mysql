@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
-final class ColumnSchemaProvider
+final class ColumnProvider
 {
     public static function bigIntValue(): array
     {

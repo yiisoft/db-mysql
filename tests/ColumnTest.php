@@ -9,13 +9,13 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
-use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
-use Yiisoft\Db\Schema\Column\BooleanColumnSchema;
-use Yiisoft\Db\Schema\Column\DoubleColumnSchema;
-use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
-use Yiisoft\Db\Schema\Column\JsonColumnSchema;
-use Yiisoft\Db\Schema\Column\StringColumnSchema;
-use Yiisoft\Db\Tests\Common\CommonColumnSchemaTest;
+use Yiisoft\Db\Schema\Column\BinaryColumn;
+use Yiisoft\Db\Schema\Column\BooleanColumn;
+use Yiisoft\Db\Schema\Column\DoubleColumn;
+use Yiisoft\Db\Schema\Column\IntegerColumn;
+use Yiisoft\Db\Schema\Column\JsonColumn;
+use Yiisoft\Db\Schema\Column\StringColumn;
+use Yiisoft\Db\Tests\Common\CommonColumnTest;
 
 use function str_repeat;
 
@@ -24,12 +24,12 @@ use function str_repeat;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ColumnSchemaTest extends CommonColumnSchemaTest
+final class ColumnTest extends CommonColumnTest
 {
     use TestTrait;
 
     /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnSchemaProvider::bigIntValue
+     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider::bigIntValue
      *
      * @throws Exception
      * @throws Throwable
@@ -99,18 +99,18 @@ final class ColumnSchemaTest extends CommonColumnSchemaTest
         $db->close();
     }
 
-    public function testColumnSchemaInstance(): void
+    public function testColumnInstance(): void
     {
         $db = $this->getConnection(true);
         $schema = $db->getSchema();
         $tableSchema = $schema->getTableSchema('type');
 
-        $this->assertInstanceOf(IntegerColumnSchema::class, $tableSchema->getColumn('int_col'));
-        $this->assertInstanceOf(StringColumnSchema::class, $tableSchema->getColumn('char_col'));
-        $this->assertInstanceOf(DoubleColumnSchema::class, $tableSchema->getColumn('float_col'));
-        $this->assertInstanceOf(BinaryColumnSchema::class, $tableSchema->getColumn('blob_col'));
-        $this->assertInstanceOf(BooleanColumnSchema::class, $tableSchema->getColumn('bool_col'));
-        $this->assertInstanceOf(JsonColumnSchema::class, $tableSchema->getColumn('json_col'));
+        $this->assertInstanceOf(IntegerColumn::class, $tableSchema->getColumn('int_col'));
+        $this->assertInstanceOf(StringColumn::class, $tableSchema->getColumn('char_col'));
+        $this->assertInstanceOf(DoubleColumn::class, $tableSchema->getColumn('float_col'));
+        $this->assertInstanceOf(BinaryColumn::class, $tableSchema->getColumn('blob_col'));
+        $this->assertInstanceOf(BooleanColumn::class, $tableSchema->getColumn('bool_col'));
+        $this->assertInstanceOf(JsonColumn::class, $tableSchema->getColumn('json_col'));
     }
 
     public function testLongtextType(): void

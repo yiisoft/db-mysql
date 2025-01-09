@@ -6,7 +6,7 @@ namespace Yiisoft\Db\Mysql\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\QueryBuilder\AbstractColumnDefinitionBuilder;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function str_contains;
 use function version_compare;
@@ -61,14 +61,14 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'fixed',
     ];
 
-    protected function buildComment(ColumnSchemaInterface $column): string
+    protected function buildComment(ColumnInterface $column): string
     {
         $comment = $column->getComment();
 
         return $comment === null ? '' : ' COMMENT ' . $this->queryBuilder->quoter()->quoteValue($comment);
     }
 
-    protected function getDbType(ColumnSchemaInterface $column): string
+    protected function getDbType(ColumnInterface $column): string
     {
         /** @psalm-suppress DocblockTypeContradiction */
         $dbType = $column->getDbType() ?? match ($column->getType()) {
