@@ -6,10 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Mysql\Driver;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\Support\DbHelper;
 
 /**
  * @group mysql
@@ -29,7 +26,7 @@ final class PDODriverTest extends TestCase
 
         $this->assertEqualsIgnoringCase('utf8mb4', array_values($charset)[1]);
 
-        $pdoDriver = new Driver('mysql:host=127.0.0.1;dbname=yiitest;port=3306', 'root', '');
+        $pdoDriver = $this->getDriver();
         $newCharset = 'latin1';
         $pdoDriver->charset($newCharset);
         $pdo = $pdoDriver->createConnection();
@@ -40,11 +37,7 @@ final class PDODriverTest extends TestCase
 
     public function testCharsetDefault(): void
     {
-        $db = new Connection(
-            new Driver('mysql:host=127.0.0.1;dbname=yiitest;port=3306', 'root', ''),
-            DbHelper::getSchemaCache(),
-        );
-
+        $db = self::getDb();
         $db->open();
         $command = $db->createCommand();
 
