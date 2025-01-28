@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -11,6 +12,7 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\Dsn;
 use Yiisoft\Db\Mysql\Driver;
+use Yiisoft\Db\Mysql\Tests\Provider\CommandProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -148,5 +150,11 @@ final class CommandTest extends CommonCommandTest
 
         $this->assertSame('mysql:host=127.0.0.1;port=3306', $db->getDriver()->getDsn());
         $this->assertSame(['yiitest'], $command->showDatabases());
+    }
+
+    #[DataProviderExternal(CommandProvider::class, 'createIndex')]
+    public function testCreateIndex(array $columns, array $indexColumns, string|null $indexType, string|null $indexMethod): void
+    {
+        parent::testCreateIndex($columns, $indexColumns, $indexType, $indexMethod);
     }
 }
