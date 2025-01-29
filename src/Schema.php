@@ -20,6 +20,7 @@ use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_change_key_case;
+use function array_column;
 use function array_map;
 use function array_values;
 use function in_array;
@@ -533,21 +534,21 @@ final class Schema extends AbstractPdoSchema
                 switch ($type) {
                     case 'PRIMARY KEY':
                         $result[self::PRIMARY_KEY] = (new Constraint())
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'));
+                            ->columnNames(array_column($constraint, 'column_name'));
                         break;
                     case 'FOREIGN KEY':
                         $result[self::FOREIGN_KEYS][] = (new ForeignKeyConstraint())
                             ->foreignSchemaName($constraint[0]['foreign_table_schema'])
                             ->foreignTableName($constraint[0]['foreign_table_name'])
-                            ->foreignColumnNames(DbArrayHelper::getColumn($constraint, 'foreign_column_name'))
+                            ->foreignColumnNames(array_column($constraint, 'foreign_column_name'))
                             ->onDelete($constraint[0]['on_delete'])
                             ->onUpdate($constraint[0]['on_update'])
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(array_column($constraint, 'column_name'))
                             ->name($name);
                         break;
                     case 'UNIQUE':
                         $result[self::UNIQUES][] = (new Constraint())
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(array_column($constraint, 'column_name'))
                             ->name($name);
                         break;
                 }
@@ -640,7 +641,7 @@ final class Schema extends AbstractPdoSchema
             $ic->primary((bool) $index[0]['index_is_primary']);
             $ic->unique((bool) $index[0]['index_is_unique']);
             $ic->name($name !== 'PRIMARY' ? $name : null);
-            $ic->columnNames(DbArrayHelper::getColumn($index, 'column_name'));
+            $ic->columnNames(array_column($index, 'column_name'));
 
             $result[] = $ic;
         }
