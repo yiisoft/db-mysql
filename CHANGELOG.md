@@ -23,6 +23,7 @@
 - Enh #367: Use `ColumnDefinitionBuilder` to generate table column SQL representation (@Tigrov)
 - Enh #371: Remove `ColumnInterface` (@Tigrov)
 - Enh #372: Rename `ColumnSchemaInterface` to `ColumnInterface` (@Tigrov)
+- Enh #373: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
