@@ -617,7 +617,7 @@ final class Schema extends AbstractPdoSchema
             `s`.`TABLE_SCHEMA` = COALESCE(:schemaName, DATABASE()) AND
             `s`.`INDEX_SCHEMA` = `s`.`TABLE_SCHEMA` AND
             `s`.`TABLE_NAME` = :tableName
-        ORDER BY `index_is_primary` DESC, `s`.`SEQ_IN_INDEX` ASC
+        ORDER BY `s`.`SEQ_IN_INDEX` ASC
         SQL;
 
         $resolvedName = $this->resolveTableName($tableName);
