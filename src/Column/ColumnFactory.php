@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Mysql\Column;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Schema\Column\AbstractColumnFactory;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function bindec;
 use function in_array;
@@ -64,7 +64,7 @@ final class ColumnFactory extends AbstractColumnFactory
         return parent::getType($dbType, $info);
     }
 
-    protected function normalizeDefaultValue(string|null $defaultValue, ColumnSchemaInterface $column): mixed
+    protected function normalizeDefaultValue(string|null $defaultValue, ColumnInterface $column): mixed
     {
         if (
             $defaultValue === null
@@ -77,7 +77,7 @@ final class ColumnFactory extends AbstractColumnFactory
         return $this->normalizeNotNullDefaultValue($defaultValue, $column);
     }
 
-    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnSchemaInterface $column): mixed
+    protected function normalizeNotNullDefaultValue(string $defaultValue, ColumnInterface $column): mixed
     {
         if ($defaultValue === '') {
             return $column->phpTypecast($defaultValue);
@@ -90,7 +90,10 @@ final class ColumnFactory extends AbstractColumnFactory
             return new Expression('CURRENT_TIMESTAMP' . (!empty($matches[1]) ? '(' . $matches[1] . ')' : ''));
         }
 
-        if (!empty($column->getExtra())) {
+        if (!empty($column->getExtra())
+            || $defaultValue[0] === '('
+            && !in_array($column->getType(), [ColumnType::CHAR, ColumnType::STRING, ColumnType::TEXT, ColumnType::BINARY], true)
+        ) {
             return new Expression($defaultValue);
         }
 

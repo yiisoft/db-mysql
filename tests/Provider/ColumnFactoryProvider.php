@@ -6,13 +6,13 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Schema\Column\BinaryColumnSchema;
-use Yiisoft\Db\Schema\Column\BitColumnSchema;
-use Yiisoft\Db\Schema\Column\BooleanColumnSchema;
-use Yiisoft\Db\Schema\Column\DoubleColumnSchema;
-use Yiisoft\Db\Schema\Column\IntegerColumnSchema;
-use Yiisoft\Db\Schema\Column\JsonColumnSchema;
-use Yiisoft\Db\Schema\Column\StringColumnSchema;
+use Yiisoft\Db\Schema\Column\BinaryColumn;
+use Yiisoft\Db\Schema\Column\BitColumn;
+use Yiisoft\Db\Schema\Column\BooleanColumn;
+use Yiisoft\Db\Schema\Column\DoubleColumn;
+use Yiisoft\Db\Schema\Column\IntegerColumn;
+use Yiisoft\Db\Schema\Column\JsonColumn;
+use Yiisoft\Db\Schema\Column\StringColumn;
 
 final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFactoryProvider
 {
@@ -20,35 +20,35 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         return [
             // db type, expected abstract type, expected instance of
-            ['bit', ColumnType::BIT, BitColumnSchema::class],
-            ['tinyint', ColumnType::TINYINT, IntegerColumnSchema::class],
-            ['smallint', ColumnType::SMALLINT, IntegerColumnSchema::class],
-            ['mediumint', ColumnType::INTEGER, IntegerColumnSchema::class],
-            ['int', ColumnType::INTEGER, IntegerColumnSchema::class],
-            ['integer', ColumnType::INTEGER, IntegerColumnSchema::class],
-            ['bigint', ColumnType::BIGINT, IntegerColumnSchema::class],
-            ['float', ColumnType::FLOAT, DoubleColumnSchema::class],
-            ['real', ColumnType::FLOAT, DoubleColumnSchema::class],
-            ['double', ColumnType::DOUBLE, DoubleColumnSchema::class],
-            ['decimal', ColumnType::DECIMAL, DoubleColumnSchema::class],
-            ['numeric', ColumnType::DECIMAL, DoubleColumnSchema::class],
-            ['char', ColumnType::CHAR, StringColumnSchema::class],
-            ['varchar', ColumnType::STRING, StringColumnSchema::class],
-            ['string', ColumnType::STRING, StringColumnSchema::class],
-            ['enum', ColumnType::STRING, StringColumnSchema::class],
-            ['tinytext', ColumnType::TEXT, StringColumnSchema::class],
-            ['mediumtext', ColumnType::TEXT, StringColumnSchema::class],
-            ['longtext', ColumnType::TEXT, StringColumnSchema::class],
-            ['text', ColumnType::TEXT, StringColumnSchema::class],
-            ['varbinary', ColumnType::BINARY, BinaryColumnSchema::class],
-            ['blob', ColumnType::BINARY, BinaryColumnSchema::class],
-            ['longblob', ColumnType::BINARY, BinaryColumnSchema::class],
-            ['year', ColumnType::DATE, StringColumnSchema::class],
-            ['date', ColumnType::DATE, StringColumnSchema::class],
-            ['time', ColumnType::TIME, StringColumnSchema::class],
-            ['datetime', ColumnType::DATETIME, StringColumnSchema::class],
-            ['timestamp', ColumnType::TIMESTAMP, StringColumnSchema::class],
-            ['json', ColumnType::JSON, JsonColumnSchema::class],
+            ['bit', ColumnType::BIT, BitColumn::class],
+            ['tinyint', ColumnType::TINYINT, IntegerColumn::class],
+            ['smallint', ColumnType::SMALLINT, IntegerColumn::class],
+            ['mediumint', ColumnType::INTEGER, IntegerColumn::class],
+            ['int', ColumnType::INTEGER, IntegerColumn::class],
+            ['integer', ColumnType::INTEGER, IntegerColumn::class],
+            ['bigint', ColumnType::BIGINT, IntegerColumn::class],
+            ['float', ColumnType::FLOAT, DoubleColumn::class],
+            ['real', ColumnType::FLOAT, DoubleColumn::class],
+            ['double', ColumnType::DOUBLE, DoubleColumn::class],
+            ['decimal', ColumnType::DECIMAL, DoubleColumn::class],
+            ['numeric', ColumnType::DECIMAL, DoubleColumn::class],
+            ['char', ColumnType::CHAR, StringColumn::class],
+            ['varchar', ColumnType::STRING, StringColumn::class],
+            ['string', ColumnType::STRING, StringColumn::class],
+            ['enum', ColumnType::STRING, StringColumn::class],
+            ['tinytext', ColumnType::TEXT, StringColumn::class],
+            ['mediumtext', ColumnType::TEXT, StringColumn::class],
+            ['longtext', ColumnType::TEXT, StringColumn::class],
+            ['text', ColumnType::TEXT, StringColumn::class],
+            ['varbinary', ColumnType::BINARY, BinaryColumn::class],
+            ['blob', ColumnType::BINARY, BinaryColumn::class],
+            ['longblob', ColumnType::BINARY, BinaryColumn::class],
+            ['year', ColumnType::DATE, StringColumn::class],
+            ['date', ColumnType::DATE, StringColumn::class],
+            ['time', ColumnType::TIME, StringColumn::class],
+            ['datetime', ColumnType::DATETIME, StringColumn::class],
+            ['timestamp', ColumnType::TIMESTAMP, StringColumn::class],
+            ['json', ColumnType::JSON, JsonColumn::class],
         ];
     }
 
@@ -56,7 +56,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         $definitions = parent::definitions();
 
-        $definitions[] = ['bit(1)', ColumnType::BOOLEAN, BooleanColumnSchema::class, ['getDbType' => 'bit', 'getSize' => 1]];
+        $definitions[] = ['bit(1)', ColumnType::BOOLEAN, BooleanColumn::class, ['getDbType' => 'bit', 'getSize' => 1]];
 
         return $definitions;
     }
@@ -76,6 +76,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             [ColumnType::STRING, "'str''ing'", "str'ing"],
             [ColumnType::TIMESTAMP, 'CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
             [ColumnType::TIMESTAMP, 'current_timestamp(3)', new Expression('CURRENT_TIMESTAMP(3)')],
+            [ColumnType::INTEGER, '(1 + 2)', new Expression('(1 + 2)')],
         ];
     }
 }

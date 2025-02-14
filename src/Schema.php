@@ -14,14 +14,13 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
-use Yiisoft\Db\Schema\Builder\ColumnInterface;
 use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
 use function array_change_key_case;
+use function array_column;
 use function array_map;
 use function array_values;
 use function in_array;
@@ -73,12 +72,6 @@ use function trim;
  */
 final class Schema extends AbstractPdoSchema
 {
-    /** @deprecated Use {@see ColumnBuilder} instead. Will be removed in 2.0. */
-    public function createColumn(string $type, array|int|string $length = null): ColumnInterface
-    {
-        return new Column($type, $length);
-    }
-
     public function getColumnFactory(): ColumnFactoryInterface
     {
         return new ColumnFactory();
@@ -181,7 +174,7 @@ final class Schema extends AbstractPdoSchema
             }
 
             /** @psalm-var ColumnArray $info */
-            $column = $this->loadColumnSchema($info);
+            $column = $this->loadColumn($info);
             $table->column($info['column_name'], $column);
 
             if ($column->isPrimaryKey()) {
@@ -398,15 +391,15 @@ final class Schema extends AbstractPdoSchema
     }
 
     /**
-     * Loads the column information into a {@see ColumnSchemaInterface} object.
+     * Loads the column information into a {@see ColumnInterface} object.
      *
      * @param array $info The column information.
      *
-     * @return ColumnSchemaInterface The column schema object.
+     * @return ColumnInterface The column object.
      *
      * @psalm-param ColumnArray $info The column information.
      */
-    private function loadColumnSchema(array $info): ColumnSchemaInterface
+    private function loadColumn(array $info): ColumnInterface
     {
         $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
 
@@ -541,21 +534,21 @@ final class Schema extends AbstractPdoSchema
                 switch ($type) {
                     case 'PRIMARY KEY':
                         $result[self::PRIMARY_KEY] = (new Constraint())
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'));
+                            ->columnNames(array_column($constraint, 'column_name'));
                         break;
                     case 'FOREIGN KEY':
                         $result[self::FOREIGN_KEYS][] = (new ForeignKeyConstraint())
                             ->foreignSchemaName($constraint[0]['foreign_table_schema'])
                             ->foreignTableName($constraint[0]['foreign_table_name'])
-                            ->foreignColumnNames(DbArrayHelper::getColumn($constraint, 'foreign_column_name'))
+                            ->foreignColumnNames(array_column($constraint, 'foreign_column_name'))
                             ->onDelete($constraint[0]['on_delete'])
                             ->onUpdate($constraint[0]['on_update'])
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(array_column($constraint, 'column_name'))
                             ->name($name);
                         break;
                     case 'UNIQUE':
                         $result[self::UNIQUES][] = (new Constraint())
-                            ->columnNames(DbArrayHelper::getColumn($constraint, 'column_name'))
+                            ->columnNames(array_column($constraint, 'column_name'))
                             ->name($name);
                         break;
                 }
@@ -648,7 +641,7 @@ final class Schema extends AbstractPdoSchema
             $ic->primary((bool) $index[0]['index_is_primary']);
             $ic->unique((bool) $index[0]['index_is_unique']);
             $ic->name($name !== 'PRIMARY' ? $name : null);
-            $ic->columnNames(DbArrayHelper::getColumn($index, 'column_name'));
+            $ic->columnNames(array_column($index, 'column_name'));
 
             $result[] = $ic;
         }

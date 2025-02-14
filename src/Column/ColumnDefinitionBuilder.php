@@ -6,13 +6,14 @@ namespace Yiisoft\Db\Mysql\Column;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\QueryBuilder\AbstractColumnDefinitionBuilder;
-use Yiisoft\Db\Schema\Column\ColumnSchemaInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
+
+use function str_contains;
+use function version_compare;
 
 final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 {
     protected const AUTO_INCREMENT_KEYWORD = 'AUTO_INCREMENT';
-
-    protected const GENERATE_UUID_EXPRESSION = "unhex(replace(uuid(),'-',''))";
 
     protected const TYPES_WITH_SIZE = [
         'bit',
@@ -60,14 +61,14 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'fixed',
     ];
 
-    protected function buildComment(ColumnSchemaInterface $column): string
+    protected function buildComment(ColumnInterface $column): string
     {
         $comment = $column->getComment();
 
         return $comment === null ? '' : ' COMMENT ' . $this->queryBuilder->quoter()->quoteValue($comment);
     }
 
-    protected function getDbType(ColumnSchemaInterface $column): string
+    protected function getDbType(ColumnInterface $column): string
     {
         /** @psalm-suppress DocblockTypeContradiction */
         $dbType = $column->getDbType() ?? match ($column->getType()) {
@@ -101,5 +102,18 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         }
 
         return $dbType;
+    }
+
+    protected function getDefaultUuidExpression(): string
+    {
+        $serverVersion = $this->queryBuilder->getServerInfo()->getVersion();
+
+        if (!str_contains($serverVersion, 'MariaDB')
+            && version_compare($serverVersion, '8', '<')
+        ) {
+            return '';
+        }
+
+        return "(unhex(replace(uuid(),'-','')))";
     }
 }
