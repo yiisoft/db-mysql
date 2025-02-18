@@ -6,6 +6,8 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
+use Yiisoft\Db\Command\Param;
+use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -695,14 +697,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
 
         $this->assertSame('JSON_OVERLAPS(`column`, :qp0)', $sql);
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         // Test column as Expression
         $params = [];
         $sql = $qb->buildExpression(new JsonOverlapsCondition(new Expression('column'), [1, 2, 3]), $params);
 
         $this->assertSame('JSON_OVERLAPS(column, :qp0)', $sql);
-        $this->assertSame([':qp0' => '[1,2,3]'], $params);
+        $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         $db->close();
     }
