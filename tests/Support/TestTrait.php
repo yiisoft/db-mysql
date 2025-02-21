@@ -79,37 +79,37 @@ trait TestTrait
     private static function getDatabaseName(): string
     {
         if (self::isMariadb()) {
-            return getenv('YII_MARIADB_DATABASE') ?: '';
+            return getenv('YII_MARIADB_DATABASE') ?: 'yiitest';
         }
 
-        return getenv('YII_MYSQL_DATABASE') ?: '';
+        return getenv('YII_MYSQL_DATABASE') ?: 'yiitest';
     }
 
     private static function getHost(): string
     {
         if (self::isMariadb()) {
-            return getenv('YII_MARIADB_HOST') ?: '';
+            return getenv('YII_MARIADB_HOST') ?: '127.0.0.1';
         }
 
-        return getenv('YII_MYSQL_HOST') ?: '';
+        return getenv('YII_MYSQL_HOST') ?: '127.0.0.1';
     }
 
     private static function getPort(): string
     {
         if (self::isMariadb()) {
-            return getenv('YII_MARIADB_PORT') ?: '';
+            return getenv('YII_MARIADB_PORT') ?: '3306';
         }
 
-        return getenv('YII_MYSQL_PORT') ?: '';
+        return getenv('YII_MYSQL_PORT') ?: '3306';
     }
 
     private static function getUsername(): string
     {
         if (self::isMariadb()) {
-            return getenv('YII_MARIADB_USER') ?: '';
+            return getenv('YII_MARIADB_USER') ?: 'root';
         }
 
-        return getenv('YII_MYSQL_USER') ?: '';
+        return getenv('YII_MYSQL_USER') ?: 'root';
     }
 
     private static function getPassword(): string
