@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-if (getenv('ENVIRONMENT', true) === 'local') {
-    putenv('YII_MYSQL_DATABASE=yii');
-    putenv('YII_MYSQL_HOST=mysql');
-    putenv('YII_MYSQL_PASSWORD=root');
+if (getenv('ENVIRONMENT', local_only: true) === 'local') {
+    $dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
+    $dotenv->load();
 }
