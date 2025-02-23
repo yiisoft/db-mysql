@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use Throwable;
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\Constraint;
 use Yiisoft\Db\Constraint\ForeignKeyConstraint;
 use Yiisoft\Db\Constraint\IndexConstraint;
@@ -64,8 +65,8 @@ use function trim;
  *     foreign_table_schema: string|null,
  *     foreign_table_name: string|null,
  *     foreign_column_name: string|null,
- *     on_update: string,
- *     on_delete: string,
+ *     on_update: ReferentialAction::*,
+ *     on_delete: ReferentialAction::*,
  *     check_expr: string
  *   }
  * >
