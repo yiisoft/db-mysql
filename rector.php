@@ -26,7 +26,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         LevelSetList::UP_TO_PHP_81,
     ]);
-
+    $rectorConfig->rule(\Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector::class);
     $rectorConfig->skip([
         NullToStrictStringFuncCallArgRector::class,
         ReadOnlyPropertyRector::class,
