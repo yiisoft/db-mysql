@@ -25,6 +25,7 @@
 - Enh #372: Rename `ColumnSchemaInterface` to `ColumnInterface` (@Tigrov)
 - Enh #373: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov)
 - New #374: Add `IndexType` and `IndexMethod` classes (@Tigrov)
+- Bug #377: Explicitly mark nullable parameters (@vjik)
 
 ## 1.2.0 March 21, 2024
 
