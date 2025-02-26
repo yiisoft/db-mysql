@@ -26,6 +26,7 @@
 - Enh #373: Replace `DbArrayHelper::getColumn()` with `array_column()` (@Tigrov)
 - New #374: Add `IndexType` and `IndexMethod` classes (@Tigrov)
 - Enh #376: Move `JsonExpressionBuilder` and JSON type tests to `yiisoft/db` package (@Tigrov)
+- Bug #377: Explicitly mark nullable parameters (@vjik)
 
 ## 1.2.0 March 21, 2024
 
