@@ -7,10 +7,8 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\JsonExpression;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Query\Query;
 
 use function array_replace;
 
@@ -24,85 +22,6 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     {
         return [
             [ColumnType::STRING, 'ALTER TABLE `foo1` CHANGE `bar` `bar` varchar(255)'],
-        ];
-    }
-
-    public static function buildCondition(): array
-    {
-        return [
-            ...parent::buildCondition(),
-            [
-                ['=', 'jsoncol', new JsonExpression(['lang' => 'uk', 'country' => 'UA'])],
-                '[[jsoncol]] = :qp0', [':qp0' => '{"lang":"uk","country":"UA"}'],
-            ],
-            [
-                ['=', 'jsoncol', new JsonExpression([false])],
-                '[[jsoncol]] = :qp0', [':qp0' => '[false]'],
-            ],
-            'object with type. Type is ignored for MySQL' => [
-                ['=', 'prices', new JsonExpression(['seeds' => 15, 'apples' => 25], 'jsonb')],
-                '[[prices]] = :qp0', [':qp0' => '{"seeds":15,"apples":25}'],
-            ],
-            'nested json' => [
-                [
-                    '=',
-                    'data',
-                    new JsonExpression(
-                        [
-                            'user' => ['login' => 'silverfire', 'password' => 'c4ny0ur34d17?'],
-                            'props' => ['mood' => 'good'],
-                        ]
-                    ),
-                ],
-                '[[data]] = :qp0',
-                [':qp0' => '{"user":{"login":"silverfire","password":"c4ny0ur34d17?"},"props":{"mood":"good"}}'],
-            ],
-            'null value' => [
-                ['=', 'jsoncol', new JsonExpression(null)],
-                '[[jsoncol]] = :qp0', [':qp0' => 'null'],
-            ],
-            'null as array value' => [
-                ['=', 'jsoncol', new JsonExpression([null])],
-                '[[jsoncol]] = :qp0', [':qp0' => '[null]'],
-            ],
-            'null as object value' => [
-                ['=', 'jsoncol', new JsonExpression(['nil' => null])],
-                '[[jsoncol]] = :qp0', [':qp0' => '{"nil":null}'],
-            ],
-            'query' => [
-                [
-                    '=',
-                    'jsoncol',
-                    new JsonExpression((new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1])),
-                ],
-                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)',
-                [':qp0' => 1],
-            ],
-            'query with type, that is ignored in MySQL' => [
-                [
-                    '=',
-                    'jsoncol',
-                    new JsonExpression(
-                        (new Query(self::getDb()))->select('params')->from('user')->where(['id' => 1]),
-                        'jsonb'
-                    ),
-                ],
-                '[[jsoncol]] = (SELECT [[params]] FROM [[user]] WHERE [[id]]=:qp0)', [':qp0' => 1],
-            ],
-            'nested and combined json expression' => [
-                [
-                    '=',
-                    'jsoncol',
-                    new JsonExpression(
-                        new JsonExpression(['a' => 1, 'b' => 2, 'd' => new JsonExpression(['e' => 3])])
-                    ),
-                ],
-                '[[jsoncol]] = :qp0', [':qp0' => '{"a":1,"b":2,"d":{"e":3}}'],
-            ],
-            'search by property in JSON column (issue #15838)' => [
-                ['=', new Expression("(jsoncol->>'$.someKey')"), '42'],
-                "(jsoncol->>'$.someKey') = :qp0", [':qp0' => 42],
-            ],
         ];
     }
 
@@ -213,7 +132,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['binary()'][0] = 'blob';
         $values['binary(1000)'][0] = 'blob(1000)';
         $values['uuid()'][0] = 'binary(16)';
-        $values["check('value > 5')"][0] = 'int CHECK (`col_59` > 5)';
+        $values["check('value > 5')"][0] = 'int CHECK (`check_col` > 5)';
         $values["check('')"][0] = 'int';
         $values['check(null)'][0] = 'int';
         $values['defaultValue($expression)'][0] = 'int DEFAULT (1 + 2)';

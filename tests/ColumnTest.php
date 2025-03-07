@@ -15,7 +15,7 @@ use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
-use Yiisoft\Db\Tests\Common\CommonColumnTest;
+use Yiisoft\Db\Tests\AbstractColumnTest;
 
 use function str_repeat;
 
@@ -24,7 +24,7 @@ use function str_repeat;
  *
  * @psalm-suppress PropertyNotSetInConstructor
  */
-final class ColumnTest extends CommonColumnTest
+final class ColumnTest extends AbstractColumnTest
 {
     use TestTrait;
 

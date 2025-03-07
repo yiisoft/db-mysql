@@ -9,6 +9,7 @@ use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Tests\AbstractColumnFactoryTest;
 
 /**
@@ -25,23 +26,15 @@ final class ColumnFactoryTest extends AbstractColumnFactoryTest
     }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'definitions')]
-    public function testFromDefinition(
-        string $definition,
-        string $expectedType,
-        string $expectedInstanceOf,
-        array $expectedMethodResults = []
-    ): void {
-        parent::testFromDefinition($definition, $expectedType, $expectedInstanceOf, $expectedMethodResults);
+    public function testFromDefinition(string $definition, ColumnInterface $expected): void
+    {
+        parent::testFromDefinition($definition, $expected);
     }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'pseudoTypes')]
-    public function testFromPseudoType(
-        string $pseudoType,
-        string $expectedType,
-        string $expectedInstanceOf,
-        array $expectedMethodResults = []
-    ): void {
-        parent::testFromPseudoType($pseudoType, $expectedType, $expectedInstanceOf, $expectedMethodResults);
+    public function testFromPseudoType(string $pseudoType, ColumnInterface $expected): void
+    {
+        parent::testFromPseudoType($pseudoType, $expected);
     }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'types')]
