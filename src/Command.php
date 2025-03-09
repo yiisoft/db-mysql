@@ -15,7 +15,7 @@ use function str_starts_with;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array $columns): bool|array
+    public function insertWithReturningPks(string $table, array $columns): array|false
     {
         $params = [];
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
@@ -36,7 +36,7 @@ final class Command extends AbstractPdoCommand
                 continue;
             }
 
-            /** @psalm-var mixed */
+            /** @var mixed */
             $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
         }
 
