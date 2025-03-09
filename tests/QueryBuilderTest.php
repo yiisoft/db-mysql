@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Command\Param;
@@ -757,5 +758,24 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testBuildColumnDefinition(string $expected, ColumnInterface|string $column): void
     {
         parent::testBuildColumnDefinition($expected, $column);
+    }
+
+    #[DataProvider('dataDropTable')]
+    public function testDropTable(string $expected, ?bool $ifExists, ?bool $cascade): void
+    {
+        if ($cascade) {
+            $qb = $this->getConnection()->getQueryBuilder();
+
+            $this->expectException(NotSupportedException::class);
+            $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
+
+            $ifExists === null
+                ? $qb->dropTable('customer', cascade: true)
+                : $qb->dropTable('customer', ifExists: $ifExists, cascade: true);
+
+            return;
+        }
+
+        parent::testDropTable($expected, $ifExists, $cascade);
     }
 }
