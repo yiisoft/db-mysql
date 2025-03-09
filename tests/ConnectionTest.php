@@ -58,13 +58,13 @@ final class ConnectionTest extends CommonConnectionTest
         $db->setEmulatePrepare(true);
         $db->open();
 
-        $this->assertsAME(1, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(true, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
         $db->setEmulatePrepare(false);
         $db->open();
 
-        $this->assertSame(0, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(false, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
     }
