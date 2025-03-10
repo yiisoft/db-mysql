@@ -91,6 +91,8 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
          * non-transactional tables, the AUTO_INCREMENT counter is not incremented.
          */
         $this->assertSame('0', $db->getLastInsertID());
+
+        $db->close();
     }
 
     public function testTransactionAutocommit()
@@ -106,5 +108,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
             $db->createCommand()->dropTable($name)->execute();
         });
         // If we made it this far without an error, then everything's working
+
+        $db->close();
     }
 }

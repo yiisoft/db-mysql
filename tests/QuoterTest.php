@@ -61,5 +61,7 @@ final class QuoterTest extends AbstractQuoterTest
         $this->assertSame("'1.1e0'", $quoter->quoteValue('1.1e0'));
         $this->assertSame("'test'", $quoter->quoteValue('test'));
         $this->assertSame("'test\'test'", $quoter->quoteValue("test'test"));
+
+        $db->close();
     }
 }

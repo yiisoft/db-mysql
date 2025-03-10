@@ -155,5 +155,7 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectExceptionMessageMatches('/SQLSTATE\[HY000\]: General error: (?:2006|4031) /');
 
         $db->createCommand('SELECT 1')->queryScalar();
+
+        $db->close();
     }
 }
