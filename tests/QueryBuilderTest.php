@@ -767,7 +767,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             $qb = $this->getConnection()->getQueryBuilder();
 
             $this->expectException(NotSupportedException::class);
-            $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
+            $this->expectExceptionMessage('MySQL doesn\'t support cascade drop table.');
 
             $ifExists === null
                 ? $qb->dropTable('customer', cascade: true)

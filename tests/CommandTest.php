@@ -98,7 +98,7 @@ final class CommandTest extends CommonCommandTest
         $command = $this->getConnection()->createCommand();
 
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('SQLite doesn\'t support cascade drop table.');
+        $this->expectExceptionMessage('MySQL doesn\'t support cascade drop table.');
         $command->dropTable('{{table}}', cascade: true);
     }
 
