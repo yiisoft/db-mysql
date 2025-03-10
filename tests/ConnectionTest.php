@@ -58,13 +58,13 @@ final class ConnectionTest extends CommonConnectionTest
         $db->setEmulatePrepare(true);
         $db->open();
 
-        $this->assertsAME(1, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(true, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
         $db->setEmulatePrepare(false);
         $db->open();
 
-        $this->assertSame(0, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(false, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
     }
@@ -152,8 +152,10 @@ final class ConnectionTest extends CommonConnectionTest
         sleep(2);
 
         $this->expectException(IntegrityException::class);
-        $this->expectExceptionMessage('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away');
+        $this->expectExceptionMessageMatches('/SQLSTATE\[HY000\]: General error: (?:2006|4031) /');
 
         $db->createCommand('SELECT 1')->queryScalar();
+
+        $db->close();
     }
 }

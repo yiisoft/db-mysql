@@ -32,14 +32,9 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
      */
     public function addCommentOnColumn(string $table, string $column, string $comment): string
     {
-        /* Strip existing comment which may include escaped quotes */
-        $definition = trim(
-            preg_replace(
-                "/COMMENT '(?:''|[^'])*'/i",
-                '',
-                $this->getColumnDefinition($table, $column)
-            )
-        );
+        /** @var string $definition Strip existing comment which may include escaped quotes */
+        $definition = preg_replace("/COMMENT '(?:''|[^'])*'/i", '', $this->getColumnDefinition($table, $column));
+        $definition = trim($definition);
 
         $checkRegex = '/CHECK *(\(([^()]|(?-2))*\))/';
         $check = preg_match($checkRegex, $definition, $checkMatches);

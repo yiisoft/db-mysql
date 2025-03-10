@@ -44,6 +44,8 @@ final class ColumnTest extends AbstractColumnTest
         $query = (new Query($db))->from('negative_default_values')->one();
 
         $this->assertSame($bigint, $query['bigint_col']);
+
+        $db->close();
     }
 
     public function testPhpTypeCast(): void
@@ -111,6 +113,8 @@ final class ColumnTest extends AbstractColumnTest
         $this->assertInstanceOf(BinaryColumn::class, $tableSchema->getColumn('blob_col'));
         $this->assertInstanceOf(BooleanColumn::class, $tableSchema->getColumn('bool_col'));
         $this->assertInstanceOf(JsonColumn::class, $tableSchema->getColumn('json_col'));
+
+        $db->close();
     }
 
     public function testLongtextType(): void
@@ -139,5 +143,7 @@ final class ColumnTest extends AbstractColumnTest
         $this->assertSame('text', $table->getColumn('text')->getDbType());
         $this->assertSame('mediumtext', $table->getColumn('mediumtext')->getDbType());
         $this->assertSame('longtext', $table->getColumn('longtext')->getDbType());
+
+        $db->close();
     }
 }

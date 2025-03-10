@@ -40,6 +40,8 @@ final class QueryTest extends CommonQueryTest
             ->column();
 
         $this->assertSame([1 => 'user1 in profile customer 1', 3 => 'user3 in profile customer 3'], $result);
+
+        $db->close();
     }
 
     /**
@@ -58,6 +60,8 @@ final class QueryTest extends CommonQueryTest
         $this->assertArrayHasKey('id', $row);
         $this->assertArrayHasKey('name', $row);
         $this->assertArrayHasKey('email', $row);
+
+        $db->close();
     }
 
     /**
@@ -80,12 +84,15 @@ final class QueryTest extends CommonQueryTest
         $this->assertContains('2', $result);
         $this->assertContains('3', $result);
         $this->assertNotContains('1', $result);
+
+        $db->close();
     }
 
     public function testWithQuery()
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
+        $db->close();
 
         if (
             !str_contains($serverVersion, 'MariaDB')
@@ -101,6 +108,7 @@ final class QueryTest extends CommonQueryTest
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
+        $db->close();
 
         if (
             !str_contains($serverVersion, 'MariaDB')

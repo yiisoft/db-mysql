@@ -44,7 +44,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
         $tableName = $this->quoter->quoteTableName($table);
 
         if ($value !== null) {
-            return 'ALTER TABLE ' . $tableName . ' AUTO_INCREMENT=' . $value . ';';
+            return 'ALTER TABLE ' . $tableName . ' AUTO_INCREMENT=' . (string) $value . ';';
         }
 
         $key = $tableSchema->getPrimaryKey()[0];

@@ -56,6 +56,8 @@ final class CommandTest extends CommonCommandTest
 
         $this->assertArrayHasKey('email', $columns);
         $this->assertSame('text', $columns['email']->getDbType());
+
+        $db->close();
     }
 
     /**
