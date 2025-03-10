@@ -33,7 +33,7 @@ It is used in [Yii Framework](https://www.yiiframework.com/) but can be used sep
 
 | PHP         | MySQL/MariaDB Version | CI-Actions |
 |-------------|-----------------------|------------|
-| **8.1-8.3** |**5.7-8.0**/**10.4-10.10**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![ansi-mode](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml)
+| **8.1-8.4** |**5.7-8.0**/**10.4-10.10**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![ansi-mode](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml)
 
 ## Installation
 
