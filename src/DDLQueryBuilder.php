@@ -189,7 +189,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
-     * @throws NotSupportedException SQLite doesn't support cascade drop table.
+     * @throws NotSupportedException MySQL doesn't support cascade drop table.
      */
     public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
     {
