@@ -182,4 +182,15 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
 
         return $matches[2];
     }
+
+    /**
+     * @throws NotSupportedException MySQL doesn't support cascade drop table.
+     */
+    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
+    {
+        if ($cascade) {
+            throw new NotSupportedException('MySQL doesn\'t support cascade drop table.');
+        }
+        return parent::dropTable($table, $ifExists, false);
+    }
 }

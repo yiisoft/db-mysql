@@ -29,6 +29,8 @@
 - Bug #377: Explicitly mark nullable parameters (@vjik)
 - Chg #378: Change supported PHP versions to `8.1 - 8.4` (@Tigrov)
 - Enh #378: Minor refactoring (@Tigrov)
+- New #379: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
+  `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 
 ## 1.2.0 March 21, 2024
 
