@@ -7,7 +7,9 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\IntegrityException;
 
+use function in_array;
 use function str_starts_with;
+use function substr;
 
 /**
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for MySQL,
@@ -15,7 +17,7 @@ use function str_starts_with;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array $columns): bool|array
+    public function insertWithReturningPks(string $table, array $columns): array|false
     {
         $params = [];
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
@@ -36,7 +38,7 @@ final class Command extends AbstractPdoCommand
                 continue;
             }
 
-            /** @psalm-var mixed */
+            /** @var mixed */
             $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
         }
 
@@ -49,7 +51,8 @@ final class Command extends AbstractPdoCommand
             return parent::queryInternal($queryMode);
         } catch (IntegrityException $e) {
             if (
-                str_starts_with($e->getMessage(), 'SQLSTATE[HY000]: General error: 2006 ')
+                str_starts_with($e->getMessage(), 'SQLSTATE[HY000]: General error: ')
+                && in_array(substr($e->getMessage(), 32, 5), ['2006 ', '4031 '], true)
                 && $this->db->getTransaction() === null
             ) {
                 $this->cancel();

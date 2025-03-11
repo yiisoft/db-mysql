@@ -50,6 +50,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.');
 
         $qb->addCheck('id', 'customer', 'id > 0');
+
+        $db->close();
     }
 
     /**
@@ -76,6 +78,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         }
 
         $this->assertSame($sql, $qb->addCommentOnColumn('customer', 'id', 'Primary key.'));
+
+        $db->close();
     }
 
     /**
@@ -94,6 +98,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $sql,
         );
+
+        $db->close();
     }
 
     /**
@@ -109,6 +115,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.');
 
         $qb->addDefaultValue('T_constraints_1', 'CN_pk', 'C_default', 1);
+
+        $db->close();
     }
 
     /**
@@ -240,6 +248,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
 
         $this->assertSame([], $params);
+
+        $db->close();
     }
 
     /**
@@ -271,6 +281,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->checkIntegrity('', 'customer'),
         );
+
+        $db->close();
     }
 
     public function testCreateTable(): void
@@ -300,6 +312,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
                 ],
             ),
         );
+
+        $db->close();
     }
 
     /**
@@ -325,6 +339,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropCheck is not supported by MySQL.');
 
         $qb->dropCheck('T_constraints_1', 'CN_check');
+
+        $db->close();
     }
 
     /**
@@ -356,6 +372,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->insert('negative_default_values', []),
         );
+
+        $db->close();
     }
 
     public function testDropCommentFromColumn(): void
@@ -379,6 +397,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         }
 
         $this->assertSame($sql, $qb->dropCommentFromColumn('customer', 'id'));
+
+        $db->close();
     }
 
     public function testDropCommentFromTable(): void
@@ -393,6 +413,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->dropCommentFromTable('customer'),
         );
+
+        $db->close();
     }
 
     /**
@@ -408,6 +430,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->expectExceptionMessage('Yiisoft\Db\Mysql\DDLQueryBuilder::dropDefaultValue is not supported by MySQL.');
 
         $qb->dropDefaultValue('T_constraints_1', 'CN_pk');
+
+        $db->close();
     }
 
     public function testDropForeignKey(): void
@@ -422,6 +446,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->dropForeignKey('T_constraints_3', 'CN_constraints_3'),
         );
+
+        $db->close();
     }
 
     public function testDropPrimaryKey(): void
@@ -436,6 +462,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->dropPrimaryKey('T_constraints_1', 'CN_pk'),
         );
+
+        $db->close();
     }
 
     public function testDropUnique(): void
@@ -450,6 +478,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->dropUnique('test_uq', 'test_uq_constraint'),
         );
+
+        $db->close();
     }
 
     /**
@@ -488,6 +518,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
         $qb->insertWithReturningPks($table, $columns, $params);
+
+        $db->close();
     }
 
     /**
@@ -532,6 +564,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $command->insert('{{type}}', ['bigint_col' => '1000000000000'])->getRawSql(),
         );
+
+        $db->close();
     }
 
     public function testRenameColumn(): void
@@ -559,6 +593,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             SQL,
             $qb->renameColumn('non_exist_table', 'non_exist_column', 'new_column'),
         );
+
+        $db->close();
     }
 
     /**
@@ -623,6 +659,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->createCommand($sql)->execute();
         $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(6, $insertResult['id']);
+
+        $db->close();
     }
 
     /**

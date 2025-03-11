@@ -107,7 +107,8 @@ final class Schema extends AbstractPdoSchema
         if (preg_match_all($regexp, $sql, $matches, PREG_SET_ORDER) > 0) {
             foreach ($matches as $match) {
                 $indexName = $match[1];
-                $indexColumns = array_map(trim(...), preg_split('/[`"],[`"]/', trim($match[2], '`"')));
+                /** @var string[] $indexColumns */
+                $indexColumns = preg_split('/[`"],[`"]/', trim($match[2], '`"'));
                 $uniqueIndexes[$indexName] = $indexColumns;
             }
         }

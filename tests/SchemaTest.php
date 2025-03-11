@@ -42,6 +42,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
+        $db->close();
 
         if (
             version_compare($serverVersion, '8.0.17', '>') &&
@@ -135,6 +136,8 @@ final class SchemaTest extends CommonSchemaTest
             $columnName = $column->getName();
             $this->assertEquals($columnsData[$columnName][1], $column->getDefaultValue());
         }
+
+        $db->close();
     }
 
     /**
@@ -174,6 +177,8 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertNotNull($ts);
         $this->assertInstanceOf(Expression::class, $ts->getDefaultValue());
         $this->assertEquals('CURRENT_TIMESTAMP(3)', (string) $ts->getDefaultValue());
+
+        $db->close();
     }
 
     public function testGetSchemaChecks(): void
@@ -206,6 +211,8 @@ final class SchemaTest extends CommonSchemaTest
         $schema = $db->getSchema();
 
         $this->assertSame([self::getDatabaseName()], $schema->getSchemaNames());
+
+        $db->close();
     }
 
     public function testGetTableChecks(): void
@@ -266,6 +273,8 @@ final class SchemaTest extends CommonSchemaTest
         foreach ($expectedTableNames as $tableName) {
             $this->assertContains($tableName, $tablesNames);
         }
+
+        $db->close();
     }
 
     public function testGetViewNames(): void
@@ -281,6 +290,8 @@ final class SchemaTest extends CommonSchemaTest
         };
 
         $this->assertSame($viewExpected, $views);
+
+        $db->close();
     }
 
     /**
@@ -344,6 +355,8 @@ final class SchemaTest extends CommonSchemaTest
 
         $schema = new Schema($mockDb, DbHelper::getSchemaCache());
         $schema->getTablePrimaryKey($tableName);
+
+        $db->close();
     }
 
     public function testWorkWithCheckConstraint(): void
@@ -390,6 +403,8 @@ final class SchemaTest extends CommonSchemaTest
         $this->assertNull($constraints);
 
         $this->dropTableForIndexAndConstraintTests($db, $tableName);
+
+        $db->close();
     }
 
     public function withIndexDataProvider(): array
@@ -443,6 +458,8 @@ final class SchemaTest extends CommonSchemaTest
 
         $this->assertEquals($status, $selectedRow['status']);
         $this->assertEquals(true, $selectedRow['bool_col']);
+
+        $db->close();
     }
 
     public function testNotConnectionPDO(): void
@@ -473,6 +490,8 @@ final class SchemaTest extends CommonSchemaTest
             'float_col' => '-12345.6789',
             'numeric_col' => '-33.22',
         ], $row);
+
+        $db->close();
     }
 
     public function testGetColumnFactory(): void
@@ -480,5 +499,7 @@ final class SchemaTest extends CommonSchemaTest
         $db = $this->getConnection();
 
         $this->assertInstanceOf(ColumnFactory::class, $db->getSchema()->getColumnFactory());
+
+        $db->close();
     }
 }
