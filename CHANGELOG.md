@@ -27,6 +27,8 @@
 - New #374: Add `IndexType` and `IndexMethod` classes (@Tigrov)
 - Enh #376: Move `JsonExpressionBuilder` and JSON type tests to `yiisoft/db` package (@Tigrov)
 - Bug #377: Explicitly mark nullable parameters (@vjik)
+- New #379: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
+  `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 
 ## 1.2.0 March 21, 2024
 
