@@ -16,6 +16,10 @@ on:
 
 name: static analysis
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   psalm:
     name: PHP ${{ matrix.php }}
@@ -38,14 +42,14 @@ jobs:
 
     steps:
       - name: Checkout.
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install PHP with extensions.
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-          tools: composer:v2, cs2pr
+          tools: cs2pr
 
       - name: Update composer.
         run: composer self-update
@@ -61,9 +65,6 @@ jobs:
           CURRENT_PACKAGE: db
           FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
           WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
-
-      - name: Install dependencies with composer.
-        run: composer update --no-interaction --no-progress --optimize-autoloader --ansi
 
       - name: Static analysis.
         run: vendor/bin/psalm --config=${{ inputs.psalm-config }} --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
