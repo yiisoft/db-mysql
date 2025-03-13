@@ -13,7 +13,7 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
 {
     protected function prepareColumn(LikeConditionInterface $expression, array &$params): string
     {
-        $column = parent::prepareColumn($expression, $params);
+        $column = null;
 
         if ($expression->getCaseSensitive() === true) {
             $column = 'BINARY ' . $column;
