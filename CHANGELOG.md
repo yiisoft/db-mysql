@@ -31,6 +31,7 @@
 - Enh #378: Minor refactoring (@Tigrov)
 - New #379: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
+- Chg #382: Remove `yiisoft/json` dependency (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
