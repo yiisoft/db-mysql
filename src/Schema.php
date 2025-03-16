@@ -15,8 +15,6 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Helper\DbArrayHelper;
-use Yiisoft\Db\Mysql\Column\ColumnFactory;
-use Yiisoft\Db\Schema\Column\ColumnFactoryInterface;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\TableSchemaInterface;
 
@@ -73,11 +71,6 @@ use function trim;
  */
 final class Schema extends AbstractPdoSchema
 {
-    public function getColumnFactory(): ColumnFactoryInterface
-    {
-        return new ColumnFactory();
-    }
-
     /**
      * Returns all unique indexes for the given table.
      *
@@ -405,7 +398,7 @@ final class Schema extends AbstractPdoSchema
     {
         $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
 
-        $column = $this->getColumnFactory()->fromDefinition($info['column_type'], [
+        $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], [
             'autoIncrement' => $autoIncrement > 0,
             'comment' => $info['column_comment'],
             'defaultValueRaw' => $info['column_default'],

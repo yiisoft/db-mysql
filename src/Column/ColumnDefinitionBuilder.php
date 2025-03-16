@@ -65,7 +65,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
     {
         $comment = $column->getComment();
 
-        return $comment === null ? '' : ' COMMENT ' . $this->queryBuilder->quoter()->quoteValue($comment);
+        return $comment === null ? '' : ' COMMENT ' . $this->queryBuilder->getQuoter()->quoteValue($comment);
     }
 
     protected function getDbType(ColumnInterface $column): string
