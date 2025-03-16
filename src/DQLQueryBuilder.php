@@ -8,8 +8,11 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Builder\ExpressionBuilder;
 use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
+use Yiisoft\Db\Mysql\Builder\LikeConditionBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+
+use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 
 use function ctype_digit;
 
@@ -83,6 +86,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             ...parent::defaultExpressionBuilders(),
             JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
             Expression::class => ExpressionBuilder::class,
+            LikeCondition::class => LikeConditionBuilder::class,
         ];
     }
 }
