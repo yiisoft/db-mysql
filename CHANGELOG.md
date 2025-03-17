@@ -33,6 +33,7 @@
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 - Chg #382: Remove `yiisoft/json` dependency (@Tigrov)
 - Enh #384: Refactor according changes in `db` package (@Tigrov)
+- New #383: Add `caseSensitive` option to like condition (@vjik)
 
 ## 1.2.0 March 21, 2024
 
