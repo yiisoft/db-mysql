@@ -52,7 +52,7 @@ final class ColumnFactoryTest extends AbstractColumnFactoryTest
     public function testExpressionDefaultValueRaw(): void
     {
         $db = $this->getConnection();
-        $columnFactory = $db->getSchema()->getColumnFactory();
+        $columnFactory = $db->getColumnFactory();
 
         $column = $columnFactory->fromType(ColumnType::DATETIME, ['defaultValueRaw' => 'now()', 'extra' => 'DEFAULT_GENERATED']);
 
