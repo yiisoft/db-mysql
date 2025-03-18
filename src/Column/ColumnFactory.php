@@ -59,7 +59,8 @@ final class ColumnFactory extends AbstractColumnFactory
     {
         /** @psalm-var ColumnType::* */
         return $this->mapType($this->typeMap, $dbType, $info)
-            ?? ($dbType === 'bit' && isset($info['size']) && $info['size'] === 1
+            ?? (
+                $dbType === 'bit' && isset($info['size']) && $info['size'] === 1
                 ? ColumnType::BOOLEAN
                 : parent::getType($dbType, $info)
             );
