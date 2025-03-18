@@ -55,13 +55,14 @@ final class ColumnFactory extends AbstractColumnFactory
         'json' => ColumnType::JSON,
     ];
 
-    protected function getType(string $dbType, array $info = []): string
+    protected function getType(string $dbType, array &$info = []): string
     {
-        if ($dbType === 'bit' && isset($info['size']) && $info['size'] === 1) {
-            return ColumnType::BOOLEAN;
-        }
-
-        return parent::getType($dbType, $info);
+        /** @psalm-var ColumnType::* */
+        return $this->mapType($this->typeMap, $dbType, $info)
+            ?? ($dbType === 'bit' && isset($info['size']) && $info['size'] === 1
+                ? ColumnType::BOOLEAN
+                : parent::getType($dbType, $info)
+            );
     }
 
     protected function normalizeDefaultValue(string|null $defaultValue, ColumnInterface $column): mixed
