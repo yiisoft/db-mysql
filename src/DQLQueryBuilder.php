@@ -11,7 +11,6 @@ use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Mysql\Builder\LikeConditionBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-
 use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 
 use function ctype_digit;
