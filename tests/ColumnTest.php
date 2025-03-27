@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
+use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
@@ -27,6 +28,86 @@ use function str_repeat;
 final class ColumnTest extends AbstractColumnTest
 {
     use TestTrait;
+
+    private function insertTypeValues(Connection $db): void
+    {
+        $db->createCommand()->insert(
+            'type',
+            [
+                'int_col' => 1,
+                'bigunsigned_col' => '12345678901234567890',
+                'char_col' => str_repeat('x', 100),
+                'char_col3' => null,
+                'float_col' => 1.234,
+                'blob_col' => "\x10\x11\x12",
+                'time' => '2023-07-11 14:50:23',
+                'bool_col' => false,
+                'bit_col' => 0b0110_0100, // 100
+                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
+            ]
+        )->execute();
+    }
+
+    private function assertResultValues(array $result): void
+    {
+        $this->assertSame(1, $result['int_col']);
+        $this->assertSame('12345678901234567890', $result['bigunsigned_col']);
+        $this->assertSame(str_repeat('x', 100), $result['char_col']);
+        $this->assertNull($result['char_col3']);
+        $this->assertSame(1.234, $result['float_col']);
+        $this->assertSame("\x10\x11\x12", $result['blob_col']);
+        $this->assertSame('2023-07-11 14:50:23', $result['time']);
+        $this->assertFalse($result['bool_col']);
+        $this->assertSame(0b0110_0100, $result['bit_col']);
+        $this->assertSame('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
+    }
+
+    public function testQueryTypecasting(): void
+    {
+        $db = $this->getConnection(true);
+
+        $this->insertTypeValues($db);
+
+        $result = (new Query($db))->typecasting()->from('type')->one();
+
+        $this->assertResultValues($result);
+
+        $db->close();
+    }
+
+    public function testCommandPhpTypecasting(): void
+    {
+        $db = $this->getConnection(true);
+
+        $this->insertTypeValues($db);
+
+        $result = $db->createCommand('SELECT * FROM type')->phpTypecasting()->queryOne();
+
+        $this->assertResultValues($result);
+
+        $db->close();
+    }
+
+    public function testSelectPhpTypecasting(): void
+    {
+        $db = $this->getConnection();
+
+        $result = $db->createCommand("SELECT null, 1, 2.5, true, false, 'string'")->phpTypecasting()->queryOne();
+
+        $this->assertSame(
+            [
+                'NULL' => null,
+                1 => 1,
+                '2.5' => 2.5,
+                'TRUE' => 1,
+                'FALSE' => 0,
+                'string' => 'string',
+            ],
+            $result,
+        );
+
+        $db->close();
+    }
 
     /**
      * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider::bigIntValue
@@ -51,30 +132,12 @@ final class ColumnTest extends AbstractColumnTest
     public function testPhpTypeCast(): void
     {
         $db = $this->getConnection(true);
-
-        $command = $db->createCommand();
         $schema = $db->getSchema();
         $tableSchema = $schema->getTableSchema('type');
 
-        $command->insert(
-            'type',
-            [
-                'int_col' => 1,
-                'bigunsigned_col' => 1234567890,
-                'char_col' => str_repeat('x', 100),
-                'char_col3' => null,
-                'float_col' => 1.234,
-                'blob_col' => "\x10\x11\x12",
-                'time' => '2023-07-11 14:50:23',
-                'bool_col' => false,
-                'bit_col' => 0b0110_0100, // 100
-                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
-            ]
-        );
-        $command->execute();
-        $query = (new Query($db))->from('type')->one();
+        $this->insertTypeValues($db);
 
-        $this->assertNotNull($tableSchema);
+        $query = (new Query($db))->from('type')->one();
 
         $intColPhpType = $tableSchema->getColumn('int_col')?->phpTypecast($query['int_col']);
         $bigUnsignedColPhpType = $tableSchema->getColumn('bigunsigned_col')?->phpTypecast($query['bigunsigned_col']);
@@ -88,7 +151,7 @@ final class ColumnTest extends AbstractColumnTest
         $jsonColPhpType = $tableSchema->getColumn('json_col')?->phpTypecast($query['json_col']);
 
         $this->assertSame(1, $intColPhpType);
-        $this->assertSame('1234567890', $bigUnsignedColPhpType);
+        $this->assertSame('12345678901234567890', $bigUnsignedColPhpType);
         $this->assertSame(str_repeat('x', 100), $charColPhpType);
         $this->assertNull($charCol3PhpType);
         $this->assertSame(1.234, $floatColPhpType);

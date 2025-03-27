@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Schema\Column\BigIntColumn;
+use Yiisoft\Db\Schema\Column\BitColumn;
+use Yiisoft\Db\Schema\Column\BooleanColumn;
+use Yiisoft\Db\Schema\Column\DoubleColumn;
+use Yiisoft\Db\Schema\Column\IntegerColumn;
+use Yiisoft\Db\Schema\Column\StringColumn;
 
 final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
@@ -443,6 +450,158 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         $constraints['4: check'][2] = false;
 
         return $constraints;
+    }
+
+    public static function resultColumns(): array
+    {
+        return [
+            [null, []],
+            [null, ['native_type' => 'NULL']],
+            [new IntegerColumn(dbType: 'int', name: 'int_col', notNull: true, size: 11), [
+                'native_type' => 'LONG',
+                'pdo_type' => 1,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'int_col',
+                'len' => 11,
+                'precision' => 0,
+            ]],
+            [new BigIntColumn(dbType: 'bigint', name: 'bigunsigned_col', notNull: false, size: 20, unsigned: true), [
+                'native_type' => 'LONGLONG',
+                'pdo_type' => 1,
+                'flags' => [],
+                'table' => 'type',
+                'name' => 'bigunsigned_col',
+                'len' => 20,
+                'precision' => 0,
+            ]],
+            [new IntegerColumn(ColumnType::TINYINT, dbType: 'tinyint', name: 'tinyint_col', notNull: false, size: 3), [
+                'native_type' => 'TINY',
+                'pdo_type' => 1,
+                'flags' => [],
+                'table' => 'type',
+                'name' => 'tinyint_col',
+                'len' => 3,
+                'precision' => 0,
+            ]],
+            [new IntegerColumn(ColumnType::SMALLINT, dbType: 'smallint', name: 'smallint_col', notNull: false, size: 1), [
+                'native_type' => 'SHORT',
+                'pdo_type' => 1,
+                'flags' => [],
+                'table' => 'type',
+                'name' => 'smallint_col',
+                'len' => 1,
+                'precision' => 0,
+            ]],
+            [new StringColumn(ColumnType::CHAR, dbType: 'char', name: 'char_col', notNull: true, size: 400), [
+                'native_type' => 'STRING',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'char_col',
+                'len' => 400,
+                'precision' => 0,
+            ]],
+            [new StringColumn(dbType: 'varchar', name: 'char_col2', notNull: false, size: 400), [
+                'native_type' => 'VAR_STRING',
+                'pdo_type' => 2,
+                'flags' => [],
+                'table' => 'type',
+                'name' => 'char_col2',
+                'len' => 400,
+                'precision' => 0,
+            ]],
+            [new StringColumn(ColumnType::TEXT, dbType: 'text', name: 'char_col3', notNull: false, size: 262140), [
+                'native_type' => 'BLOB',
+                'pdo_type' => 2,
+                'flags' => ['blob'],
+                'table' => 'type',
+                'name' => 'char_col3',
+                'len' => 262140,
+                'precision' => 0,
+            ]],
+            [new DoubleColumn(dbType: 'double', name: 'float_col', notNull: true, size: 4, scale: 3), [
+                'native_type' => 'DOUBLE',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'float_col',
+                'len' => 4,
+                'precision' => 3,
+            ]],
+            [new DoubleColumn(ColumnType::DECIMAL, dbType: 'decimal', name: 'numeric_col', notNull: false, size: 5, scale: 2), [
+                'native_type' => 'NEWDECIMAL',
+                'pdo_type' => 2,
+                'flags' => [],
+                'table' => 'type',
+                'name' => 'numeric_col',
+                'len' => 7,
+                'precision' => 2,
+            ]],
+            [new StringColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'time', notNull: true, size: 0), [
+                'native_type' => 'TIMESTAMP',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'time',
+                'len' => 19,
+                'precision' => 0,
+            ]],
+            [new BooleanColumn(dbType: 'bit', name: 'bool_col', notNull: true, size: 1), [
+                'native_type' => 'BIT',
+                'pdo_type' => 1,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'bool_col',
+                'len' => 1,
+                'precision' => 0,
+            ]],
+            [new BitColumn(dbType: 'bit', name: 'bit_col', notNull: true, size: 8), [
+                'native_type' => 'BIT',
+                'pdo_type' => 1,
+                'flags' => ['not_null'],
+                'table' => 'type',
+                'name' => 'bit_col',
+                'len' => 8,
+                'precision' => 0,
+            ]],
+            [new IntegerColumn(dbType: 'int', name: '1', size: 1, notNull: true), [
+                'native_type' => 'LONG',
+                'pdo_type' => 1,
+                'flags' => ['not_null'],
+                'table' => '',
+                'name' => '1',
+                'len' => 1,
+                'precision' => 0,
+            ]],
+            [new DoubleColumn(ColumnType::DECIMAL, dbType: 'decimal', name: '2.5', notNull: true, size: 2, scale: 1), [
+                'native_type' => 'NEWDECIMAL',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => '',
+                'name' => '2.5',
+                'len' => 4,
+                'precision' => 1,
+            ]],
+            [new StringColumn(dbType: 'varchar', name: 'string', notNull: true, size: 24), [
+                'native_type' => 'VAR_STRING',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => '',
+                'name' => 'string',
+                'len' => 24,
+                'precision' => 39,
+            ]],
+            [new StringColumn(ColumnType::DATETIME, dbType: 'datetime', name: 'CURRENT_TIMESTAMP(3)', notNull: true, size: 3), [
+                'native_type' => 'DATETIME',
+                'pdo_type' => 2,
+                'flags' => ['not_null'],
+                'table' => '',
+                'name' => 'CURRENT_TIMESTAMP(3)',
+                'len' => 23,
+                'precision' => 3,
+            ]],
+        ];
     }
 
     public static function tableSchemaWithDbSchemes(): array
