@@ -755,8 +755,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $serverVersion = $db->getServerInfo()->getVersion();
 
         if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
+            $db->close();
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
         } elseif (version_compare($serverVersion, '8', '<')) {
+            $db->close();
             self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
@@ -777,8 +779,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $serverVersion = $db->getServerInfo()->getVersion();
 
         if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
+            $db->close();
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
         } elseif (version_compare($serverVersion, '8', '<')) {
+            $db->close();
             self::markTestSkipped('MySQL < 8 does not support JSON_OVERLAPS() function.');
         }
 
