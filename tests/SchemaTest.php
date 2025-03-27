@@ -60,6 +60,8 @@ final class SchemaTest extends CommonSchemaTest
                 $columns['tinyint_col']['size'] = null;
 
                 $columns['smallint_col']['size'] = null;
+
+                $columns['mediumint_col']['size'] = null;
             }
 
             if ($tableName === 'animal') {
