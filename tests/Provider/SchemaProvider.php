@@ -574,6 +574,15 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => 1,
                 'precision' => 0,
             ]],
+            [new IntegerColumn(dbType: 'int', name: '1', size: 1, notNull: true), [
+                'native_type' => 'LONGLONG',
+                'pdo_type' => 1,
+                'flags' => ['not_null'],
+                'table' => '',
+                'name' => '1',
+                'len' => 1,
+                'precision' => 0,
+            ]],
             [new DoubleColumn(ColumnType::DECIMAL, dbType: 'decimal', name: '2.5', notNull: true, size: 2, scale: 1), [
                 'native_type' => 'NEWDECIMAL',
                 'pdo_type' => 2,

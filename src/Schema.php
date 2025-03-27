@@ -386,7 +386,7 @@ final class Schema extends AbstractPdoSchema
             'SHORT' => 'smallint',
             'INT24' => 'mediumint',
             'LONG' => 'int',
-            'LONGLONG' => 'bigint',
+            'LONGLONG' => $info['len'] < 10 ? 'int' : 'bigint',
             'NEWDECIMAL' => 'decimal',
             'STRING' => 'char',
             'VAR_STRING' => 'varchar',
@@ -422,8 +422,8 @@ final class Schema extends AbstractPdoSchema
 
         match ($dbType) {
             'float', 'double', 'decimal' => $columnInfo['scale'] = $info['precision'],
-            'bigint' => $columnInfo['unsigned'] = true,
-            'int' => PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
+            'bigint' => $info['len'] === 20 ? $columnInfo['unsigned'] = true : null,
+            'int' => $info['len'] === 10 && PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
             default => null,
         };
 

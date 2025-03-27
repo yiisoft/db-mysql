@@ -59,7 +59,7 @@ final class ColumnTest extends AbstractColumnTest
         $this->assertSame('2023-07-11 14:50:23', $result['time']);
         $this->assertFalse($result['bool_col']);
         $this->assertSame(0b0110_0100, $result['bit_col']);
-        $this->assertSame('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
+        $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
     }
 
     public function testQueryTypecasting(): void
@@ -92,15 +92,25 @@ final class ColumnTest extends AbstractColumnTest
     {
         $db = $this->getConnection();
 
-        $result = $db->createCommand("SELECT null, 1, 2.5, true, false, 'string'")->phpTypecasting()->queryOne();
+        $result = $db->createCommand(
+            <<<SQL
+            SELECT
+                null AS `null`,
+                1 AS `1`,
+                2.5 AS `2.5`,
+                true AS `true`,
+                false AS `false`,
+                'string' AS `string`
+            SQL
+        )->phpTypecasting()->queryOne();
 
         $this->assertSame(
             [
-                'NULL' => null,
+                'null' => null,
                 1 => 1,
                 '2.5' => 2.5,
-                'TRUE' => 1,
-                'FALSE' => 0,
+                'true' => 1,
+                'false' => 0,
                 'string' => 'string',
             ],
             $result,
