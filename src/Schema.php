@@ -381,7 +381,7 @@ final class Schema extends AbstractPdoSchema
             return null;
         }
 
-        $dbType = match($info['native_type']) {
+        $dbType = match ($info['native_type']) {
             'TINY' => 'tinyint',
             'SHORT' => 'smallint',
             'INT24' => 'mediumint',
@@ -390,7 +390,7 @@ final class Schema extends AbstractPdoSchema
             'NEWDECIMAL' => 'decimal',
             'STRING' => 'char',
             'VAR_STRING' => 'varchar',
-            'BLOB' => match($info['len']) {
+            'BLOB' => match ($info['len']) {
                 255 => 'tinyblob',
                 510, 765, 1020 => 'tinytext',
                 // 65535 => 'blob',
