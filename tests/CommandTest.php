@@ -97,11 +97,14 @@ final class CommandTest extends CommonCommandTest
 
     public function testDropTableCascade(): void
     {
-        $command = $this->getConnection()->createCommand();
+        $db = $this->getConnection();
+        $command = $db->createCommand();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('MySQL doesn\'t support cascade drop table.');
         $command->dropTable('{{table}}', cascade: true);
+
+        $db->close();
     }
 
     /**
