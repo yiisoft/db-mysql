@@ -152,6 +152,7 @@ CREATE TABLE `type` (
   `bigunsigned_col` bigint unsigned DEFAULT '12345678901234567890',
   `tinyint_col` tinyint(3) DEFAULT '1',
   `smallint_col` smallint(1) DEFAULT '1',
+  `mediumint_col` mediumint,
   `char_col` char(100) NOT NULL,
   `char_col2` varchar(100) DEFAULT 'something',
   `char_col3` text,
@@ -165,6 +166,10 @@ CREATE TABLE `type` (
   `tiny_col` tinyint(1) DEFAULT '2',
   `ts_default` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `bit_col` BIT(8) NOT NULL DEFAULT b'10000010',
+  `tinyblob_col` tinyblob,
+  `tinytext_col` tinytext,
+  `mediumblob_col` mediumblob,
+  `mediumtext_col` mediumtext,
   `json_col` json
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
