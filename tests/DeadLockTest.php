@@ -42,7 +42,7 @@ use function unlink;
  */
 final class DeadLockTest extends TestCase
 {
-    use testTrait;
+    use TestTrait;
 
     private const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
