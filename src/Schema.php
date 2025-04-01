@@ -386,7 +386,8 @@ final class Schema extends AbstractPdoSchema
         ]);
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $column->extra(trim(substr($extra, 18)));
+            $extra = trim(substr($extra, 18));
+            $column->extra($extra === '' ? null : $extra);
         }
 
         return $column;
