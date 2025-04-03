@@ -48,29 +48,22 @@ final class SchemaTest extends CommonSchemaTest
             !str_contains($serverVersion, 'MariaDB')
         ) {
             if ($tableName === 'type') {
-                $columns['int_col']['size'] = null;
-
-                $columns['int_col2']['size'] = null;
-
-                $columns['bigunsigned_col']['size'] = null;
-
-                $columns['tinyint_col']['size'] = null;
-
-                $columns['smallint_col']['size'] = null;
+                $columns['int_col']->size(null);
+                $columns['int_col2']->size(null);
+                $columns['bigunsigned_col']->size(null);
+                $columns['tinyint_col']->size(null);
+                $columns['smallint_col']->size(null);
             }
 
             if ($tableName === 'animal') {
-                $columns['id']['size'] = null;
+                $columns['id']->size(null);
             }
 
             if ($tableName === 'T_constraints_1') {
-                $columns['C_id']['size'] = null;
-
-                $columns['C_not_null']['size'] = null;
-
-                $columns['C_unique']['size'] = null;
-
-                $columns['C_default']['size'] = null;
+                $columns['C_id']->size(null);
+                $columns['C_not_null']->size(null);
+                $columns['C_unique']->size(null);
+                $columns['C_default']->size(null);
             }
         }
 

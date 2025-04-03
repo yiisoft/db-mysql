@@ -374,9 +374,9 @@ final class Schema extends AbstractPdoSchema
 
         $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], [
             'autoIncrement' => $autoIncrement > 0,
-            'comment' => $info['column_comment'],
+            'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
             'defaultValueRaw' => $info['column_default'],
-            'extra' => $extra,
+            'extra' => $extra === '' ? null : $extra,
             'name' => $info['column_name'],
             'notNull' => $info['is_nullable'] !== 'YES',
             'primaryKey' => $info['column_key'] === 'PRI',
@@ -386,7 +386,8 @@ final class Schema extends AbstractPdoSchema
         ]);
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $column->extra(trim(substr($extra, 18)));
+            $extra = trim(substr($extra, 18));
+            $column->extra($extra === '' ? null : $extra);
         }
 
         return $column;

@@ -35,6 +35,7 @@
 - Enh #384: Refactor according changes in `db` package (@Tigrov)
 - New #383: Add `caseSensitive` option to like condition (@vjik)
 - Enh #386: Remove `getCacheKey()` and `getCacheTag()` methods from `Schema` class (@Tigrov)
+- Bug #388: Set empty `comment` and `extra` properties to `null` when loading table columns (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
