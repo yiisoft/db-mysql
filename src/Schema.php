@@ -447,9 +447,9 @@ final class Schema extends AbstractPdoSchema
 
         $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], [
             'autoIncrement' => $autoIncrement > 0,
-            'comment' => $info['column_comment'],
+            'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
             'defaultValueRaw' => $info['column_default'],
-            'extra' => $extra,
+            'extra' => $extra === '' ? null : $extra,
             'name' => $info['column_name'],
             'notNull' => $info['is_nullable'] !== 'YES',
             'primaryKey' => $info['column_key'] === 'PRI',
@@ -459,7 +459,8 @@ final class Schema extends AbstractPdoSchema
         ]);
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $column->extra(trim(substr($extra, 18)));
+            $extra = trim(substr($extra, 18));
+            $column->extra($extra === '' ? null : $extra);
         }
 
         return $column;
@@ -553,9 +554,8 @@ final class Schema extends AbstractPdoSchema
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
-        /** @psalm-var array[][] $constraints */
         $constraints = array_map(array_change_key_case(...), $constraints);
-        $constraints = DbArrayHelper::index($constraints, null, ['type', 'name']);
+        $constraints = DbArrayHelper::arrange($constraints, ['type', 'name']);
 
         $result = [
             self::PRIMARY_KEY => null,
@@ -668,14 +668,13 @@ final class Schema extends AbstractPdoSchema
             ':tableName' => $resolvedName->getName(),
         ])->queryAll();
 
-        /** @psalm-var array[] $indexes */
         $indexes = array_map(array_change_key_case(...), $indexes);
-        $indexes = DbArrayHelper::index($indexes, null, ['name']);
+        $indexes = DbArrayHelper::arrange($indexes, ['name']);
         $result = [];
 
         /**
-         * @psalm-var object|string|null $name
-         * @psalm-var array[] $index
+         * @var string $name
+         * @var array[] $index
          */
         foreach ($indexes as $name => $index) {
             $ic = new IndexConstraint();
