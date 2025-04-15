@@ -371,26 +371,26 @@ final class Schema extends AbstractPdoSchema
      *     name: string,
      *     len: int,
      *     precision: int,
-     * } $info
+     * } $metadata
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    protected function loadResultColumn(array $info): ColumnInterface|null
+    protected function loadResultColumn(array $metadata): ColumnInterface|null
     {
-        if (empty($info['native_type']) || $info['native_type'] === 'NULL') {
+        if (empty($metadata['native_type']) || $metadata['native_type'] === 'NULL') {
             return null;
         }
 
-        $dbType = match ($info['native_type']) {
+        $dbType = match ($metadata['native_type']) {
             'TINY' => 'tinyint',
             'SHORT' => 'smallint',
             'INT24' => 'mediumint',
             'LONG' => 'int',
-            'LONGLONG' => $info['len'] < 10 ? 'int' : 'bigint',
+            'LONGLONG' => $metadata['len'] < 10 ? 'int' : 'bigint',
             'NEWDECIMAL' => 'decimal',
             'STRING' => 'char',
             'VAR_STRING' => 'varchar',
-            'BLOB' => match ($info['len']) {
+            'BLOB' => match ($metadata['len']) {
                 255 => 'tinyblob',
                 510, 765, 1020 => 'tinytext',
                 // 65535 => 'blob',
@@ -400,34 +400,34 @@ final class Schema extends AbstractPdoSchema
                 4294967295 => 'longblob',
                 default => 'blob',
             },
-            default => strtolower($info['native_type']),
+            default => strtolower($metadata['native_type']),
         };
 
         $columnInfo = [];
 
-        if (!empty($info['table'])) {
-            $columnInfo['table'] = $info['table'];
-            $columnInfo['name'] = $info['name'];
-        } elseif (!empty($info['name'])) {
-            $columnInfo['name'] = $info['name'];
+        if (!empty($metadata['table'])) {
+            $columnInfo['table'] = $metadata['table'];
+            $columnInfo['name'] = $metadata['name'];
+        } elseif (!empty($metadata['name'])) {
+            $columnInfo['name'] = $metadata['name'];
         }
 
-        if (!empty($info['len'])) {
+        if (!empty($metadata['len'])) {
             $columnInfo['size'] = match ($dbType) {
-                'decimal' => $info['len'] - ($info['precision'] === 0 ? 1 : 2),
-                'time', 'datetime', 'timestamp' => $info['precision'],
-                default => $info['len'],
+                'decimal' => $metadata['len'] - ($metadata['precision'] === 0 ? 1 : 2),
+                'time', 'datetime', 'timestamp' => $metadata['precision'],
+                default => $metadata['len'],
             };
         }
 
         match ($dbType) {
-            'float', 'double', 'decimal' => $columnInfo['scale'] = $info['precision'],
-            'bigint' => $info['len'] === 20 ? $columnInfo['unsigned'] = true : null,
-            'int' => $info['len'] === 10 && PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
+            'float', 'double', 'decimal' => $columnInfo['scale'] = $metadata['precision'],
+            'bigint' => $metadata['len'] === 20 ? $columnInfo['unsigned'] = true : null,
+            'int' => $metadata['len'] === 10 && PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
             default => null,
         };
 
-        $columnInfo['notNull'] = in_array('not_null', $info['flags'], true);
+        $columnInfo['notNull'] = in_array('not_null', $metadata['flags'], true);
 
         return $this->db->getColumnFactory()->fromDbType($dbType, $columnInfo);
     }
