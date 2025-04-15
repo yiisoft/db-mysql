@@ -37,6 +37,7 @@
 - Enh #386: Remove `getCacheKey()` and `getCacheTag()` methods from `Schema` class (@Tigrov)
 - Bug #388: Set empty `comment` and `extra` properties to `null` when loading table columns (@Tigrov)
 - Enh #389, #390: Use `DbArrayHelper::arrange()` instead of `DbArrayHelper::index()` method (@Tigrov)
+- New #387: Realize `Schema::loadResultColumn()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
