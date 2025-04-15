@@ -125,14 +125,14 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         size: 8,
                         defaultValue: 130, // b'10000010'
                     ),
-                    'tinyblob_col' => new StringColumn(
+                    'tinyblob_col' => new BinaryColumn(
                         dbType: 'tinyblob',
                     ),
                     'tinytext_col' => new StringColumn(
                         ColumnType::TEXT,
                         dbType: 'tinytext',
                     ),
-                    'mediumblob_col' => new StringColumn(
+                    'mediumblob_col' => new BinaryColumn(
                         dbType: 'mediumblob',
                     ),
                     'mediumtext_col' => new StringColumn(
