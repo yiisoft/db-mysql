@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
@@ -18,6 +19,11 @@ use Yiisoft\Db\Tests\AbstractColumnFactoryTest;
 final class ColumnFactoryTest extends AbstractColumnFactoryTest
 {
     use TestTrait;
+
+    protected function getColumnFactoryClass(): string
+    {
+        return ColumnFactory::class;
+    }
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'dbTypes')]
     public function testFromDbType(string $dbType, string $expectedType, string $expectedInstanceOf): void
