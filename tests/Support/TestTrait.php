@@ -69,7 +69,7 @@ trait TestTrait
         $db->close();
     }
 
-    private function getDriver(): Driver
+    protected function getDriver(): Driver
     {
         return new Driver($this->getDsn(), self::getUsername(), self::getPassword());
     }
