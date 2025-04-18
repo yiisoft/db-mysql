@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
@@ -15,8 +16,10 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Schema;
+use Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
@@ -53,6 +56,7 @@ final class SchemaTest extends CommonSchemaTest
                 $columns['bigunsigned_col']->size(null);
                 $columns['tinyint_col']->size(null);
                 $columns['smallint_col']->size(null);
+                $columns['mediumint_col']->size(null);
             }
 
             if ($tableName === 'animal') {
@@ -484,5 +488,11 @@ final class SchemaTest extends CommonSchemaTest
         ], $row);
 
         $db->close();
+    }
+
+    #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
+    public function testGetResultColumn(ColumnInterface|null $expected, array $info): void
+    {
+        parent::testGetResultColumn($expected, $info);
     }
 }

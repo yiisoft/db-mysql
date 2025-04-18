@@ -29,8 +29,11 @@ use function preg_match_all;
 use function str_contains;
 use function str_ireplace;
 use function str_starts_with;
+use function strtolower;
 use function substr;
 use function trim;
+
+use const PHP_INT_SIZE;
 
 /**
  * Implements MySQL, MariaDB specific schema, supporting MySQL Server 5.7, MariaDB Server 10.4 and higher.
@@ -357,6 +360,76 @@ final class Schema extends AbstractPdoSchema
         }
 
         return $sql;
+    }
+
+    /**
+     * @psalm-param array{
+     *     native_type: string,
+     *     pdo_type: int,
+     *     flags: string[],
+     *     table: string,
+     *     name: string,
+     *     len: int,
+     *     precision: int,
+     * } $metadata
+     *
+     * @psalm-suppress MoreSpecificImplementedParamType
+     */
+    protected function loadResultColumn(array $metadata): ColumnInterface|null
+    {
+        if (empty($metadata['native_type']) || $metadata['native_type'] === 'NULL') {
+            return null;
+        }
+
+        $dbType = match ($metadata['native_type']) {
+            'TINY' => 'tinyint',
+            'SHORT' => 'smallint',
+            'INT24' => 'mediumint',
+            'LONG' => 'int',
+            'LONGLONG' => $metadata['len'] < 10 ? 'int' : 'bigint',
+            'NEWDECIMAL' => 'decimal',
+            'STRING' => 'char',
+            'VAR_STRING' => 'varchar',
+            'BLOB' => match ($metadata['len']) {
+                255 => 'tinyblob',
+                510, 765, 1020 => 'tinytext',
+                // 65535 => 'blob',
+                131070, 196605, 262140 => 'text',
+                16777215 => 'mediumblob',
+                33554430, 50331645, 67108860 => 'mediumtext',
+                4294967295 => 'longblob',
+                default => 'blob',
+            },
+            default => strtolower($metadata['native_type']),
+        };
+
+        $columnInfo = [];
+
+        if (!empty($metadata['table'])) {
+            $columnInfo['table'] = $metadata['table'];
+            $columnInfo['name'] = $metadata['name'];
+        } elseif (!empty($metadata['name'])) {
+            $columnInfo['name'] = $metadata['name'];
+        }
+
+        if (!empty($metadata['len'])) {
+            $columnInfo['size'] = match ($dbType) {
+                'decimal' => $metadata['len'] - ($metadata['precision'] === 0 ? 1 : 2),
+                'time', 'datetime', 'timestamp' => $metadata['precision'],
+                default => $metadata['len'],
+            };
+        }
+
+        match ($dbType) {
+            'float', 'double', 'decimal' => $columnInfo['scale'] = $metadata['precision'],
+            'bigint' => $metadata['len'] === 20 ? $columnInfo['unsigned'] = true : null,
+            'int' => $metadata['len'] === 10 && PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
+            default => null,
+        };
+
+        $columnInfo['notNull'] = in_array('not_null', $metadata['flags'], true);
+
+        return $this->db->getColumnFactory()->fromDbType($dbType, $columnInfo);
     }
 
     /**

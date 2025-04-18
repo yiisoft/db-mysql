@@ -46,6 +46,8 @@ final class ColumnFactory extends AbstractColumnFactory
         'binary' => ColumnType::BINARY,
         'varbinary' => ColumnType::BINARY,
         'blob' => ColumnType::BINARY,
+        'tinyblob' => ColumnType::BINARY,
+        'mediumblob' => ColumnType::BINARY,
         'longblob' => ColumnType::BINARY,
         'year' => ColumnType::DATE,
         'date' => ColumnType::DATE,
