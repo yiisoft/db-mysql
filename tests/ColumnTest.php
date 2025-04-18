@@ -68,27 +68,39 @@ final class ColumnTest extends AbstractColumnTest
 
         $this->insertTypeValues($db);
 
-        $result = (new Query($db))->typecasting()->from('type')->one();
+        $query = (new Query($db))->from('type')->withTypecasting();
+
+        $result = $query->one();
 
         $this->assertResultValues($result);
+
+        $result = $query->all();
+
+        $this->assertResultValues($result[0]);
 
         $db->close();
     }
 
-    public function testCommandPhpTypecasting(): void
+    public function testCommandWithPhpTypecasting(): void
     {
         $db = $this->getConnection(true);
 
         $this->insertTypeValues($db);
 
-        $result = $db->createCommand('SELECT * FROM type')->phpTypecasting()->queryOne();
+        $command = $db->createCommand('SELECT * FROM type')->withPhpTypecasting();
+
+        $result = $command->queryOne();
 
         $this->assertResultValues($result);
+
+        $result = $command->queryAll();
+
+        $this->assertResultValues($result[0]);
 
         $db->close();
     }
 
-    public function testSelectPhpTypecasting(): void
+    public function testSelectWithPhpTypecasting(): void
     {
         $db = $this->getConnection();
 
@@ -111,19 +123,27 @@ final class ColumnTest extends AbstractColumnTest
             'string' => 'string',
         ];
 
-        $result = $db->createCommand($sql)->phpTypecasting()->queryOne();
+        $result = $db->createCommand($sql)
+            ->withPhpTypecasting()
+            ->queryOne();
 
         $this->assertSame($expected, $result);
 
-        $result = $db->createCommand($sql)->phpTypecasting()->queryAll();
+        $result = $db->createCommand($sql)
+            ->withPhpTypecasting()
+            ->queryAll();
 
         $this->assertSame([$expected], $result);
 
-        $result = $db->createCommand('SELECT 2.5')->phpTypecasting()->queryScalar();
+        $result = $db->createCommand('SELECT 2.5')
+            ->withPhpTypecasting()
+            ->queryScalar();
 
         $this->assertSame(2.5, $result);
 
-        $result = $db->createCommand('SELECT 2.5 UNION SELECT 3.3')->phpTypecasting()->queryColumn();
+        $result = $db->createCommand('SELECT 2.5 UNION SELECT 3.3')
+            ->withPhpTypecasting()
+            ->queryColumn();
 
         $this->assertSame([2.5, 3.3], $result);
 
