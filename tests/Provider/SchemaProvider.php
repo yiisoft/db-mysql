@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Mysql\Column\DateTimeColumn;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\Column\BigIntColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
@@ -22,6 +25,10 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 
     public static function columns(): array
     {
+        $db = self::getDb();
+        $dbTimezone = self::getDb()->getServerInfo()->getTimezone();
+        $db->close();
+
         return [
             [
                 [
@@ -96,11 +103,20 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         scale: 2,
                         defaultValue: 33.22,
                     ),
-                    'time' => new StringColumn(
+                    'timestamp_col' => new DateTimeColumn(
                         ColumnType::TIMESTAMP,
                         dbType: 'timestamp',
                         notNull: true,
-                        defaultValue: '2002-01-01 00:00:00',
+                        defaultValue: new DateTimeImmutable('2002-01-01 00:00:00', new DateTimeZone('UTC')),
+                        shouldConvertTimezone: true,
+                        dbTimezone: $dbTimezone,
+                    ),
+                    'timestamp_default' => new DateTimeColumn(
+                        ColumnType::TIMESTAMP,
+                        dbType: 'timestamp',
+                        notNull: true,
+                        defaultValue: new Expression('CURRENT_TIMESTAMP'),
+                        dbTimezone: $dbTimezone,
                     ),
                     'bool_col' => new BooleanColumn(
                         dbType: 'bit',
@@ -112,12 +128,6 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         dbType: 'tinyint',
                         size: 1,
                         defaultValue: 2,
-                    ),
-                    'ts_default' => new StringColumn(
-                        ColumnType::TIMESTAMP,
-                        dbType: 'timestamp',
-                        notNull: true,
-                        defaultValue: new Expression('CURRENT_TIMESTAMP'),
                     ),
                     'bit_col' => new BitColumn(
                         dbType: 'bit',
@@ -254,6 +264,10 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 
     public static function resultColumns(): array
     {
+        $db = self::getDb();
+        $dbTimezone = self::getDb()->getServerInfo()->getTimezone();
+        $db->close();
+
         return [
             [null, []],
             [null, ['native_type' => 'NULL']],
@@ -338,7 +352,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => 7,
                 'precision' => 2,
             ]],
-            [new StringColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'time', notNull: true, size: 0), [
+            [new DateTimeColumn(ColumnType::TIMESTAMP, dbType: 'timestamp', name: 'time', notNull: true, size: 0, dbTimezone: $dbTimezone), [
                 'native_type' => 'TIMESTAMP',
                 'pdo_type' => 2,
                 'flags' => ['not_null'],
@@ -401,7 +415,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => 24,
                 'precision' => 39,
             ]],
-            [new StringColumn(ColumnType::DATETIME, dbType: 'datetime', name: 'CURRENT_TIMESTAMP(3)', notNull: true, size: 3), [
+            [new DateTimeColumn(dbType: 'datetime', name: 'CURRENT_TIMESTAMP(3)', notNull: true, size: 3), [
                 'native_type' => 'DATETIME',
                 'pdo_type' => 2,
                 'flags' => ['not_null'],
