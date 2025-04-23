@@ -4,7 +4,7 @@
 
 - Enh #320: Minor refactoring of `DDLQueryBuilder::getColumnDefinition()` method (@Tigrov)
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
-- Enh #321: Implement `SqlParser` and `ExpressionBuilder` driver classes (@Tigrov)
+- Enh #321, #391: Implement `SqlParser` and `ExpressionBuilder` driver classes (@Tigrov)
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
 - New #342: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
