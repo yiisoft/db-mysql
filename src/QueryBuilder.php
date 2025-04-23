@@ -26,4 +26,9 @@ final class QueryBuilder extends AbstractQueryBuilder
             new ColumnDefinitionBuilder($this),
         );
     }
+
+    protected function createSqlParser(string $sql): SqlParser
+    {
+        return new SqlParser($sql);
+    }
 }
