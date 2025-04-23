@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Mysql\Builder\LikeConditionBuilder;
