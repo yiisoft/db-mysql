@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Mysql\Builder\ExpressionBuilder;
 use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
 use Yiisoft\Db\Mysql\Builder\LikeConditionBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
@@ -72,19 +70,11 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         return ctype_digit($offset) && $offset !== '0';
     }
 
-    /**
-     * Has an array of default expression builders.
-     *
-     * Extend this method and override it if you want to change default expression builders for this query builder.
-     *
-     * {@see ExpressionBuilder} docs for details.
-     */
     protected function defaultExpressionBuilders(): array
     {
         return [
             ...parent::defaultExpressionBuilders(),
             JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
-            Expression::class => ExpressionBuilder::class,
             LikeCondition::class => LikeConditionBuilder::class,
         ];
     }
