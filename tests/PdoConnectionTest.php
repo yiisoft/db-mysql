@@ -64,7 +64,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
             SQL
         )->execute();
 
-        $this->assertSame('1', $db->getLastInsertID());
+        $this->assertSame('1', $db->getLastInsertId());
 
         $command->setSQL(
             <<<SQL
@@ -77,7 +77,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
          * these rows was 3, and it is this value that is returned by LAST_INSERT_ID() for the following SELECT
          * statement.
          */
-        $this->assertSame('3', $db->getLastInsertID());
+        $this->assertSame('3', $db->getLastInsertId());
 
         $command->setSQL(
             <<<SQL
@@ -90,7 +90,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
          * value (or 0 is returned if the connection has not yet performed a successful INSERT) and, for
          * non-transactional tables, the AUTO_INCREMENT counter is not incremented.
          */
-        $this->assertSame('0', $db->getLastInsertID());
+        $this->assertSame('0', $db->getLastInsertId());
 
         $db->close();
     }
