@@ -6,14 +6,17 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Connection;
+use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
@@ -299,5 +302,23 @@ final class ColumnTest extends CommonColumnTest
         date_default_timezone_set($phpTimezone);
 
         $db->close();
+    }
+
+    #[DataProviderExternal(ColumnProvider::class, 'predefinedTypes')]
+    public function testPredefinedType(string $className, string $type, string $phpType)
+    {
+        parent::testPredefinedType($className, $type, $phpType);
+    }
+
+    #[DataProviderExternal(ColumnProvider::class, 'dbTypecastColumns')]
+    public function testDbTypecastColumns(ColumnInterface $column, array $values)
+    {
+        parent::testDbTypecastColumns($column, $values);
+    }
+
+    #[DataProviderExternal(ColumnProvider::class, 'phpTypecastColumns')]
+    public function testPhpTypecastColumns(ColumnInterface $column, array $values)
+    {
+        parent::testPhpTypecastColumns($column, $values);
     }
 }
