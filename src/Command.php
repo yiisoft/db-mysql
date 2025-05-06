@@ -34,7 +34,7 @@ final class Command extends AbstractPdoCommand
 
         foreach ($tablePrimaryKeys as $name) {
             if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
-                $result[$name] = $this->db->getLastInsertID((string) $tableSchema?->getSequenceName());
+                $result[$name] = $this->db->getLastInsertId((string) $tableSchema?->getSequenceName());
                 continue;
             }
 
