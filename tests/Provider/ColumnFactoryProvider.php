@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Mysql\Column\DateTimeColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
@@ -43,11 +44,11 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             ['varbinary', ColumnType::BINARY, BinaryColumn::class],
             ['blob', ColumnType::BINARY, BinaryColumn::class],
             ['longblob', ColumnType::BINARY, BinaryColumn::class],
-            ['year', ColumnType::DATE, StringColumn::class],
-            ['date', ColumnType::DATE, StringColumn::class],
-            ['time', ColumnType::TIME, StringColumn::class],
-            ['datetime', ColumnType::DATETIME, StringColumn::class],
-            ['timestamp', ColumnType::TIMESTAMP, StringColumn::class],
+            ['year', ColumnType::SMALLINT, IntegerColumn::class],
+            ['timestamp', ColumnType::TIMESTAMP, DateTimeColumn::class],
+            ['datetime', ColumnType::DATETIME, DateTimeColumn::class],
+            ['time', ColumnType::TIME, DateTimeColumn::class],
+            ['date', ColumnType::DATE, DateTimeColumn::class],
             ['json', ColumnType::JSON, JsonColumn::class],
         ];
     }

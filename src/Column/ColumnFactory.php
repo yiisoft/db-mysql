@@ -49,13 +49,26 @@ final class ColumnFactory extends AbstractColumnFactory
         'tinyblob' => ColumnType::BINARY,
         'mediumblob' => ColumnType::BINARY,
         'longblob' => ColumnType::BINARY,
-        'year' => ColumnType::DATE,
-        'date' => ColumnType::DATE,
-        'time' => ColumnType::TIME,
-        'datetime' => ColumnType::DATETIME,
+        'year' => ColumnType::SMALLINT,
         'timestamp' => ColumnType::TIMESTAMP,
+        'datetime' => ColumnType::DATETIME,
+        'time' => ColumnType::TIME,
+        'date' => ColumnType::DATE,
         'json' => ColumnType::JSON,
     ];
+
+    protected function getColumnClass(string $type, array $info = []): string
+    {
+        return match ($type) {
+            ColumnType::TIMESTAMP => DateTimeColumn::class,
+            ColumnType::DATETIME => DateTimeColumn::class,
+            ColumnType::DATETIMETZ => DateTimeColumn::class,
+            ColumnType::TIME => DateTimeColumn::class,
+            ColumnType::TIMETZ => DateTimeColumn::class,
+            ColumnType::DATE => DateTimeColumn::class,
+            default => parent::getColumnClass($type, $info),
+        };
+    }
 
     protected function getType(string $dbType, array $info = []): string
     {

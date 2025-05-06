@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use Psr\Log\LogLevel;
 use Throwable;
+use Yiisoft\Db\Connection\ServerInfoInterface;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoConnection;
 use Yiisoft\Db\Driver\Pdo\PdoCommandInterface;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
@@ -83,5 +84,10 @@ final class Connection extends AbstractPdoConnection
     public function getSchema(): SchemaInterface
     {
         return $this->schema ??= new Schema($this, $this->schemaCache);
+    }
+
+    public function getServerInfo(): ServerInfoInterface
+    {
+        return $this->serverInfo ??= new ServerInfo($this);
     }
 }

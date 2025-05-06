@@ -132,6 +132,12 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['binary()'][0] = 'blob';
         $values['binary(1000)'][0] = 'blob(1000)';
         $values['uuid()'][0] = 'binary(16)';
+        $values['datetimeWithTimezone()'][0] = 'datetime(0)';
+        $values['datetimeWithTimezone(6)'][0] = 'datetime(6)';
+        $values['datetimeWithTimezone(null)'][0] = 'datetime';
+        $values['timeWithTimezone()'][0] = 'time(0)';
+        $values['timeWithTimezone(6)'][0] = 'time(6)';
+        $values['timeWithTimezone(null)'][0] = 'time';
         $values["check('value > 5')"][0] = 'int CHECK (`check_col` > 5)';
         $values["check('')"][0] = 'int';
         $values['check(null)'][0] = 'int';
