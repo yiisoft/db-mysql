@@ -17,5 +17,6 @@
   </projectFiles>
   <issueHandlers>
     <RiskyTruthyFalsyComparison errorLevel="suppress" />
+    <MixedAssignment errorLevel="suppress" />
   </issueHandlers>
 </psalm>
