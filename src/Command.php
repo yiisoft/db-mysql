@@ -75,22 +75,21 @@ final class Command extends AbstractPdoCommand
         array|QueryInterface $columns,
         string $method,
     ): array|false {
-        $this->setSql($sql)->bindValues($params);
-
         $tableSchema = $this->db->getSchema()->getTableSchema($table);
+        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+
+        if ($columns instanceof QueryInterface && !empty($primaryKeys)) {
+            throw new NotSupportedException($method . '() not supported for QueryInterface by MySQL.');
+        }
+
+        $this->setSql($sql)->bindValues($params);
 
         if ($this->execute() === 0) {
             return false;
         }
 
-        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
-
         if (empty($primaryKeys)) {
             return [];
-        }
-
-        if ($columns instanceof QueryInterface) {
-            throw new NotSupportedException($method . '() not supported for QueryInterface by MySQL.');
         }
 
         $result = [];
