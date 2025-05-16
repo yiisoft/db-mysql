@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
@@ -98,14 +100,17 @@ final class SchemaTest extends CommonSchemaTest
             !str_contains($serverVersion, 'MariaDB')
         );
 
+        $utcTimezone = new DateTimeZone('UTC');
+        $dbTimezone = new DateTimeZone($db->getServerInfo()->getTimezone());
+
         $columnsData = [
             'id' => ['int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY', ''],
-            'd' => ['date DEFAULT \'2011-11-11\'', '2011-11-11'],
+            'd' => ['date DEFAULT \'2011-11-11\'', new DateTimeImmutable('2011-11-11', $utcTimezone)],
             'dt' => ['datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
-            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00'],
+            'dt1' => ['datetime DEFAULT \'2011-11-11 00:00:00\'', new DateTimeImmutable('2011-11-11 00:00:00', $utcTimezone)],
             'dt2' => ['datetime DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
             'ts' => ['timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
-            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', '2011-11-11 00:00:00'],
+            'ts1' => ['timestamp DEFAULT \'2011-11-11 00:00:00\'', new DateTimeImmutable('2011-11-11 00:00:00', $dbTimezone)],
             'ts2' => ['timestamp DEFAULT CURRENT_TIMESTAMP', new Expression('CURRENT_TIMESTAMP')],
             'simple_col' => ['varchar(40) DEFAULT \'uuid()\'', 'uuid()'],
         ];
@@ -491,8 +496,8 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
-    public function testGetResultColumn(ColumnInterface|null $expected, array $info): void
+    public function testGetResultColumn(ColumnInterface|null $expected, array $metadata): void
     {
-        parent::testGetResultColumn($expected, $info);
+        parent::testGetResultColumn($expected, $metadata);
     }
 }
