@@ -31,6 +31,7 @@ use function str_ireplace;
 use function str_starts_with;
 use function strtolower;
 use function substr;
+use function substr_compare;
 use function trim;
 
 use const PHP_INT_SIZE;
@@ -424,6 +425,7 @@ final class Schema extends AbstractPdoSchema
             'float', 'double', 'decimal' => $columnInfo['scale'] = $metadata['precision'],
             'bigint' => $metadata['len'] === 20 ? $columnInfo['unsigned'] = true : null,
             'int' => $metadata['len'] === 10 && PHP_INT_SIZE !== 8 ? $columnInfo['unsigned'] = true : null,
+            'timestamp' => $columnInfo['dbTimezone'] = $this->db->getServerInfo()->getTimezone(),
             default => null,
         };
 
@@ -444,8 +446,7 @@ final class Schema extends AbstractPdoSchema
     private function loadColumn(array $info): ColumnInterface
     {
         $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
-
-        $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], [
+        $columnInfo = [
             'autoIncrement' => $autoIncrement > 0,
             'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
             'defaultValueRaw' => $info['column_default'],
@@ -456,7 +457,13 @@ final class Schema extends AbstractPdoSchema
             'schema' => $info['schema'],
             'table' => $info['table'],
             'unique' => $info['column_key'] === 'UNI',
-        ]);
+        ];
+
+        if (substr_compare($info['column_type'], 'timestamp', 0, 9, true) === 0) {
+            $columnInfo['dbTimezone'] = $this->db->getServerInfo()->getTimezone();
+        }
+
+        $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], $columnInfo);
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
             $extra = trim(substr($extra, 18));
