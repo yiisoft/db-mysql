@@ -196,7 +196,7 @@ CREATE TABLE `default_pk` (
 
 CREATE TABLE `notauto_pk` (
   `id_1` INTEGER,
-  `id_2` INTEGER,
+  `id_2` DECIMAL(5,2),
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id_1`, `id_2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

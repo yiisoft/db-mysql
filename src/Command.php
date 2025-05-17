@@ -6,6 +6,9 @@ namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\IntegrityException;
+use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Query\QueryInterface;
+use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function in_array;
 use function str_starts_with;
@@ -17,32 +20,23 @@ use function substr;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array $columns): array|false
+    public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
     {
         $params = [];
         $sql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
-        $this->setSql($sql)->bindValues($params);
 
-        $tableSchema = $this->db->getSchema()->getTableSchema($table);
+        return $this->executeWithReturningPks($sql, $params, $table, $columns, __METHOD__);
+    }
 
-        if (!$this->execute()) {
-            return false;
-        }
+    public function upsertWithReturningPks(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns = true
+    ): array|false {
+        $params = [];
+        $sql = $this->db->getQueryBuilder()->upsert($table, $insertColumns, $updateColumns, $params);
 
-        $tablePrimaryKeys = $tableSchema?->getPrimaryKey() ?? [];
-        $result = [];
-
-        foreach ($tablePrimaryKeys as $name) {
-            if ($tableSchema?->getColumn($name)?->isAutoIncrement()) {
-                $result[$name] = $this->db->getLastInsertId((string) $tableSchema?->getSequenceName());
-                continue;
-            }
-
-            /** @var mixed */
-            $result[$name] = $columns[$name] ?? $tableSchema?->getColumn($name)?->getDefaultValue();
-        }
-
-        return $result;
+        return $this->executeWithReturningPks($sql, $params, $table, $insertColumns, __METHOD__);
     }
 
     protected function queryInternal(int $queryMode): mixed
@@ -72,5 +66,52 @@ final class Command extends AbstractPdoCommand
         SQL;
 
         return $this->setSql($sql)->queryColumn();
+    }
+
+    private function executeWithReturningPks(
+        string $sql,
+        array $params,
+        string $table,
+        array|QueryInterface $columns,
+        string $method,
+    ): array|false {
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
+        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+
+        if ($columns instanceof QueryInterface && !empty($primaryKeys)) {
+            throw new NotSupportedException($method . '() not supported for QueryInterface by MySQL.');
+        }
+
+        $this->setSql($sql)->bindValues($params);
+
+        if ($this->execute() === 0) {
+            return false;
+        }
+
+        if (empty($primaryKeys)) {
+            return [];
+        }
+
+        $result = [];
+
+        /** @var TableSchema $tableSchema */
+        foreach ($primaryKeys as $name) {
+            /** @var ColumnInterface $column */
+            $column = $tableSchema->getColumn($name);
+
+            if ($column->isAutoIncrement()) {
+                $value = $this->db->getLastInsertId();
+            } else {
+                $value = $columns[$name] ?? $column->getDefaultValue();
+            }
+
+            if ($this->phpTypecasting) {
+                $value = $column->phpTypecast($value);
+            }
+
+            $result[$name] = $value;
+        }
+
+        return $result;
     }
 }
