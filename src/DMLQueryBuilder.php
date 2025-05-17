@@ -21,7 +21,7 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
     /** @throws NotSupportedException */
     public function insertWithReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by Mysql.');
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySql.');
     }
 
     public function resetSequence(string $table, int|string|null $value = null): string
