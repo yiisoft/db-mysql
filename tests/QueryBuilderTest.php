@@ -417,7 +417,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertWithReturningPks is not supported by Mysql.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertWithReturningPks is not supported by MySQL.'
         );
 
         $db = $this->getConnection(true);
@@ -593,7 +593,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturningPks() is not supported by Mysql.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturningPks() is not supported by MySQL.'
         );
 
         $qb->upsertWithReturningPks($table, $insertColumns, $updateColumns);
