@@ -6,12 +6,8 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidArgumentException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -28,8 +24,6 @@ use function version_compare;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class QueryBuilderTest extends CommonQueryBuilderTest
 {
@@ -54,9 +48,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     */
     public function testAddCommentOnColumn(): void
     {
         $db = $this->getConnection(true);
@@ -82,9 +73,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     */
     public function testAddCommentOnTable(): void
     {
         $db = $this->getConnection();
@@ -102,9 +90,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     */
     public function testAddDefaultValue(): void
     {
         $db = $this->getConnection();
@@ -119,14 +104,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addForeignKey
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'addForeignKey')]
     public function testAddForeignKey(
         string $name,
         string $table,
@@ -140,17 +118,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testAddForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addPrimaryKey
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'addPrimaryKey')]
     public function testAddPrimaryKey(string $name, string $table, array|string $columns, string $expected): void
     {
         parent::testAddPrimaryKey($name, $table, $columns, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::addUnique
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'addUnique')]
     public function testAddUnique(string $name, string $table, array|string $columns, string $expected): void
     {
         parent::testAddUnique($name, $table, $columns, $expected);
@@ -162,14 +136,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testAlterColumn($type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::batchInsert
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'batchInsert')]
     public function testBatchInsert(
         string $table,
         iterable $rows,
@@ -180,14 +147,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBatchInsert($table, $rows, $columns, $expected, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildCondition
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildCondition')]
     public function testBuildCondition(
         array|ExpressionInterface|string $condition,
         string|null $expected,
@@ -196,14 +156,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBuildCondition($condition, $expected, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildLikeCondition
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildLikeCondition')]
     public function testBuildLikeCondition(
         array|ExpressionInterface $condition,
         string $expected,
@@ -212,25 +165,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testBuildLikeCondition($condition, $expected, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildFrom
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildFrom')]
     public function testBuildWithFrom(mixed $table, string $expectedSql, array $expectedParams = []): void
     {
         parent::testBuildWithFrom($table, $expectedSql, $expectedParams);
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
     public function testBuildWithOffset(): void
     {
         $db = $this->getConnection();
@@ -252,23 +192,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildWhereExists
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildWhereExists')]
     public function testBuildWithWhereExists(string $cond, string $expectedQuerySql): void
     {
         parent::testBuildWithWhereExists($cond, $expectedQuerySql);
     }
 
-    /**
-     * @throws Exception
-     * @throws NotSupportedException
-     */
     public function testCheckIntegrity(): void
     {
         $db = $this->getConnection();
@@ -316,14 +245,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::delete
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'delete')]
     public function testDelete(string $table, array|string $condition, string $expectedSQL, array $expectedParams): void
     {
         parent::testDelete($table, $condition, $expectedSQL, $expectedParams);
@@ -345,11 +267,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     /**
      * Test for issue https://github.com/yiisoft/yii2/issues/15500
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
      */
     public function testDefaultValues(): void
     {
@@ -417,9 +334,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     */
     public function testDropDefaultValue(): void
     {
         $db = $this->getConnection(true);
@@ -482,14 +396,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insert
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'insert')]
     public function testInsert(
         string $table,
         array|QueryInterface $columns,
@@ -500,9 +407,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::insertWithReturningPks
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'insertWithReturningPks')]
     public function testInsertWithReturningPks(
         string $table,
         array|QueryInterface $columns,
@@ -512,7 +417,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertWithReturningPks is not supported by Mysql.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertWithReturningPks is not supported by MySQL.'
         );
 
         $db = $this->getConnection(true);
@@ -524,12 +429,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
     /**
      * @link https://github.com/yiisoft/yii2/issues/14663
-     *
-     * @throws Exception
-     * @throws \Exception
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws NotSupportedException
      */
     public function testInsertInteger()
     {
@@ -597,11 +496,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
     public function testResetSequence(): void
     {
         $db = $this->getConnection(true);
@@ -663,13 +557,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::update
-     *
-     * @throws Exception
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'update')]
     public function testUpdate(
         string $table,
         array $columns,
@@ -681,13 +569,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert
-     *
-     * @throws Exception
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
     public function testUpsert(
         string $table,
         array|QueryInterface $insertColumns,
@@ -698,22 +580,26 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::upsert
-     *
-     * @throws Exception
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
-    public function testUpsertExecute(
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithReturningPks')]
+    public function testUpsertWithReturningPks(
         string $table,
         array|QueryInterface $insertColumns,
-        array|bool $updateColumns
+        array|bool $updateColumns,
+        string $expectedSql,
+        array $expectedParams
     ): void {
-        parent::testUpsertExecute($table, $insertColumns, $updateColumns);
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturningPks() is not supported by MySQL.'
+        );
+
+        $qb->upsertWithReturningPks($table, $insertColumns, $updateColumns);
     }
 
-    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::selectScalar */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'selectScalar')]
     public function testSelectScalar(array|bool|float|int|string $columns, string $expected): void
     {
         parent::testSelectScalar($columns, $expected);
@@ -748,7 +634,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
     public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
@@ -772,7 +658,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::overlapsCondition */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
     public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
@@ -796,7 +682,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $db->close();
     }
 
-    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider::buildColumnDefinition() */
+    #[DataProviderExternal(QueryBuilderProvider::class, 'buildColumnDefinition')]
     public function testBuildColumnDefinition(string $expected, ColumnInterface|string $column): void
     {
         parent::testBuildColumnDefinition($expected, $column);

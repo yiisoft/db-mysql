@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Provider\CommandProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
 /**
@@ -40,11 +39,6 @@ final class CommandTest extends CommonCommandTest
         parent::testAddDefaultValue();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testAlterColumn(): void
     {
         $db = $this->getConnection(true);
@@ -60,14 +54,7 @@ final class CommandTest extends CommonCommandTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::batchInsert
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    #[DataProviderExternal(CommandProvider::class, 'batchInsert')]
     public function testBatchInsert(
         string $table,
         iterable $values,
@@ -107,26 +94,25 @@ final class CommandTest extends CommonCommandTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::rawSql
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     */
+    #[DataProviderExternal(CommandProvider::class, 'rawSql')]
     public function testGetRawSql(string $sql, array $params, string $expectedRawSql): void
     {
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::update
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    public function testInsertWithReturningPksWithQuery(): void
+    {
+        $db = $this->getConnection(true);
+        $command = $db->createCommand();
+        $query = (new Query($db))->select(new Expression("'new category'"));
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Command::insertWithReturningPks() not supported for QueryInterface by MySQL.');
+
+        $command->insertWithReturningPks('category', $query);
+    }
+
+    #[DataProviderExternal(CommandProvider::class, 'update')]
     public function testUpdate(
         string $table,
         array $columns,
@@ -138,17 +124,22 @@ final class CommandTest extends CommonCommandTest
         parent::testUpdate($table, $columns, $conditions, $params, $expectedValues, $expectedCount);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\CommandProvider::upsert
-     *
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
+    #[DataProviderExternal(CommandProvider::class, 'upsert')]
     public function testUpsert(array $firstData, array $secondData): void
     {
         parent::testUpsert($firstData, $secondData);
+    }
+
+    public function testUpsertWithReturningPksWithQuery(): void
+    {
+        $db = $this->getConnection(true);
+        $command = $db->createCommand();
+        $query = (new Query($db))->select(new Expression("'new category'"));
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Command::upsertWithReturningPks() not supported for QueryInterface by MySQL.');
+
+        $command->upsertWithReturningPks('category', $query);
     }
 
     public function testShowDatabases(): void

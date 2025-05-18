@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
@@ -19,13 +18,10 @@ use function str_replace;
  */
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
-    /**
-     * @throws Exception
-     * @throws NotSupportedException
-     */
-    public function insertWithReturningPks(string $table, QueryInterface|array $columns, array &$params = []): string
+    /** @throws NotSupportedException */
+    public function insertWithReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
     {
-        throw new NotSupportedException(__METHOD__ . ' is not supported by Mysql.');
+        throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
 
     public function resetSequence(string $table, int|string|null $value = null): string
@@ -57,9 +53,9 @@ EXECUTE autoincrement_stmt";
 
     public function upsert(
         string $table,
-        QueryInterface|array $insertColumns,
-        bool|array $updateColumns,
-        array &$params
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns = true,
+        array &$params = [],
     ): string {
         $insertSql = $this->insert($table, $insertColumns, $params);
 
@@ -86,7 +82,17 @@ EXECUTE autoincrement_stmt";
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
 
-    protected function prepareInsertValues(string $table, QueryInterface|array $columns, array $params = []): array
+    /** @throws NotSupportedException */
+    public function upsertWithReturningPks(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns = true,
+        array &$params = [],
+    ): string {
+        throw new NotSupportedException(__METHOD__ . '() is not supported by MySQL.');
+    }
+
+    protected function prepareInsertValues(string $table, array|QueryInterface $columns, array $params = []): array
     {
         if (empty($columns)) {
             return [[], [], 'VALUES ()', []];
