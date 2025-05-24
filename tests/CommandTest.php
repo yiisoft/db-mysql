@@ -130,18 +130,6 @@ final class CommandTest extends CommonCommandTest
         parent::testUpsert($firstData, $secondData);
     }
 
-    public function testUpsertWithReturningPksWithQuery(): void
-    {
-        $db = $this->getConnection(true);
-        $command = $db->createCommand();
-        $query = (new Query($db))->select(new Expression("'new category'"));
-
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Command::upsertWithReturningPks() not supported for QueryInterface by MySQL.');
-
-        $command->upsertWithReturningPks('category', $query);
-    }
-
     public function testShowDatabases(): void
     {
         $this->assertSame([self::getDatabaseName()], self::getDb()->createCommand()->showDatabases());

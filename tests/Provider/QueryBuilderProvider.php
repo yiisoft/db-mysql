@@ -75,20 +75,20 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                     'ON DUPLICATE KEY UPDATE `orders`=T_upsert.orders + 1',
             ],
             'values and expressions without update part' => [
-                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)',
             ],
             'query, values and expressions with update part' => [
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ' .
                     'ON DUPLICATE KEY UPDATE `ts`=:qp1, `orders`=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
-                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
             ],
             'no columns to update' => [
                 3 => 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)',
             ],
             'no columns to update with unique' => [
-                3 => 'INSERT IGNORE INTO {{%T_upsert}} (`email`) VALUES (:qp0)',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`) VALUES (:qp0)',
             ],
             'no unique columns in table - simple insert' => [
                 3 => 'INSERT INTO {{%animal}} (`type`) VALUES (:qp0)',
@@ -102,6 +102,71 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         }
 
         return $upsert;
+    }
+
+    public static function upsertWithReturning(): array
+    {
+        $upsert = self::upsert();
+
+        foreach ($upsert as &$data) {
+            array_splice($data, 3, 0, [['id']]);
+            $data[4] .= ';SELECT LAST_INSERT_ID() `id`';
+        }
+
+        $upsert['no columns to update'][3] = ['a'];
+        $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0);SELECT :qp1 `a`';
+        $upsert['no columns to update'][5][':qp1'] = 1;
+
+        return [
+            ...$upsert,
+            'composite primary key' => [
+                'notauto_pk',
+                ['id_1' => 1, 'id_2' => 2.5, 'type' => 'Test'],
+                true,
+                ['id_1', 'id_2'],
+                'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) VALUES (:qp0, :qp1, :qp2)'
+                . ' ON DUPLICATE KEY UPDATE `type`=VALUES(`type`);SELECT :qp3 `id_1`, :qp4 `id_2`',
+                [':qp0' => 1, ':qp1' => 2.5, ':qp2' => 'Test', ':qp3' => 1, ':qp4' => 2.5],
+            ],
+            'no return columns' => [
+                'type',
+                ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
+                true,
+                [],
+                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3)',
+                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true],
+            ],
+            'return all columns' => [
+                'T_upsert',
+                ['email' => 'test@example.com', 'address' => 'test address', 'status' => 1, 'profile_id' => 1],
+                true,
+                null,
+                'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
+                . ' ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`);'
+                . 'SELECT `id`, `ts`, `email`, `recovery_email`, `address`, `status`, `orders`, `profile_id`'
+                . ' FROM `T_upsert` WHERE `id` = LAST_INSERT_ID()',
+                [':qp0' => 'test@example.com', ':qp1' => 'test address', ':qp2' => 1, ':qp3' => 1],
+            ],
+            'no primary key' => [
+                'type',
+                ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
+                true,
+                ['int_col', 'char_col', 'char_col2', 'char_col3'],
+                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3);'
+                . 'SELECT :qp4 `int_col`, :qp5 `char_col`, :qp6 `char_col2`, :qp7 `char_col3`',
+                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true, ':qp4' => 3, ':qp5' => 'a', ':qp6' => 'something', ':qp7' => null],
+            ],
+            'no primary key but unique' => [
+                'without_pk',
+                ['email' => 'test@example.com', 'name' => 'John Doe'],
+                true,
+                null,
+                'INSERT INTO `without_pk` (`email`, `name`) VALUES (:qp0, :qp1)'
+                . ' ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);'
+                . 'SELECT `email`, `name`, `address`, `status` FROM `without_pk` WHERE `email` = :qp2',
+                [':qp0' => 'test@example.com', ':qp1' => 'John Doe', ':qp2' => 'test@example.com'],
+            ],
+        ];
     }
 
     public static function buildColumnDefinition(): array

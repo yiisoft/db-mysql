@@ -7,10 +7,17 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Exception\InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
+use function array_diff;
+use function array_intersect;
+use function array_key_exists;
+use function array_keys;
+use function array_map;
 use function implode;
+use function is_array;
 use function str_replace;
 
 /**
@@ -68,8 +75,8 @@ EXECUTE autoincrement_stmt";
         if ($updateColumns === true) {
             $updateColumns = [];
             /** @psalm-var string[] $updateNames */
-            foreach ($updateNames as $quotedName) {
-                $updateColumns[$quotedName] = new Expression('VALUES(' . $quotedName . ')');
+            foreach ($updateNames as $name) {
+                $updateColumns[$name] = new Expression('VALUES(' . $this->quoter->quoteColumnName($name) . ')');
             }
         }
 
@@ -77,19 +84,119 @@ EXECUTE autoincrement_stmt";
             return str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insertSql);
         }
 
-        [$updates, $params] = $this->prepareUpdateSets($table, $updateColumns, $params);
+        $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
 
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
 
-    /** @throws NotSupportedException */
-    public function upsertWithReturningPks(
+    public function upsertWithReturning(
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
+        array|null $returnColumns = null,
         array &$params = [],
     ): string {
-        throw new NotSupportedException(__METHOD__ . '() is not supported by MySQL.');
+        $tableSchema = $this->schema->getTableSchema($table);
+        $returnColumns ??= $tableSchema?->getColumnNames();
+
+        $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
+
+        if (empty($returnColumns)) {
+            return $upsertSql;
+        }
+
+        $quoter = $this->quoter;
+        /** @var TableSchema $tableSchema */
+        $uniqueColumns = $tableSchema->getPrimaryKey()
+            ?: $this->prepareUpsertColumns($table, $insertColumns, $updateColumns)[0];
+
+        if (empty($uniqueColumns)) {
+            $returnValues = $this->prepareColumnValues($tableSchema, $returnColumns, $insertColumns, $params);
+            $selectValues = [];
+
+            foreach ($returnValues as $name => $value) {
+                $selectValues[] = $value . ' ' . $quoter->quoteColumnName($name);
+            }
+
+            return $upsertSql . ';' . 'SELECT ' . implode(', ', $selectValues);
+        }
+
+        if (is_array($updateColumns) && !empty(array_intersect($uniqueColumns, array_keys($updateColumns)))) {
+            throw new NotSupportedException(
+                __METHOD__ . '() is not supported by MySQL when updating primary key or unique values.'
+            );
+        }
+
+        $uniqueValues = $this->prepareColumnValues($tableSchema, $uniqueColumns, $insertColumns, $params);
+
+        if (empty(array_diff($returnColumns, array_keys($uniqueValues)))) {
+            $selectValues = [];
+
+            foreach ($returnColumns as $name) {
+                $selectValues[] = $uniqueValues[$name] . ' ' . $quoter->quoteColumnName($name);
+            }
+
+            return $upsertSql . ';' . 'SELECT ' . implode(', ', $selectValues);
+        }
+
+        $conditions = [];
+
+        foreach ($uniqueValues as $name => $value) {
+            if (array_key_exists($value, $params) && $params[$value] === null) {
+                throw new NotSupportedException(
+                    __METHOD__ . '() is not supported by MySQL when inserting `null` primary key or unique values.'
+                );
+            }
+
+            $conditions[] = $quoter->quoteColumnName($name) . ' = ' . $value;
+        }
+
+        $quotedReturnColumns = array_map($quoter->quoteColumnName(...), $returnColumns);
+
+        return $upsertSql . ';'
+            . 'SELECT ' . implode(', ', $quotedReturnColumns)
+            . ' FROM ' . $this->quoter->quoteTableName($table)
+            . ' WHERE ' . implode(' AND ', $conditions);
+    }
+
+    /**
+     * @param string[] $columnNames
+     *
+     * @return string[] Prepared column values for using in a SQL statement.
+     * @psalm-return array<string, string>
+     */
+    private function prepareColumnValues(
+        TableSchema $tableSchema,
+        array $columnNames,
+        array|QueryInterface $insertColumns,
+        array &$params,
+    ): array {
+        $columnValues = [];
+
+        $tableColumns = $tableSchema->getColumns();
+
+        foreach ($columnNames as $name) {
+            $column = $tableColumns[$name];
+
+            if ($column->isAutoIncrement()) {
+                $columnValues[$name] = 'LAST_INSERT_ID()';
+            } elseif ($insertColumns instanceof QueryInterface) {
+                throw new NotSupportedException(
+                    static::class . '::upsertWithReturning() is not supported by MySQL'
+                    . ' for tables without auto increment when inserting sub-query.'
+                );
+            } else {
+                $value = $insertColumns[$name] ?? $column->getDefaultValue();
+
+                if ($value instanceof ExpressionInterface) {
+                    $columnValues[$name] = $this->queryBuilder->buildExpression($value, $params);
+                } else {
+                    $columnValues[$name] = $this->queryBuilder->bindParam($value, $params);
+                }
+            }
+        }
+
+        return $columnValues;
     }
 
     protected function prepareInsertValues(string $table, array|QueryInterface $columns, array $params = []): array
