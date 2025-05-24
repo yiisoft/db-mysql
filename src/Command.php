@@ -96,7 +96,7 @@ final class Command extends AbstractPdoCommand
             return $result;
         }
 
-        $columns = $this->db->getTableSchema($table)?->getColumns() ?? [];
+        $columns = $this->db->getTableSchema($table)?->getColumns();
 
         if (empty($columns)) {
             return $result;
