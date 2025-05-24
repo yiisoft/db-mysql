@@ -91,6 +91,7 @@ final class Command extends AbstractPdoCommand
         $this->pdoStatement->nextRowset();
         /** @psalm-var array<string,mixed>|false $result */
         $result = $this->pdoStatement->fetch(PDO::FETCH_ASSOC);
+        $this->pdoStatement->closeCursor();
 
         if (!$this->phpTypecasting || $result === false) {
             return $result;
