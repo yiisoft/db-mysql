@@ -24,21 +24,34 @@ final class Command extends AbstractPdoCommand
 {
     public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
     {
-        if ($columns instanceof QueryInterface) {
-            throw new NotSupportedException(__METHOD__ . '() not supported for QueryInterface by MySQL.');
+        $tableSchema = $this->db->getSchema()->getTableSchema($table);
+        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
+        $tableColumns = $tableSchema?->getColumns() ?? [];
+
+        foreach ($primaryKeys as $name) {
+            /** @var ColumnInterface $column */
+            $column = $tableColumns[$name];
+
+            if ($column->isAutoIncrement()) {
+                continue;
+            }
+
+            if ($columns instanceof QueryInterface) {
+                throw new NotSupportedException(
+                    __METHOD__ . '() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+                );
+            }
+
+            break;
         }
 
         $params = [];
         $insertSql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
         $this->setSql($insertSql)->bindValues($params);
 
-        $tableSchema = $this->db->getSchema()->getTableSchema($table);
-
         if ($this->execute() === 0) {
             return false;
         }
-
-        $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
 
         if (empty($primaryKeys)) {
             return [];
@@ -46,10 +59,9 @@ final class Command extends AbstractPdoCommand
 
         $result = [];
 
-        /** @var TableSchema $tableSchema */
         foreach ($primaryKeys as $name) {
             /** @var ColumnInterface $column */
-            $column = $tableSchema->getColumn($name);
+            $column = $tableColumns[$name];
 
             if ($column->isAutoIncrement()) {
                 $value = $this->db->getLastInsertId();
