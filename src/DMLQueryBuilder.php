@@ -182,7 +182,7 @@ EXECUTE autoincrement_stmt";
                 $columnValues[$name] = 'LAST_INSERT_ID()';
             } elseif ($insertColumns instanceof QueryInterface) {
                 throw new NotSupportedException(
-                    static::class . '::upsertWithReturning() is not supported by MySQL'
+                    self::class . '::upsertWithReturning() is not supported by MySQL'
                     . ' for tables without auto increment when inserting sub-query.'
                 );
             } else {
