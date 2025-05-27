@@ -89,7 +89,7 @@ EXECUTE autoincrement_stmt";
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
 
-    public function upsertWithReturning(
+    public function upsertReturning(
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
@@ -182,7 +182,7 @@ EXECUTE autoincrement_stmt";
                 $columnValues[$name] = 'LAST_INSERT_ID()';
             } elseif ($insertColumns instanceof QueryInterface) {
                 throw new NotSupportedException(
-                    self::class . '::upsertWithReturning() is not supported by MySQL'
+                    self::class . '::upsertReturning() is not supported by MySQL'
                     . ' for tables without auto increment when inserting sub-query.'
                 );
             } else {

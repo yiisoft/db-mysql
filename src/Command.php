@@ -80,7 +80,7 @@ final class Command extends AbstractPdoCommand
         return $result;
     }
 
-    public function upsertWithReturning(
+    public function upsertReturning(
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
@@ -95,7 +95,7 @@ final class Command extends AbstractPdoCommand
 
         $params = [];
         $sql = $this->getQueryBuilder()
-            ->upsertWithReturning($table, $insertColumns, $updateColumns, $returnColumns, $params);
+            ->upsertReturning($table, $insertColumns, $updateColumns, $returnColumns, $params);
 
         $this->setSql($sql)->bindValues($params);
         $this->queryInternal(self::QUERY_MODE_EXECUTE);

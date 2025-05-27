@@ -575,14 +575,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        string $expectedSQL,
+        string $expectedSql,
         array $expectedParams
     ): void {
-        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
+        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
     }
 
-    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithReturning')]
-    public function testUpsertWithReturning(
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertReturning')]
+    public function testUpsertReturning(
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
@@ -590,12 +590,12 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $expectedSql,
         array $expectedParams
     ): void {
-        parent::testUpsertWithReturning($table, $insertColumns, $updateColumns, $returnColumns, $expectedSql, $expectedParams);
+        parent::testUpsertReturning($table, $insertColumns, $updateColumns, $returnColumns, $expectedSql, $expectedParams);
     }
 
     #[TestWith(['order', ['id' => 1], ['id' => 10]])]
     #[TestWith(['without_pk', ['email' => 'test@example.com'], ['email' => 'info@example.com']])]
-    public function testUpsertWithReturningWithUpdatingPrimaryKeyOrUnique(
+    public function testUpsertReturningWithUpdatingPrimaryKeyOrUnique(
         string $table,
         array $insertColumns,
         array $updateColumns,
@@ -605,15 +605,15 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturning() is not supported by MySQL when updating primary key or unique values.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating primary key or unique values.'
         );
 
-        $qb->upsertWithReturning($table, $insertColumns, $updateColumns);
+        $qb->upsertReturning($table, $insertColumns, $updateColumns);
     }
 
     #[TestWith(['order_item', ['subtotal' => 1], ['subtotal' => 10]])]
     #[TestWith(['without_pk', ['email' => null, 'name' => 'John'], ['name' => 'John']])]
-    public function testUpsertWithReturningWithNullPrimaryKeyOrUnique(
+    public function testUpsertReturningWithNullPrimaryKeyOrUnique(
         string $table,
         array $insertColumns,
         array $updateColumns,
@@ -623,13 +623,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturning() is not supported by MySQL when inserting `null` primary key or unique values.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when inserting `null` primary key or unique values.'
         );
 
-        $qb->upsertWithReturning($table, $insertColumns, $updateColumns);
+        $qb->upsertReturning($table, $insertColumns, $updateColumns);
     }
 
-    public function testUpsertWithReturningWithSubqueryAndNoAutoincrement(): void
+    public function testUpsertReturningWithSubqueryAndNoAutoincrement(): void
     {
         $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
@@ -638,10 +638,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturning() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL for tables without auto increment when inserting sub-query.'
         );
 
-        $qb->upsertWithReturning('order_item', $query);
+        $qb->upsertReturning('order_item', $query);
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'selectScalar')]
