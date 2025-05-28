@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\TestWith;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -574,29 +575,73 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        string $expectedSQL,
-        array $expectedParams
-    ): void {
-        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSQL, $expectedParams);
-    }
-
-    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithReturningPks')]
-    public function testUpsertWithReturningPks(
-        string $table,
-        array|QueryInterface $insertColumns,
-        array|bool $updateColumns,
         string $expectedSql,
         array $expectedParams
     ): void {
-        $db = $this->getConnection();
+        parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertReturning')]
+    public function testUpsertReturning(
+        string $table,
+        array|QueryInterface $insertColumns,
+        array|bool $updateColumns,
+        array|null $returnColumns,
+        string $expectedSql,
+        array $expectedParams
+    ): void {
+        parent::testUpsertReturning($table, $insertColumns, $updateColumns, $returnColumns, $expectedSql, $expectedParams);
+    }
+
+    #[TestWith(['order', ['id' => 1], ['id' => 10]])]
+    #[TestWith(['without_pk', ['email' => 'test@example.com'], ['email' => 'info@example.com']])]
+    public function testUpsertReturningWithUpdatingPrimaryKeyOrUnique(
+        string $table,
+        array $insertColumns,
+        array $updateColumns,
+    ): void {
+        $db = $this->getConnection(true);
         $qb = $db->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertWithReturningPks() is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating primary key or unique values.'
         );
 
-        $qb->upsertWithReturningPks($table, $insertColumns, $updateColumns);
+        $qb->upsertReturning($table, $insertColumns, $updateColumns);
+    }
+
+    #[TestWith(['order_item', ['subtotal' => 1], ['subtotal' => 10]])]
+    #[TestWith(['without_pk', ['email' => null, 'name' => 'John'], ['name' => 'John']])]
+    public function testUpsertReturningWithNullPrimaryKeyOrUnique(
+        string $table,
+        array $insertColumns,
+        array $updateColumns,
+    ): void {
+        $db = $this->getConnection(true);
+        $qb = $db->getQueryBuilder();
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when inserting `null` primary key or unique values.'
+        );
+
+        $qb->upsertReturning($table, $insertColumns, $updateColumns);
+    }
+
+    public function testUpsertReturningWithSubqueryAndNoAutoincrement(): void
+    {
+        $db = $this->getConnection(true);
+        $qb = $db->getQueryBuilder();
+
+        $query = (new Query($db))->select(['order_id' => 1, 'item_id' => 2, 'quantity' => 3, 'subtotal' => 4]);
+
+        $this->expectException(NotSupportedException::class);
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+        );
+
+        $qb->upsertReturning('order_item', $query);
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'selectScalar')]

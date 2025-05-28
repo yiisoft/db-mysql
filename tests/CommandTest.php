@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Provider\CommandProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -100,16 +99,19 @@ final class CommandTest extends CommonCommandTest
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
-    public function testInsertWithReturningPksWithQuery(): void
+    public function testInsertWithReturningPksWithSubqueryAndNoAutoincrement(): void
     {
         $db = $this->getConnection(true);
         $command = $db->createCommand();
-        $query = (new Query($db))->select(new Expression("'new category'"));
+
+        $query = (new Query($db))->select(['order_id' => 1, 'item_id' => 2, 'quantity' => 3, 'subtotal' => 4]);
 
         $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Command::insertWithReturningPks() not supported for QueryInterface by MySQL.');
+        $this->expectExceptionMessage(
+            'Yiisoft\Db\Mysql\Command::insertWithReturningPks() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+        );
 
-        $command->insertWithReturningPks('category', $query);
+        $command->insertWithReturningPks('order_item', $query);
     }
 
     #[DataProviderExternal(CommandProvider::class, 'update')]
@@ -128,18 +130,6 @@ final class CommandTest extends CommonCommandTest
     public function testUpsert(array $firstData, array $secondData): void
     {
         parent::testUpsert($firstData, $secondData);
-    }
-
-    public function testUpsertWithReturningPksWithQuery(): void
-    {
-        $db = $this->getConnection(true);
-        $command = $db->createCommand();
-        $query = (new Query($db))->select(new Expression("'new category'"));
-
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage('Yiisoft\Db\Mysql\Command::upsertWithReturningPks() not supported for QueryInterface by MySQL.');
-
-        $command->upsertWithReturningPks('category', $query);
     }
 
     public function testShowDatabases(): void

@@ -178,7 +178,6 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         dbType: 'int',
                         primaryKey: true,
                         notNull: true,
-                        autoIncrement: true,
                         size: 11,
                     ),
                     'C_not_null' => new IntegerColumn(
