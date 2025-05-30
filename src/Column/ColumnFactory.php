@@ -57,9 +57,18 @@ final class ColumnFactory extends AbstractColumnFactory
         'json' => ColumnType::JSON,
     ];
 
+    protected function columnDefinitionParser(): ColumnDefinitionParser
+    {
+        return new ColumnDefinitionParser();
+    }
+
     protected function getColumnClass(string $type, array $info = []): string
     {
         return match ($type) {
+            ColumnType::CHAR => StringColumn::class,
+            ColumnType::STRING => StringColumn::class,
+            ColumnType::TEXT => StringColumn::class,
+            ColumnType::UUID => StringColumn::class,
             ColumnType::TIMESTAMP => DateTimeColumn::class,
             ColumnType::DATETIME => DateTimeColumn::class,
             ColumnType::DATETIMETZ => DateTimeColumn::class,

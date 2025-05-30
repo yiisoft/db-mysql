@@ -11,11 +11,11 @@ use Yiisoft\Db\QueryBuilder\Condition\Like;
  */
 final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeBuilder
 {
-    protected function prepareColumn(Like $expression, array &$params): string
+    protected function prepareColumn(Like $condition, array &$params): string
     {
-        $column = parent::prepareColumn($expression, $params);
+        $column = parent::prepareColumn($condition, $params);
 
-        if ($expression->caseSensitive === true) {
+        if ($condition->caseSensitive === true) {
             $column = 'BINARY ' . $column;
         }
 

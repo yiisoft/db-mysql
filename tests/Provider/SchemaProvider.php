@@ -9,6 +9,7 @@ use DateTimeZone;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\DateTimeColumn;
+use Yiisoft\Db\Mysql\Column\StringColumn;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Schema\Column\BigIntColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
@@ -17,7 +18,6 @@ use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
-use Yiisoft\Db\Schema\Column\StringColumn;
 use Yiisoft\Db\Tests\Support\Assert;
 
 final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
@@ -68,20 +68,28 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'char_col' => new StringColumn(
                         ColumnType::CHAR,
                         dbType: 'char',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                         notNull: true,
                         size: 100,
                     ),
                     'char_col2' => new StringColumn(
                         dbType: 'varchar',
+                        characterSet: 'utf8mb3',
+                        collation: 'utf8mb3_bin',
                         size: 100,
                         defaultValue: 'something',
                     ),
                     'char_col3' => new StringColumn(
                         ColumnType::TEXT,
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                         dbType: 'text',
                     ),
                     'enum_col' => new StringColumn(
                         dbType: 'enum',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                         enumValues: ['a', 'B', 'c,D'],
                     ),
                     'float_col' => new DoubleColumn(
@@ -142,13 +150,19 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'tinytext_col' => new StringColumn(
                         ColumnType::TEXT,
                         dbType: 'tinytext',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                     ),
                     'mediumblob_col' => new BinaryColumn(
                         dbType: 'mediumblob',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                     ),
                     'mediumtext_col' => new StringColumn(
                         ColumnType::TEXT,
                         dbType: 'mediumtext',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                     ),
                     'json_col' => new JsonColumn(
                         dbType: 'json',
@@ -167,6 +181,8 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     ),
                     'type' => new StringColumn(
                         dbType: 'varchar',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                         notNull: true,
                         size: 255,
                     ),
@@ -188,6 +204,8 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     ),
                     'C_check' => new StringColumn(
                         dbType: 'varchar',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_general_ci',
                         size: 255,
                     ),
                     'C_unique' => new IntegerColumn(

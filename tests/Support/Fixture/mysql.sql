@@ -155,7 +155,7 @@ CREATE TABLE `type` (
   `smallint_col` smallint(1) DEFAULT '1',
   `mediumint_col` mediumint,
   `char_col` char(100) NOT NULL,
-  `char_col2` varchar(100) DEFAULT 'something',
+  `char_col2` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT 'something',
   `char_col3` text,
   `enum_col` enum('a', 'B', 'c,D'),
   `float_col` double(4,3) NOT NULL,

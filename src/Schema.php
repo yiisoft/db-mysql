@@ -41,6 +41,8 @@ use const PHP_INT_SIZE;
  *   column_name: string,
  *   column_default: string|null,
  *   is_nullable: string,
+ *   character_set_name: string|null,
+ *   collation_name: string|null,
  *   column_type: string,
  *   column_key: string,
  *   extra: string,
@@ -91,6 +93,8 @@ final class Schema extends AbstractPdoSchema
                 `COLUMN_NAME`,
                 `COLUMN_DEFAULT`,
                 `IS_NULLABLE`,
+                `CHARACTER_SET_NAME`,
+                `COLLATION_NAME`,
                 `COLUMN_TYPE`,
                 `COLUMN_KEY`,
                 `EXTRA`,
@@ -309,6 +313,8 @@ final class Schema extends AbstractPdoSchema
         $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
         $columnInfo = [
             'autoIncrement' => $autoIncrement > 0,
+            'characterSet' => $info['character_set_name'],
+            'collation' => $info['collation_name'],
             'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
             'defaultValueRaw' => $info['column_default'],
             'extra' => $extra === '' ? null : $extra,
@@ -324,6 +330,7 @@ final class Schema extends AbstractPdoSchema
             $columnInfo['dbTimezone'] = $this->db->getServerInfo()->getTimezone();
         }
 
+        /** @psalm-suppress InvalidArgument */
         $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], $columnInfo);
 
         if (str_starts_with($extra, 'DEFAULT_GENERATED')) {

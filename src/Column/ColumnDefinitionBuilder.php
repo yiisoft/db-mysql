@@ -61,6 +61,17 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         'fixed',
     ];
 
+    public function buildType(ColumnInterface $column): string
+    {
+        $dbType = parent::buildType($column);
+
+        if (!$column instanceof StringColumn || empty($column->getCharacterSet())) {
+            return $dbType;
+        }
+
+        return "$dbType CHARACTER SET " . $column->getCharacterSet();
+    }
+
     protected function buildComment(ColumnInterface $column): string
     {
         $comment = $column->getComment();

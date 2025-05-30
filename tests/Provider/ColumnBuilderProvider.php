@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Mysql\Column\DateTimeColumn;
+use Yiisoft\Db\Mysql\Column\StringColumn;
 
 class ColumnBuilderProvider extends \Yiisoft\Db\Tests\Provider\ColumnBuilderProvider
 {
@@ -12,6 +13,13 @@ class ColumnBuilderProvider extends \Yiisoft\Db\Tests\Provider\ColumnBuilderProv
     {
         $values = parent::buildingMethods();
 
+        $values['char()'][2] = StringColumn::class;
+        $values['char(100)'][2] = StringColumn::class;
+        $values['string()'][2] = StringColumn::class;
+        $values['string(100)'][2] = StringColumn::class;
+        $values['text()'][2] = StringColumn::class;
+        $values['text(5000)'][2] = StringColumn::class;
+        $values['uuid()'][2] = StringColumn::class;
         $values['timestamp()'][2] = DateTimeColumn::class;
         $values['timestamp(3)'][2] = DateTimeColumn::class;
         $values['datetime()'][2] = DateTimeColumn::class;

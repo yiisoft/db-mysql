@@ -250,6 +250,16 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['check(null)'][0] = 'int';
         $values['defaultValue($expression)'][0] = 'int DEFAULT (1 + 2)';
         $values['defaultValue($emptyExpression)'][0] = 'int';
+        $values["characterSet('utf8mb4')"] = [
+            'varchar(255) CHARACTER SET utf8mb4',
+            ColumnBuilder::string()->characterSet('utf8mb4')
+        ];
+        $values["characterSet('')"] = ['varchar(255)', ColumnBuilder::string()->characterSet('')];
+        $values["characterSet(null)"] = ['varchar(255)', ColumnBuilder::string()->characterSet(null)];
+        $values["collation('collation_name')"] = [
+            'varchar(255) COLLATE utf8mb4_unicode_ci',
+            ColumnBuilder::string()->collation('utf8mb4_unicode_ci')
+        ];
         $values["comment('comment')"][0] = "varchar(255) COMMENT 'comment'";
         $values["comment('')"][0] = "varchar(255) COMMENT ''";
         $values['integer()->primaryKey()'][0] = 'int PRIMARY KEY';
