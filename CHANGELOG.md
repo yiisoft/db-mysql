@@ -41,6 +41,7 @@
 - New #393: Use `DateTimeColumn` class for datetime column types (@Tigrov)
 - New #394: Implement `Command::upsertWithReturningPks()` method (@Tigrov)
 - Enh #394: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
+- Enh #396: Refactor constraints (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
