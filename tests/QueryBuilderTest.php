@@ -706,4 +706,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         parent::testDropTable($expected, $ifExists, $cascade);
     }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'prepareValue')]
+    public function testPrepareValue(string $expected, mixed $value): void
+    {
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+
+        $this->assertSame($expected, $qb->prepareValue($value));
+    }
 }
