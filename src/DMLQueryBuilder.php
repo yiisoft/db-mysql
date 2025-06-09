@@ -137,7 +137,7 @@ EXECUTE autoincrement_stmt";
         }
 
         $quotedTable = $quoter->quoteTableName($table);
-        $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])->isAutoIncrement();
+        $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])?->isAutoIncrement();
 
         if ($isAutoIncrement) {
             $id = $quoter->quoteColumnName($primaryKeys[0]);
