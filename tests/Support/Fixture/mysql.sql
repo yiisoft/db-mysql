@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS `constraints` CASCADE;
 DROP TABLE IF EXISTS `animal` CASCADE;
 DROP TABLE IF EXISTS `default_pk` CASCADE;
 DROP TABLE IF EXISTS `notauto_pk` CASCADE;
+DROP TABLE IF EXISTS `without_pk` CASCADE;
 DROP TABLE IF EXISTS `document` CASCADE;
 DROP TABLE IF EXISTS `comment` CASCADE;
 DROP TABLE IF EXISTS `dossier`;
@@ -201,6 +202,13 @@ CREATE TABLE `notauto_pk` (
   PRIMARY KEY (`id_1`, `id_2`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE `without_pk` (
+  `email` VARCHAR(126) UNIQUE,
+  `name` VARCHAR(126),
+  `address` TEXT,
+  `status` INT(11) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE `document` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
@@ -356,7 +364,7 @@ INSERT INTO `bit_values` (id, val) VALUES (1, b'0'), (2, b'1');
 
 CREATE TABLE `T_constraints_1`
 (
-    `C_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `C_id` INT NOT NULL PRIMARY KEY,
     `C_not_null` INT NOT NULL,
     `C_check` VARCHAR(255) NULL CHECK (`C_check` <> ''),
     `C_unique` INT NOT NULL,

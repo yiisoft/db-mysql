@@ -42,6 +42,8 @@
 - New #394: Implement `Command::upsertWithReturningPks()` method (@Tigrov)
 - Enh #394: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Enh #396: Refactor constraints (@Tigrov)
+- New #394, #395: Implement `Command::upsertReturning()` method (@Tigrov)
+- Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
