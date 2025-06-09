@@ -11,14 +11,17 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
+use function array_combine;
 use function array_diff;
 use function array_intersect;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function count;
 use function implode;
 use function is_array;
-use function str_replace;
+use function str_starts_with;
+use function substr;
 
 /**
  * Implements a DML (Data Manipulation Language) SQL statements for MySQL, MariaDB.
@@ -81,7 +84,7 @@ EXECUTE autoincrement_stmt";
         }
 
         if (empty($updateColumns)) {
-            return str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insertSql);
+            return 'INSERT IGNORE' . substr($insertSql, 6);
         }
 
         $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
@@ -106,9 +109,15 @@ EXECUTE autoincrement_stmt";
         }
 
         $quoter = $this->quoter;
+        [$uniqueNames, $insertNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
         /** @var TableSchema $tableSchema */
-        $uniqueColumns = $tableSchema->getPrimaryKey()
-            ?: $this->prepareUpsertColumns($table, $insertColumns, $updateColumns)[0];
+        $primaryKeys = $tableSchema->getPrimaryKey();
+        $uniqueColumns = $primaryKeys ?: $uniqueNames;
+
+        if (is_array($insertColumns)) {
+            $insertColumns = array_combine($insertNames, $insertColumns);
+        }
+
 
         if (empty($uniqueColumns)) {
             $returnValues = $this->prepareColumnValues($tableSchema, $returnColumns, $insertColumns, $params);
@@ -118,13 +127,27 @@ EXECUTE autoincrement_stmt";
                 $selectValues[] = $value . ' ' . $quoter->quoteColumnName($name);
             }
 
-            return $upsertSql . ';' . 'SELECT ' . implode(', ', $selectValues);
+            return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
         }
 
         if (is_array($updateColumns) && !empty(array_intersect($uniqueColumns, array_keys($updateColumns)))) {
             throw new NotSupportedException(
                 __METHOD__ . '() is not supported by MySQL when updating primary key or unique values.'
             );
+        }
+
+        $quotedTable = $quoter->quoteTableName($table);
+        $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])->isAutoIncrement();
+
+        if ($isAutoIncrement) {
+            $id = $quoter->quoteColumnName($primaryKeys[0]);
+            $setLastInsertId = "$id=LAST_INSERT_ID($quotedTable.$id)";
+
+            if (str_starts_with($upsertSql, 'INSERT IGNORE INTO')) {
+                $upsertSql = 'INSERT' . substr($upsertSql, 13) . " ON DUPLICATE KEY UPDATE $setLastInsertId";
+            } elseif (str_contains($upsertSql, ' ON DUPLICATE KEY UPDATE ')) {
+                $upsertSql .= ", $setLastInsertId";
+            }
         }
 
         $uniqueValues = $this->prepareColumnValues($tableSchema, $uniqueColumns, $insertColumns, $params);
@@ -136,7 +159,7 @@ EXECUTE autoincrement_stmt";
                 $selectValues[] = $uniqueValues[$name] . ' ' . $quoter->quoteColumnName($name);
             }
 
-            return $upsertSql . ';' . 'SELECT ' . implode(', ', $selectValues);
+            return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
         }
 
         $conditions = [];
@@ -153,9 +176,9 @@ EXECUTE autoincrement_stmt";
 
         $quotedReturnColumns = array_map($quoter->quoteColumnName(...), $returnColumns);
 
-        return $upsertSql . ';'
-            . 'SELECT ' . implode(', ', $quotedReturnColumns)
-            . ' FROM ' . $this->quoter->quoteTableName($table)
+        return $upsertSql
+            . ';SELECT ' . implode(', ', $quotedReturnColumns)
+            . ' FROM ' . $quotedTable
             . ' WHERE ' . implode(' AND ', $conditions);
     }
 

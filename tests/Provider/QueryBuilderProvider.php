@@ -107,15 +107,39 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     public static function upsertReturning(): array
     {
         $upsert = self::upsert();
+        $quoter = self::getDb()->getQuoter();
 
         foreach ($upsert as &$data) {
             array_splice($data, 3, 0, [['id']]);
-            $data[4] .= ';SELECT LAST_INSERT_ID() `id`';
+            $quotedTable = $quoter->quoteTableName($data[0]);
+            $data[4] .= ", `id`=LAST_INSERT_ID($quotedTable.`id`);SELECT LAST_INSERT_ID() `id`";
         }
+
+        $upsert['regular values without update part'][4] = 'INSERT INTO `T_upsert`'
+            . ' (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+
+        $upsert['values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `ts`)'
+            . ' VALUES (:qp0, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
+            . 'SELECT LAST_INSERT_ID() `id`';
+
+        $upsert['query without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `status`)'
+            . ' SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1'
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+
+        $upsert['query, values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, [[ts]])'
+            . ' SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]'
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
 
         $upsert['no columns to update'][3] = ['a'];
         $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0);SELECT :qp1 `a`';
         $upsert['no columns to update'][5][':qp1'] = 1;
+
+        $upsert['no columns to update with unique'][4] = 'INSERT INTO `T_upsert` (`email`) VALUES (:qp0)'
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+
+        $upsert['no unique columns in table - simple insert'][4] = 'INSERT INTO {{%animal}} (`type`) VALUES (:qp0);'
+            . 'SELECT LAST_INSERT_ID() `id`';
 
         return [
             ...$upsert,
@@ -142,7 +166,8 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 true,
                 null,
                 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
-                . ' ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`);'
+                . ' ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`),'
+                . ' `profile_id`=VALUES(`profile_id`), `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
                 . 'SELECT `id`, `ts`, `email`, `recovery_email`, `address`, `status`, `orders`, `profile_id`'
                 . ' FROM `T_upsert` WHERE `id` = LAST_INSERT_ID()',
                 [':qp0' => 'test@example.com', ':qp1' => 'test address', ':qp2' => 1, ':qp3' => 1],
