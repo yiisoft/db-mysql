@@ -236,4 +236,17 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         return $values;
     }
+
+    public static function prepareValue(): array
+    {
+        $values = parent::prepareValue();
+
+        $values['array'][0] = '\'[\\"a\\",\\"b\\",\\"c\\"]\'';
+        $values['json'][0] = '\'{\\"a\\":1,\\"b\\":2}\'';
+        $values['Iterator'][0] = '\'[\\"a\\",\\"b\\",\\"c\\"]\'';
+        $values['Traversable'][0] = '\'{\\"a\\":1,\\"b\\":2}\'';
+        $values['JsonSerializable'][0] = '\'{\\"a\\":1,\\"b\\":2}\'';
+
+        return $values;
+    }
 }
