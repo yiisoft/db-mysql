@@ -408,22 +408,23 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
     }
 
-    #[DataProviderExternal(QueryBuilderProvider::class, 'insertWithReturningPks')]
-    public function testInsertWithReturningPks(
+    #[DataProviderExternal(QueryBuilderProvider::class, 'insertReturningPks')]
+    public function testInsertReturningPks(
         string $table,
         array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
         array $expectedParams
     ): void {
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertWithReturningPks is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertReturningPks is not supported by MySQL.'
         );
 
-        $db = $this->getConnection(true);
-        $qb = $db->getQueryBuilder();
-        $qb->insertWithReturningPks($table, $columns, $params);
+        $qb->insertReturningPks($table, $columns, $params);
 
         $db->close();
     }
@@ -515,7 +516,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item'));
 
         $command->setSql($sql)->execute();
-        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $insertResult = $command->insertReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(6, $insertResult['id']);
 
         // Key as string.
@@ -526,7 +527,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item', '40'));
 
         $command->setSql($sql)->execute();
-        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $insertResult = $command->insertReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(40, $insertResult['id']);
 
         // Change up, key as int.
@@ -537,7 +538,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item', 43));
 
         $db->createCommand($sql)->execute();
-        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $insertResult = $command->insertReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(43, $insertResult['id']);
 
         $command->delete('item', ['>=','id', 6])->execute();
@@ -552,7 +553,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertSame($sql, $qb->resetSequence('item'));
 
         $db->createCommand($sql)->execute();
-        $insertResult = $command->insertWithReturningPks('item', ['name' => '123', 'category_id' => 1]);
+        $insertResult = $command->insertReturningPks('item', ['name' => '123', 'category_id' => 1]);
         $this->assertEquals(6, $insertResult['id']);
 
         $db->close();
