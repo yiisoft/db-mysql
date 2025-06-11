@@ -454,7 +454,7 @@ final class SchemaTest extends CommonSchemaTest
         )->execute();
 
         $status = 2;
-        $insertedRow = $db->createCommand()->insertWithReturningPks($tableName, ['status' => $status, 'bool_col' => true]);
+        $insertedRow = $db->createCommand()->insertReturningPks($tableName, ['status' => $status, 'bool_col' => true]);
         $selectedRow = $db->createCommand('SELECT * FROM ' . $tableName . ' WHERE id=:id', ['id' => $insertedRow['id']])->queryOne();
 
         $this->assertEquals($status, $selectedRow['status']);

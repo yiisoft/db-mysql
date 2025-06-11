@@ -99,7 +99,7 @@ final class CommandTest extends CommonCommandTest
         parent::testGetRawSql($sql, $params, $expectedRawSql);
     }
 
-    public function testInsertWithReturningPksWithSubqueryAndNoAutoincrement(): void
+    public function testInsertReturningPksWithSubqueryAndNoAutoincrement(): void
     {
         $db = $this->getConnection(true);
         $command = $db->createCommand();
@@ -108,10 +108,10 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Command::insertWithReturningPks() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+            'Yiisoft\Db\Mysql\Command::insertReturningPks() is not supported by MySQL for tables without auto increment when inserting sub-query.'
         );
 
-        $command->insertWithReturningPks('order_item', $query);
+        $command->insertReturningPks('order_item', $query);
     }
 
     #[DataProviderExternal(CommandProvider::class, 'update')]

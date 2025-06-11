@@ -22,7 +22,7 @@ use function substr;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertWithReturningPks(string $table, array|QueryInterface $columns): array|false
+    public function insertReturningPks(string $table, array|QueryInterface $columns): array|false
     {
         $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
