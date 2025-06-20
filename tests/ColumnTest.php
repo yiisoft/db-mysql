@@ -7,7 +7,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
@@ -34,7 +34,7 @@ final class ColumnTest extends CommonColumnTest
 
     protected const COLUMN_BUILDER = ColumnBuilder::class;
 
-    protected function insertTypeValues(PdoConnectionInterface $db): void
+    protected function insertTypeValues(ConnectionInterface $db): void
     {
         $db->createCommand()->insert(
             'type',
