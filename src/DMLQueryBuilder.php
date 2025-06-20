@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
-use Yiisoft\Db\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
@@ -29,7 +29,7 @@ use function substr;
 final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 {
     /** @throws NotSupportedException */
-    public function insertWithReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
+    public function insertReturningPks(string $table, array|QueryInterface $columns, array &$params = []): string
     {
         throw new NotSupportedException(__METHOD__ . ' is not supported by MySQL.');
     }
