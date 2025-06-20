@@ -389,4 +389,26 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         return $data;
     }
+
+    public static function upsertWithMultiOperandFunctions(): array
+    {
+        $data = parent::upsertWithMultiOperandFunctions();
+
+        unset(
+            $data[0][2]['array_col'],
+            $data[0][4]['array_col'],
+        );
+
+        $data[0][3] = 'INSERT INTO `test_upsert_with_functions`'
+            . ' (`id`, `array_col`, `greatest_col`, `least_col`, `longest_col`, `shortest_col`)'
+            . ' SELECT `id`, `array_col`, `greatest_col`, `least_col`, `longest_col`, `shortest_col`'
+            . ' FROM (SELECT 1 AS `id`, :qp0 AS `array_col`, 5 AS `greatest_col`, 5 AS `least_col`, :qp1 AS `longest_col`, :qp2 AS `shortest_col`)'
+            . ' AS EXCLUDED ON DUPLICATE KEY UPDATE'
+            . ' `greatest_col`=GREATEST(`test_upsert_with_functions`.`greatest_col`, EXCLUDED.`greatest_col`),'
+            . ' `least_col`=LEAST(`test_upsert_with_functions`.`least_col`, EXCLUDED.`least_col`),'
+            . ' `longest_col`=(SELECT `test_upsert_with_functions`.`longest_col` AS value UNION SELECT EXCLUDED.`longest_col` AS value ORDER BY LENGTH(value) DESC LIMIT 1),'
+            . ' `shortest_col`=(SELECT `test_upsert_with_functions`.`shortest_col` AS value UNION SELECT EXCLUDED.`shortest_col` AS value ORDER BY LENGTH(value) ASC LIMIT 1)';
+
+        return $data;
+    }
 }
