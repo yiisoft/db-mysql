@@ -7,10 +7,9 @@ namespace Yiisoft\Db\Mysql\Tests;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
+use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
-use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -23,12 +22,11 @@ use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
 use Yiisoft\Db\Tests\Common\CommonColumnTest;
 
+use function iterator_to_array;
 use function str_repeat;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ColumnTest extends CommonColumnTest
 {
@@ -36,7 +34,7 @@ final class ColumnTest extends CommonColumnTest
 
     protected const COLUMN_BUILDER = ColumnBuilder::class;
 
-    private function insertTypeValues(Connection $db): void
+    protected function insertTypeValues(PdoConnectionInterface $db): void
     {
         $db->createCommand()->insert(
             'type',
@@ -56,7 +54,7 @@ final class ColumnTest extends CommonColumnTest
         )->execute();
     }
 
-    private function assertTypecastedValues(array $result, bool $allTypecasted = false): void
+    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
     {
         $this->assertSame(1, $result['int_col']);
         $this->assertSame('12345678901234567890', $result['bigunsigned_col']);
@@ -74,44 +72,6 @@ final class ColumnTest extends CommonColumnTest
         } else {
             $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
         }
-    }
-
-    public function testQueryTypecasting(): void
-    {
-        $db = $this->getConnection(true);
-
-        $this->insertTypeValues($db);
-
-        $query = (new Query($db))->from('type')->withTypecasting();
-
-        $result = $query->one();
-
-        $this->assertTypecastedValues($result);
-
-        $result = $query->all();
-
-        $this->assertTypecastedValues($result[0]);
-
-        $db->close();
-    }
-
-    public function testCommandWithPhpTypecasting(): void
-    {
-        $db = $this->getConnection(true);
-
-        $this->insertTypeValues($db);
-
-        $command = $db->createCommand('SELECT * FROM type')->withPhpTypecasting();
-
-        $result = $command->queryOne();
-
-        $this->assertTypecastedValues($result);
-
-        $result = $command->queryAll();
-
-        $this->assertTypecastedValues($result[0]);
-
-        $db->close();
     }
 
     public function testSelectWithPhpTypecasting(): void
@@ -149,6 +109,12 @@ final class ColumnTest extends CommonColumnTest
 
         $this->assertSame([$expected], $result);
 
+        $result = $db->createCommand($sql)
+            ->withPhpTypecasting()
+            ->query();
+
+        $this->assertSame([$expected], iterator_to_array($result));
+
         $result = $db->createCommand('SELECT 2.5')
             ->withPhpTypecasting()
             ->queryScalar();
@@ -164,12 +130,7 @@ final class ColumnTest extends CommonColumnTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider::bigIntValue
-     *
-     * @throws Exception
-     * @throws Throwable
-     */
+    #[DataProviderExternal(ColumnProvider::class, 'bigIntValue')]
     public function testColumnBigInt(string $bigint): void
     {
         $db = $this->getConnection(true);
@@ -180,27 +141,6 @@ final class ColumnTest extends CommonColumnTest
         $query = (new Query($db))->from('negative_default_values')->one();
 
         $this->assertSame($bigint, $query['bigint_col']);
-
-        $db->close();
-    }
-
-    public function testPhpTypeCast(): void
-    {
-        $db = $this->getConnection(true);
-        $schema = $db->getSchema();
-        $columns = $schema->getTableSchema('type')->getColumns();
-
-        $this->insertTypeValues($db);
-
-        $query = (new Query($db))->from('type')->one();
-
-        $result = [];
-
-        foreach ($columns as $columnName => $column) {
-            $result[$columnName] = $column->phpTypecast($query[$columnName]);
-        }
-
-        $this->assertTypecastedValues($result, true);
 
         $db->close();
     }
