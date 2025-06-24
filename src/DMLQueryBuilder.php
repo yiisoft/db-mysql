@@ -67,25 +67,43 @@ EXECUTE autoincrement_stmt";
         array|bool $updateColumns = true,
         array &$params = [],
     ): string {
-        $insertSql = $this->insert($table, $insertColumns, $params);
-
         [$uniqueNames, , $updateNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
 
         if (empty($uniqueNames)) {
-            return $insertSql;
+            return $this->insert($table, $insertColumns, $params);
         }
 
         if ($updateColumns === true) {
             $updateColumns = [];
             /** @psalm-var string[] $updateNames */
             foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression('VALUES(' . $this->quoter->quoteColumnName($name) . ')');
+                $updateColumns[$name] = new Expression('EXCLUDED.' . $this->quoter->quoteColumnName($name));
             }
         }
 
         if (empty($updateColumns)) {
+            $insertSql = $this->insert($table, $insertColumns, $params);
             return 'INSERT IGNORE' . substr($insertSql, 6);
         }
+
+        [$names, $placeholders, $values, $params] = $this->prepareInsertValues($table, $insertColumns, $params);
+
+        $quotedNames = array_map($this->quoter->quoteColumnName(...), $names);
+
+        if (!empty($placeholders)) {
+            $selectValues = [];
+
+            foreach ($placeholders as $i => $placeholder) {
+                $selectValues[] = "$placeholder $quotedNames[$i]";
+            }
+
+            $values = 'SELECT ' . implode(', ', $selectValues);
+        }
+
+        $fields = implode(', ', $quotedNames);
+
+        $insertSql = 'INSERT INTO ' . $this->quoter->quoteTableName($table)
+            . " ($fields) SELECT $fields FROM ($values) EXCLUDED";
 
         $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
 
