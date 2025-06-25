@@ -40,46 +40,59 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     {
         $concreteData = [
             'regular values' => [
-                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ' .
-                    'ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`)',
+                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
+                    . ' SELECT `email`, `address`, `status`, `profile_id`'
+                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
+                    . ' `profile_id`=EXCLUDED.`profile_id`',
             ],
             'regular values with unique at not the first position' => [
-                3 => 'INSERT INTO `T_upsert` (`address`, `email`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ' .
-                    'ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`), `profile_id`=VALUES(`profile_id`)',
+                3 => 'INSERT INTO `T_upsert` (`address`, `email`, `status`, `profile_id`)'
+                    . ' SELECT `address`, `email`, `status`, `profile_id`'
+                    . ' FROM (SELECT :qp0 AS `address`, :qp1 AS `email`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
+                    . ' `profile_id`=EXCLUDED.`profile_id`',
             ],
             'regular values with update part' => [
-                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3) ' .
-                    'ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1',
+                3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
+                    . ' SELECT `email`, `address`, `status`, `profile_id`'
+                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1',
             ],
             'regular values without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)',
             ],
             'query' => [
-                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
-                    'WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `status`=VALUES(`status`)',
+                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
+                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `status`=EXCLUDED.`status`',
             ],
             'query with update part' => [
-                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
-                    'WHERE `name`=:qp0 LIMIT 1 ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1',
+                3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
+                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1',
             ],
             'query without update part' => [
-                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer` ' .
-                    'WHERE `name`=:qp0 LIMIT 1',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer`'
+                    . ' WHERE `name`=:qp0 LIMIT 1',
             ],
             'values and expressions' => [
-                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
-                    'ON DUPLICATE KEY UPDATE `ts`=VALUES(`ts`)',
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) SELECT `email`, `ts`'
+                    . ' FROM (SELECT :qp0 AS `email`, CURRENT_TIMESTAMP AS `ts`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `ts`=EXCLUDED.`ts`',
             ],
             'values and expressions with update part' => [
-                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP) ' .
-                    'ON DUPLICATE KEY UPDATE `orders`=T_upsert.orders + 1',
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) SELECT `email`, `ts`'
+                    . ' FROM (SELECT :qp0 AS `email`, CURRENT_TIMESTAMP AS `ts`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `orders`=T_upsert.orders + 1',
             ],
             'values and expressions without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)',
             ],
             'query, values and expressions with update part' => [
-                3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]] ' .
-                    'ON DUPLICATE KEY UPDATE `ts`=:qp1, `orders`=T_upsert.orders + 1',
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT `email`, [[ts]]'
+                    . ' FROM (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `ts`=:qp1, `orders`=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
@@ -112,34 +125,34 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         foreach ($upsert as &$data) {
             array_splice($data, 3, 0, [['id']]);
             $quotedTable = $quoter->quoteTableName($data[0]);
-            $data[4] .= ", `id`=LAST_INSERT_ID($quotedTable.`id`);SELECT LAST_INSERT_ID() `id`";
+            $data[4] .= ", `id`=LAST_INSERT_ID($quotedTable.`id`);SELECT LAST_INSERT_ID() AS `id`";
         }
 
         $upsert['regular values without update part'][4] = 'INSERT INTO `T_upsert`'
             . ' (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
-            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `ts`)'
             . ' VALUES (:qp0, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
-            . 'SELECT LAST_INSERT_ID() `id`';
+            . 'SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['query without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `status`)'
             . ' SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1'
-            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['query, values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, [[ts]])'
             . ' SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]'
-            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['no columns to update'][3] = ['a'];
-        $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0);SELECT :qp1 `a`';
+        $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0);SELECT :qp1 AS `a`';
         $upsert['no columns to update'][5][':qp1'] = 1;
 
         $upsert['no columns to update with unique'][4] = 'INSERT INTO `T_upsert` (`email`) VALUES (:qp0)'
-            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() `id`';
+            . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['no unique columns in table - simple insert'][4] = 'INSERT INTO {{%animal}} (`type`) VALUES (:qp0);'
-            . 'SELECT LAST_INSERT_ID() `id`';
+            . 'SELECT LAST_INSERT_ID() AS `id`';
 
         return [
             ...$upsert,
@@ -148,8 +161,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id_1' => 1, 'id_2' => 2.5, 'type' => 'Test'],
                 true,
                 ['id_1', 'id_2'],
-                'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) VALUES (:qp0, :qp1, :qp2)'
-                . ' ON DUPLICATE KEY UPDATE `type`=VALUES(`type`);SELECT :qp3 `id_1`, :qp4 `id_2`',
+                'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) SELECT `id_1`, `id_2`, `type`'
+                . ' FROM (SELECT :qp0 AS `id_1`, :qp1 AS `id_2`, :qp2 AS `type`) AS EXCLUDED'
+                . ' ON DUPLICATE KEY UPDATE `type`=EXCLUDED.`type`;SELECT :qp3 AS `id_1`, :qp4 AS `id_2`',
                 [':qp0' => 1, ':qp1' => 2.5, ':qp2' => 'Test', ':qp3' => 1, ':qp4' => 2.5],
             ],
             'no return columns' => [
@@ -165,9 +179,11 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['email' => 'test@example.com', 'address' => 'test address', 'status' => 1, 'profile_id' => 1],
                 true,
                 null,
-                'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
-                . ' ON DUPLICATE KEY UPDATE `address`=VALUES(`address`), `status`=VALUES(`status`),'
-                . ' `profile_id`=VALUES(`profile_id`), `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
+                'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
+                . ' SELECT `email`, `address`, `status`, `profile_id`'
+                . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
+                . ' `profile_id`=EXCLUDED.`profile_id`, `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
                 . 'SELECT `id`, `ts`, `email`, `recovery_email`, `address`, `status`, `orders`, `profile_id`'
                 . ' FROM `T_upsert` WHERE `id` = LAST_INSERT_ID()',
                 [':qp0' => 'test@example.com', ':qp1' => 'test address', ':qp2' => 1, ':qp3' => 1],
@@ -178,7 +194,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 true,
                 ['int_col', 'char_col', 'char_col2', 'char_col3'],
                 'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3);'
-                . 'SELECT :qp4 `int_col`, :qp5 `char_col`, :qp6 `char_col2`, :qp7 `char_col3`',
+                . 'SELECT :qp4 AS `int_col`, :qp5 AS `char_col`, :qp6 AS `char_col2`, :qp7 AS `char_col3`',
                 [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true, ':qp4' => 3, ':qp5' => 'a', ':qp6' => 'something', ':qp7' => null],
             ],
             'no primary key but unique' => [
@@ -186,8 +202,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['email' => 'test@example.com', 'name' => 'John Doe'],
                 true,
                 null,
-                'INSERT INTO `without_pk` (`email`, `name`) VALUES (:qp0, :qp1)'
-                . ' ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);'
+                'INSERT INTO `without_pk` (`email`, `name`) SELECT `email`, `name`'
+                . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `name`) AS EXCLUDED'
+                . ' ON DUPLICATE KEY UPDATE `name`=EXCLUDED.`name`;'
                 . 'SELECT `email`, `name`, `address`, `status` FROM `without_pk` WHERE `email` = :qp2',
                 [':qp0' => 'test@example.com', ':qp1' => 'John Doe', ':qp2' => 'test@example.com'],
             ],
