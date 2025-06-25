@@ -13,9 +13,7 @@ use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
 use function array_combine;
 use function array_diff;
-use function array_fill_keys;
 use function array_intersect;
-use function array_intersect_key;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
