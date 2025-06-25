@@ -13,7 +13,9 @@ use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 
 use function array_combine;
 use function array_diff;
+use function array_fill_keys;
 use function array_intersect;
+use function array_intersect_key;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -77,7 +79,7 @@ EXECUTE autoincrement_stmt";
             $updateColumns = [];
             /** @psalm-var string[] $updateNames */
             foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression('EXCLUDED.' . $this->quoter->quoteColumnName($name));
+                $updateColumns[$name] = new Expression('EXCLUDED.' . $this->quoter->quoteSimpleColumnName($name));
             }
         }
 
@@ -94,7 +96,7 @@ EXECUTE autoincrement_stmt";
             $selectValues = [];
 
             foreach ($placeholders as $i => $placeholder) {
-                $selectValues[] = "$placeholder $quotedNames[$i]";
+                $selectValues[] = "$placeholder AS $quotedNames[$i]";
             }
 
             $values = 'SELECT ' . implode(', ', $selectValues);
@@ -103,7 +105,7 @@ EXECUTE autoincrement_stmt";
         $fields = implode(', ', $quotedNames);
 
         $insertSql = 'INSERT INTO ' . $this->quoter->quoteTableName($table)
-            . " ($fields) SELECT $fields FROM ($values) EXCLUDED";
+            . " ($fields) SELECT $fields FROM ($values) AS EXCLUDED";
 
         $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
 
@@ -142,7 +144,7 @@ EXECUTE autoincrement_stmt";
             $selectValues = [];
 
             foreach ($returnValues as $name => $value) {
-                $selectValues[] = $value . ' ' . $quoter->quoteColumnName($name);
+                $selectValues[] = $value . ' AS ' . $quoter->quoteSimpleColumnName($name);
             }
 
             return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
@@ -158,7 +160,7 @@ EXECUTE autoincrement_stmt";
         $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])?->isAutoIncrement();
 
         if ($isAutoIncrement) {
-            $id = $quoter->quoteColumnName($primaryKeys[0]);
+            $id = $quoter->quoteSimpleColumnName($primaryKeys[0]);
             $setLastInsertId = "$id=LAST_INSERT_ID($quotedTable.$id)";
 
             if (str_starts_with($upsertSql, 'INSERT IGNORE INTO')) {
@@ -174,7 +176,7 @@ EXECUTE autoincrement_stmt";
             $selectValues = [];
 
             foreach ($returnColumns as $name) {
-                $selectValues[] = $uniqueValues[$name] . ' ' . $quoter->quoteColumnName($name);
+                $selectValues[] = $uniqueValues[$name] . ' AS ' . $quoter->quoteSimpleColumnName($name);
             }
 
             return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
@@ -189,10 +191,10 @@ EXECUTE autoincrement_stmt";
                 );
             }
 
-            $conditions[] = $quoter->quoteColumnName($name) . ' = ' . $value;
+            $conditions[] = $quoter->quoteSimpleColumnName($name) . ' = ' . $value;
         }
 
-        $quotedReturnColumns = array_map($quoter->quoteColumnName(...), $returnColumns);
+        $quotedReturnColumns = array_map($quoter->quoteSimpleColumnName(...), $returnColumns);
 
         return $upsertSql
             . ';SELECT ' . implode(', ', $quotedReturnColumns)
