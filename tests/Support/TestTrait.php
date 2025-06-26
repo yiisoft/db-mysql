@@ -59,7 +59,7 @@ trait TestTrait
         return $this->dsn;
     }
 
-    protected function getDriverName(): string
+    protected static function getDriverName(): string
     {
         return 'mysql';
     }

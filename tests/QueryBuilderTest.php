@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use Yiisoft\Db\Command\Param;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\CaseExpression;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
@@ -760,5 +761,15 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb = $db->getQueryBuilder();
 
         $this->assertSame($expected, $qb->prepareValue($value));
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'caseExpressionBuilder')]
+    public function testCaseExpressionBuilder(
+        CaseExpression $case,
+        string $expectedSql,
+        array $expectedParams,
+        string|int $expectedResult,
+    ): void {
+        parent::testCaseExpressionBuilder($case, $expectedSql, $expectedParams, $expectedResult);
     }
 }
