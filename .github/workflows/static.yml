@@ -14,7 +14,7 @@ on:
       - 'psalm*.xml'
       - 'composer.json'
 
-name: static analysis
+name: Static analysis
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,49 +22,9 @@ concurrency:
 
 jobs:
   psalm:
-    name: PHP ${{ matrix.php }}
-
-    env:
-      COMPOSER_ROOT_VERSION: 1.0.0
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-
-        php:
-          - 8.1
-          - 8.2
-          - 8.3
-          - 8.4
-
-    steps:
-      - name: Checkout.
-        uses: actions/checkout@v4
-
-      - name: Install PHP with extensions.
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          coverage: none
-          tools: cs2pr
-
-      - name: Update composer.
-        run: composer self-update
-
-      - name: Set environment variables pull request linux.
-        uses: yiisoft/actions/db/environment-linux@master
-
-      - name: Install db.
-        uses: yiisoft/actions/db/subpackage-install@master
-        with:
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
-          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
-          CURRENT_PACKAGE: db
-          FULL_BRANCH_NAME: ${{ env.FULL_BRANCH_NAME }}
-          WORK_PACKAGE_URL: ${{ env.WORK_PACKAGE_URL }}
-
-      - name: Static analysis.
-        run: vendor/bin/psalm --config=${{ inputs.psalm-config }} --shepherd --stats --output-format=github --php-version=${{ matrix.php }}
+    uses: yiisoft/actions/.github/workflows/psalm.yml@master
+    with:
+      php: >-
+        ['8.1', '8.2', '8.3', '8.4']
+      required-packages: >-
+        ['db']
