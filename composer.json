@@ -50,6 +50,9 @@
         "yiisoft/cache-file": "^3.2",
         "yiisoft/var-dumper": "^1.7"
     },
+    "provide": {
+        "yiisoft/db-implementation": "1.0.0"
+    },
     "autoload": {
         "psr-4": {
             "Yiisoft\\Db\\Mysql\\": "src"

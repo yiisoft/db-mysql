@@ -45,6 +45,7 @@
 - Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Chg #399: Rename `insertWithReturningPks()` to `insertReturningPks()` in `Command` and `DMLQueryBuilder` classes (@Tigrov)
 - Enh #403: Refactor `DMLQueryBuilder::upsert()`, allow use `EXCLUDED` table alias to access inserted values (@Tigrov)
+- Enh #405: Provide `yiisoft/db-implementation` virtual package (@vjik)
 
 ## 1.2.0 March 21, 2024
 
