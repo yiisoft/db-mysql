@@ -14,6 +14,7 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
 {
     /**+
      * @param LikeConditionInterface $expression
+     * @psalm-suppress MoreSpecificImplementedParamType
      */
     protected function prepareColumn(ExpressionInterface $expression, array &$params): string
     {
