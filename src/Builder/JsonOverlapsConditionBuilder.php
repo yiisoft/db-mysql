@@ -22,6 +22,7 @@ final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilde
      * Build SQL for {@see JsonOverlapsCondition}.
      *
      * @param JsonOverlapsCondition $expression The {@see JsonOverlapsCondition} to be built.
+     * @psalm-suppress MoreSpecificImplementedParamType
      *
      * @throws Exception
      * @throws InvalidArgumentException
