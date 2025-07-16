@@ -15,6 +15,8 @@ use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
 
 /**
  * Builds expressions for {@see JsonOverlapsCondition} for MySQL Server.
+ *
+ * @extends AbstractOverlapsConditionBuilder<JsonOverlapsCondition>
  */
 final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilder
 {
@@ -22,7 +24,6 @@ final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilde
      * Build SQL for {@see JsonOverlapsCondition}.
      *
      * @param JsonOverlapsCondition $expression The {@see JsonOverlapsCondition} to be built.
-     * @psalm-suppress MoreSpecificImplementedParamType
      *
      * @throws Exception
      * @throws InvalidArgumentException
