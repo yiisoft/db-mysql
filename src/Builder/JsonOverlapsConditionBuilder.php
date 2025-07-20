@@ -8,18 +8,24 @@ use Yiisoft\Db\Exception\Exception;
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\QueryBuilder\Condition\Builder\AbstractOverlapsConditionBuilder;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\Condition\Overlaps\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
  * Builds expressions for {@see JsonOverlapsCondition} for MySQL Server.
  *
- * @extends AbstractOverlapsConditionBuilder<JsonOverlapsCondition>
+ * @implements ExpressionBuilderInterface<JsonOverlapsCondition>
  */
-final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilder
+final class JsonOverlapsConditionBuilder implements ExpressionBuilderInterface
 {
+    public function __construct(
+        private readonly QueryBuilderInterface $queryBuilder,
+    ) {
+    }
+
     /**
      * Build SQL for {@see JsonOverlapsCondition}.
      *
@@ -32,8 +38,10 @@ final class JsonOverlapsConditionBuilder extends AbstractOverlapsConditionBuilde
      */
     public function build(ExpressionInterface $expression, array &$params = []): string
     {
-        $column = $this->prepareColumn($expression->getColumn());
-        $values = $expression->getValues();
+        $column = $expression->column instanceof ExpressionInterface
+            ? $this->queryBuilder->buildExpression($expression->column)
+            : $this->queryBuilder->getQuoter()->quoteColumnName($expression->column);
+        $values = $expression->values;
 
         if (!$values instanceof ExpressionInterface) {
             $values = new JsonExpression($values);

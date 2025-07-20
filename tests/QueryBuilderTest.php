@@ -17,7 +17,7 @@ use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\Condition\Overlaps\JsonOverlapsCondition;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
