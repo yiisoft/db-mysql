@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Builder;
 
-use Yiisoft\Db\QueryBuilder\Condition\Interface\LikeConditionInterface;
+use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
 
 /**
- * Build an object of {@see LikeConditionInterface} into SQL expressions for MySQL Server.
+ * Build an object of {@see LikeCondition} into SQL expressions for MySQL Server.
  */
 final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeConditionBuilder
 {
-    protected function prepareColumn(LikeConditionInterface $expression, array &$params): string
+    protected function prepareColumn(LikeCondition $expression, array &$params): string
     {
         $column = parent::prepareColumn($expression, $params);
 
