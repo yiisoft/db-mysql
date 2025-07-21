@@ -7,7 +7,9 @@ namespace Yiisoft\Db\Mysql;
 use Yiisoft\Db\Connection\AbstractDsn;
 
 /**
- * Implement a Data Source Name (DSN) for an MySQL, MariaDB.
+ * Represents a Data Source Name (DSN) for MySQL and MariaDB servers that's used to configure a {@see Driver} instance.
+ *
+ * To get DSN in string format, use the `(string)` type casting operator.
  *
  * @link https://www.php.net/manual/en/ref.pdo-mysql.connection.php
  */
@@ -19,9 +21,9 @@ final class Dsn extends AbstractDsn
     public function __construct(
         string $driver = 'mysql',
         string $host = '127.0.0.1',
-        string|null $databaseName = null,
+        string $databaseName = '',
         string $port = '3306',
-        array $options = []
+        array $options = [],
     ) {
         parent::__construct($driver, $host, $databaseName, $port, $options);
     }
