@@ -15,7 +15,7 @@ final class LikeConditionBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Buil
     {
         $column = parent::prepareColumn($expression, $params);
 
-        if ($expression->getCaseSensitive() === true) {
+        if ($expression->caseSensitive === true) {
             $column = 'BINARY ' . $column;
         }
 
