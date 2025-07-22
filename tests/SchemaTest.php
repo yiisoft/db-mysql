@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Constraint\Index;
 use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
@@ -391,11 +391,10 @@ final class SchemaTest extends CommonSchemaTest
         $this->createTableForIndexAndConstraintTests($db, $tableName, $columnName);
         $db->createCommand()->addPrimaryKey($tableName, $constraintName, $columnName)->execute();
 
-        $constraints = $db->getSchema()->getTablePrimaryKey($tableName, true);
-
-        $this->assertInstanceOf(IndexConstraint::class, $constraints);
-        $this->assertEquals('', $constraints->getName());
-        $this->assertEquals([$columnName], $constraints->getColumnNames());
+        $this->assertEquals(
+            new Index('', [$columnName], true, true),
+            $db->getSchema()->getTablePrimaryKey($tableName),
+        );
 
         $db->createCommand()->dropPrimaryKey($tableName, $constraintName)->execute();
 

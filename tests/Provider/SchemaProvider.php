@@ -18,6 +18,7 @@ use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Schema\Column\StringColumn;
+use Yiisoft\Db\Tests\Support\Assert;
 
 final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
@@ -253,8 +254,8 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         $constraints = parent::constraints();
 
         $constraints['1: check'][2] = false;
-        $constraints['2: primary key'][2]->name('');
-        $constraints['2: index'][2][0]->name('');
+        Assert::setPropertyValue($constraints['2: primary key'][2], 'name', '');
+        Assert::setPropertyValue($constraints['2: index'][2][0], 'name', '');
         $constraints['2: check'][2] = false;
         $constraints['3: check'][2] = false;
         $constraints['4: check'][2] = false;
