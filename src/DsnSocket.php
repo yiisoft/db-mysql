@@ -40,8 +40,8 @@ final class DsnSocket implements Stringable
      *
      * ```php
      * $dsn = new DsnSocket('mysql', '/var/run/mysqld/mysqld.sock', 'yiitest', ['charset' => 'utf8mb4']);
-     * $pdoDriver = new PDODriver($dsn, 'username', 'password');
-     * $connection = new Connection($pdoDriver, $schemaCache);
+     * $driver = new Driver($dsn, 'username', 'password');
+     * $connection = new Connection($driver, $schemaCache);
      * ```
      *
      * Will result in the DSN string `mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname=yiitest;charset=utf8mb4`.
