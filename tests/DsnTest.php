@@ -36,11 +36,15 @@ final class DsnTest extends TestCase
         $this->assertSame('mysql:host=127.0.0.1;port=3306', (string) $dsn);
     }
 
-    public function testGetDsnWithoutDatabaseName(): void
+    public function testConstructWithEmptyPort(): void
     {
-        $dsn = new Dsn('mysql', 'localhost', '', '3306', ['charset' => 'utf8']);
+        $dsn = new Dsn(port: '');
 
+        $this->assertSame('mysql', $dsn->driver);
+        $this->assertSame('127.0.0.1', $dsn->host);
         $this->assertSame('', $dsn->databaseName);
-        $this->assertSame('mysql:host=localhost;port=3306;charset=utf8', (string) $dsn);
+        $this->assertSame('', $dsn->port);
+        $this->assertSame([], $dsn->options);
+        $this->assertSame('mysql:host=127.0.0.1', (string) $dsn);
     }
 }
