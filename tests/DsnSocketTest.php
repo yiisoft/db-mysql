@@ -9,24 +9,36 @@ use Yiisoft\Db\Mysql\DsnSocket;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class DsnSocketTest extends TestCase
 {
-    public function testAsString(): void
+    public function testConstruct(): void
     {
-        $this->assertSame(
-            'mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname=yiitest',
-            (new DsnSocket('mysql', '/var/run/mysqld/mysqld.sock', 'yiitest'))->asString(),
-        );
+        $dsn = new DsnSocket('mysql', '/var/run/mysql/mysql.sock', 'yiitest', ['charset' => 'utf8']);
+
+        $this->assertSame('mysql', $dsn->driver);
+        $this->assertSame('/var/run/mysql/mysql.sock', $dsn->unixSocket);
+        $this->assertSame('yiitest', $dsn->databaseName);
+        $this->assertSame(['charset' => 'utf8'], $dsn->options);
+        $this->assertSame('mysql:unix_socket=/var/run/mysql/mysql.sock;dbname=yiitest;charset=utf8', (string) $dsn);
     }
 
-    public function testAsStringWithOptions(): void
+    public function testConstructDefaults(): void
     {
-        $this->assertSame(
-            'mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname=yiitest;charset=utf8',
-            (new DsnSocket('mysql', '/var/run/mysqld/mysqld.sock', 'yiitest', ['charset' => 'utf8']))->asString(),
-        );
+        $dsn = new DsnSocket();
+
+        $this->assertSame('mysql', $dsn->driver);
+        $this->assertSame('/var/run/mysqld/mysqld.sock', $dsn->unixSocket);
+        $this->assertSame('', $dsn->databaseName);
+        $this->assertSame([], $dsn->options);
+        $this->assertSame('mysql:unix_socket=/var/run/mysqld/mysqld.sock', (string) $dsn);
+    }
+
+    public function testConstructWithEmptyDatabase(): void
+    {
+        $dsn = new DsnSocket('mysql', '/var/run/mysqld/mysqld.sock', '', ['charset' => 'utf8']);
+
+        $this->assertSame('mysql:unix_socket=/var/run/mysqld/mysqld.sock;charset=utf8', (string) $dsn);
+        $this->assertEmpty($dsn->databaseName);
     }
 }
