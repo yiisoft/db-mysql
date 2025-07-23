@@ -40,7 +40,7 @@
 - Enh #389, #390: Use `DbArrayHelper::arrange()` instead of `DbArrayHelper::index()` method (@Tigrov)
 - New #387: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #393: Use `DateTimeColumn` class for datetime column types (@Tigrov)
-- Enh #396: Refactor constraints (@Tigrov)
+- Enh #396, #409: Refactor constraints (@Tigrov)
 - New #394, #395, #398: Implement `Command::upsertReturning()` method (@Tigrov)
 - Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Chg #399: Rename `insertWithReturningPks()` to `insertReturningPks()` in `Command` and `DMLQueryBuilder` classes (@Tigrov)

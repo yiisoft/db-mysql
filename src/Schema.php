@@ -6,8 +6,8 @@ namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\ReferentialAction;
-use Yiisoft\Db\Constraint\ForeignKeyConstraint;
-use Yiisoft\Db\Constraint\IndexConstraint;
+use Yiisoft\Db\Constraint\ForeignKey;
+use Yiisoft\Db\Constraint\Index;
 use Yiisoft\Db\Driver\Pdo\AbstractPdoSchema;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\NotSupportedException;
@@ -59,7 +59,7 @@ use const PHP_INT_SIZE;
  *     name: string,
  *     column_name: string,
  *     type: string,
- *     foreign_table_schema: string|null,
+ *     foreign_table_schema: string,
  *     foreign_table_name: string,
  *     foreign_column_name: string,
  *     on_update: ReferentialAction::*,
@@ -419,9 +419,9 @@ final class Schema extends AbstractPdoSchema
      * - foreignKeys
      * - uniques
      *
-     * @psalm-return ForeignKeyConstraint[]|IndexConstraint[]|IndexConstraint|null
+     * @psalm-return ForeignKey[]|Index[]|Index|null
      */
-    private function loadTableConstraints(string $tableName, string $returnType): array|IndexConstraint|null
+    private function loadTableConstraints(string $tableName, string $returnType): array|Index|null
     {
         $sql = <<<SQL
         SELECT
@@ -429,7 +429,7 @@ final class Schema extends AbstractPdoSchema
             `kcu`.`COLUMN_NAME` AS `column_name`,
             `tc`.`CONSTRAINT_TYPE` AS `type`,
         CASE
-            WHEN :schemaName IS NULL AND `kcu`.`REFERENCED_TABLE_SCHEMA` = DATABASE() THEN NULL
+            WHEN :schemaName IS NULL AND `kcu`.`REFERENCED_TABLE_SCHEMA` = DATABASE() THEN ''
         ELSE `kcu`.`REFERENCED_TABLE_SCHEMA`
         END AS `foreign_table_schema`,
             `kcu`.`REFERENCED_TABLE_NAME` AS `foreign_table_name`,
@@ -496,23 +496,22 @@ final class Schema extends AbstractPdoSchema
         foreach ($constraints as $type => $names) {
             foreach ($names as $name => $constraint) {
                 match ($type) {
-                    'PRIMARY KEY' => $result[self::PRIMARY_KEY] = new IndexConstraint(
+                    'PRIMARY KEY' => $result[self::PRIMARY_KEY] = new Index(
                         '',
                         array_column($constraint, 'column_name'),
                         true,
                         true,
                     ),
-                    'FOREIGN KEY' => $result[self::FOREIGN_KEYS][] = new ForeignKeyConstraint(
+                    'FOREIGN KEY' => $result[self::FOREIGN_KEYS][] = new ForeignKey(
                         $name,
                         array_column($constraint, 'column_name'),
-                        $constraint[0]['foreign_table_schema'] !== null
-                            ? ($constraint[0]['foreign_table_schema'] . '.' . $constraint[0]['foreign_table_name'])
-                            : $constraint[0]['foreign_table_name'],
+                        $constraint[0]['foreign_table_schema'],
+                        $constraint[0]['foreign_table_name'],
                         array_column($constraint, 'foreign_column_name'),
-                        $constraint[0]['on_update'],
                         $constraint[0]['on_delete'],
+                        $constraint[0]['on_update'],
                     ),
-                    'UNIQUE' => $result[self::UNIQUES][] = new IndexConstraint(
+                    'UNIQUE' => $result[self::UNIQUES][] = new Index(
                         $name,
                         array_column($constraint, 'column_name'),
                         true,
@@ -538,7 +537,7 @@ final class Schema extends AbstractPdoSchema
 
     protected function loadTableForeignKeys(string $tableName): array
     {
-        /** @var ForeignKeyConstraint[] */
+        /** @var ForeignKey[] */
         return $this->loadTableConstraints($tableName, self::FOREIGN_KEYS);
     }
 
@@ -575,7 +574,7 @@ final class Schema extends AbstractPdoSchema
         foreach ($indexes as $name => $index) {
             $isPrimaryKey = (bool) $index[0]['is_primary_key'];
 
-            $result[] = new IndexConstraint(
+            $result[] = new Index(
                 $isPrimaryKey ? '' : $name,
                 array_column($index, 'column_name'),
                 (bool) $index[0]['is_unique'],
@@ -586,9 +585,9 @@ final class Schema extends AbstractPdoSchema
         return $result;
     }
 
-    protected function loadTablePrimaryKey(string $tableName): IndexConstraint|null
+    protected function loadTablePrimaryKey(string $tableName): Index|null
     {
-        /** @var IndexConstraint|null */
+        /** @var Index|null */
         return $this->loadTableConstraints($tableName, self::PRIMARY_KEY);
     }
 
@@ -609,7 +608,7 @@ final class Schema extends AbstractPdoSchema
 
     protected function loadTableUniques(string $tableName): array
     {
-        /** @var IndexConstraint[] */
+        /** @var Index[] */
         return $this->loadTableConstraints($tableName, self::UNIQUES);
     }
 
