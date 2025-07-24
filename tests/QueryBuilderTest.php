@@ -17,7 +17,7 @@ use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 
@@ -652,7 +652,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testSelectScalar($columns, $expected);
     }
 
-    public function testJsonOverlapsConditionBuilder(): void
+    public function testJsonOverlapsBuilder(): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
@@ -666,14 +666,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb = $db->getQueryBuilder();
 
         $params = [];
-        $sql = $qb->buildExpression(new JsonOverlapsCondition('column', [1, 2, 3]), $params);
+        $sql = $qb->buildExpression(new JsonOverlaps('column', [1, 2, 3]), $params);
 
         $this->assertSame('JSON_OVERLAPS(`column`, :qp0)', $sql);
         $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
 
         // Test column as Expression
         $params = [];
-        $sql = $qb->buildExpression(new JsonOverlapsCondition(new Expression('column'), [1, 2, 3]), $params);
+        $sql = $qb->buildExpression(new JsonOverlaps(new Expression('column'), [1, 2, 3]), $params);
 
         $this->assertSame('JSON_OVERLAPS(column, :qp0)', $sql);
         $this->assertEquals([':qp0' => new Param('[1,2,3]', DataType::STRING)], $params);
@@ -682,7 +682,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
-    public function testJsonOverlapsCondition(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlaps(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
@@ -697,7 +697,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $count = (new Query($db))
             ->from('json_type')
-            ->where(new JsonOverlapsCondition('json_col', $values))
+            ->where(new JsonOverlaps('json_col', $values))
             ->count();
 
         $this->assertSame($expectedCount, $count);
@@ -706,7 +706,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'overlapsCondition')]
-    public function testJsonOverlapsConditionOperator(iterable|ExpressionInterface $values, int $expectedCount): void
+    public function testJsonOverlapsOperator(iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();

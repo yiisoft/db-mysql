@@ -11,15 +11,15 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\JsonExpression;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
 /**
- * Builds expressions for {@see JsonOverlapsCondition} for MySQL Server.
+ * Builds expressions for {@see JsonOverlaps} for MySQL Server.
  *
- * @implements ExpressionBuilderInterface<JsonOverlapsCondition>
+ * @implements ExpressionBuilderInterface<JsonOverlaps>
  */
-final class JsonOverlapsConditionBuilder implements ExpressionBuilderInterface
+final class JsonOverlapsBuilder implements ExpressionBuilderInterface
 {
     public function __construct(
         private readonly QueryBuilderInterface $queryBuilder,
@@ -27,9 +27,9 @@ final class JsonOverlapsConditionBuilder implements ExpressionBuilderInterface
     }
 
     /**
-     * Build SQL for {@see JsonOverlapsCondition}.
+     * Build SQL for {@see JsonOverlaps}.
      *
-     * @param JsonOverlapsCondition $expression The {@see JsonOverlapsCondition} to be built.
+     * @param JsonOverlaps $expression The {@see JsonOverlaps} to be built.
      *
      * @throws Exception
      * @throws InvalidArgumentException
