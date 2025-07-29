@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Mysql\Builder\JsonOverlapsConditionBuilder;
-use Yiisoft\Db\Mysql\Builder\LikeConditionBuilder;
+use Yiisoft\Db\Mysql\Builder\JsonOverlapsBuilder;
+use Yiisoft\Db\Mysql\Builder\LikeBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
-use Yiisoft\Db\QueryBuilder\Condition\JsonOverlapsCondition;
-use Yiisoft\Db\QueryBuilder\Condition\LikeCondition;
+use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
+use Yiisoft\Db\QueryBuilder\Condition\Like;
 
 use function ctype_digit;
 
@@ -74,8 +74,8 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
     {
         return [
             ...parent::defaultExpressionBuilders(),
-            JsonOverlapsCondition::class => JsonOverlapsConditionBuilder::class,
-            LikeCondition::class => LikeConditionBuilder::class,
+            JsonOverlaps::class => JsonOverlapsBuilder::class,
+            Like::class => LikeBuilder::class,
         ];
     }
 }
