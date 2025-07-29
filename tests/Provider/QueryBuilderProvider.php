@@ -64,17 +64,17 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ],
             'query' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
-                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) AS EXCLUDED'
+                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name` = :qp0 LIMIT 1) AS EXCLUDED'
                     . ' ON DUPLICATE KEY UPDATE `status`=EXCLUDED.`status`',
             ],
             'query with update part' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
-                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1) AS EXCLUDED'
+                    . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name` = :qp0 LIMIT 1) AS EXCLUDED'
                     . ' ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1',
             ],
             'query without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer`'
-                    . ' WHERE `name`=:qp0 LIMIT 1',
+                    . ' WHERE `name` = :qp0 LIMIT 1',
             ],
             'values and expressions' => [
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) SELECT `email`, `ts`'
@@ -137,7 +137,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             . 'SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['query without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `status`)'
-            . ' SELECT `email`, 2 AS `status` FROM `customer` WHERE `name`=:qp0 LIMIT 1'
+            . ' SELECT `email`, 2 AS `status` FROM `customer` WHERE `name` = :qp0 LIMIT 1'
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['query, values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, [[ts]])'
