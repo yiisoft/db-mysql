@@ -33,7 +33,7 @@
 - New #379: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)
 - Chg #382: Remove `yiisoft/json` dependency (@Tigrov)
-- Enh #384: Refactor according changes in `db` package (@Tigrov)
+- Enh #384, #413: Refactor according changes in `db` package (@Tigrov)
 - New #383: Add `caseSensitive` option to like condition (@vjik)
 - Enh #386: Remove `getCacheKey()` and `getCacheTag()` methods from `Schema` class (@Tigrov)
 - Bug #388: Set empty `comment` and `extra` properties to `null` when loading table columns (@Tigrov)
