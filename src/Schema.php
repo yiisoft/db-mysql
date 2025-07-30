@@ -474,10 +474,10 @@ final class Schema extends AbstractPdoSchema
         ORDER BY `position` ASC
         SQL;
 
-        $resolvedName = $this->resolveTableName($tableName);
+        $nameParts = $this->db->getQuoter()->getTableNameParts($tableName);
         $constraints = $this->db->createCommand($sql, [
-            ':schemaName' => $resolvedName->getSchemaName(),
-            ':tableName' => $resolvedName->getName(),
+            ':schemaName' => $nameParts['schemaName'] ?? null,
+            ':tableName' => $nameParts['name'],
         ])->queryAll();
 
         $constraints = array_map(array_change_key_case(...), $constraints);
@@ -557,10 +557,10 @@ final class Schema extends AbstractPdoSchema
         ORDER BY `s`.`SEQ_IN_INDEX` ASC
         SQL;
 
-        $resolvedName = $this->resolveTableName($tableName);
+        $nameParts = $this->db->getQuoter()->getTableNameParts($tableName);
         $indexes = $this->db->createCommand($sql, [
-            ':schemaName' => $resolvedName->getSchemaName(),
-            ':tableName' => $resolvedName->getName(),
+            ':schemaName' => $nameParts['schemaName'] ?? null,
+            ':tableName' => $nameParts['name'],
         ])->queryAll();
 
         $indexes = array_map(array_change_key_case(...), $indexes);
@@ -616,12 +616,12 @@ final class Schema extends AbstractPdoSchema
     {
         $resolvedName = new TableSchema();
 
-        $parts = array_reverse($this->db->getQuoter()->getTableNameParts($name));
-        $resolvedName->name($parts[0] ?? '');
-        $resolvedName->schemaName($parts[1] ?? $this->defaultSchema);
+        $parts = $this->db->getQuoter()->getTableNameParts($name);
+        $resolvedName->name($parts['name']);
+        $resolvedName->schemaName($parts['schemaName'] ?? $this->defaultSchema);
         $resolvedName->fullName(
             $resolvedName->getSchemaName() !== $this->defaultSchema ?
-            implode('.', array_reverse($parts)) : $resolvedName->getName()
+            implode('.', $parts) : $resolvedName->getName()
         );
 
         return $resolvedName;
