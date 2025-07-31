@@ -4,37 +4,31 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use PHPUnit\Framework\Attributes\DataProviderExternal;
+use Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\AbstractQuoterTest;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class QuoterTest extends AbstractQuoterTest
 {
     use TestTrait;
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider::tableNameParts
-     */
-    public function testGetTableNameParts(string $tableName, string ...$expected): void
+    #[DataProviderExternal(QuoterProvider::class, 'tableNameParts')]
+    public function testGetTableNameParts(string $tableName, array $expected): void
     {
-        parent::testGetTableNameParts($tableName, ...$expected);
+        parent::testGetTableNameParts($tableName, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider::columnNames
-     */
+    #[DataProviderExternal(QuoterProvider::class, 'columnNames')]
     public function testQuoteColumnName(string $columnName, string $expected): void
     {
         parent::testQuoteColumnName($columnName, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider::simpleColumnNames
-     */
+    #[DataProviderExternal(QuoterProvider::class, 'simpleColumnNames')]
     public function testQuoteSimpleColumnName(
         string $columnName,
         string $expectedQuotedColumnName,
@@ -43,9 +37,7 @@ final class QuoterTest extends AbstractQuoterTest
         parent::testQuoteSimpleColumnName($columnName, $expectedQuotedColumnName, $expectedUnQuotedColumnName);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider::simpleTableNames
-     */
+    #[DataProviderExternal(QuoterProvider::class, 'simpleTableNames')]
     public function testQuoteTableName(string $tableName, string $expected): void
     {
         parent::testQuoteTableName($tableName, $expected);

@@ -51,14 +51,14 @@ final class QuoterProvider extends \Yiisoft\Db\Tests\Provider\QuoterProvider
     public static function tableNameParts(): array
     {
         return [
-            ['', ''],
-            ['[]', '[]'],
-            ['animal', 'animal'],
-            ['dbo.animal', 'animal', 'dbo'],
-            ['[dbo].[animal]', '[animal]', '[dbo]'],
-            ['[other].[animal2]', '[animal2]', '[other]'],
-            ['other.[animal2]', '[animal2]', 'other'],
-            ['other.animal2', 'animal2', 'other'],
+            ['', ['name' => '']],
+            ['``', ['name' => '']],
+            ['animal', ['name' => 'animal']],
+            ['`animal`', ['name' => 'animal']],
+            ['dbo.animal', ['schemaName' => 'dbo', 'name' => 'animal']],
+            ['`dbo`.`animal`', ['schemaName' => 'dbo', 'name' => 'animal']],
+            ['`dbo`.animal', ['schemaName' => 'dbo', 'name' => 'animal']],
+            ['dbo.`animal`', ['schemaName' => 'dbo', 'name' => 'animal']],
         ];
     }
 }
