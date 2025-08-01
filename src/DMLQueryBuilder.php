@@ -10,6 +10,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
+use Yiisoft\Db\Schema\TableSchema;
 
 use function array_combine;
 use function array_diff;

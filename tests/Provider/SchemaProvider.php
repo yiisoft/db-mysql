@@ -254,8 +254,9 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
         $constraints = parent::constraints();
 
         $constraints['1: check'][2] = false;
-        Assert::setPropertyValue($constraints['2: primary key'][2], 'name', '');
-        Assert::setPropertyValue($constraints['2: index'][2][0], 'name', '');
+        Assert::setPropertyValue($constraints['2: primary key'][2], 'name', 'PRIMARY');
+        Assert::setPropertyValue($constraints['2: unique'][2][0], 'name', 'PRIMARY');
+        Assert::setPropertyValue($constraints['2: index'][2][0], 'name', 'PRIMARY');
         $constraints['2: check'][2] = false;
         $constraints['3: check'][2] = false;
         $constraints['4: check'][2] = false;
