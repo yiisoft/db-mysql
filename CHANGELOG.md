@@ -47,6 +47,7 @@
 - Enh #403: Refactor `DMLQueryBuilder::upsert()`, allow use `EXCLUDED` table alias to access inserted values (@Tigrov)
 - Enh #405: Provide `yiisoft/db-implementation` virtual package (@vjik)
 - Enh #407, #408, #411: Adapt to conditions refactoring in `yiisoft/db` package (@vjik)
+- Enh #414: Remove `TableSchema` class and refactor `Schema` class (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

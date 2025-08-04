@@ -7,13 +7,10 @@ namespace Yiisoft\Db\Mysql\Tests;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
-use Throwable;
 use Yiisoft\Db\Command\CommandInterface;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constraint\Index;
 use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
@@ -22,7 +19,6 @@ use Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
-use Yiisoft\Db\Schema\SchemaInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
@@ -37,11 +33,7 @@ final class SchemaTest extends CommonSchemaTest
 {
     use TestTrait;
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columns
-     *
-     * @throws Exception
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'columns')]
     public function testColumns(array $columns, string $tableName): void
     {
         $db = $this->getConnection();
@@ -76,19 +68,12 @@ final class SchemaTest extends CommonSchemaTest
         parent::testColumns($columns, $tableName);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::columnsTypeBit
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'columnsTypeBit')]
     public function testColumnWithTypeBit(array $columns): void
     {
         $this->assertTableColumns($columns, 'type_bit');
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testDefaultValueDatetimeColumn(): void
     {
         $tableName = '{{%datetime_test}}';
@@ -141,11 +126,6 @@ final class SchemaTest extends CommonSchemaTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testDefaultValueDatetimeColumnWithMicrosecs(): void
     {
         $db = $this->getConnection();
@@ -202,9 +182,6 @@ final class SchemaTest extends CommonSchemaTest
         parent::testGetSchemaDefaultValues();
     }
 
-    /**
-     * @throws NotSupportedException
-     */
     public function testGetSchemaNames(): void
     {
         $db = $this->getConnection();
@@ -226,9 +203,6 @@ final class SchemaTest extends CommonSchemaTest
         parent::testGetTableChecks();
     }
 
-    /**
-     * @throws NotSupportedException
-     */
     public function testGetTableNamesWithSchema(): void
     {
         $db = $this->getConnection(true);
@@ -295,39 +269,25 @@ final class SchemaTest extends CommonSchemaTest
         $db->close();
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraints(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraints($tableName, $type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraintsWithPdoLowercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoLowercase($tableName, $type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::constraints
-     *
-     * @throws Exception
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'constraints')]
     public function testTableSchemaConstraintsWithPdoUppercase(string $tableName, string $type, mixed $expected): void
     {
         parent::testTableSchemaConstraintsWithPdoUppercase($tableName, $type, $expected);
     }
 
-    /**
-     * @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider::tableSchemaWithDbSchemes
-     */
+    #[DataProviderExternal(SchemaProvider::class, 'tableSchemaWithDbSchemes')]
     public function testTableSchemaWithDbSchemes(
         string $tableName,
         string $expectedTableName,
@@ -355,7 +315,7 @@ final class SchemaTest extends CommonSchemaTest
             ->willReturn($commandMock);
 
         $schema = new Schema($mockDb, DbHelper::getSchemaCache());
-        $schema->getTablePrimaryKey($tableName);
+        $schema->getTablePrimaryKey($tableName, true);
 
         $db->close();
     }
@@ -392,7 +352,7 @@ final class SchemaTest extends CommonSchemaTest
         $db->createCommand()->addPrimaryKey($tableName, $constraintName, $columnName)->execute();
 
         $this->assertEquals(
-            new Index('', [$columnName], true, true),
+            new Index('PRIMARY', [$columnName], true, true),
             $db->getSchema()->getTablePrimaryKey($tableName),
         );
 
@@ -405,33 +365,6 @@ final class SchemaTest extends CommonSchemaTest
         $this->dropTableForIndexAndConstraintTests($db, $tableName);
 
         $db->close();
-    }
-
-    public function withIndexDataProvider(): array
-    {
-        return [
-            ...parent::withIndexDataProvider(),
-            [
-                'indexType' => null,
-                'indexMethod' => SchemaInterface::INDEX_HASH,
-                'columnType' => 'varchar(16)',
-            ],
-            [
-                'indexType' => null,
-                'indexMethod' => SchemaInterface::INDEX_BTREE,
-                'columnType' => 'varchar(16)',
-            ],
-            [
-                'indexType' => SchemaInterface::INDEX_FULLTEXT,
-                'indexMethod' => null,
-                'columnType' => 'varchar(16)',
-            ],
-            [
-                'indexType' => SchemaInterface::INDEX_SPATIAL,
-                'indexMethod' => null,
-                'columnType' => 'GEOMETRY NOT NULL',
-            ],
-        ];
     }
 
     public function testTinyInt1()
