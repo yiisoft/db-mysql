@@ -75,8 +75,8 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     ),
                     'char_col2' => new StringColumn(
                         dbType: 'varchar',
-                        characterSet: 'utf8mb3',
-                        collation: 'utf8mb3_bin',
+                        characterSet: 'utf8mb4',
+                        collation: 'utf8mb4_unicode_ci',
                         size: 100,
                         defaultValue: 'something',
                     ),
