@@ -187,7 +187,7 @@ CREATE TABLE `animal` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `default_pk` (
   `id` INT NOT NULL DEFAULT 5,
@@ -371,7 +371,7 @@ CREATE TABLE `T_constraints_1`
     `C_default` INT NOT NULL DEFAULT 0,
     CONSTRAINT `CN_unique` UNIQUE (`C_unique`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4' COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `T_constraints_2`
 (
