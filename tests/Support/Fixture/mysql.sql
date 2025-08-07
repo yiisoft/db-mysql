@@ -172,7 +172,7 @@ CREATE TABLE `type` (
   `mediumblob_col` mediumblob,
   `mediumtext_col` mediumtext,
   `json_col` json
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `type_bit` (
   `bit_col_1` BIT(1) NOT NULL DEFAULT b'0',
