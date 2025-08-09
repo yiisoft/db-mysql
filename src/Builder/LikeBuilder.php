@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Builder;
 
+use Yiisoft\Db\QueryBuilder\Condition\AbstractLike;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
 
 /**
@@ -11,7 +12,7 @@ use Yiisoft\Db\QueryBuilder\Condition\Like;
  */
 final class LikeBuilder extends \Yiisoft\Db\QueryBuilder\Condition\Builder\LikeBuilder
 {
-    protected function prepareColumn(Like $condition, array &$params): string
+    protected function prepareColumn(AbstractLike $condition, array &$params): string
     {
         $column = parent::prepareColumn($condition, $params);
 
