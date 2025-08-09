@@ -9,6 +9,8 @@ use Yiisoft\Db\Mysql\Driver;
 use Yiisoft\Db\Mysql\Dsn;
 use Yiisoft\Db\Tests\Support\DbHelper;
 
+use function str_replace;
+
 trait TestTrait
 {
     private string $dsn = '';
@@ -62,6 +64,11 @@ trait TestTrait
     protected static function getDriverName(): string
     {
         return 'mysql';
+    }
+
+    protected static function replaceQuotes(string $sql): string
+    {
+        return str_replace(['[[', ']]'], '`', $sql);
     }
 
     protected function setDsn(string $dsn): void
