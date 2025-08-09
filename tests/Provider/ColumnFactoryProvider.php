@@ -7,13 +7,14 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\DateTimeColumn;
+use Yiisoft\Db\Mysql\Column\StringColumn;
+use Yiisoft\Db\Schema\Column\ArrayColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
-use Yiisoft\Db\Schema\Column\StringColumn;
 
 final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFactoryProvider
 {
@@ -57,6 +58,12 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
     {
         $definitions = parent::definitions();
 
+        $definitions[''][1] = new StringColumn(dbType: '');
+        $definitions['text'][1] = new StringColumn(ColumnType::TEXT, dbType: 'text');
+        $definitions['text NOT NULL'][1] = new StringColumn(ColumnType::TEXT, dbType: 'text', notNull: true);
+        $definitions['char(1)'][1] = new StringColumn(ColumnType::CHAR, dbType: 'char', size: 1);
+        $definitions['string(126)[][]'][1] = new ArrayColumn(size: 126, dimension: 2, column: new StringColumn(size: 126));
+
         $definitions[] = ['bit(1)', new BooleanColumn(dbType: 'bit', size: 1)];
 
         return $definitions;
@@ -79,5 +86,14 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             [ColumnType::TIMESTAMP, 'current_timestamp(3)', new Expression('CURRENT_TIMESTAMP(3)')],
             [ColumnType::INTEGER, '(1 + 2)', new Expression('(1 + 2)')],
         ];
+    }
+
+    public static function pseudoTypes(): array
+    {
+        $pseudoTypes = parent::pseudoTypes();
+        $pseudoTypes['uuid_pk'][1] = new StringColumn(ColumnType::UUID, primaryKey: true, autoIncrement: true);
+        $pseudoTypes['uuid_pk_seq'][1] = new StringColumn(ColumnType::UUID, primaryKey: true, autoIncrement: true);
+
+        return $pseudoTypes;
     }
 }

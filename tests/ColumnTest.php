@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
+use Yiisoft\Db\Mysql\Column\StringColumn;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -19,7 +20,6 @@ use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
-use Yiisoft\Db\Schema\Column\StringColumn;
 use Yiisoft\Db\Tests\Common\CommonColumnTest;
 
 use function iterator_to_array;
@@ -260,5 +260,14 @@ final class ColumnTest extends CommonColumnTest
     public function testPhpTypecastColumns(ColumnInterface $column, array $values)
     {
         parent::testPhpTypecastColumns($column, $values);
+    }
+
+    public function testStringColumnCharacterSet(): void
+    {
+        $stringCol = new StringColumn();
+
+        $this->assertNull($stringCol->getCharacterSet());
+        $this->assertSame($stringCol, $stringCol->characterSet('utf8mb4_bin'));
+        $this->assertSame('utf8mb4_bin', $stringCol->getCharacterSet());
     }
 }

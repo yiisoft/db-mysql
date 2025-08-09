@@ -155,7 +155,7 @@ CREATE TABLE `type` (
   `smallint_col` smallint(1) DEFAULT '1',
   `mediumint_col` mediumint,
   `char_col` char(100) NOT NULL,
-  `char_col2` varchar(100) DEFAULT 'something',
+  `char_col2` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'something',
   `char_col3` text,
   `enum_col` enum('a', 'B', 'c,D'),
   `float_col` double(4,3) NOT NULL,
@@ -172,7 +172,7 @@ CREATE TABLE `type` (
   `mediumblob_col` mediumblob,
   `mediumtext_col` mediumtext,
   `json_col` json
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `type_bit` (
   `bit_col_1` BIT(1) NOT NULL DEFAULT b'0',
@@ -187,7 +187,7 @@ CREATE TABLE `animal` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `default_pk` (
   `id` INT NOT NULL DEFAULT 5,
@@ -371,7 +371,7 @@ CREATE TABLE `T_constraints_1`
     `C_default` INT NOT NULL DEFAULT 0,
     CONSTRAINT `CN_unique` UNIQUE (`C_unique`)
 )
-ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4';
+ENGINE = 'InnoDB' DEFAULT CHARSET = 'utf8mb4' COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `T_constraints_2`
 (
