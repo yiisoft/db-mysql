@@ -9,10 +9,13 @@ use DateTimeImmutable;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\DateTimeColumn;
+use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Tests\Support\Stringable;
 
 final class ColumnProvider extends \Yiisoft\Db\Tests\Provider\ColumnProvider
 {
+    use TestTrait;
+
     public static function predefinedTypes(): array
     {
         $values = parent::predefinedTypes();
