@@ -10,6 +10,7 @@ use Yiisoft\Db\Mysql\Builder\LikeBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
+use Yiisoft\Db\QueryBuilder\Condition\NotLike;
 
 use function ctype_digit;
 
@@ -76,6 +77,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             ...parent::defaultExpressionBuilders(),
             JsonOverlaps::class => JsonOverlapsBuilder::class,
             Like::class => LikeBuilder::class,
+            NotLike::class => LikeBuilder::class,
         ];
     }
 }
