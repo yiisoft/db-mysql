@@ -245,7 +245,7 @@ final class ColumnTest extends CommonColumnTest
     }
 
     #[DataProviderExternal(ColumnProvider::class, 'predefinedTypes')]
-    public function testPredefinedType(string $className, string $type)
+    public function testPredefinedType(string $className, string $type, string $phpType)
     {
         parent::testPredefinedType($className, $type);
     }
