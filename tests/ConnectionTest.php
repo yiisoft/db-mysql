@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
-use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\IntegrityException;
-use Yiisoft\Db\Exception\InvalidConfigException;
-use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Connection;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -20,17 +17,11 @@ use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class ConnectionTest extends CommonConnectionTest
 {
     use TestTrait;
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testInitConnection(): void
     {
         $db = $this->getConnection();
@@ -47,10 +38,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     */
     public function testSettingDefaultAttributes(): void
     {
         $db = $this->getConnection();
@@ -72,12 +59,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws NotSupportedException
-     * @throws Throwable
-     */
     public function testTransactionIsolation(): void
     {
         $db = $this->getConnection(true);
@@ -100,11 +81,6 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testTransactionShortcutCustom(): void
     {
         $db = $this->getConnection(true);
@@ -158,6 +134,15 @@ final class ConnectionTest extends CommonConnectionTest
         $this->expectExceptionMessageMatches('/SQLSTATE\[HY000\]: General error: (?:2006|4031) /');
 
         $db->createCommand('SELECT 1')->queryScalar();
+
+        $db->close();
+    }
+
+    public function getColumnBuilderClass(): void
+    {
+        $db = $this->getConnection();
+
+        $this->assertSame(ColumnBuilder::class, $db->getColumnBuilderClass());
 
         $db->close();
     }

@@ -32,8 +32,6 @@ final class ColumnTest extends CommonColumnTest
 {
     use TestTrait;
 
-    protected const COLUMN_BUILDER = ColumnBuilder::class;
-
     protected function insertTypeValues(ConnectionInterface $db): void
     {
         $db->createCommand()->insert(
