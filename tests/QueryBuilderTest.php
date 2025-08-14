@@ -822,7 +822,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             "'[1,2,3]'",
             [5, 6, 7],
             $stringParam,
-            static::getDb()->select(new ArrayExpression([9, 10])),
+            self::getDb()->select(new ArrayExpression([9, 10])),
         ))->type($type);
         $params = [];
 
