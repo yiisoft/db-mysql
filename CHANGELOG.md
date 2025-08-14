@@ -49,6 +49,7 @@
 - Enh #407, #408, #411: Adapt to conditions refactoring in `yiisoft/db` package (@vjik)
 - Enh #414: Remove `TableSchema` class and refactor `Schema` class (@Tigrov)
 - Enh #415: Support column's collation (@Tigrov)
+- New #421: Add `Connection::getColumnBuilderClass()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
