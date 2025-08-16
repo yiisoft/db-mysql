@@ -5,8 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql;
 
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\Function\ArrayMerge;
+use Yiisoft\Db\Expression\Function\Longest;
+use Yiisoft\Db\Expression\Function\Shortest;
+use Yiisoft\Db\Mysql\Builder\ArrayMergeBuilder;
 use Yiisoft\Db\Mysql\Builder\JsonOverlapsBuilder;
 use Yiisoft\Db\Mysql\Builder\LikeBuilder;
+use Yiisoft\Db\Mysql\Builder\LongestBuilder;
+use Yiisoft\Db\Mysql\Builder\ShortestBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
@@ -78,6 +84,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             JsonOverlaps::class => JsonOverlapsBuilder::class,
             Like::class => LikeBuilder::class,
             NotLike::class => LikeBuilder::class,
+            ArrayMerge::class => ArrayMergeBuilder::class,
+            Longest::class => LongestBuilder::class,
+            Shortest::class => ShortestBuilder::class,
         ];
     }
 }
