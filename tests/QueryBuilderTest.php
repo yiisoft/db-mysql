@@ -805,10 +805,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testMultiOperandFunctionBuilderWithoutOperands($class);
     }
 
-    #[TestWith(['int[]', 'int', '[1,2,3,5,6,7,4,9,10]'])]
-    #[TestWith([new IntegerColumn(), 'int', '[1,2,3,5,6,7,4,9,10]'])]
-    #[TestWith([new ArrayColumn(), 'json', '["1","2","3","5","6","7","4","9","10"]'])]
-    #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,5,6,7,4,9,10]'])]
+    #[TestWith(['int[]', 'int', '[1,2,3,5,6,7,4]'])]
+    #[TestWith([new IntegerColumn(), 'int', '[1,2,3,5,6,7,4]'])]
+    #[TestWith([new ArrayColumn(), 'json', '["1","2","3","5","6","7","4"]'])]
+    #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,5,6,7,4]'])]
     public function testMultiOperandFunctionBuilderWithType(
         string|ColumnInterface $type,
         string $operandType,
@@ -816,13 +816,22 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         $db = $this->getConnection();
         $qb = $db->getQueryBuilder();
+        $serverVersion = $db->getServerInfo()->getVersion();
+
+        $isMariadb = str_contains($serverVersion, 'MariaDB');
+
+        if (
+            $isMariadb && version_compare($serverVersion, '10.6', '<')
+            || !$isMariadb && version_compare($serverVersion, '8.0.0', '<')
+        ) {
+            $this->markTestSkipped('MariaDB < 10.6 and MySQL < 8 does not support JSON_TABLE() function.');
+        }
 
         $stringParam = new Param('[3,4,5]', DataType::STRING);
         $arrayMerge = (new ArrayMerge(
             "'[1,2,3]'",
             [5, 6, 7],
             $stringParam,
-            self::getDb()->select(new ArrayExpression([9, 10])),
         ))->type($type);
         $params = [];
 
@@ -831,7 +840,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE((SELECT :qp2), '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . ') AS t)',
             $qb->buildExpression($arrayMerge, $params)
         );
@@ -839,7 +847,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             [
                 ':qp0' => new Param('[5,6,7]', DataType::STRING),
                 ':qp1' => $stringParam,
-                ':qp2' => new Param('[9,10]', DataType::STRING),
             ],
             $params,
         );

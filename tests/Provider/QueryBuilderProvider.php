@@ -15,6 +15,8 @@ use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 use function array_replace;
+use function str_contains;
+use function version_compare;
 
 final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilderProvider
 {
