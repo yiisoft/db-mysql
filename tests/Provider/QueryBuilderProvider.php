@@ -329,9 +329,11 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $serverVersion = $db->getServerInfo()->getVersion();
         $db->close();
 
+        $isMariadb = str_contains($serverVersion, 'MariaDB');
+
         if (
-            self::isMariadb() && version_compare($serverVersion, '10.6', '<')
-            || !self::isMariadb() && version_compare($serverVersion, '8.0.0', '<')
+            $isMariadb && version_compare($serverVersion, '10.6', '<')
+            || !$isMariadb && version_compare($serverVersion, '8.0.0', '<')
         ) {
             // MariaDB < 10.6 and MySQL < 8 does not support JSON_TABLE() function.
             return $data;
@@ -353,7 +355,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             [':qp0' => $stringParam],
         ];
 
-        if (self::isMariadb()) {
+        if ($isMariadb) {
             // MySQL does not support query parameters in JSON_TABLE() function.
             $data['ArrayMerge with 4 operands'] = [
                 ArrayMerge::class,
