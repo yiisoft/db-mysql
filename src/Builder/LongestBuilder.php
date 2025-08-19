@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Builder;
 
 use Yiisoft\Db\Expression\Function\Builder\MultiOperandFunctionBuilder;
-use Yiisoft\Db\Expression\Function\Greatest;
 use Yiisoft\Db\Expression\Function\Longest;
 use Yiisoft\Db\Expression\Function\MultiOperandFunction;
 
