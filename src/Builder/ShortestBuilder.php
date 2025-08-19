@@ -11,13 +11,13 @@ use Yiisoft\Db\Expression\Function\Shortest;
 /**
  * Builds SQL representation of function expressions which return the shortest string from a set of operands.
  *
- * @see Shortest
- *
  * ```SQL
  * (SELECT operand1 AS value
  * UNION SELECT operand2 AS value
  * ORDER BY LENGTH(value) ASC LIMIT 1)
  * ```
+ *
+ * @extends MultiOperandFunctionBuilder<Shortest>
  */
 final class ShortestBuilder extends MultiOperandFunctionBuilder
 {

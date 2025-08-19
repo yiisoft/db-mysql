@@ -24,6 +24,8 @@ use function rtrim;
  *     SELECT value FROM JSON_TABLE(operand2, '$[*]' COLUMNS(value json PATH '$')) AS t
  * ) t)
  * ```
+ *
+ * @extends MultiOperandFunctionBuilder<ArrayMerge>
  */
 final class ArrayMergeBuilder extends MultiOperandFunctionBuilder
 {
