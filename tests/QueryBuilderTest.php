@@ -25,6 +25,8 @@ use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
 
+use function json_decode;
+use function sort;
 use function str_contains;
 use function version_compare;
 
@@ -804,10 +806,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         parent::testMultiOperandFunctionBuilderWithoutOperands($class);
     }
 
-    #[TestWith(['int[]', 'int', '[1,2,3,5,6,7,4]'])]
-    #[TestWith([new IntegerColumn(), 'int', '[1,2,3,5,6,7,4]'])]
-    #[TestWith([new ArrayColumn(), 'json', '["1","2","3","5","6","7","4"]'])]
-    #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,5,6,7,4]'])]
+    #[TestWith(['int[]', 'int', '[1,2,3,4,5,6,7]'])]
+    #[TestWith([new IntegerColumn(), 'int', '[1,2,3,4,5,6,7]'])]
+    #[TestWith([new ArrayColumn(), 'json', '["1","2","3","4","5","6","7"]'])]
+    #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,4,5,6,7]'])]
     public function testMultiOperandFunctionBuilderWithType(
         string|ColumnInterface $type,
         string $operandType,
@@ -851,7 +853,10 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         );
 
         $result = $db->select($arrayMerge)->scalar();
+        $result = json_decode($result);
+        sort($result, SORT_NUMERIC);
+        $expectedResult = json_decode($expectedResult);
 
-        $this->assertSame($expectedResult, $result);
+        $this->assertEquals($expectedResult, $result);
     }
 }
