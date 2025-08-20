@@ -564,12 +564,13 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testUpdate(
         string $table,
         array $columns,
-        array|string $condition,
+        array|ExpressionInterface|string $condition,
+        array|ExpressionInterface|string|null $from,
         array $params,
         string $expectedSql,
         array $expectedParams,
     ): void {
-        parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
+        parent::testUpdate($table, $columns, $condition, $from, $params, $expectedSql, $expectedParams);
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]
