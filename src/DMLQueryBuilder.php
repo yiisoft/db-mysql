@@ -62,6 +62,19 @@ PREPARE autoincrement_stmt FROM @sql;
 EXECUTE autoincrement_stmt";
     }
 
+    public function update(
+        string $table,
+        array $columns,
+        array|string|ExpressionInterface $condition,
+        array|string|ExpressionInterface|null $from = null,
+        array &$params = []
+    ): string {
+        /**
+         * MySQL does not support UPDATE ... FROM ...
+         */
+        return parent::update($table, $columns, $condition, null, $params);
+    }
+
     public function upsert(
         string $table,
         array|QueryInterface $insertColumns,

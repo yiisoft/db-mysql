@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
 use Yiisoft\Db\Constant\ColumnType;
+use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
 use Yiisoft\Db\Expression\Expression;
+use Yiisoft\Db\Expression\Param;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
@@ -117,6 +119,343 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $upsert;
     }
 
+    public static function update(): array
+    {
+        return [
+            [
+                '{{table}}',
+                ['name' => '{{test}}'],
+                [],
+                null,
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{test}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{test}}'],
+                ['id' => 1],
+                null,
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0 WHERE [[id]] = 1
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{test}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}.{{name}}'],
+                [],
+                'tmp',
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}.{{name}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}.{{name}}'],
+                [],
+                ['tmp'],
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}.{{name}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}.{{name}}'],
+                ['id' => 1],
+                'tmp',
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0 WHERE [[id]] = 1
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}.{{name}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}.{{name}}'],
+                [],
+                new Expression('SELECT [[name]] FROM [[tmp]] WHERE [[id]] = 1'),
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}.{{name}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}.{{name}}'],
+                [],
+                [static::getDb()->select('name')->from('tmp')->where(['id' => 1])],
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}.{{name}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['name' => '{{tmp}}'],
+                [],
+                ['tmp' => static::getDb()->select('name')->from('tmp')->where(['id' => 1])],
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                ),
+                [
+                    ':qp0' => '{{tmp}}',
+                ],
+            ],
+            [
+                '{{table}}',
+                ['{{table}}.name' => '{{test}}'],
+                ['id' => 1],
+                null,
+                ['id' => 'boolean'],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp1 WHERE [[id]] = 1
+                    SQL
+                ),
+                [
+                    'id' => 'boolean',
+                    ':qp1' => '{{test}}',
+                ],
+            ],
+            [
+                'customer',
+                ['status' => 1, 'updated_at' => new Expression('now()')],
+                ['id' => 100],
+                null,
+                [],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[customer]] SET [[status]]=:qp0, [[updated_at]]=now() WHERE [[id]] = 100
+                    SQL
+                ),
+                [':qp0' => 1],
+            ],
+            'Expressions without params' => [
+                '{{product}}',
+                ['name' => new Expression('UPPER([[name]])')],
+                '[[name]] = :name',
+                null,
+                ['name' => new Expression('LOWER([[name]])')],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=UPPER([[name]]) WHERE [[name]] = LOWER([[name]])
+                    SQL
+                ),
+                [],
+            ],
+            'Expression with params and without params' => [
+                '{{product}}',
+                ['price' => new Expression('[[price]] + :val', [':val' => 1])],
+                '[[start_at]] < :date',
+                null,
+                ['date' => new Expression('NOW()')],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[price]]=[[price]] + :val WHERE [[start_at]] < NOW()
+                    SQL
+                ),
+                [':val' => 1],
+            ],
+            'Expression without params and with params' => [
+                '{{product}}',
+                ['name' => new Expression('UPPER([[name]])')],
+                '[[name]] = :name',
+                null,
+                ['name' => new Expression('LOWER(:val)', [':val' => 'Apple'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=UPPER([[name]]) WHERE [[name]] = LOWER(:val)
+                    SQL
+                ),
+                [':val' => 'Apple'],
+            ],
+            'Expressions with the same params' => [
+                '{{product}}',
+                ['name' => new Expression('LOWER(:val)', ['val' => 'Apple'])],
+                '[[name]] != :name',
+                null,
+                ['name' => new Expression('UPPER(:val)', ['val' => 'Banana'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val_0)
+                    SQL
+                ),
+                [
+                    'val' => 'Apple',
+                    'val_0' => 'Banana',
+                ],
+            ],
+            'Expressions with the same params starting with and without colon' => [
+                '{{product}}',
+                ['name' => new Expression('LOWER(:val)', [':val' => 'Apple'])],
+                '[[name]] != :name',
+                null,
+                ['name' => new Expression('UPPER(:val)', ['val' => 'Banana'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val_0)
+                    SQL
+                ),
+                [
+                    ':val' => 'Apple',
+                    'val_0' => 'Banana',
+                ],
+            ],
+            'Expressions with the same and different params' => [
+                '{{product}}',
+                ['price' => new Expression('[[price]] * :val + :val1', ['val' => 1.2, 'val1' => 2])],
+                '[[name]] IN :values',
+                null,
+                ['values' => new Expression('(:val, :val2)', ['val' => 'Banana', 'val2' => 'Cherry'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[price]]=[[price]] * :val + :val1 WHERE [[name]] IN (:val_0, :val2)
+                    SQL
+                ),
+                [
+                    'val' => 1.2,
+                    'val1' => 2,
+                    'val_0' => 'Banana',
+                    'val2' => 'Cherry',
+                ],
+            ],
+            'Expressions with the different params' => [
+                '{{product}}',
+                ['name' => new Expression('LOWER(:val)', ['val' => 'Apple'])],
+                '[[name]] != :name',
+                null,
+                ['name' => new Expression('UPPER(:val1)', ['val1' => 'Banana'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val1)
+                    SQL
+                ),
+                [
+                    'val' => 'Apple',
+                    'val1' => 'Banana',
+                ],
+            ],
+            'Expressions with nested Expressions' => [
+                '{{table}}',
+                [
+                    'name' => new Expression(
+                        ':val || :val_0',
+                        [
+                            'val' => new Expression('LOWER(:val || :val_0)', ['val' => 'A', 'val_0' => 'B']),
+                            'val_0' => new Param('C', DataType::STRING),
+                        ],
+                    ),
+                ],
+                '[[name]] != :val || :val_0',
+                null,
+                [
+                    'val_0' => new Param('F', DataType::STRING),
+                    'val' => new Expression('UPPER(:val || :val_0)', ['val' => 'D', 'val_0' => 'E']),
+                ],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[table]] SET [[name]]=LOWER(:val_2 || :val_0_1) || :val_0_0 WHERE [[name]] != UPPER(:val_1 || :val_0_2) || :val_0
+                    SQL
+                ),
+                [
+                    'val_2' => 'A',
+                    'val_0_1' => 'B',
+                    'val_0_0' => new Param('C', DataType::STRING),
+                    'val_1' => 'D',
+                    'val_0_2' => 'E',
+                    'val_0' => new Param('F', DataType::STRING),
+                ],
+            ],
+            'Expressions with indexed params' => [
+                '{{product}}',
+                ['name' => new Expression('LOWER(?)', ['Apple'])],
+                '[[name]] != ?',
+                null,
+                ['Banana'],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[name]]=LOWER(?) WHERE [[name]] != ?
+                    SQL
+                ),
+                // Wrong order of params
+                ['Banana', 'Apple'],
+            ],
+            'Expressions with a string value containing a placeholder name' => [
+                '{{product}}',
+                ['price' => 10],
+                ':val',
+                null,
+                [':val' => new Expression("label=':val' AND name=:val", [':val' => 'Apple'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[price]]=:qp1 WHERE label=':val' AND name=:val_0
+                    SQL
+                ),
+                [
+                    ':qp1' => 10,
+                    ':val_0' => 'Apple',
+                ],
+            ],
+            'Expressions without placeholders in SQL statement' => [
+                '{{product}}',
+                ['price' => 10],
+                ':val',
+                null,
+                [':val' => new Expression("label=':val'", [':val' => 'Apple'])],
+                static::replaceQuotes(
+                    <<<SQL
+                    UPDATE [[product]] SET [[price]]=:qp1 WHERE label=':val'
+                    SQL
+                ),
+                [
+                    ':qp1' => 10,
+                    ':val_0' => 'Apple',
+                ],
+            ],
+        ];
+    }
+
     public static function upsertReturning(): array
     {
         $upsert = self::upsert();
@@ -195,7 +534,16 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['int_col', 'char_col', 'char_col2', 'char_col3'],
                 'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3);'
                 . 'SELECT :qp4 AS `int_col`, :qp5 AS `char_col`, :qp6 AS `char_col2`, :qp7 AS `char_col3`',
-                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true, ':qp4' => 3, ':qp5' => 'a', ':qp6' => 'something', ':qp7' => null],
+                [
+                    ':qp0' => 3,
+                    ':qp1' => 'a',
+                    ':qp2' => 1.2,
+                    ':qp3' => true,
+                    ':qp4' => 3,
+                    ':qp5' => 'a',
+                    ':qp6' => 'something',
+                    ':qp7' => null,
+                ],
             ],
             'no primary key but unique' => [
                 'without_pk',
@@ -282,8 +630,16 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             $values[PseudoType::UUID_PK_SEQ][0] = 'binary(16) PRIMARY KEY';
             $values['uuidPrimaryKey()'][0] = 'binary(16) PRIMARY KEY';
             $values['defaultValue($expression)'] = ['int DEFAULT 3', ColumnBuilder::integer()->defaultValue(3)];
-            $values['timestamp(6)'] = ['timestamp(6) DEFAULT CURRENT_TIMESTAMP(6)', ColumnBuilder::timestamp(6)->defaultValue(new Expression('CURRENT_TIMESTAMP(6)'))];
-            $values['timestamp(null)'] = ['timestamp DEFAULT CURRENT_TIMESTAMP', ColumnBuilder::timestamp(null)->defaultValue(new Expression('CURRENT_TIMESTAMP'))];
+            $values['timestamp(6)'] = [
+                'timestamp(6) DEFAULT CURRENT_TIMESTAMP(6)',
+                ColumnBuilder::timestamp(6)->defaultValue(new Expression('CURRENT_TIMESTAMP(6)')),
+            ];
+            $values['timestamp(null)'] = [
+                'timestamp DEFAULT CURRENT_TIMESTAMP',
+                ColumnBuilder::timestamp(null)->defaultValue(
+                    new Expression('CURRENT_TIMESTAMP')
+                ),
+            ];
         }
 
         return $values;
