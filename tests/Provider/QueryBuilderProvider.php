@@ -132,7 +132,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [],
                 null,
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -147,7 +147,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id' => 1],
                 null,
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0 WHERE [[id]] = 1
                     SQL
@@ -162,7 +162,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [],
                 'tmp',
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -177,7 +177,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [],
                 ['tmp'],
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -192,7 +192,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id' => 1],
                 'tmp',
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0 WHERE [[id]] = 1
                     SQL
@@ -207,7 +207,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 [],
                 new Expression('SELECT [[name]] FROM [[tmp]] WHERE [[id]] = 1'),
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -220,9 +220,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '{{table}}',
                 ['name' => '{{tmp}}.{{name}}'],
                 [],
-                [static::getDb()->select('name')->from('tmp')->where(['id' => 1])],
+                [self::getDb()->select('name')->from('tmp')->where(['id' => 1])],
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -235,9 +235,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '{{table}}',
                 ['name' => '{{tmp}}'],
                 [],
-                ['tmp' => static::getDb()->select('name')->from('tmp')->where(['id' => 1])],
+                ['tmp' => self::getDb()->select('name')->from('tmp')->where(['id' => 1])],
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp0
                     SQL
@@ -252,7 +252,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id' => 1],
                 null,
                 ['id' => 'boolean'],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=:qp1 WHERE [[id]] = 1
                     SQL
@@ -268,7 +268,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ['id' => 100],
                 null,
                 [],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[customer]] SET [[status]]=:qp0, [[updated_at]]=now() WHERE [[id]] = 100
                     SQL
@@ -281,7 +281,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] = :name',
                 null,
                 ['name' => new Expression('LOWER([[name]])')],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=UPPER([[name]]) WHERE [[name]] = LOWER([[name]])
                     SQL
@@ -294,7 +294,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[start_at]] < :date',
                 null,
                 ['date' => new Expression('NOW()')],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[price]]=[[price]] + :val WHERE [[start_at]] < NOW()
                     SQL
@@ -307,7 +307,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] = :name',
                 null,
                 ['name' => new Expression('LOWER(:val)', [':val' => 'Apple'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=UPPER([[name]]) WHERE [[name]] = LOWER(:val)
                     SQL
@@ -320,7 +320,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] != :name',
                 null,
                 ['name' => new Expression('UPPER(:val)', ['val' => 'Banana'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val_0)
                     SQL
@@ -336,7 +336,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] != :name',
                 null,
                 ['name' => new Expression('UPPER(:val)', ['val' => 'Banana'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val_0)
                     SQL
@@ -352,7 +352,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] IN :values',
                 null,
                 ['values' => new Expression('(:val, :val2)', ['val' => 'Banana', 'val2' => 'Cherry'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[price]]=[[price]] * :val + :val1 WHERE [[name]] IN (:val_0, :val2)
                     SQL
@@ -370,7 +370,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] != :name',
                 null,
                 ['name' => new Expression('UPPER(:val1)', ['val1' => 'Banana'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=LOWER(:val) WHERE [[name]] != UPPER(:val1)
                     SQL
@@ -397,7 +397,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                     'val_0' => new Param('F', DataType::STRING),
                     'val' => new Expression('UPPER(:val || :val_0)', ['val' => 'D', 'val_0' => 'E']),
                 ],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[table]] SET [[name]]=LOWER(:val_2 || :val_0_1) || :val_0_0 WHERE [[name]] != UPPER(:val_1 || :val_0_2) || :val_0
                     SQL
@@ -417,7 +417,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 '[[name]] != ?',
                 null,
                 ['Banana'],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[name]]=LOWER(?) WHERE [[name]] != ?
                     SQL
@@ -431,7 +431,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ':val',
                 null,
                 [':val' => new Expression("label=':val' AND name=:val", [':val' => 'Apple'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[price]]=:qp1 WHERE label=':val' AND name=:val_0
                     SQL
@@ -447,7 +447,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 ':val',
                 null,
                 [':val' => new Expression("label=':val'", [':val' => 'Apple'])],
-                static::replaceQuotes(
+                self::replaceQuotes(
                     <<<SQL
                     UPDATE [[product]] SET [[price]]=:qp1 WHERE label=':val'
                     SQL
