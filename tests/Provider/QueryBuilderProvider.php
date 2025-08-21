@@ -63,7 +63,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
                     . ' SELECT `email`, `address`, `status`, `profile_id`'
                     . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
-                    . ' ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=:qp5, `orders`=T_upsert.orders + 1',
+                    . ' ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=2, `orders`=T_upsert.orders + 1',
             ],
             'regular values without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)',
@@ -76,7 +76,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             'query with update part' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
                     . ' FROM (SELECT `email`, 2 AS `status` FROM `customer` WHERE `name` = :qp0 LIMIT 1) AS EXCLUDED'
-                    . ' ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=:qp2, `orders`=T_upsert.orders + 1',
+                    . ' ON DUPLICATE KEY UPDATE `address`=:qp1, `status`=2, `orders`=T_upsert.orders + 1',
             ],
             'query without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `status`) SELECT `email`, 2 AS `status` FROM `customer`'
@@ -98,7 +98,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             'query, values and expressions with update part' => [
                 3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT `email`, [[ts]]'
                     . ' FROM (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) AS EXCLUDED'
-                    . ' ON DUPLICATE KEY UPDATE `ts`=:qp1, `orders`=T_upsert.orders + 1',
+                    . ' ON DUPLICATE KEY UPDATE `ts`=0, `orders`=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
