@@ -12,15 +12,21 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\CaseExpression;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Param;
 use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
+use Yiisoft\Db\Schema\Column\ArrayColumn;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
+use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
+use Yiisoft\Db\Tests\Support\Assert;
 
+use function json_decode;
+use function sort;
 use function str_contains;
 use function version_compare;
 
@@ -772,5 +778,86 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string|int $expectedResult,
     ): void {
         parent::testCaseExpressionBuilder($case, $expectedSql, $expectedParams, $expectedResult);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'lengthBuilder')]
+    public function testLengthBuilder(
+        string|ExpressionInterface $operand,
+        string $expectedSql,
+        int $expectedResult,
+        array $expectedParams = [],
+    ): void {
+        parent::testLengthBuilder($operand, $expectedSql, $expectedResult, $expectedParams);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'multiOperandFunctionBuilder')]
+    public function testMultiOperandFunctionBuilder(
+        string $class,
+        array $operands,
+        string $expectedSql,
+        array|string|int $expectedResult,
+        array $expectedParams = [],
+    ): void {
+        parent::testMultiOperandFunctionBuilder($class, $operands, $expectedSql, $expectedResult, $expectedParams);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'multiOperandFunctionClasses')]
+    public function testMultiOperandFunctionBuilderWithoutOperands(string $class): void
+    {
+        parent::testMultiOperandFunctionBuilderWithoutOperands($class);
+    }
+
+    #[TestWith(['int[]', 'int', '[1,2,3,4,5,6,7]'])]
+    #[TestWith([new IntegerColumn(), 'int', '[1,2,3,4,5,6,7]'])]
+    #[TestWith([new ArrayColumn(), 'json', '["1","2","3","4","5","6","7"]'])]
+    #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,4,5,6,7]'])]
+    public function testMultiOperandFunctionBuilderWithType(
+        string|ColumnInterface $type,
+        string $operandType,
+        string $expectedResult,
+    ): void {
+        $db = $this->getConnection();
+        $qb = $db->getQueryBuilder();
+        $serverVersion = $db->getServerInfo()->getVersion();
+
+        $isMariadb = str_contains($serverVersion, 'MariaDB');
+
+        if (
+            $isMariadb && version_compare($serverVersion, '10.6', '<')
+            || !$isMariadb && version_compare($serverVersion, '8.0.0', '<')
+        ) {
+            $this->markTestSkipped('MariaDB < 10.6 and MySQL < 8 does not support JSON_TABLE() function.');
+        }
+
+        $stringParam = new Param('[3,4,5]', DataType::STRING);
+        $arrayMerge = (new ArrayMerge(
+            "'[1,2,3]'",
+            [5, 6, 7],
+            $stringParam,
+        ))->type($type);
+        $params = [];
+
+        $this->assertSame(
+            '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
+            . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . ') AS t)',
+            $qb->buildExpression($arrayMerge, $params)
+        );
+        Assert::arraysEquals(
+            [
+                ':qp0' => new Param('[5,6,7]', DataType::STRING),
+                ':qp1' => $stringParam,
+            ],
+            $params,
+        );
+
+        $result = $db->select($arrayMerge)->scalar();
+        $result = json_decode($result);
+        sort($result, SORT_NUMERIC);
+        $expectedResult = json_decode($expectedResult);
+
+        $this->assertEquals($expectedResult, $result);
     }
 }
