@@ -51,6 +51,7 @@
 - Enh #415: Support column's collation (@Tigrov)
 - New #421: Add `Connection::getColumnBuilderClass()` method (@Tigrov)
 - New #420: Implement `ArrayMergeBuilder`, `LongestBuilder` and `ShortestBuilder` classes (@Tigrov)
+- Enh #423: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
