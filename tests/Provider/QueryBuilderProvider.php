@@ -15,6 +15,7 @@ use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 use function array_replace;
+use function in_array;
 use function str_contains;
 use function version_compare;
 
@@ -384,7 +385,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     {
         foreach (parent::dateTimeValue() as $key => $value) {
             // MySQL cannot store date in float column
-            if ($key === 'Float') {
+            if (in_array($key, ['Float', 'Float 2'])) {
                 continue;
             }
             yield $key => $value;
