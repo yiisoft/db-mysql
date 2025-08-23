@@ -379,4 +379,15 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         return $data;
     }
+
+    public static function dateTimeValue(): iterable
+    {
+        foreach (parent::dateTimeValue() as $key => $value) {
+            // MySQL cannot store date in float column
+            if ($key === 'Float') {
+                continue;
+            }
+            yield $key => $value;
+        }
+    }
 }

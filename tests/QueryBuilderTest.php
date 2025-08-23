@@ -14,6 +14,7 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Param;
+use Yiisoft\Db\Expression\Value\DateTimeValue;
 use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -858,5 +859,11 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $expectedResult = json_decode($expectedResult);
 
         $this->assertEquals($expectedResult, $result);
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'dateTimeValue')]
+    public function testDateTimeValue(string $expected, string $column, DateTimeValue $expression): void
+    {
+        parent::testDateTimeValue($expected, $column, $expression);
     }
 }
