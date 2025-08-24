@@ -859,4 +859,16 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertEquals($expectedResult, $result);
     }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithMultiOperandFunctions')]
+    public function testUpsertWithMultiOperandFunctions(
+        array $initValues,
+        array|QueryInterface $insertValues,
+        array $updateValues,
+        string $expectedSql,
+        array $expectedResult,
+        array $expectedParams = [],
+    ): void {
+        parent::testUpsertWithMultiOperandFunctions($initValues, $insertValues, $updateValues, $expectedSql, $expectedResult, $expectedParams);
+    }
 }
