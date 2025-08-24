@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
@@ -16,7 +15,6 @@ use function array_diff;
 use function array_fill_keys;
 use function array_intersect;
 use function array_intersect_key;
-use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function count;
