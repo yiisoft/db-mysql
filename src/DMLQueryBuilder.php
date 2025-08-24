@@ -6,7 +6,6 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
@@ -16,7 +15,6 @@ use function array_diff;
 use function array_fill_keys;
 use function array_intersect;
 use function array_intersect_key;
-use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function count;
@@ -163,7 +161,7 @@ EXECUTE autoincrement_stmt";
         $conditions = [];
 
         foreach ($uniqueValues as $name => $value) {
-            if (array_key_exists($value, $params) && $params[$value] === null) {
+            if ($value === 'NULL') {
                 throw new NotSupportedException(
                     __METHOD__ . '() is not supported by MySQL when inserting `null` primary key or unique values.'
                 );
@@ -208,12 +206,7 @@ EXECUTE autoincrement_stmt";
                 );
             } else {
                 $value = $insertColumns[$name] ?? $column->getDefaultValue();
-
-                if ($value instanceof ExpressionInterface) {
-                    $columnValues[$name] = $this->queryBuilder->buildExpression($value, $params);
-                } else {
-                    $columnValues[$name] = $this->queryBuilder->bindParam($value, $params);
-                }
+                $columnValues[$name] = $this->queryBuilder->buildValue($value, $params);
             }
         }
 
