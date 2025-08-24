@@ -41,7 +41,7 @@
 - New #387: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #393: Use `DateTimeColumn` class for datetime column types (@Tigrov)
 - Enh #396, #409: Refactor constraints (@Tigrov)
-- New #394, #395, #398: Implement `Command::upsertReturning()` method (@Tigrov)
+- New #394, #395, #398, #425: Implement `Command::upsertReturning()` method (@Tigrov)
 - Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Chg #399: Rename `insertWithReturningPks()` to `insertReturningPks()` in `Command` and `DMLQueryBuilder` classes (@Tigrov)
 - Enh #403: Refactor `DMLQueryBuilder::upsert()`, allow use `EXCLUDED` table alias to access inserted values (@Tigrov)

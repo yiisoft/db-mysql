@@ -48,25 +48,25 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             'regular values' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
                     . ' SELECT `email`, `address`, `status`, `profile_id`'
-                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, 1 AS `status`, NULL AS `profile_id`) AS EXCLUDED'
                     . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
                     . ' `profile_id`=EXCLUDED.`profile_id`',
             ],
             'regular values with unique at not the first position' => [
                 3 => 'INSERT INTO `T_upsert` (`address`, `email`, `status`, `profile_id`)'
                     . ' SELECT `address`, `email`, `status`, `profile_id`'
-                    . ' FROM (SELECT :qp0 AS `address`, :qp1 AS `email`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                    . ' FROM (SELECT :qp0 AS `address`, :qp1 AS `email`, 1 AS `status`, NULL AS `profile_id`) AS EXCLUDED'
                     . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
                     . ' `profile_id`=EXCLUDED.`profile_id`',
             ],
             'regular values with update part' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
                     . ' SELECT `email`, `address`, `status`, `profile_id`'
-                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
-                    . ' ON DUPLICATE KEY UPDATE `address`=:qp4, `status`=2, `orders`=T_upsert.orders + 1',
+                    . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, 1 AS `status`, NULL AS `profile_id`) AS EXCLUDED'
+                    . ' ON DUPLICATE KEY UPDATE `address`=:qp2, `status`=2, `orders`=T_upsert.orders + 1',
             ],
             'regular values without update part' => [
-                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, 1, NULL)',
             ],
             'query' => [
                 3 => 'INSERT INTO `T_upsert` (`email`, `status`) SELECT `email`, `status`'
@@ -104,7 +104,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
             ],
             'no columns to update' => [
-                3 => 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0)',
+                3 => 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (1)',
             ],
             'no columns to update with unique' => [
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`) VALUES (:qp0)',
@@ -135,7 +135,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         }
 
         $upsert['regular values without update part'][4] = 'INSERT INTO `T_upsert`'
-            . ' (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, :qp2, :qp3)'
+            . ' (`email`, `address`, `status`, `profile_id`) VALUES (:qp0, :qp1, 1, NULL)'
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `ts`)'
@@ -151,8 +151,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
         $upsert['no columns to update'][3] = ['a'];
-        $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (:qp0);SELECT :qp1 AS `a`';
-        $upsert['no columns to update'][5][':qp1'] = 1;
+        $upsert['no columns to update'][4] = 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (1);SELECT 1 AS `a`';
 
         $upsert['no columns to update with unique'][4] = 'INSERT INTO `T_upsert` (`email`) VALUES (:qp0)'
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
@@ -168,17 +167,17 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 true,
                 ['id_1', 'id_2'],
                 'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) SELECT `id_1`, `id_2`, `type`'
-                . ' FROM (SELECT :qp0 AS `id_1`, :qp1 AS `id_2`, :qp2 AS `type`) AS EXCLUDED'
-                . ' ON DUPLICATE KEY UPDATE `type`=EXCLUDED.`type`;SELECT :qp3 AS `id_1`, :qp4 AS `id_2`',
-                [':qp0' => 1, ':qp1' => 2.5, ':qp2' => 'Test', ':qp3' => 1, ':qp4' => 2.5],
+                . ' FROM (SELECT 1 AS `id_1`, 2.5 AS `id_2`, :qp0 AS `type`) AS EXCLUDED'
+                . ' ON DUPLICATE KEY UPDATE `type`=EXCLUDED.`type`;SELECT 1 AS `id_1`, 2.5 AS `id_2`',
+                [':qp0' => new Param('Test', DataType::STRING)],
             ],
             'no return columns' => [
                 'type',
                 ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
                 true,
                 [],
-                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3)',
-                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true],
+                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (3, :qp0, 1.2, TRUE)',
+                [':qp0' => new Param('a', DataType::STRING)],
             ],
             'return all columns' => [
                 'T_upsert',
@@ -187,21 +186,28 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 null,
                 'INSERT INTO `T_upsert` (`email`, `address`, `status`, `profile_id`)'
                 . ' SELECT `email`, `address`, `status`, `profile_id`'
-                . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, :qp2 AS `status`, :qp3 AS `profile_id`) AS EXCLUDED'
+                . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `address`, 1 AS `status`, 1 AS `profile_id`) AS EXCLUDED'
                 . ' ON DUPLICATE KEY UPDATE `address`=EXCLUDED.`address`, `status`=EXCLUDED.`status`,'
                 . ' `profile_id`=EXCLUDED.`profile_id`, `id`=LAST_INSERT_ID(`T_upsert`.`id`);'
                 . 'SELECT `id`, `ts`, `email`, `recovery_email`, `address`, `status`, `orders`, `profile_id`'
                 . ' FROM `T_upsert` WHERE `id` = LAST_INSERT_ID()',
-                [':qp0' => 'test@example.com', ':qp1' => 'test address', ':qp2' => 1, ':qp3' => 1],
+                [
+                    ':qp0' => new Param('test@example.com', DataType::STRING),
+                    ':qp1' => new Param('test address', DataType::STRING),
+                ],
             ],
             'no primary key' => [
                 'type',
                 ['int_col' => 3, 'char_col' => 'a', 'float_col' => 1.2, 'bool_col' => true],
                 true,
                 ['int_col', 'char_col', 'char_col2', 'char_col3'],
-                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (:qp0, :qp1, :qp2, :qp3);'
-                . 'SELECT :qp4 AS `int_col`, :qp5 AS `char_col`, :qp6 AS `char_col2`, :qp7 AS `char_col3`',
-                [':qp0' => 3, ':qp1' => 'a', ':qp2' => 1.2, ':qp3' => true, ':qp4' => 3, ':qp5' => 'a', ':qp6' => 'something', ':qp7' => null],
+                'INSERT INTO `type` (`int_col`, `char_col`, `float_col`, `bool_col`) VALUES (3, :qp0, 1.2, TRUE);'
+                . 'SELECT 3 AS `int_col`, :qp1 AS `char_col`, :qp2 AS `char_col2`, NULL AS `char_col3`',
+                [
+                    ':qp0' => new Param('a', DataType::STRING),
+                    ':qp1' => new Param('a', DataType::STRING),
+                    ':qp2' => new Param('something', DataType::STRING),
+                ],
             ],
             'no primary key but unique' => [
                 'without_pk',
@@ -212,7 +218,11 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 . ' FROM (SELECT :qp0 AS `email`, :qp1 AS `name`) AS EXCLUDED'
                 . ' ON DUPLICATE KEY UPDATE `name`=EXCLUDED.`name`;'
                 . 'SELECT `email`, `name`, `address`, `status` FROM `without_pk` WHERE `email` = :qp2',
-                [':qp0' => 'test@example.com', ':qp1' => 'John Doe', ':qp2' => 'test@example.com'],
+                [
+                    ':qp0' => new Param('test@example.com', DataType::STRING),
+                    ':qp1' => new Param('John Doe', DataType::STRING),
+                    ':qp2' => new Param('test@example.com', DataType::STRING),
+                ],
             ],
         ];
     }
