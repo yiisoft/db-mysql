@@ -854,6 +854,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $result = $db->select($arrayMerge)->scalar();
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertEquals(json_decode($expectedResult), json_decode($result));
     }
 }
