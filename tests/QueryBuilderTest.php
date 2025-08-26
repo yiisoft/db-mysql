@@ -25,8 +25,6 @@ use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
 
-use function json_decode;
-use function sort;
 use function str_contains;
 use function version_compare;
 
