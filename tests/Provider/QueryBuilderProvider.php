@@ -362,7 +362,8 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             ["'[1,2,3]'", $stringParam],
             '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
             . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value json PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t) AS t)",
+            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
+            . ') AS t)',
             [1, 2, 3, 4, 5],
             [':qp0' => $stringParam],
         ];
