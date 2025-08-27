@@ -25,8 +25,6 @@ use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Tests\Common\CommonQueryBuilderTest;
 use Yiisoft\Db\Tests\Support\Assert;
 
-use function json_decode;
-use function sort;
 use function str_contains;
 use function version_compare;
 
@@ -574,7 +572,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|ExpressionInterface|string|null $from,
         array $params,
         string $expectedSql,
-        array $expectedParams,
+        array $expectedParams = [],
     ): void {
         parent::testUpdate($table, $columns, $condition, $from, $params, $expectedSql, $expectedParams);
     }
@@ -811,7 +809,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[TestWith([new IntegerColumn(), 'int', '[1,2,3,4,5,6,7]'])]
     #[TestWith([new ArrayColumn(), 'json', '["1","2","3","4","5","6","7"]'])]
     #[TestWith([new ArrayColumn(column: new IntegerColumn()), 'int', '[1,2,3,4,5,6,7]'])]
-    public function testMultiOperandFunctionBuilderWithType(
+    public function testArrayMergeWithTypeWithOrdering(
         string|ColumnInterface $type,
         string $operandType,
         string $expectedResult,
@@ -829,35 +827,44 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             $this->markTestSkipped('MariaDB < 10.6 and MySQL < 8 does not support JSON_TABLE() function.');
         }
 
-        $stringParam = new Param('[3,4,5]', DataType::STRING);
+        $stringParam = new Param('[4,3,5]', DataType::STRING);
         $arrayMerge = (new ArrayMerge(
-            "'[1,2,3]'",
-            [5, 6, 7],
+            "'[2,1,3]'",
+            [6, 5, 7],
             $stringParam,
-        ))->type($type);
+        ))->type($type)->ordered();
         $params = [];
 
         $this->assertSame(
             '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-            . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . "SELECT value FROM JSON_TABLE('[2,1,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . ') AS t)',
+            . ' ORDER BY value) AS t)',
             $qb->buildExpression($arrayMerge, $params)
         );
         Assert::arraysEquals(
             [
-                ':qp0' => new Param('[5,6,7]', DataType::STRING),
+                ':qp0' => new Param('[6,5,7]', DataType::STRING),
                 ':qp1' => $stringParam,
             ],
             $params,
         );
 
         $result = $db->select($arrayMerge)->scalar();
-        $result = json_decode($result);
-        sort($result, SORT_NUMERIC);
-        $expectedResult = json_decode($expectedResult);
 
-        $this->assertEquals($expectedResult, $result);
+        $this->assertEquals(json_decode($expectedResult), json_decode($result));
+    }
+
+    #[DataProviderExternal(QueryBuilderProvider::class, 'upsertWithMultiOperandFunctions')]
+    public function testUpsertWithMultiOperandFunctions(
+        array $initValues,
+        array|QueryInterface $insertValues,
+        array $updateValues,
+        string $expectedSql,
+        array $expectedResult,
+        array $expectedParams = [],
+    ): void {
+        parent::testUpsertWithMultiOperandFunctions($initValues, $insertValues, $updateValues, $expectedSql, $expectedResult, $expectedParams);
     }
 }

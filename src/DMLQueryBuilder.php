@@ -6,16 +6,15 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
 
 use function array_combine;
 use function array_diff;
+use function array_fill_keys;
 use function array_intersect;
-use function array_key_exists;
+use function array_intersect_key;
 use function array_keys;
 use function array_map;
 use function count;
@@ -87,15 +86,8 @@ EXECUTE autoincrement_stmt";
             return $this->insert($table, $insertColumns, $params);
         }
 
-        if ($updateColumns === true) {
-            $updateColumns = [];
-            /** @psalm-var string[] $updateNames */
-            foreach ($updateNames as $name) {
-                $updateColumns[$name] = new Expression('EXCLUDED.' . $this->quoter->quoteSimpleColumnName($name));
-            }
-        }
-
-        if (empty($updateColumns)) {
+        if (empty($updateColumns) || $updateNames === []) {
+            /** there are no columns to update */
             $insertSql = $this->insert($table, $insertColumns, $params);
             return 'INSERT IGNORE' . substr($insertSql, 6);
         }
@@ -105,13 +97,7 @@ EXECUTE autoincrement_stmt";
         $quotedNames = array_map($this->quoter->quoteColumnName(...), $names);
 
         if (!empty($placeholders)) {
-            $selectValues = [];
-
-            foreach ($placeholders as $i => $placeholder) {
-                $selectValues[] = "$placeholder AS $quotedNames[$i]";
-            }
-
-            $values = 'SELECT ' . implode(', ', $selectValues);
+            $values = $this->buildSimpleSelect(array_combine($names, $placeholders));
         }
 
         $fields = implode(', ', $quotedNames);
@@ -119,7 +105,7 @@ EXECUTE autoincrement_stmt";
         $insertSql = 'INSERT INTO ' . $this->quoter->quoteTableName($table)
             . " ($fields) SELECT $fields FROM ($values) AS EXCLUDED";
 
-        $updates = $this->prepareUpdateSets($table, $updateColumns, $params);
+        $updates = $this->prepareUpsertSets($table, $updateColumns, $updateNames, $params);
 
         return $insertSql . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $updates);
     }
@@ -153,13 +139,8 @@ EXECUTE autoincrement_stmt";
 
         if (empty($uniqueColumns)) {
             $returnValues = $this->prepareColumnValues($tableSchema, $returnColumns, $insertColumns, $params);
-            $selectValues = [];
 
-            foreach ($returnValues as $name => $value) {
-                $selectValues[] = $value . ' AS ' . $quoter->quoteSimpleColumnName($name);
-            }
-
-            return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
+            return $upsertSql . ';' . $this->buildSimpleSelect($returnValues);
         }
 
         if (is_array($updateColumns) && !empty(array_intersect($uniqueColumns, array_keys($updateColumns)))) {
@@ -185,19 +166,15 @@ EXECUTE autoincrement_stmt";
         $uniqueValues = $this->prepareColumnValues($tableSchema, $uniqueColumns, $insertColumns, $params);
 
         if (empty(array_diff($returnColumns, array_keys($uniqueValues)))) {
-            $selectValues = [];
+            $selectValues = array_intersect_key($uniqueValues, array_fill_keys($returnColumns, null));
 
-            foreach ($returnColumns as $name) {
-                $selectValues[] = $uniqueValues[$name] . ' AS ' . $quoter->quoteSimpleColumnName($name);
-            }
-
-            return $upsertSql . ';SELECT ' . implode(', ', $selectValues);
+            return $upsertSql . ';' . $this->buildSimpleSelect($selectValues);
         }
 
         $conditions = [];
 
         foreach ($uniqueValues as $name => $value) {
-            if (array_key_exists($value, $params) && $params[$value] === null) {
+            if ($value === 'NULL') {
                 throw new NotSupportedException(
                     __METHOD__ . '() is not supported by MySQL when inserting `null` primary key or unique values.'
                 );
@@ -242,12 +219,7 @@ EXECUTE autoincrement_stmt";
                 );
             } else {
                 $value = $insertColumns[$name] ?? $column->getDefaultValue();
-
-                if ($value instanceof ExpressionInterface) {
-                    $columnValues[$name] = $this->queryBuilder->buildExpression($value, $params);
-                } else {
-                    $columnValues[$name] = $this->queryBuilder->bindParam($value, $params);
-                }
+                $columnValues[$name] = $this->queryBuilder->buildValue($value, $params);
             }
         }
 

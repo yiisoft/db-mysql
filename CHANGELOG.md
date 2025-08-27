@@ -41,7 +41,7 @@
 - New #387: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #393: Use `DateTimeColumn` class for datetime column types (@Tigrov)
 - Enh #396, #409: Refactor constraints (@Tigrov)
-- New #394, #395, #398: Implement `Command::upsertReturning()` method (@Tigrov)
+- New #394, #395, #398, #425: Implement `Command::upsertReturning()` method (@Tigrov, @vjik)
 - Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Chg #399: Rename `insertWithReturningPks()` to `insertReturningPks()` in `Command` and `DMLQueryBuilder` classes (@Tigrov)
 - Enh #403: Refactor `DMLQueryBuilder::upsert()`, allow use `EXCLUDED` table alias to access inserted values (@Tigrov)
@@ -50,7 +50,8 @@
 - Enh #414: Remove `TableSchema` class and refactor `Schema` class (@Tigrov)
 - Enh #415: Support column's collation (@Tigrov)
 - New #421: Add `Connection::getColumnBuilderClass()` method (@Tigrov)
-- New #420: Implement `ArrayMergeBuilder`, `LongestBuilder` and `ShortestBuilder` classes (@Tigrov)
+- New #420, #427: Implement `ArrayMergeBuilder`, `LongestBuilder` and `ShortestBuilder` classes (@Tigrov)
+- Enh #423: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
