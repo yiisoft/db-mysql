@@ -131,7 +131,41 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 unset($data[$key]);
             }
         }
-        return $data;
+        return array_merge(
+            $data,
+            [
+                [
+                    '{{table}}',
+                    ['name' => '{{tmp}}.{{name}}'],
+                    [],
+                    'tmp',
+                    [],
+                    self::replaceQuotes(
+                        <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                    ),
+                    [
+                        ':qp0' => new Param('{{tmp}}.{{name}}', DataType::STRING),
+                    ],
+                ],
+                [
+                    '{{table}}',
+                    ['name' => '{{tmp}}.{{name}}'],
+                    [],
+                    ['tmp' => self::getDb()->select()->from('{{tmp}}')],
+                    [],
+                    self::replaceQuotes(
+                        <<<SQL
+                    UPDATE [[table]] SET [[name]]=:qp0
+                    SQL
+                    ),
+                    [
+                        ':qp0' => new Param('{{tmp}}.{{name}}', DataType::STRING),
+                    ],
+                ],
+            ]
+        );
     }
 
     public static function upsertReturning(): array

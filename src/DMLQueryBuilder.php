@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
