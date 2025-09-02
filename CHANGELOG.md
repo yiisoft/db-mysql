@@ -7,7 +7,7 @@
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
 - Enh #321, #391: Implement and use `SqlParser` class (@Tigrov)
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
-- New #342: Add JSON overlaps condition builder (@Tigrov)
+- New #342, #430: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 - New #346, #361: Implement `ColumnFactory` class (@Tigrov)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
