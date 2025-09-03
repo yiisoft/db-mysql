@@ -7,7 +7,7 @@
 - Bug #320: Change visibility of `DDLQueryBuilder::getColumnDefinition()` method to `private` (@Tigrov)
 - Enh #321, #391: Implement and use `SqlParser` class (@Tigrov)
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
-- New #342: Add JSON overlaps condition builder (@Tigrov)
+- New #342, #430: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
 - New #346, #361: Implement `ColumnFactory` class (@Tigrov)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
@@ -52,6 +52,7 @@
 - New #421: Add `Connection::getColumnBuilderClass()` method (@Tigrov)
 - New #420, #427: Implement `ArrayMergeBuilder`, `LongestBuilder` and `ShortestBuilder` classes (@Tigrov)
 - Enh #423: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
+- Chg #428: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 

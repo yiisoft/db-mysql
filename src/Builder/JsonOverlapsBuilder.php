@@ -8,9 +8,9 @@ use Yiisoft\Db\Exception\Exception;
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Exception\NotSupportedException;
-use Yiisoft\Db\Expression\Builder\ExpressionBuilderInterface;
+use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Expression\JsonExpression;
+use Yiisoft\Db\Expression\Value\JsonValue;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\QueryBuilderInterface;
 
@@ -44,7 +44,7 @@ final class JsonOverlapsBuilder implements ExpressionBuilderInterface
         $values = $expression->values;
 
         if (!$values instanceof ExpressionInterface) {
-            $values = new JsonExpression($values);
+            $values = new JsonValue($values);
         }
 
         $values = $this->queryBuilder->buildExpression($values, $params);
