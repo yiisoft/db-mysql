@@ -121,10 +121,11 @@ final class CommandTest extends CommonCommandTest
         array $columns,
         array|ExpressionInterface|string $conditions,
         array|ExpressionInterface|string|null $from,
+        array $params,
         array $expectedValues,
         int $expectedCount,
     ): void {
-        parent::testUpdate($table, $columns, $conditions, $from, $expectedValues, $expectedCount);
+        parent::testUpdate($table, $columns, $conditions, $from, $params, $expectedValues, $expectedCount);
     }
 
     #[DataProviderExternal(CommandProvider::class, 'upsert')]
