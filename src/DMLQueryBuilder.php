@@ -69,9 +69,9 @@ EXECUTE autoincrement_stmt";
         array|string|ExpressionInterface|null $from = null,
         array &$params = []
     ): string {
-        /**
-         * MySQL does not support UPDATE ... FROM ...
-         */
+        if ($from !== null) {
+            throw new NotSupportedException('MySQL does not support UPDATE with FROM clause.');
+        }
         return parent::update($table, $columns, $condition, null, $params);
     }
 
