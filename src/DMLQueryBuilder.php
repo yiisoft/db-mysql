@@ -70,7 +70,7 @@ EXECUTE autoincrement_stmt";
         array &$params = []
     ): string {
         if ($from !== null) {
-            throw new NotSupportedException('MySQL does not support UPDATE with FROM clause.');
+            throw new NotSupportedException('MySQL does not support FROM clause in UPDATE statement.');
         }
         return parent::update($table, $columns, $condition, null, $params);
     }

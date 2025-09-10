@@ -123,51 +123,6 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $upsert;
     }
 
-    public static function update(): array
-    {
-        $data = parent::update();
-        foreach ($data as $key => $item) {
-            if ($item[3] !== null) {
-                unset($data[$key]);
-            }
-        }
-        return array_merge(
-            $data,
-            [
-                [
-                    '{{table}}',
-                    ['name' => '{{tmp}}.{{name}}'],
-                    [],
-                    'tmp',
-                    [],
-                    self::replaceQuotes(
-                        <<<SQL
-                    UPDATE [[table]] SET [[name]]=:qp0
-                    SQL
-                    ),
-                    [
-                        ':qp0' => new Param('{{tmp}}.{{name}}', DataType::STRING),
-                    ],
-                ],
-                [
-                    '{{table}}',
-                    ['name' => '{{tmp}}.{{name}}'],
-                    [],
-                    ['tmp' => self::getDb()->select()->from('{{tmp}}')],
-                    [],
-                    self::replaceQuotes(
-                        <<<SQL
-                    UPDATE [[table]] SET [[name]]=:qp0
-                    SQL
-                    ),
-                    [
-                        ':qp0' => new Param('{{tmp}}.{{name}}', DataType::STRING),
-                    ],
-                ],
-            ]
-        );
-    }
-
     public static function upsertReturning(): array
     {
         $upsert = self::upsert();
