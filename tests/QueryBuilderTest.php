@@ -835,11 +835,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $params = [];
 
         $this->assertSame(
-            '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-            . "SELECT value FROM JSON_TABLE('[2,1,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . ' ORDER BY value) AS t)',
+            '(SELECT JSON_ARRAYAGG(DISTINCT value ORDER BY value) AS value'
+            . " FROM JSON_TABLE(JSON_MERGE_PRESERVE('[2,1,3]', :qp0, :qp1),"
+            . " '$[*]' COLUMNS(value $operandType PATH '$')) AS t)",
             $qb->buildExpression($arrayMerge, $params)
         );
         Assert::arraysEquals(
