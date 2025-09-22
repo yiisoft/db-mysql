@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Provider\CommandProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Query\Query;
@@ -118,12 +119,17 @@ final class CommandTest extends CommonCommandTest
     public function testUpdate(
         string $table,
         array $columns,
-        array|string $conditions,
+        array|ExpressionInterface|string $conditions,
+        array|ExpressionInterface|string|null $from,
         array $params,
         array $expectedValues,
         int $expectedCount,
     ): void {
-        parent::testUpdate($table, $columns, $conditions, $params, $expectedValues, $expectedCount);
+        if ($from !== null) {
+            $this->expectException(NotSupportedException::class);
+            $this->expectExceptionMessage('MySQL does not support FROM clause in UPDATE statement.');
+        }
+        parent::testUpdate($table, $columns, $conditions, $from, $params, $expectedValues, $expectedCount);
     }
 
     #[DataProviderExternal(CommandProvider::class, 'upsert')]

@@ -568,12 +568,17 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testUpdate(
         string $table,
         array $columns,
-        array|string $condition,
+        array|ExpressionInterface|string $condition,
+        array|ExpressionInterface|string|null $from,
         array $params,
         string $expectedSql,
         array $expectedParams = [],
     ): void {
-        parent::testUpdate($table, $columns, $condition, $params, $expectedSql, $expectedParams);
+        if ($from !== null) {
+            $this->expectException(NotSupportedException::class);
+            $this->expectExceptionMessage('MySQL does not support FROM clause in UPDATE statement.');
+        }
+        parent::testUpdate($table, $columns, $condition, $from, $params, $expectedSql, $expectedParams);
     }
 
     #[DataProviderExternal(QueryBuilderProvider::class, 'upsert')]

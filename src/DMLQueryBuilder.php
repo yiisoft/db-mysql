@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
@@ -59,6 +60,19 @@ final class DMLQueryBuilder extends AbstractDMLQueryBuilder
 SET @sql = CONCAT('ALTER TABLE $tableName AUTO_INCREMENT =', @new_autoincrement_value);
 PREPARE autoincrement_stmt FROM @sql;
 EXECUTE autoincrement_stmt";
+    }
+
+    public function update(
+        string $table,
+        array $columns,
+        array|string|ExpressionInterface $condition,
+        array|string|ExpressionInterface|null $from = null,
+        array &$params = []
+    ): string {
+        if ($from !== null) {
+            throw new NotSupportedException('MySQL does not support FROM clause in UPDATE statement.');
+        }
+        return parent::update($table, $columns, $condition, null, $params);
     }
 
     public function upsert(
