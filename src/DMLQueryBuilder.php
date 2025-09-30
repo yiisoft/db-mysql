@@ -70,21 +70,14 @@ EXECUTE autoincrement_stmt";
         array|ExpressionInterface|string|null $from = null,
         array &$params = []
     ): string {
-        $sql = 'UPDATE ';
+        $sql = 'UPDATE ' . $this->quoter->quoteTableName($table);
 
         if ($from !== null) {
-            $fromTables = [
-                $table,
-                ...DbArrayHelper::normalizeExpressions($from),
-            ];
-
-            $fromClause = $this->queryBuilder->buildFrom($fromTables, $params);
-            $sql .= substr($fromClause, 5);
+            $fromClause = $this->queryBuilder->buildFrom(DbArrayHelper::normalizeExpressions($from), $params);
+            $sql .= ', ' . substr($fromClause, 5);
 
             $updateSets = $this->prepareUpdateSets($table, $columns, $params, useTableName: true);
         } else {
-            $sql .= $this->quoter->quoteTableName($table);
-
             $updateSets = $this->prepareUpdateSets($table, $columns, $params);
         }
 
