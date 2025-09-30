@@ -574,10 +574,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $expectedSql,
         array $expectedParams = [],
     ): void {
-        if ($from !== null) {
-            $this->expectException(NotSupportedException::class);
-            $this->expectExceptionMessage('MySQL does not support FROM clause in UPDATE statement.');
-        }
         parent::testUpdate($table, $columns, $condition, $from, $params, $expectedSql, $expectedParams);
     }
 

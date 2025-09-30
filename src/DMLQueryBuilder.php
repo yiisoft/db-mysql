@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Mysql;
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
+use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\AbstractDMLQueryBuilder;
 use Yiisoft\Db\Schema\TableSchema;
@@ -65,14 +66,26 @@ EXECUTE autoincrement_stmt";
     public function update(
         string $table,
         array $columns,
-        array|string|ExpressionInterface $condition,
-        array|string|ExpressionInterface|null $from = null,
+        array|ExpressionInterface|string $condition,
+        array|ExpressionInterface|string|null $from = null,
         array &$params = []
     ): string {
+        $sql = 'UPDATE ' . $this->quoter->quoteTableName($table);
+
         if ($from !== null) {
-            throw new NotSupportedException('MySQL does not support FROM clause in UPDATE statement.');
+            $fromClause = $this->queryBuilder->buildFrom(DbArrayHelper::normalizeExpressions($from), $params);
+            $sql .= ', ' . substr($fromClause, 5);
+
+            $updateSets = $this->prepareUpdateSets($table, $columns, $params, useTableName: true);
+        } else {
+            $updateSets = $this->prepareUpdateSets($table, $columns, $params);
         }
-        return parent::update($table, $columns, $condition, null, $params);
+
+        $sql .= ' SET ' . implode(', ', $updateSets);
+
+        $where = $this->queryBuilder->buildWhere($condition, $params);
+
+        return $where === '' ? $sql : "$sql $where";
     }
 
     public function upsert(

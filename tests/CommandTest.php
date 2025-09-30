@@ -125,10 +125,6 @@ final class CommandTest extends CommonCommandTest
         array $expectedValues,
         int $expectedCount,
     ): void {
-        if ($from !== null) {
-            $this->expectException(NotSupportedException::class);
-            $this->expectExceptionMessage('MySQL does not support FROM clause in UPDATE statement.');
-        }
         parent::testUpdate($table, $columns, $conditions, $from, $params, $expectedValues, $expectedCount);
     }
 

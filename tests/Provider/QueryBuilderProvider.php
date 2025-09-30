@@ -42,6 +42,20 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         return $insert;
     }
 
+    public static function update(): array
+    {
+        $data = parent::update();
+
+        $data['from table'][5] = 'UPDATE `table`, `tmp` SET `table`.`name`=:qp0';
+        $data['from array'][5] = 'UPDATE `table`, `tmp` SET `table`.`name`=:qp0';
+        $data['from table w/ condition'][5] = 'UPDATE `table`, `tmp` SET `table`.`name`=:qp0 WHERE `id` = 1';
+        $data['from expression'][5] = 'UPDATE `table`, (SELECT `name` FROM `tmp` WHERE `id` = 1) SET `table`.`name`=:qp0';
+        $data['from query'][5] = 'UPDATE `table`, (SELECT `name` FROM `tmp` WHERE `id` = 1) `0` SET `table`.`name`=:qp0';
+        $data['from query w/ alias'][5] = 'UPDATE `table`, (SELECT `name` FROM `tmp` WHERE `id` = 1) `tmp` SET `table`.`name`=:qp0';
+
+        return $data;
+    }
+
     public static function upsert(): array
     {
         $concreteData = [
