@@ -15,7 +15,6 @@ use Yiisoft\Db\Schema\TableSchema;
 use function array_combine;
 use function array_diff;
 use function array_fill_keys;
-use function array_intersect;
 use function array_intersect_key;
 use function array_keys;
 use function array_map;
