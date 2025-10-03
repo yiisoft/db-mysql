@@ -157,9 +157,12 @@ EXECUTE autoincrement_stmt";
             return $upsertSql . ';' . $this->buildSimpleSelect($returnValues);
         }
 
-        if (is_array($updateColumns) && !empty(array_intersect($uniqueColumns, array_keys($updateColumns)))) {
+        if (is_array($updateColumns)
+            && !empty($uniqueUpdateValues = array_intersect_key($updateColumns, array_fill_keys($uniqueColumns, null)))
+            && $uniqueUpdateValues !== array_intersect_key($insertColumns, $uniqueUpdateValues)
+        ) {
             throw new NotSupportedException(
-                __METHOD__ . '() is not supported by MySQL when updating primary key or unique values.'
+                __METHOD__ . '() is not supported by MySQL when updating different primary key or unique values.'
             );
         }
 
