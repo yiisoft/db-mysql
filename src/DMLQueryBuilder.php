@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql;
 
 use InvalidArgumentException;
 use Yiisoft\Db\Exception\NotSupportedException;
+use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Helper\DbArrayHelper;
 use Yiisoft\Db\Query\QueryInterface;
@@ -133,13 +134,10 @@ EXECUTE autoincrement_stmt";
         $tableSchema = $this->schema->getTableSchema($table);
         $returnColumns ??= $tableSchema?->getColumnNames();
 
-        $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
-
         if (empty($returnColumns)) {
-            return $upsertSql;
+            return $this->upsert($table, $insertColumns, $updateColumns, $params);
         }
 
-        $quoter = $this->quoter;
         [$uniqueNames, $insertNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
         /** @var TableSchema $tableSchema */
         $primaryKeys = $tableSchema->getPrimaryKey();
@@ -149,8 +147,8 @@ EXECUTE autoincrement_stmt";
             $insertColumns = array_combine($insertNames, $insertColumns);
         }
 
-
         if (empty($uniqueColumns)) {
+            $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
             $returnValues = $this->prepareColumnValues($tableSchema, $returnColumns, $insertColumns, $params);
 
             return $upsertSql . ';' . $this->buildSimpleSelect($returnValues);
@@ -165,18 +163,31 @@ EXECUTE autoincrement_stmt";
             );
         }
 
+        $quoter = $this->quoter;
         $quotedTable = $quoter->quoteTableName($table);
         $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])?->isAutoIncrement();
 
         if ($isAutoIncrement) {
-            $id = $quoter->quoteSimpleColumnName($primaryKeys[0]);
-            $setLastInsertId = "$id=LAST_INSERT_ID($quotedTable.$id)";
+            $primaryKey = $primaryKeys[0];
+            $id = $quoter->quoteSimpleColumnName($primaryKey);
 
-            if (str_starts_with($upsertSql, 'INSERT IGNORE INTO')) {
-                $upsertSql = 'INSERT' . substr($upsertSql, 13) . " ON DUPLICATE KEY UPDATE $setLastInsertId";
-            } elseif (str_contains($upsertSql, ' ON DUPLICATE KEY UPDATE ')) {
-                $upsertSql .= ", $setLastInsertId";
+            if (is_array($updateColumns) && isset($updateColumns[$primaryKey])) {
+                $builtValue = $this->queryBuilder->buildValue($updateColumns[$primaryKey], $params);
+                $updateColumns[$primaryKey] = new Expression("LAST_INSERT_ID($builtValue)");
+                $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
+            } else {
+                $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
+                $lastInsertId = "$quotedTable.$id";
+                $setLastInsertId = "$id=LAST_INSERT_ID($lastInsertId)";
+
+                if (str_starts_with($upsertSql, 'INSERT IGNORE INTO')) {
+                    $upsertSql = 'INSERT' . substr($upsertSql, 13) . " ON DUPLICATE KEY UPDATE $setLastInsertId";
+                } elseif (str_contains($upsertSql, ' ON DUPLICATE KEY UPDATE ')) {
+                    $upsertSql .= ", $setLastInsertId";
+                }
             }
+        } else {
+            $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
         }
 
         $uniqueValues = $this->prepareColumnValues($tableSchema, $uniqueColumns, $insertColumns, $params);

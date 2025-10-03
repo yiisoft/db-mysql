@@ -618,6 +618,23 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb->upsertReturning($table, $insertColumns, $updateColumns);
     }
 
+    public function testUpsertReturningWithSameUpdatingPrimaryKeyOrUnique(): void
+    {
+        $db = $this->getConnection(true);
+        $qb = $db->getQueryBuilder();
+
+        $params = [];
+        $sql = $qb->upsertReturning('category', ['id' => 1, 'name' => 'Books'], ['id' => 1, 'name' => 'Audio'], params: $params);
+
+        $this->assertSame(
+            'INSERT INTO `category` (`id`, `name`) SELECT `id`, `name`'
+            . ' FROM (SELECT 1 AS `id`, :qp0 AS `name`) AS EXCLUDED ON DUPLICATE KEY UPDATE'
+            . ' `id`=LAST_INSERT_ID(1), `name`=:qp1;'
+            . 'SELECT `id`, `name` FROM `category` WHERE `id` = LAST_INSERT_ID()',
+            $sql,
+        );
+    }
+
     #[TestWith(['order_item', ['subtotal' => 1], ['subtotal' => 10]])]
     #[TestWith(['without_pk', ['email' => null, 'name' => 'John'], ['name' => 'John']])]
     public function testUpsertReturningWithNullPrimaryKeyOrUnique(
