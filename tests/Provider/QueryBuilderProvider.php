@@ -382,10 +382,8 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $data['ArrayMerge with 2 operands'] = [
             ArrayMerge::class,
             ["'[1,2,3]'", $stringParam],
-            '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-            . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value json PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
-            . ') AS t)',
+            '(SELECT JSON_ARRAYAGG(DISTINCT value) AS value'
+            . " FROM JSON_TABLE(JSON_MERGE_PRESERVE('[1,2,3]', :qp0), '$[*]' COLUMNS(value json PATH '$')) AS t)",
             [1, 2, 3, 4, 5],
             [':qp0' => $stringParam],
         ];
@@ -395,12 +393,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             $data['ArrayMerge with 4 operands'] = [
                 ArrayMerge::class,
                 ["'[1,2,3]'", [5, 6, 7], $stringParam, self::getDb()->select(new ArrayValue([9, 10]))],
-                '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-                . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . " UNION SELECT value FROM JSON_TABLE((SELECT :qp2), '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . ') AS t)',
+                '(SELECT JSON_ARRAYAGG(DISTINCT value) AS value'
+                . " FROM JSON_TABLE(JSON_MERGE_PRESERVE('[1,2,3]', :qp0, :qp1, (SELECT :qp2)),"
+                . " '$[*]' COLUMNS(value json PATH '$')) AS t)",
                 [1, 2, 3, 4, 5, 6, 7, 9, 10],
                 [
                     ':qp0' => new Param('[5,6,7]', DataType::STRING),
