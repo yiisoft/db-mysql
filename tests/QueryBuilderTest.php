@@ -637,7 +637,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $this->assertEquals(
             [
                 ':qp0' => new Param('Books', DataType::STRING),
-                ':qp1' => new Param('Audio', DataType::STRING)
+                ':qp1' => new Param('Audio', DataType::STRING),
             ],
             $params,
         );
