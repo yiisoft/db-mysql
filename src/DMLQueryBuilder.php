@@ -157,7 +157,9 @@ EXECUTE autoincrement_stmt";
         if (is_array($updateColumns)
             && !empty($uniqueUpdateValues = array_intersect_key($updateColumns, array_fill_keys($uniqueColumns, null)))
         ) {
-            if ($uniqueUpdateValues !== array_intersect_key($insertColumns, $uniqueUpdateValues)) {
+            if (!is_array($insertColumns)
+                || $uniqueUpdateValues !== array_intersect_key($insertColumns, $uniqueUpdateValues)
+            ) {
                 throw new NotSupportedException(
                     __METHOD__ . '() is not supported by MySQL when updating different primary key or unique values.'
                 );
