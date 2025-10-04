@@ -633,6 +633,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             . 'SELECT `id`, `name` FROM `category` WHERE `id` = LAST_INSERT_ID()',
             $sql,
         );
+
+        $this->assertEquals(
+            [
+                ':qp0' => new Param('Books', DataType::STRING),
+                ':qp1' => new Param('Audio', DataType::STRING)
+            ],
+            $params,
+        );
     }
 
     #[TestWith(['order_item', ['subtotal' => 1], ['subtotal' => 10]])]
