@@ -627,9 +627,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $sql = $qb->upsertReturning('category', ['id' => 1, 'name' => 'Books'], ['id' => 1, 'name' => 'Audio'], params: $params);
 
         $this->assertSame(
-            'INSERT INTO `category` (`id`, `name`) SELECT `id`, `name`'
-            . ' FROM (SELECT 1 AS `id`, :qp0 AS `name`) AS EXCLUDED ON DUPLICATE KEY UPDATE'
-            . ' `id`=LAST_INSERT_ID(1), `name`=:qp1;'
+            'INSERT INTO `category` (`id`, `name`)'
+            . ' SELECT `id`, `name` FROM (SELECT 1 AS `id`, :qp0 AS `name`) AS EXCLUDED'
+            . ' ON DUPLICATE KEY UPDATE `name`=:qp1, `id`=LAST_INSERT_ID(`category`.`id`);'
             . 'SELECT `id`, `name` FROM `category` WHERE `id` = LAST_INSERT_ID()',
             $sql,
         );
