@@ -14,8 +14,8 @@ use Yiisoft\Db\Schema\TableSchema;
 
 use function array_combine;
 use function array_diff;
+use function array_diff_key;
 use function array_fill_keys;
-use function array_intersect;
 use function array_intersect_key;
 use function array_keys;
 use function array_map;
@@ -134,13 +134,10 @@ EXECUTE autoincrement_stmt";
         $tableSchema = $this->schema->getTableSchema($table);
         $returnColumns ??= $tableSchema?->getColumnNames();
 
-        $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
-
         if (empty($returnColumns)) {
-            return $upsertSql;
+            return $this->upsert($table, $insertColumns, $updateColumns, $params);
         }
 
-        $quoter = $this->quoter;
         [$uniqueNames, $insertNames] = $this->prepareUpsertColumns($table, $insertColumns, $updateColumns);
         /** @var TableSchema $tableSchema */
         $primaryKeys = $tableSchema->getPrimaryKey();
@@ -150,20 +147,30 @@ EXECUTE autoincrement_stmt";
             $insertColumns = array_combine($insertNames, $insertColumns);
         }
 
-
         if (empty($uniqueColumns)) {
+            $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
             $returnValues = $this->prepareColumnValues($tableSchema, $returnColumns, $insertColumns, $params);
 
             return $upsertSql . ';' . $this->buildSimpleSelect($returnValues);
         }
 
-        if (is_array($updateColumns) && !empty(array_intersect($uniqueColumns, array_keys($updateColumns)))) {
-            throw new NotSupportedException(
-                __METHOD__ . '() is not supported by MySQL when updating primary key or unique values.'
-            );
+        if (is_array($updateColumns)
+            && !empty($uniqueUpdateValues = array_intersect_key($updateColumns, array_fill_keys($uniqueColumns, null)))
+        ) {
+            if (!is_array($insertColumns)
+                || $uniqueUpdateValues !== array_intersect_key($insertColumns, $uniqueUpdateValues)
+            ) {
+                throw new NotSupportedException(
+                    __METHOD__ . '() is not supported by MySQL when updating different primary key or unique values.'
+                );
+            }
+
+            $updateColumns = array_diff_key($updateColumns, $uniqueUpdateValues);
         }
 
+        $quoter = $this->quoter;
         $quotedTable = $quoter->quoteTableName($table);
+        $upsertSql = $this->upsert($table, $insertColumns, $updateColumns, $params);
         $isAutoIncrement = count($primaryKeys) === 1 && $tableSchema->getColumn($primaryKeys[0])?->isAutoIncrement();
 
         if ($isAutoIncrement) {

@@ -612,10 +612,35 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating primary key or unique values.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating different primary key or unique values.'
         );
 
         $qb->upsertReturning($table, $insertColumns, $updateColumns);
+    }
+
+    public function testUpsertReturningWithSameUpdatingPrimaryKeyOrUnique(): void
+    {
+        $db = $this->getConnection(true);
+        $qb = $db->getQueryBuilder();
+
+        $params = [];
+        $sql = $qb->upsertReturning('category', ['id' => 1, 'name' => 'Books'], ['id' => 1, 'name' => 'Audio'], params: $params);
+
+        $this->assertSame(
+            'INSERT INTO `category` (`id`, `name`)'
+            . ' SELECT `id`, `name` FROM (SELECT 1 AS `id`, :qp0 AS `name`) AS EXCLUDED'
+            . ' ON DUPLICATE KEY UPDATE `name`=:qp1, `id`=LAST_INSERT_ID(`category`.`id`);'
+            . 'SELECT `id`, `name` FROM `category` WHERE `id` = LAST_INSERT_ID()',
+            $sql,
+        );
+
+        $this->assertEquals(
+            [
+                ':qp0' => new Param('Books', DataType::STRING),
+                ':qp1' => new Param('Audio', DataType::STRING),
+            ],
+            $params,
+        );
     }
 
     #[TestWith(['order_item', ['subtotal' => 1], ['subtotal' => 10]])]
