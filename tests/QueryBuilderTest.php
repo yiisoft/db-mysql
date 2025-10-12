@@ -13,6 +13,7 @@ use Yiisoft\Db\Expression\Statement\CaseX;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
+use Yiisoft\Db\Expression\Value\ArrayValue;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
@@ -854,24 +855,25 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $stringParam = new Param('[4,3,5]', DataType::STRING);
         $arrayMerge = (new ArrayMerge(
-            "'[2,1,3]'",
-            [6, 5, 7],
+            [2, 1, 3],
+            new ArrayValue([6, 5, 7]),
             $stringParam,
         ))->type($type)->ordered();
         $params = [];
 
         $this->assertSame(
             '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-            . "SELECT value FROM JSON_TABLE('[2,1,3]', '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . "SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
+            . " UNION SELECT value FROM JSON_TABLE(:qp2, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . ' ORDER BY value) AS t)',
             $qb->buildExpression($arrayMerge, $params)
         );
         Assert::arraysEquals(
             [
-                ':qp0' => new Param('[6,5,7]', DataType::STRING),
-                ':qp1' => $stringParam,
+                ':qp0' => new Param('[2,1,3]', DataType::STRING),
+                ':qp1' => new Param('[6,5,7]', DataType::STRING),
+                ':qp2' => $stringParam,
             ],
             $params,
         );
