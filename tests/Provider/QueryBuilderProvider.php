@@ -354,9 +354,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $stringParam = new Param('[3,4,5]', DataType::STRING);
 
-        $data['Longest with 2 operands'][2] = "(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) DESC LIMIT 1)";
+        $data['Longest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) DESC LIMIT 1)';
         $data['Longest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) DESC LIMIT 1)";
-        $data['Shortest with 2 operands'][2] = "(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
+        $data['Shortest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)';
         $data['Shortest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
 
         $db = self::getDb();
