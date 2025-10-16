@@ -354,10 +354,10 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $stringParam = new Param('[3,4,5]', DataType::STRING);
 
-        $data['Longest with 2 operands'][2] = "(SELECT 'short' AS value UNION SELECT :qp0 AS value ORDER BY LENGTH(value) DESC LIMIT 1)";
-        $data['Longest with 3 operands'][2] = "(SELECT 'short' AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp0 AS value ORDER BY LENGTH(value) DESC LIMIT 1)";
-        $data['Shortest with 2 operands'][2] = "(SELECT 'short' AS value UNION SELECT :qp0 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
-        $data['Shortest with 3 operands'][2] = "(SELECT 'short' AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp0 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
+        $data['Longest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) DESC LIMIT 1)';
+        $data['Longest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) DESC LIMIT 1)";
+        $data['Shortest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)';
+        $data['Shortest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
 
         $db = self::getDb();
         $serverVersion = $db->getServerInfo()->getVersion();
@@ -375,37 +375,42 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $data['ArrayMerge with 1 operand'] = [
             ArrayMerge::class,
-            ["'[1,2,3]'"],
-            "('[1,2,3]')",
+            [[1, 2, 3]],
+            '(:qp0)',
             [1, 2, 3],
+            [':qp0' => new Param('[1,2,3]', DataType::STRING)],
         ];
         $data['ArrayMerge with 2 operands'] = [
             ArrayMerge::class,
-            ["'[1,2,3]'", $stringParam],
+            [[1, 2, 3], $stringParam],
             '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-            . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value json PATH '$')) AS t"
-            . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
+            . "SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
+            . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value json PATH '$')) AS t"
             . ') AS t)',
             [1, 2, 3, 4, 5],
-            [':qp0' => $stringParam],
+            [
+                ':qp0' => new Param('[1,2,3]', DataType::STRING),
+                ':qp1' => $stringParam,
+            ],
         ];
 
         if ($isMariadb) {
             // MySQL does not support query parameters in JSON_TABLE() function.
             $data['ArrayMerge with 4 operands'] = [
                 ArrayMerge::class,
-                ["'[1,2,3]'", [5, 6, 7], $stringParam, self::getDb()->select(new ArrayValue([9, 10]))],
+                [[1, 2, 3], new ArrayValue([5, 6, 7]), $stringParam, self::getDb()->select(new ArrayValue([9, 10]))],
                 '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
-                . "SELECT value FROM JSON_TABLE('[1,2,3]', '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . " UNION SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
+                . "SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
                 . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value json PATH '$')) AS t"
-                . " UNION SELECT value FROM JSON_TABLE((SELECT :qp2), '$[*]' COLUMNS(value json PATH '$')) AS t"
+                . " UNION SELECT value FROM JSON_TABLE(:qp2, '$[*]' COLUMNS(value json PATH '$')) AS t"
+                . " UNION SELECT value FROM JSON_TABLE((SELECT :qp3), '$[*]' COLUMNS(value json PATH '$')) AS t"
                 . ') AS t)',
                 [1, 2, 3, 4, 5, 6, 7, 9, 10],
                 [
-                    ':qp0' => new Param('[5,6,7]', DataType::STRING),
-                    ':qp1' => $stringParam,
-                    ':qp2' => new Param('[9,10]', DataType::STRING),
+                    ':qp0' => new Param('[1,2,3]', DataType::STRING),
+                    ':qp1' => new Param('[5,6,7]', DataType::STRING),
+                    ':qp2' => $stringParam,
+                    ':qp3' => new Param('[9,10]', DataType::STRING),
                 ],
             ];
         }
