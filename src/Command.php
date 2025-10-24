@@ -10,7 +10,6 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function in_array;
 use function str_starts_with;
