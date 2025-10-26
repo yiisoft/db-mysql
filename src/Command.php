@@ -12,6 +12,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\QueryInterface;
 
 use function in_array;
+use function restore_error_handler;
+use function set_error_handler;
 use function str_starts_with;
 use function substr;
 
