@@ -146,4 +146,19 @@ final class Command extends AbstractPdoCommand
 
         return $this->setSql($sql)->queryColumn();
     }
+
+    protected function pdoStatementExecute(): void
+    {
+        set_error_handler(
+            static fn(int $errorNumber, string $errorString): bool =>
+            str_starts_with($errorString, 'Packets out of order. Expected '),
+            E_WARNING,
+        );
+
+        try {
+            $this->pdoStatementExecute();
+        } finally {
+            restore_error_handler();
+        }
+    }
 }
