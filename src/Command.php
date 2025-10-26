@@ -153,12 +153,12 @@ final class Command extends AbstractPdoCommand
     {
         set_error_handler(
             static fn(int $errorNumber, string $errorString): bool =>
-            str_starts_with($errorString, 'Packets out of order. Expected '),
+                str_starts_with($errorString, 'Packets out of order. Expected '),
             E_WARNING,
         );
 
         try {
-            $this->pdoStatementExecute();
+            $this->pdoStatement?->execute();
         } finally {
             restore_error_handler();
         }
