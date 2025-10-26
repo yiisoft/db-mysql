@@ -10,7 +10,6 @@ use Yiisoft\Db\Driver\Pdo\AbstractPdoCommand;
 use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\QueryInterface;
-use Yiisoft\Db\Schema\Column\ColumnInterface;
 
 use function in_array;
 use function str_starts_with;
@@ -22,14 +21,13 @@ use function substr;
  */
 final class Command extends AbstractPdoCommand
 {
-    public function insertReturningPks(string $table, array|QueryInterface $columns): array|false
+    public function insertReturningPks(string $table, array|QueryInterface $columns): array
     {
         $tableSchema = $this->db->getSchema()->getTableSchema($table);
         $primaryKeys = $tableSchema?->getPrimaryKey() ?? [];
         $tableColumns = $tableSchema?->getColumns() ?? [];
 
         foreach ($primaryKeys as $name) {
-            /** @var ColumnInterface $column */
             $column = $tableColumns[$name];
 
             if ($column->isAutoIncrement()) {
@@ -49,9 +47,7 @@ final class Command extends AbstractPdoCommand
         $insertSql = $this->db->getQueryBuilder()->insert($table, $columns, $params);
         $this->setSql($insertSql)->bindValues($params);
 
-        if ($this->execute() === 0) {
-            return false;
-        }
+        $this->execute();
 
         if (empty($primaryKeys)) {
             return [];
@@ -60,7 +56,6 @@ final class Command extends AbstractPdoCommand
         $result = [];
 
         foreach ($primaryKeys as $name) {
-            /** @var ColumnInterface $column */
             $column = $tableColumns[$name];
 
             if ($column->isAutoIncrement()) {
@@ -85,7 +80,7 @@ final class Command extends AbstractPdoCommand
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
         array|null $returnColumns = null,
-    ): array|false {
+    ): array {
         $returnColumns ??= $this->db->getTableSchema($table)?->getColumnNames();
 
         if (empty($returnColumns)) {
@@ -102,11 +97,11 @@ final class Command extends AbstractPdoCommand
 
         /** @psalm-var PDOStatement $this->pdoStatement */
         $this->pdoStatement->nextRowset();
-        /** @psalm-var array<string,mixed>|false $result */
+        /** @psalm-var array<string,mixed> $result */
         $result = $this->pdoStatement->fetch(PDO::FETCH_ASSOC);
         $this->pdoStatement->closeCursor();
 
-        if (!$this->phpTypecasting || $result === false) {
+        if (!$this->phpTypecasting) {
             return $result;
         }
 

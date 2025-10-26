@@ -41,7 +41,7 @@
 - New #387: Realize `Schema::loadResultColumn()` method (@Tigrov)
 - New #393: Use `DateTimeColumn` class for datetime column types (@Tigrov)
 - Enh #396, #409: Refactor constraints (@Tigrov)
-- New #394, #395, #398, #425, #435: Implement `Command::upsertReturning()` method (@Tigrov, @vjik)
+- New #394, #395, #398, #425, #435, #437: Implement `Command::upsertReturning()` method (@Tigrov, @vjik)
 - Enh #394, #395: Refactor `Command::insertWithReturningPks()` method (@Tigrov)
 - Chg #399: Rename `insertWithReturningPks()` to `insertReturningPks()` in `Command` and `DMLQueryBuilder` classes (@Tigrov)
 - Enh #403: Refactor `DMLQueryBuilder::upsert()`, allow use `EXCLUDED` table alias to access inserted values (@Tigrov)
@@ -53,7 +53,7 @@
 - New #420, #427: Implement `ArrayMergeBuilder`, `LongestBuilder` and `ShortestBuilder` classes (@Tigrov)
 - Enh #423: Refactor `DMLQueryBuilder::upsert()` method (@Tigrov)
 - Chg #428: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
-- Enh #442, #433: Update `DMLQueryBuilder::update()` method to adapt changes in `yiisoft/db` (@rustamwin, @Tigrov)
+- Enh #432, #433: Update `DMLQueryBuilder::update()` method to adapt changes in `yiisoft/db` (@rustamwin, @Tigrov)
 
 ## 1.2.0 March 21, 2024
 
