@@ -14,8 +14,6 @@ use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class QueryTest extends CommonQueryTest
 {
@@ -88,7 +86,7 @@ final class QueryTest extends CommonQueryTest
         $db->close();
     }
 
-    public function testWithQuery()
+    public function testWithQuery(): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
@@ -104,7 +102,7 @@ final class QueryTest extends CommonQueryTest
         parent::testWithQuery();
     }
 
-    public function testWithQueryRecursive()
+    public function testWithQueryRecursive(): void
     {
         $db = $this->getConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
