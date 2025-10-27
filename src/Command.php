@@ -12,6 +12,8 @@ use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Query\QueryInterface;
 
 use function in_array;
+use function restore_error_handler;
+use function set_error_handler;
 use function str_starts_with;
 use function substr;
 
@@ -145,5 +147,20 @@ final class Command extends AbstractPdoCommand
         SQL;
 
         return $this->setSql($sql)->queryColumn();
+    }
+
+    protected function pdoStatementExecute(): void
+    {
+        set_error_handler(
+            static fn(int $errorNumber, string $errorString): bool =>
+                str_starts_with($errorString, 'Packets out of order. Expected '),
+            E_WARNING,
+        );
+
+        try {
+            $this->pdoStatement?->execute();
+        } finally {
+            restore_error_handler();
+        }
     }
 }
