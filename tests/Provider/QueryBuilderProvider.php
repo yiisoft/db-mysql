@@ -110,12 +110,12 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `ts`) VALUES (:qp0, CURRENT_TIMESTAMP)',
             ],
             'query, values and expressions with update part' => [
-                3 => 'INSERT INTO {{%T_upsert}} (`email`, [[ts]]) SELECT `email`, [[ts]]'
+                3 => 'INSERT INTO {{%T_upsert}} (`email`, `ts`) SELECT `email`, `ts`'
                     . ' FROM (SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]) AS EXCLUDED'
                     . ' ON DUPLICATE KEY UPDATE `ts`=0, `orders`=T_upsert.orders + 1',
             ],
             'query, values and expressions without update part' => [
-                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, [[ts]]) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
+                3 => 'INSERT IGNORE INTO `T_upsert` (`email`, `ts`) SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]',
             ],
             'no columns to update' => [
                 3 => 'INSERT IGNORE INTO `T_upsert_1` (`a`) VALUES (1)',
@@ -160,7 +160,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             . ' SELECT `email`, 2 AS `status` FROM `customer` WHERE `name` = :qp0 LIMIT 1'
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
-        $upsert['query, values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, [[ts]])'
+        $upsert['query, values and expressions without update part'][4] = 'INSERT INTO `T_upsert` (`email`, `ts`)'
             . ' SELECT :phEmail AS `email`, CURRENT_TIMESTAMP AS [[ts]]'
             . ' ON DUPLICATE KEY UPDATE `id`=LAST_INSERT_ID(`T_upsert`.`id`);SELECT LAST_INSERT_ID() AS `id`';
 
