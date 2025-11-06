@@ -336,6 +336,7 @@ final class Schema extends AbstractPdoSchema
             ':tableName' => $nameParts['name'],
         ])->queryAll();
 
+        /** @psalm-var list<array<string,mixed>> $foreignKeys */
         $foreignKeys = array_map(array_change_key_case(...), $foreignKeys);
         $foreignKeys = DbArrayHelper::arrange($foreignKeys, ['name']);
 
@@ -390,6 +391,7 @@ final class Schema extends AbstractPdoSchema
             ':tableName' => $nameParts['name'],
         ])->queryAll();
 
+        /** @psalm-var list<array<string,mixed>> $indexes */
         $indexes = array_map(array_change_key_case(...), $indexes);
         $indexes = DbArrayHelper::arrange($indexes, ['name']);
         $result = [];
