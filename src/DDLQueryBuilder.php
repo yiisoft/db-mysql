@@ -78,7 +78,7 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         string $name,
         array|string $columns,
         ?string $indexType = null,
-        ?string $indexMethod = null
+        ?string $indexMethod = null,
     ): string {
         return 'CREATE ' . (!empty($indexType) ? $indexType . ' ' : '') . 'INDEX '
             . $this->quoter->quoteTableName($name)
@@ -158,6 +158,17 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
     }
 
     /**
+     * @throws NotSupportedException MySQL doesn't support cascade drop table.
+     */
+    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
+    {
+        if ($cascade) {
+            throw new NotSupportedException('MySQL doesn\'t support cascade drop table.');
+        }
+        return parent::dropTable($table, $ifExists, false);
+    }
+
+    /**
      * Gets column definition.
      *
      * @param string $table The table name.
@@ -181,16 +192,5 @@ final class DDLQueryBuilder extends AbstractDDLQueryBuilder
         }
 
         return $matches[2];
-    }
-
-    /**
-     * @throws NotSupportedException MySQL doesn't support cascade drop table.
-     */
-    public function dropTable(string $table, bool $ifExists = false, bool $cascade = false): string
-    {
-        if ($cascade) {
-            throw new NotSupportedException('MySQL doesn\'t support cascade drop table.');
-        }
-        return parent::dropTable($table, $ifExists, false);
     }
 }

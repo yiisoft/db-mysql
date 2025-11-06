@@ -62,7 +62,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
         $command->setSQL(
             <<<SQL
             INSERT INTO $tableName (val) VALUES (1), (2);
-            SQL
+            SQL,
         )->execute();
 
         $this->assertSame('1', $db->getLastInsertId());
@@ -70,7 +70,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
         $command->setSQL(
             <<<SQL
             INSERT INTO $tableName (val) VALUES (3), (4), (5);
-            SQL
+            SQL,
         )->execute();
 
         /**
@@ -83,7 +83,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
         $command->setSQL(
             <<<SQL
             INSERT IGNORE INTO $tableName (val) VALUES (3), (4), (5);
-            SQL
+            SQL,
         )->execute();
 
         /**

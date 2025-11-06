@@ -12,12 +12,12 @@ final class StringColumn extends \Yiisoft\Db\Schema\Column\StringColumn
     /**
      * @var string|null The column character set.
      */
-    protected string|null $characterSet = null;
+    protected ?string $characterSet = null;
 
     /**
      * Sets the character set for the column.
      */
-    public function characterSet(string|null $characterSet): static
+    public function characterSet(?string $characterSet): static
     {
         $this->characterSet = $characterSet;
         return $this;
@@ -28,7 +28,7 @@ final class StringColumn extends \Yiisoft\Db\Schema\Column\StringColumn
      *
      * @psalm-mutation-free
      */
-    public function getCharacterSet(): string|null
+    public function getCharacterSet(): ?string
     {
         return $this->characterSet;
     }

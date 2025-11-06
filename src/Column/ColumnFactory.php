@@ -88,7 +88,7 @@ final class ColumnFactory extends AbstractColumnFactory
         return parent::getType($dbType, $info);
     }
 
-    protected function normalizeDefaultValue(string|null $defaultValue, ColumnInterface $column): mixed
+    protected function normalizeDefaultValue(?string $defaultValue, ColumnInterface $column): mixed
     {
         if (
             $defaultValue === null

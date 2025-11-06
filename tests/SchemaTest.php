@@ -41,8 +41,8 @@ final class SchemaTest extends CommonSchemaTest
         $db->close();
 
         if (
-            version_compare($serverVersion, '8.0.17', '>') &&
-            !str_contains($serverVersion, 'MariaDB')
+            version_compare($serverVersion, '8.0.17', '>')
+            && !str_contains($serverVersion, 'MariaDB')
         ) {
             if ($tableName === 'type') {
                 $columns['int_col']->size(null);
@@ -81,8 +81,8 @@ final class SchemaTest extends CommonSchemaTest
         $serverVersion = $db->getServerInfo()->getVersion();
 
         $oldMySQL = !(
-            version_compare($serverVersion, '8.0.0', '>') &&
-            !str_contains($serverVersion, 'MariaDB')
+            version_compare($serverVersion, '8.0.0', '>')
+            && !str_contains($serverVersion, 'MariaDB')
         );
 
         $utcTimezone = new DateTimeZone('UTC');
@@ -166,7 +166,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.',
         );
 
         parent::testGetSchemaChecks();
@@ -176,7 +176,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Schema::loadTableDefaultValues is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\Schema::loadTableDefaultValues is not supported by MySQL.',
         );
 
         parent::testGetSchemaDefaultValues();
@@ -197,7 +197,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.',
         );
 
         parent::testGetTableChecks();
@@ -291,7 +291,7 @@ final class SchemaTest extends CommonSchemaTest
     public function testTableSchemaWithDbSchemes(
         string $tableName,
         string $expectedTableName,
-        string $expectedSchemaName = ''
+        string $expectedSchemaName = '',
     ): void {
         $db = $this->getConnection();
 
@@ -302,15 +302,15 @@ final class SchemaTest extends CommonSchemaTest
         $mockDb
             ->method('createCommand')
             ->with(
-                self::callback(static fn ($sql) => true),
+                self::callback(static fn($sql) => true),
                 self::callback(
                     function ($params) use ($expectedTableName, $expectedSchemaName) {
                         $this->assertEquals($expectedTableName, $params[':tableName']);
                         $this->assertEquals($expectedSchemaName, $params[':schemaName']);
 
                         return true;
-                    }
-                )
+                    },
+                ),
             )
             ->willReturn($commandMock);
 
@@ -324,7 +324,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\DDLQueryBuilder::addCheck is not supported by MySQL.',
         );
 
         parent::testWorkWithCheckConstraint();
@@ -334,7 +334,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\DDLQueryBuilder::addDefaultValue is not supported by MySQL.',
         );
 
         parent::testWorkWithDefaultValueConstraint();
@@ -382,7 +382,7 @@ final class SchemaTest extends CommonSchemaTest
                 'id' => ColumnBuilder::primaryKey(),
                 'bool_col' => ColumnBuilder::boolean(),
                 'status' => ColumnBuilder::tinyint(),
-            ]
+            ],
         )->execute();
 
         $status = 2;
@@ -428,7 +428,7 @@ final class SchemaTest extends CommonSchemaTest
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'resultColumns')]
-    public function testGetResultColumn(ColumnInterface|null $expected, array $metadata): void
+    public function testGetResultColumn(?ColumnInterface $expected, array $metadata): void
     {
         parent::testGetResultColumn($expected, $metadata);
     }

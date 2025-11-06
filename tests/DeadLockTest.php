@@ -148,14 +148,14 @@ final class DeadLockTest extends TestCase
         if ($errors) {
             $this->fail(
                 implode('; ', $errors)
-                . ($logContent ? ". Shared children log:\n$logContent" : '')
+                . ($logContent ? ". Shared children log:\n$logContent" : ''),
             );
         }
 
         $this->assertEquals(
             1,
             $deadlockHitCount,
-            "exactly one child must hit deadlock; shared children log:\n" . $logContent
+            "exactly one child must hit deadlock; shared children log:\n" . $logContent,
         );
     }
 
@@ -246,7 +246,7 @@ final class DeadLockTest extends TestCase
         } catch (\Exception|Throwable $e) {
             $this->log(
                 'child 1: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
-                . $e->getTraceAsString() . '>>'
+                . $e->getTraceAsString() . '>>',
             );
 
             return 1;
@@ -272,8 +272,7 @@ final class DeadLockTest extends TestCase
     {
         /* install no-op signal handler to prevent termination */
         if (
-            !pcntl_signal(SIGUSR1, static function () {
-            }, false)
+            !pcntl_signal(SIGUSR1, static function () {}, false)
         ) {
             $this->log('child 2: cannot install signal handler');
 
@@ -325,7 +324,7 @@ final class DeadLockTest extends TestCase
         } catch (\Exception|Throwable $e) {
             $this->log(
                 'child 2: ! exit <<' . $e::class . ' #' . $e->getCode() . ': ' . $e->getMessage() . "\n"
-                . $e->getTraceAsString() . '>>'
+                . $e->getTraceAsString() . '>>',
             );
 
             return 1;

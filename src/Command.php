@@ -38,7 +38,7 @@ final class Command extends AbstractPdoCommand
 
             if ($columns instanceof QueryInterface) {
                 throw new NotSupportedException(
-                    __METHOD__ . '() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+                    __METHOD__ . '() is not supported by MySQL for tables without auto increment when inserting sub-query.',
                 );
             }
 
@@ -81,7 +81,7 @@ final class Command extends AbstractPdoCommand
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
-        array|null $returnColumns = null,
+        ?array $returnColumns = null,
     ): array {
         $returnColumns ??= $this->db->getTableSchema($table)?->getColumnNames();
 
@@ -120,6 +120,15 @@ final class Command extends AbstractPdoCommand
         return $result;
     }
 
+    public function showDatabases(): array
+    {
+        $sql = <<<SQL
+        SHOW DATABASES WHERE `Database` NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')
+        SQL;
+
+        return $this->setSql($sql)->queryColumn();
+    }
+
     protected function queryInternal(int $queryMode): mixed
     {
         try {
@@ -140,20 +149,11 @@ final class Command extends AbstractPdoCommand
         }
     }
 
-    public function showDatabases(): array
-    {
-        $sql = <<<SQL
-        SHOW DATABASES WHERE `Database` NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys')
-        SQL;
-
-        return $this->setSql($sql)->queryColumn();
-    }
-
     protected function pdoStatementExecute(): void
     {
         set_error_handler(
-            static fn(int $errorNumber, string $errorString): bool =>
-                str_starts_with($errorString, 'Packets out of order. Expected '),
+            static fn(int $errorNumber, string $errorString): bool
+                => str_starts_with($errorString, 'Packets out of order. Expected '),
             E_WARNING,
         );
 

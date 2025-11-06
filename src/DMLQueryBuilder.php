@@ -68,7 +68,7 @@ EXECUTE autoincrement_stmt";
         array $columns,
         array|ExpressionInterface|string $condition,
         array|ExpressionInterface|string|null $from = null,
-        array &$params = []
+        array &$params = [],
     ): string {
         $sql = 'UPDATE ' . $this->quoter->quoteTableName($table);
 
@@ -128,7 +128,7 @@ EXECUTE autoincrement_stmt";
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns = true,
-        array|null $returnColumns = null,
+        ?array $returnColumns = null,
         array &$params = [],
     ): string {
         $tableSchema = $this->schema->getTableSchema($table);
@@ -161,7 +161,7 @@ EXECUTE autoincrement_stmt";
                 || $uniqueUpdateValues !== array_intersect_key($insertColumns, $uniqueUpdateValues)
             ) {
                 throw new NotSupportedException(
-                    __METHOD__ . '() is not supported by MySQL when updating different primary key or unique values.'
+                    __METHOD__ . '() is not supported by MySQL when updating different primary key or unique values.',
                 );
             }
 
@@ -197,7 +197,7 @@ EXECUTE autoincrement_stmt";
         foreach ($uniqueValues as $name => $value) {
             if ($value === 'NULL') {
                 throw new NotSupportedException(
-                    __METHOD__ . '() is not supported by MySQL when inserting `null` primary key or unique values.'
+                    __METHOD__ . '() is not supported by MySQL when inserting `null` primary key or unique values.',
                 );
             }
 
@@ -210,6 +210,15 @@ EXECUTE autoincrement_stmt";
             . ';SELECT ' . implode(', ', $quotedReturnColumns)
             . ' FROM ' . $quotedTable
             . ' WHERE ' . implode(' AND ', $conditions);
+    }
+
+    protected function prepareInsertValues(string $table, array|QueryInterface $columns, array $params = []): array
+    {
+        if (empty($columns)) {
+            return [[], [], 'VALUES ()', []];
+        }
+
+        return parent::prepareInsertValues($table, $columns, $params);
     }
 
     /**
@@ -236,7 +245,7 @@ EXECUTE autoincrement_stmt";
             } elseif ($insertColumns instanceof QueryInterface) {
                 throw new NotSupportedException(
                     self::class . '::upsertReturning() is not supported by MySQL'
-                    . ' for tables without auto increment when inserting sub-query.'
+                    . ' for tables without auto increment when inserting sub-query.',
                 );
             } else {
                 $value = $insertColumns[$name] ?? $column->getDefaultValue();
@@ -245,14 +254,5 @@ EXECUTE autoincrement_stmt";
         }
 
         return $columnValues;
-    }
-
-    protected function prepareInsertValues(string $table, array|QueryInterface $columns, array $params = []): array
-    {
-        if (empty($columns)) {
-            return [[], [], 'VALUES ()', []];
-        }
-
-        return parent::prepareInsertValues($table, $columns, $params);
     }
 }

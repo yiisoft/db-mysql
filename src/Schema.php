@@ -107,7 +107,7 @@ final class Schema extends AbstractPdoSchema
             [
                 ':schemaName' => $schemaName ?: null,
                 ':tableName' => $tableName,
-            ]
+            ],
         )->queryAll();
 
         if (empty($columns)) {
@@ -212,7 +212,7 @@ final class Schema extends AbstractPdoSchema
         try {
             /** @psalm-var array<array-key, string> $row */
             $row = $this->db->createCommand(
-                'SHOW CREATE TABLE ' . $this->db->getQuoter()->quoteTableName($tableName)
+                'SHOW CREATE TABLE ' . $this->db->getQuoter()->quoteTableName($tableName),
             )->queryOne();
 
             if (isset($row['Create Table'])) {
@@ -241,7 +241,7 @@ final class Schema extends AbstractPdoSchema
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    protected function loadResultColumn(array $metadata): ColumnInterface|null
+    protected function loadResultColumn(array $metadata): ?ColumnInterface
     {
         if (empty($metadata['native_type']) || $metadata['native_type'] === 'NULL') {
             return null;
@@ -297,48 +297,6 @@ final class Schema extends AbstractPdoSchema
         $columnInfo['notNull'] = in_array('not_null', $metadata['flags'], true);
 
         return $this->db->getColumnFactory()->fromDbType($dbType, $columnInfo);
-    }
-
-    /**
-     * Loads the column information into a {@see ColumnInterface} object.
-     *
-     * @param array $info The column information.
-     *
-     * @return ColumnInterface The column object.
-     *
-     * @psalm-param ColumnArray $info The column information.
-     */
-    private function loadColumn(array $info): ColumnInterface
-    {
-        $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
-        $columnInfo = [
-            'autoIncrement' => $autoIncrement > 0,
-            'characterSet' => $info['character_set_name'],
-            'collation' => $info['collation_name'],
-            'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
-            'defaultValueRaw' => $info['column_default'],
-            'extra' => $extra === '' ? null : $extra,
-            'name' => $info['column_name'],
-            'notNull' => $info['is_nullable'] !== 'YES',
-            'primaryKey' => $info['column_key'] === 'PRI',
-            'schema' => $info['schema'],
-            'table' => $info['table'],
-            'unique' => $info['column_key'] === 'UNI',
-        ];
-
-        if (substr_compare($info['column_type'], 'timestamp', 0, 9, true) === 0) {
-            $columnInfo['dbTimezone'] = $this->db->getServerInfo()->getTimezone();
-        }
-
-        /** @psalm-suppress InvalidArgument */
-        $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], $columnInfo);
-
-        if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
-            $extra = trim(substr($extra, 18));
-            $column->extra($extra === '' ? null : $extra);
-        }
-
-        return $column;
     }
 
     protected function loadTableChecks(string $tableName): array
@@ -452,7 +410,7 @@ final class Schema extends AbstractPdoSchema
         return $result;
     }
 
-    protected function loadTableSchema(string $name): TableSchemaInterface|null
+    protected function loadTableSchema(string $name): ?TableSchemaInterface
     {
         $table = new TableSchema(...$this->db->getQuoter()->getTableNameParts($name));
         $this->resolveTableCreateSql($table);
@@ -471,6 +429,48 @@ final class Schema extends AbstractPdoSchema
     {
         $sql = $this->getCreateTableSql($table);
         $table->createSql($sql);
+    }
+
+    /**
+     * Loads the column information into a {@see ColumnInterface} object.
+     *
+     * @param array $info The column information.
+     *
+     * @return ColumnInterface The column object.
+     *
+     * @psalm-param ColumnArray $info The column information.
+     */
+    private function loadColumn(array $info): ColumnInterface
+    {
+        $extra = trim(str_ireplace('auto_increment', '', $info['extra'], $autoIncrement));
+        $columnInfo = [
+            'autoIncrement' => $autoIncrement > 0,
+            'characterSet' => $info['character_set_name'],
+            'collation' => $info['collation_name'],
+            'comment' => $info['column_comment'] === '' ? null : $info['column_comment'],
+            'defaultValueRaw' => $info['column_default'],
+            'extra' => $extra === '' ? null : $extra,
+            'name' => $info['column_name'],
+            'notNull' => $info['is_nullable'] !== 'YES',
+            'primaryKey' => $info['column_key'] === 'PRI',
+            'schema' => $info['schema'],
+            'table' => $info['table'],
+            'unique' => $info['column_key'] === 'UNI',
+        ];
+
+        if (substr_compare($info['column_type'], 'timestamp', 0, 9, true) === 0) {
+            $columnInfo['dbTimezone'] = $this->db->getServerInfo()->getTimezone();
+        }
+
+        /** @psalm-suppress InvalidArgument */
+        $column = $this->db->getColumnFactory()->fromDefinition($info['column_type'], $columnInfo);
+
+        if (str_starts_with($extra, 'DEFAULT_GENERATED')) {
+            $extra = trim(substr($extra, 18));
+            $column->extra($extra === '' ? null : $extra);
+        }
+
+        return $column;
     }
 
     private function getJsonColumns(TableSchemaInterface $table): array

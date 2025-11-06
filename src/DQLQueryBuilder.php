@@ -30,10 +30,10 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
         $sql = '';
 
         if ($this->hasLimit($limit)) {
-            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string)$limit);
+            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string) $limit);
 
             if ($this->hasOffset($offset)) {
-                $sql .= ' OFFSET ' . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset);
+                $sql .= ' OFFSET ' . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset);
             }
         } elseif ($this->hasOffset($offset)) {
             /**
@@ -42,9 +42,9 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
              * @link https://stackoverflow.com/a/271650/1106908
              * @link https://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
-            $sql = 'LIMIT ' .
-                ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string)$offset) .
-                ', 18446744073709551615'; // 2^64-1
+            $sql = 'LIMIT '
+                . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset)
+                . ', 18446744073709551615'; // 2^64-1
         }
 
         return $sql;

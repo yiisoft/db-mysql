@@ -97,7 +97,7 @@ final class ConnectionTest extends CommonConnectionTest
         $this->assertTrue($result, 'transaction shortcut valid value should be returned from callback');
 
         $profilesCount = $db->createCommand(
-            "SELECT COUNT(*) FROM profile WHERE description = 'test transaction shortcut';"
+            "SELECT COUNT(*) FROM profile WHERE description = 'test transaction shortcut';",
         )->queryScalar();
 
         $this->assertSame('1', $profilesCount, 'profile should be inserted in transaction shortcut');

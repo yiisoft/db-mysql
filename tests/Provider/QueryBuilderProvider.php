@@ -319,7 +319,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             $values['timestamp(null)'] = [
                 'timestamp DEFAULT CURRENT_TIMESTAMP',
                 ColumnBuilder::timestamp(null)->defaultValue(
-                    new Expression('CURRENT_TIMESTAMP')
+                    new Expression('CURRENT_TIMESTAMP'),
                 ),
             ];
         }
