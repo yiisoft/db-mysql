@@ -32,46 +32,6 @@ final class ColumnTest extends CommonColumnTest
 {
     use TestTrait;
 
-    protected function insertTypeValues(ConnectionInterface $db): void
-    {
-        $db->createCommand()->insert(
-            'type',
-            [
-                'int_col' => 1,
-                'bigunsigned_col' => '12345678901234567890',
-                'char_col' => str_repeat('x', 100),
-                'char_col3' => null,
-                'float_col' => 1.234,
-                'blob_col' => "\x10\x11\x12",
-                'timestamp_col' => '2023-07-11 14:50:23',
-                'timestamp_default' => new DateTimeImmutable('2023-07-11 14:50:23'),
-                'bool_col' => false,
-                'bit_col' => 0b0110_0100, // 100
-                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
-            ]
-        )->execute();
-    }
-
-    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
-    {
-        $this->assertSame(1, $result['int_col']);
-        $this->assertSame('12345678901234567890', $result['bigunsigned_col']);
-        $this->assertSame(str_repeat('x', 100), $result['char_col']);
-        $this->assertNull($result['char_col3']);
-        $this->assertSame(1.234, $result['float_col']);
-        $this->assertSame("\x10\x11\x12", $result['blob_col']);
-        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23', new DateTimeZone('UTC')), $result['timestamp_col']);
-        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23'), $result['timestamp_default']);
-        $this->assertFalse($result['bool_col']);
-        $this->assertSame(0b0110_0100, $result['bit_col']);
-
-        if ($allTypecasted) {
-            $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
-        } else {
-            $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
-        }
-    }
-
     public function testSelectWithPhpTypecasting(): void
     {
         $db = $this->getConnection();
@@ -212,7 +172,7 @@ final class ColumnTest extends CommonColumnTest
             [
                 'timestamp_col' => ColumnBuilder::timestamp(),
                 'datetime_col' => ColumnBuilder::datetime(),
-            ]
+            ],
         )->execute();
 
         $command->insert($tableName, [
@@ -267,5 +227,45 @@ final class ColumnTest extends CommonColumnTest
         $this->assertNull($stringCol->getCharacterSet());
         $this->assertSame($stringCol, $stringCol->characterSet('utf8mb4_bin'));
         $this->assertSame('utf8mb4_bin', $stringCol->getCharacterSet());
+    }
+
+    protected function insertTypeValues(ConnectionInterface $db): void
+    {
+        $db->createCommand()->insert(
+            'type',
+            [
+                'int_col' => 1,
+                'bigunsigned_col' => '12345678901234567890',
+                'char_col' => str_repeat('x', 100),
+                'char_col3' => null,
+                'float_col' => 1.234,
+                'blob_col' => "\x10\x11\x12",
+                'timestamp_col' => '2023-07-11 14:50:23',
+                'timestamp_default' => new DateTimeImmutable('2023-07-11 14:50:23'),
+                'bool_col' => false,
+                'bit_col' => 0b0110_0100, // 100
+                'json_col' => [['a' => 1, 'b' => null, 'c' => [1, 3, 5]]],
+            ],
+        )->execute();
+    }
+
+    protected function assertTypecastedValues(array $result, bool $allTypecasted = false): void
+    {
+        $this->assertSame(1, $result['int_col']);
+        $this->assertSame('12345678901234567890', $result['bigunsigned_col']);
+        $this->assertSame(str_repeat('x', 100), $result['char_col']);
+        $this->assertNull($result['char_col3']);
+        $this->assertSame(1.234, $result['float_col']);
+        $this->assertSame("\x10\x11\x12", $result['blob_col']);
+        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23', new DateTimeZone('UTC')), $result['timestamp_col']);
+        $this->assertEquals(new DateTimeImmutable('2023-07-11 14:50:23'), $result['timestamp_default']);
+        $this->assertFalse($result['bool_col']);
+        $this->assertSame(0b0110_0100, $result['bit_col']);
+
+        if ($allTypecasted) {
+            $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
+        } else {
+            $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
+        }
     }
 }

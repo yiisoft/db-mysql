@@ -118,9 +118,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|string $columns,
         string $refTable,
         array|string $refColumns,
-        string|null $delete,
-        string|null $update,
-        string $expected
+        ?string $delete,
+        ?string $update,
+        string $expected,
     ): void {
         parent::testAddForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update, $expected);
     }
@@ -157,8 +157,8 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     #[DataProviderExternal(QueryBuilderProvider::class, 'buildCondition')]
     public function testBuildCondition(
         array|ExpressionInterface|string $condition,
-        string|null $expected,
-        array $expectedParams
+        ?string $expected,
+        array $expectedParams,
     ): void {
         parent::testBuildCondition($condition, $expected, $expectedParams);
     }
@@ -167,7 +167,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testBuildLikeCondition(
         array|ExpressionInterface $condition,
         string $expected,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testBuildLikeCondition($condition, $expected, $expectedParams);
     }
@@ -409,7 +409,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testInsert($table, $columns, $params, $expectedSQL, $expectedParams);
     }
@@ -420,14 +420,14 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $columns,
         array $params,
         string $expectedSQL,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         $db = $this->getConnection();
         $qb = $db->getQueryBuilder();
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertReturningPks is not supported by MySQL.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::insertReturningPks is not supported by MySQL.',
         );
 
         $qb->insertReturningPks($table, $columns, $params);
@@ -584,7 +584,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
         string $expectedSql,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testUpsert($table, $insertColumns, $updateColumns, $expectedSql, $expectedParams);
     }
@@ -594,9 +594,9 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         string $table,
         array|QueryInterface $insertColumns,
         array|bool $updateColumns,
-        array|null $returnColumns,
+        ?array $returnColumns,
         string $expectedSql,
-        array $expectedParams
+        array $expectedParams,
     ): void {
         parent::testUpsertReturning($table, $insertColumns, $updateColumns, $returnColumns, $expectedSql, $expectedParams);
     }
@@ -613,7 +613,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating different primary key or unique values.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when updating different primary key or unique values.',
         );
 
         $qb->upsertReturning($table, $insertColumns, $updateColumns);
@@ -656,7 +656,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when inserting `null` primary key or unique values.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL when inserting `null` primary key or unique values.',
         );
 
         $qb->upsertReturning($table, $insertColumns, $updateColumns);
@@ -671,7 +671,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+            'Yiisoft\Db\Mysql\DMLQueryBuilder::upsertReturning() is not supported by MySQL for tables without auto increment when inserting sub-query.',
         );
 
         $qb->upsertReturning('order_item', $query);
@@ -867,7 +867,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . " UNION SELECT value FROM JSON_TABLE(:qp2, '$[*]' COLUMNS(value $operandType PATH '$')) AS t"
             . ' ORDER BY value) AS t)',
-            $qb->buildExpression($arrayMerge, $params)
+            $qb->buildExpression($arrayMerge, $params),
         );
         Assert::arraysEquals(
             [

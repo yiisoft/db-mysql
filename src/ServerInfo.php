@@ -17,7 +17,7 @@ final class ServerInfo extends PdoServerInfo
         if (!isset($this->timezone) || $refresh) {
             /** @var string */
             $this->timezone = $this->db->createCommand(
-                "SELECT LPAD(TIME_FORMAT(TIMEDIFF(NOW(), UTC_TIMESTAMP), '%H:%i'), 6, '+')"
+                "SELECT LPAD(TIME_FORMAT(TIMEDIFF(NOW(), UTC_TIMESTAMP), '%H:%i'), 6, '+')",
             )->queryScalar();
         }
 

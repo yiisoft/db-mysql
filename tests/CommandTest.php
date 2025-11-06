@@ -61,7 +61,7 @@ final class CommandTest extends CommonCommandTest
         array $columns,
         string $expected,
         array $expectedParams = [],
-        int $insertedRow = 1
+        int $insertedRow = 1,
     ): void {
         parent::testBatchInsert($table, $values, $columns, $expected, $expectedParams, $insertedRow);
     }
@@ -109,7 +109,7 @@ final class CommandTest extends CommonCommandTest
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Command::insertReturningPks() is not supported by MySQL for tables without auto increment when inserting sub-query.'
+            'Yiisoft\Db\Mysql\Command::insertReturningPks() is not supported by MySQL for tables without auto increment when inserting sub-query.',
         );
 
         $command->insertReturningPks('order_item', $query);
@@ -140,7 +140,7 @@ final class CommandTest extends CommonCommandTest
     }
 
     #[DataProviderExternal(CommandProvider::class, 'createIndex')]
-    public function testCreateIndex(array $columns, array $indexColumns, string|null $indexType, string|null $indexMethod): void
+    public function testCreateIndex(array $columns, array $indexColumns, ?string $indexType, ?string $indexMethod): void
     {
         parent::testCreateIndex($columns, $indexColumns, $indexType, $indexMethod);
     }

@@ -12,14 +12,14 @@ use Yiisoft\Db\Tests\AbstractSqlParserTest;
  */
 final class SqlParserTest extends AbstractSqlParserTest
 {
+    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SqlParserProvider::getNextPlaceholder */
+    public function testGetNextPlaceholder(string $sql, ?string $expectedPlaceholder, ?int $expectedPosition): void
+    {
+        parent::testGetNextPlaceholder($sql, $expectedPlaceholder, $expectedPosition);
+    }
+
     protected function createSqlParser(string $sql): SqlParser
     {
         return new SqlParser($sql);
-    }
-
-    /** @dataProvider \Yiisoft\Db\Mysql\Tests\Provider\SqlParserProvider::getNextPlaceholder */
-    public function testGetNextPlaceholder(string $sql, string|null $expectedPlaceholder, int|null $expectedPosition): void
-    {
-        parent::testGetNextPlaceholder($sql, $expectedPlaceholder, $expectedPosition);
     }
 }

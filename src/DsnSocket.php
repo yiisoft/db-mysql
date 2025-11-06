@@ -27,8 +27,7 @@ final class DsnSocket implements Stringable
         public readonly string $unixSocket = '/var/run/mysqld/mysqld.sock',
         public readonly string $databaseName = '',
         public readonly array $options = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @return string The Data Source Name, or DSN, has the information required to connect to the database.
