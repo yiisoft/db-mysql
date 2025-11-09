@@ -5,7 +5,7 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px" alt="MySQL">
     </a>
-    <h1 align="center">Yii Database MySQL driver</h1>
+    <h1 align="center">Yii Database MySQL Driver</h1>
     <br>
 </p>
 
