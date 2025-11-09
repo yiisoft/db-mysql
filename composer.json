@@ -1,7 +1,7 @@
 {
     "name": "yiisoft/db-mysql",
     "type": "library",
-    "description": "MySQL driver for Yii Database",
+    "description": "MySQL/MariaDB driver for Yii Database",
     "keywords": [
         "yii",
         "mysql",

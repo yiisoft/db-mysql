@@ -5,7 +5,7 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px" alt="MySQL">
     </a>
-    <h1 align="center">Yii Database MySQL Driver</h1>
+    <h1 align="center">Yii Database MySQL/MariaDB Driver</h1>
     <br>
 </p>
 
@@ -18,7 +18,7 @@
 [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 [![psalm-level](https://shepherd.dev/github/yiisoft/db-mysql/level.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
-MySQL driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with
+MySQL and MariaDB driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with
 [MySQL](https://www.mysql.com/) and [MariaDB](https://mariadb.org/) databases in PHP. It includes a database connection
 class, a command builder class, and a set of classes for representing database tables and rows as PHP objects.
 
@@ -56,7 +56,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 
 ## License
 
-The Yii Database MySQL Driver is free software. It is released under the terms of the BSD License.
+The Yii Database MySQL/MariaDB Driver is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).
