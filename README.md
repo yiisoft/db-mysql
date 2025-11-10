@@ -5,33 +5,30 @@
     <a href="https://www.mysql.com/" target="_blank">
         <img src="https://labs.mysql.com/common/logos/mysql-logo.svg" height="80px" alt="MySQL">
     </a>
-    <h1 align="center">Yii Database MySQL and MariaDB driver</h1>
+    <h1 align="center">Yii Database MySQL/MariaDB Driver</h1>
     <br>
 </p>
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/db-mysql/v)](https://packagist.org/packages/yiisoft/db-mysql)
 [![Total Downloads](https://poser.pugx.org/yiisoft/db-mysql/downloads)](https://packagist.org/packages/yiisoft/db-mysql)
-[![codecov](https://codecov.io/gh/yiisoft/db-mysql/branch/master/graph/badge.svg?token=gsKVx3WQt4)](https://codecov.io/gh/yiisoft/db-mysql)
+[![Build status](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml)
+[![Code Coverage](https://codecov.io/gh/yiisoft/db-mysql/branch/master/graph/badge.svg?token=UF9VERNMYU)](https://codecov.io/gh/yiisoft/db-mysql)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master)
+[![static analysis](https://github.com/yiisoft/db-mysql/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/db-mysql/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/db-mysql/coverage.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
+[![psalm-level](https://shepherd.dev/github/yiisoft/db-mysql/level.svg)](https://shepherd.dev/github/yiisoft/db-mysql)
 
-MySQL driver for [Yii Database](https://github.com/yiisoft/db) allows developers to access and interact with [MySQL]
-and [MariaDB] databases.
-It provides a set of classes and methods for connecting to a [MySQL] and [MariaDB] database,
-executing SQL queries, and managing data within the database.
-The package is designed to be easy to use and integrate,
-and supports a wide range of [MySQL], [MariaDB] features and functions.
-It also includes support for transactions, database schema management, and error handling.
+MySQL and MariaDB driver for [Yii Database](https://github.com/yiisoft/db) is a package for working with
+[MySQL](https://www.mysql.com/) and [MariaDB](https://mariadb.org/) databases in PHP. It includes a database connection
+class, a command builder class, and a set of classes for representing database tables and rows as PHP objects.
 
-It is used in [Yii Framework](https://www.yiiframework.com/) but can be used separately.
+Driver supports MySQL 5.7 or higher, and MariaDB 10.4 or higher.
 
-[MariaDB]: https://mariadb.org/
-[MySQL]: https://www.mysql.com/
+## Requirements
 
-## Support version
-
-| PHP         | MySQL/MariaDB Version | CI-Actions |
-|-------------|-----------------------|------------|
-| **8.1-8.4** |**5.7-8.0**/**10.4-10.10**|[![build](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/build.yml) [![ansi-mode](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml/badge.svg)](https://github.com/yiisoft/db-mysql/actions/workflows/ansi-mode.yml) [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Fdb-mysql%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/db-mysql/master) [![static analysis](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml/badge.svg?branch=dev)](https://github.com/yiisoft/db-mysql/actions/workflows/static.yml)
+- PHP 8.1 - 8.4.
+- `pdo_mysql` PHP extension.
+- `ctype` PHP extension.
 
 ## Installation
 
@@ -42,15 +39,16 @@ composer require yiisoft/db-mysql
 ```
 
 > [!IMPORTANT]
-> It also depends on [PSR-16: Common Interface for Caching Libraries](https://www.php-fig.org/psr/psr-16/) and requires
-> the installation of [PSR-16 implementation](https://packagist.org/providers/psr/simple-cache-implementation).
-> For example, [yiisoft/cache](https://github.com/yiisoft/cache) or one of the other [cache handlers](https://github.com/yiisoft/cache#cache-handlers).
+> See also [installation notes](https://github.com/yiisoft/db/?tab=readme-ov-file#installation) for `yiisoft/db`
+> package.
 
 ## Documentation
 
-[Check the documentation](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage
+For config connection to MySQL and MariaDB database check
+[Connection config for MySQL and MariaDB](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/mysql.md).
 
-- [Connection config for MySQL and MariaDB](https://github.com/yiisoft/db/blob/master/docs/guide/en/connection/mysql.md)
+Check the `yiisoft/db` [docs](https://github.com/yiisoft/db/blob/master/docs/guide/en/README.md) to learn about usage.
+
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
@@ -58,7 +56,7 @@ You may also check out other [Yii Community Resources](https://www.yiiframework.
 
 ## License
 
-The Yii Database MySQL and MariaDB driver is free software. It is released under the terms of the BSD License.
+The Yii Database MySQL/MariaDB Driver is free software. It is released under the terms of the BSD License.
 Please see [`LICENSE`](./LICENSE.md) for more information.
 
 Maintained by [Yii Software](https://www.yiiframework.com/).

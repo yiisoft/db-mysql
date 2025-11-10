@@ -1,4 +1,4 @@
-# MySQL driver for Yii Database Change Log
+# MySQL/MariaDB driver for Yii Database Change Log
 
 ## 2.0.0 under development
 
