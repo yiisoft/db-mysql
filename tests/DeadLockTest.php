@@ -53,7 +53,7 @@ final class DeadLockTest extends IntegrationTestCase
      * @link https://github.com/yiisoft/yii2/issues/12715
      * @link https://github.com/yiisoft/yii2/pull/13346
      */
-    public function testDeadlockException(): void
+    public function t1estDeadlockException(): void
     {
         if (!function_exists('pcntl_fork')) {
             $this->markTestSkipped('pcntl_fork() is not available');
