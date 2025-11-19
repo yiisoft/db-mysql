@@ -10,7 +10,7 @@ use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\DateTimeColumn;
 use Yiisoft\Db\Mysql\Column\StringColumn;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Schema\Column\BigIntColumn;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
@@ -22,13 +22,9 @@ use Yiisoft\Db\Tests\Support\Assert;
 
 final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 {
-    use TestTrait;
-
     public static function columns(): array
     {
-        $db = self::getDb();
-        $dbTimezone = self::getDb()->getServerInfo()->getTimezone();
-        $db->close();
+        $dbTimezone = TestConnection::getShared()->getServerInfo()->getTimezone();
 
         return [
             [
@@ -284,9 +280,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
 
     public static function resultColumns(): array
     {
-        $db = self::getDb();
-        $dbTimezone = self::getDb()->getServerInfo()->getTimezone();
-        $db->close();
+        $dbTimezone = TestConnection::getShared()->getServerInfo()->getTimezone();
 
         return [
             [null, []],

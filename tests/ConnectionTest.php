@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
+use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\IntegrityException;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Connection;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Tests\Common\CommonConnectionTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
+use Yiisoft\Db\Tests\Support\TestHelper;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 /**
@@ -20,11 +22,11 @@ use Yiisoft\Db\Transaction\TransactionInterface;
  */
 final class ConnectionTest extends CommonConnectionTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testInitConnection(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
 
         $db->setEmulatePrepare(true);
         $db->open();
@@ -40,28 +42,29 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testSettingDefaultAttributes(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
 
-        $this->assertSame(PDO::ERRMODE_EXCEPTION, $db->getActivePDO()?->getAttribute(PDO::ATTR_ERRMODE));
+        $this->assertSame(PDO::ERRMODE_EXCEPTION, $db->getActivePdo()?->getAttribute(PDO::ATTR_ERRMODE));
 
         $db->close();
         $db->setEmulatePrepare(true);
         $db->open();
 
-        $this->assertEquals(true, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(true, $db->getActivePdo()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
         $db->setEmulatePrepare(false);
         $db->open();
 
-        $this->assertEquals(false, $db->getActivePDO()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+        $this->assertEquals(false, $db->getActivePdo()?->getAttribute(PDO::ATTR_EMULATE_PREPARES));
 
         $db->close();
     }
 
     public function testTransactionIsolation(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->createConnection();
+        $this->loadFixture(db: $db);
 
         $transaction = $db->beginTransaction(TransactionInterface::READ_UNCOMMITTED);
         $transaction->commit();
@@ -83,7 +86,8 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testTransactionShortcutCustom(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->createConnection();
+        $this->loadFixture(db: $db);
 
         $result = $db->transaction(
             static function (ConnectionInterface $db) {
@@ -105,10 +109,12 @@ final class ConnectionTest extends CommonConnectionTest
         $db->close();
     }
 
-    /** @link https://github.com/yiisoft/db-mysql/issues/348 */
+    /**
+     * @link https://github.com/yiisoft/db-mysql/issues/348
+     */
     public function testRestartConnectionOnTimeout(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
 
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
@@ -123,44 +129,53 @@ final class ConnectionTest extends CommonConnectionTest
 
     public function testNotRestartConnectionOnTimeoutInTransaction(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
         $db->beginTransaction();
 
         $db->createCommand('SET SESSION wait_timeout = 1')->execute();
 
         sleep(2);
 
-        $this->expectException(IntegrityException::class);
-        $this->expectExceptionMessageMatches('/SQLSTATE\[HY000\]: General error: (?:2006|4031) /');
+        $command = $db->createCommand('SELECT 1');
 
-        $db->createCommand('SELECT 1')->queryScalar();
+        $exception = null;
+        try {
+            $command->queryScalar();
+        } catch (Throwable $exception) {
+        }
+
+        $this->assertInstanceOf(IntegrityException::class, $exception);
+        $this->assertMatchesRegularExpression(
+            '/SQLSTATE\[HY000\]: General error: (?:2006|4031) /',
+            $exception->getMessage(),
+        );
 
         $db->close();
     }
 
     public function getColumnBuilderClass(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->assertSame(ColumnBuilder::class, $db->getColumnBuilderClass());
-
-        $db->close();
     }
 
     public function testGetColumnFactory(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->assertInstanceOf(ColumnFactory::class, $db->getColumnFactory());
-
-        $db->close();
     }
 
     public function testUserDefinedColumnFactory(): void
     {
         $columnFactory = new ColumnFactory();
 
-        $db = new Connection($this->getDriver(), DbHelper::getSchemaCache(), $columnFactory);
+        $db = new Connection(
+            TestConnection::createDriver(),
+            TestHelper::createMemorySchemaCache(),
+            $columnFactory,
+        );
 
         $this->assertSame($columnFactory, $db->getColumnFactory());
 

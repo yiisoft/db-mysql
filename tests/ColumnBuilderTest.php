@@ -6,15 +6,15 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnBuilderProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\AbstractColumnBuilderTest;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Tests\Common\CommonColumnBuilderTest;
 
 /**
  * @group mysql
  */
-class ColumnBuilderTest extends AbstractColumnBuilderTest
+class ColumnBuilderTest extends CommonColumnBuilderTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     #[DataProviderExternal(ColumnBuilderProvider::class, 'buildingMethods')]
     public function testBuildingMethods(

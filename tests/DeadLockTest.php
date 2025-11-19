@@ -10,7 +10,6 @@ use RuntimeException;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function date;
@@ -37,13 +36,9 @@ use function unlink;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class DeadLockTest extends TestCase
 {
-    use TestTrait;
-
     private const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
 
@@ -52,8 +47,8 @@ final class DeadLockTest extends TestCase
      *
      * Accident deadlock exception lost while rolling back a transaction or savepoint
      *
-     * {@link https://github.com/yiisoft/yii2/issues/12715}
-     * {@link https://github.com/yiisoft/yii2/pull/13346}
+     * @link https://github.com/yiisoft/yii2/issues/12715
+     * @link https://github.com/yiisoft/yii2/pull/13346
      */
     public function testDeadlockException(): void
     {
@@ -341,8 +336,6 @@ final class DeadLockTest extends TestCase
      * In case of error in child process its execution bubbles up to phpunit to continue all the rest tests. So, all
      * the rest tests in this case will run both in the child and parent processes. Such mess must be prevented with
      * child's own error handler.
-     *
-     * @throws ErrorException
      */
     private function setErrorHandler(): void
     {

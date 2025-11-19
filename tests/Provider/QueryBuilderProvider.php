@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests\Provider;
 
+use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\DataType;
 use Yiisoft\Db\Constant\PseudoType;
@@ -12,7 +13,8 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 
 use function array_replace;
 use function str_contains;
@@ -20,10 +22,6 @@ use function version_compare;
 
 final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilderProvider
 {
-    use TestTrait;
-
-    protected static string $driverName = 'mysql';
-
     public static function alterColumn(): array
     {
         return [
@@ -140,7 +138,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
     public static function upsertReturning(): array
     {
         $upsert = self::upsert();
-        $quoter = self::getDb()->getQuoter();
+        $quoter = TestConnection::getShared()->getQuoter();
 
         foreach ($upsert as &$data) {
             array_splice($data, 3, 0, [['id']]);
@@ -301,9 +299,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $values[] = ["enum('a','b','c')", ColumnBuilder::string()->dbType("enum('a','b','c')")];
 
-        $db = self::getDb();
-        $serverVersion = $db->getServerInfo()->getVersion();
-        $db->close();
+        $serverVersion = TestConnection::getShared()->getServerInfo()->getVersion();
 
         if (!str_contains($serverVersion, 'MariaDB')
             && version_compare($serverVersion, '8', '<')
@@ -350,7 +346,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
     public static function multiOperandFunctionBuilder(): array
     {
-        $data = parent::multiOperandFunctionBuilder();
+        $data = iterator_to_array(parent::multiOperandFunctionBuilder());
 
         $stringParam = new Param('[3,4,5]', DataType::STRING);
 
@@ -359,9 +355,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $data['Shortest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)';
         $data['Shortest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
 
-        $db = self::getDb();
-        $serverVersion = $db->getServerInfo()->getVersion();
-        $db->close();
+        $serverVersion = TestConnection::getShared()->getServerInfo()->getVersion();
 
         $isMariadb = str_contains($serverVersion, 'MariaDB');
 
@@ -398,7 +392,12 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
             // MySQL does not support query parameters in JSON_TABLE() function.
             $data['ArrayMerge with 4 operands'] = [
                 ArrayMerge::class,
-                [[1, 2, 3], new ArrayValue([5, 6, 7]), $stringParam, self::getDb()->select(new ArrayValue([9, 10]))],
+                static fn(ConnectionInterface $db) => [
+                    [1, 2, 3],
+                    new ArrayValue([5, 6, 7]),
+                    $stringParam,
+                    $db->select(new ArrayValue([9, 10])),
+                ],
                 '(SELECT JSON_ARRAYAGG(value) AS value FROM ('
                 . "SELECT value FROM JSON_TABLE(:qp0, '$[*]' COLUMNS(value json PATH '$')) AS t"
                 . " UNION SELECT value FROM JSON_TABLE(:qp1, '$[*]' COLUMNS(value json PATH '$')) AS t"

@@ -16,27 +16,27 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Schema;
 use Yiisoft\Db\Mysql\Tests\Provider\SchemaProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
-use Yiisoft\Db\Tests\Support\DbHelper;
+
+use Yiisoft\Db\Tests\Support\TestHelper;
 
 use function version_compare;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class SchemaTest extends CommonSchemaTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
     public function testColumns(array $columns, string $tableName): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
         $db->close();
 
@@ -77,7 +77,7 @@ final class SchemaTest extends CommonSchemaTest
     public function testDefaultValueDatetimeColumn(): void
     {
         $tableName = '{{%datetime_test}}';
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
 
         $oldMySQL = !(
@@ -128,7 +128,7 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testDefaultValueDatetimeColumnWithMicrosecs(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $command = $db->createCommand();
         $schema = $db->getSchema();
@@ -184,11 +184,11 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetSchemaNames(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $schema = $db->getSchema();
 
-        $this->assertSame([self::getDatabaseName()], $schema->getSchemaNames());
+        $this->assertSame([TestConnection::databaseName()], $schema->getSchemaNames());
 
         $db->close();
     }
@@ -205,10 +205,11 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetTableNamesWithSchema(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $schema = $db->getSchema();
-        $tablesNames = $schema->getTableNames(self::getDatabaseName());
+        $tablesNames = $schema->getTableNames(TestConnection::databaseName());
 
         $expectedTableNames = [
             'alpha',
@@ -254,7 +255,8 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testGetViewNames(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
@@ -293,7 +295,7 @@ final class SchemaTest extends CommonSchemaTest
         string $expectedTableName,
         string $expectedSchemaName = '',
     ): void {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $commandMock = $this->createMock(CommandInterface::class);
         $commandMock->method('queryAll')->willReturn([]);
@@ -314,7 +316,7 @@ final class SchemaTest extends CommonSchemaTest
             )
             ->willReturn($commandMock);
 
-        $schema = new Schema($mockDb, DbHelper::getSchemaCache());
+        $schema = new Schema($mockDb, TestHelper::createMemorySchemaCache());
         $schema->getTablePrimaryKey($tableName, true);
 
         $db->close();
@@ -346,7 +348,7 @@ final class SchemaTest extends CommonSchemaTest
         $constraintName = 't_constraint';
         $columnName = 't_field';
 
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $this->createTableForIndexAndConstraintTests($db, $tableName, $columnName);
         $db->createCommand()->addPrimaryKey($tableName, $constraintName, $columnName)->execute();
@@ -369,7 +371,9 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testTinyInt1()
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $tableName = '{{%tinyint}}';
 
         if ($db->getTableSchema($tableName)) {
@@ -398,7 +402,7 @@ final class SchemaTest extends CommonSchemaTest
     public function testNotConnectionPDO(): void
     {
         $db = $this->createMock(ConnectionInterface::class);
-        $schema = new Schema($db, DbHelper::getSchemaCache());
+        $schema = new Schema($db, TestHelper::createMemorySchemaCache());
 
         $this->expectException(NotSupportedException::class);
         $this->expectExceptionMessage('Only PDO connections are supported.');
@@ -408,7 +412,9 @@ final class SchemaTest extends CommonSchemaTest
 
     public function testInsertDefaultValues()
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $command = $db->createCommand();
 
         $command->insert('negative_default_values', [])->execute();

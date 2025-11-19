@@ -4,33 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
-use Throwable;
 use Yiisoft\Db\Driver\Pdo\PdoConnectionInterface;
-use Yiisoft\Db\Exception\Exception;
-use Yiisoft\Db\Exception\InvalidCallException;
-use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Mysql\ServerInfo;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class PdoConnectionTest extends CommonPdoConnectionTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws InvalidCallException
-     * @throws Throwable
-     */
-    public function testGetLastInsertID(): void
+    public function testGetLastInsertId(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $tableName = 'test';
 
@@ -96,9 +84,11 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
         $db->close();
     }
 
-    public function testTransactionAutocommit()
+    public function testTransactionAutocommit(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $db->transaction(function (PdoConnectionInterface $db) {
             $this->assertTrue($db->getTransaction()->isActive());
 
@@ -115,7 +105,7 @@ final class PdoConnectionTest extends CommonPdoConnectionTest
 
     public function testGetServerInfo(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
         $serverInfo = $db->getServerInfo();
 
         $this->assertInstanceOf(ServerInfo::class, $serverInfo);

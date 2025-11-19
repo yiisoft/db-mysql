@@ -5,41 +5,38 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use PDO;
-use PHPUnit\Framework\TestCase;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
+use Yiisoft\Db\Tests\Support\IntegrationTestCase;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
-final class PDODriverTest extends TestCase
+final class PdoDriverTest extends IntegrationTestCase
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testConnectionCharset(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
-        $pdo = $db->getActivePDO();
+        $pdo = $db->getActivePdo();
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
 
         $this->assertEqualsIgnoringCase('utf8mb4', array_values($charset)[1]);
 
-        $pdoDriver = $this->getDriver();
+        $pdoDriver = TestConnection::createDriver();
         $newCharset = 'latin1';
         $pdoDriver->charset($newCharset);
         $pdo = $pdoDriver->createConnection();
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
 
         $this->assertEqualsIgnoringCase($newCharset, array_values($charset)[1]);
-
-        $db->close();
     }
 
     public function testCharsetDefault(): void
     {
-        $db = self::getDb();
+        $db = $this->getSharedConnection();
         $db->open();
         $command = $db->createCommand();
 

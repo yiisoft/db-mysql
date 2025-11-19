@@ -8,7 +8,7 @@ use Throwable;
 use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Exception\InvalidConfigException;
 use Yiisoft\Db\Expression\Expression;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
@@ -17,7 +17,7 @@ use Yiisoft\Db\Tests\Common\CommonQueryTest;
  */
 final class QueryTest extends CommonQueryTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     /**
      * Ensure no ambiguous column error occurs on indexBy with JOIN.
@@ -26,7 +26,8 @@ final class QueryTest extends CommonQueryTest
      */
     public function testAmbiguousColumnIndexBy(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $selectExpression = "concat(customer.name,' in ', p.description) name";
 
@@ -38,18 +39,11 @@ final class QueryTest extends CommonQueryTest
             ->column();
 
         $this->assertSame([1 => 'user1 in profile customer 1', 3 => 'user3 in profile customer 3'], $result);
-
-        $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testQueryIndexHint(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $query = (new Query($db))->from([new Expression('{{%customer}} USE INDEX (primary)')]);
 
@@ -62,14 +56,9 @@ final class QueryTest extends CommonQueryTest
         $db->close();
     }
 
-    /**
-     * @throws Exception
-     * @throws InvalidConfigException
-     * @throws Throwable
-     */
     public function testLimitOffsetWithExpression(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $query = (new Query($db))->from('customer')->select('id')->orderBy('id');
 
@@ -88,7 +77,7 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQuery(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
         $db->close();
 
@@ -104,9 +93,8 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQueryRecursive(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $serverVersion = $db->getServerInfo()->getVersion();
-        $db->close();
 
         if (
             !str_contains($serverVersion, 'MariaDB')
