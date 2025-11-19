@@ -33,7 +33,7 @@ final class SchemaTest extends CommonSchemaTest
     use IntegrationTestTrait;
 
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
-    public function testColumns(array $columns, string $tableName): void
+    public function testColumns(array $columns, string $tableName, ?string $dump = null): void
     {
         $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
 
@@ -62,7 +62,7 @@ final class SchemaTest extends CommonSchemaTest
             }
         }
 
-        parent::testColumns($columns, $tableName);
+        parent::testColumns($columns, $tableName, $dump);
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'columnsTypeBit')]
