@@ -53,7 +53,7 @@ final class DeadLockTest extends IntegrationTestCase
      * @link https://github.com/yiisoft/yii2/issues/12715
      * @link https://github.com/yiisoft/yii2/pull/13346
      */
-    public function t1estDeadlockException(): void
+    public function testDeadlockException(): void
     {
         if (!function_exists('pcntl_fork')) {
             $this->markTestSkipped('pcntl_fork() is not available');
@@ -248,6 +248,8 @@ final class DeadLockTest extends IntegrationTestCase
             );
 
             return 1;
+        } finally {
+            $first->close();
         }
 
         $this->log('child 1: exit');
@@ -326,6 +328,8 @@ final class DeadLockTest extends IntegrationTestCase
             );
 
             return 1;
+        } finally {
+            $second->close();
         }
 
         $this->log('child 2: exit');
