@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use ErrorException;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Throwable;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Exception\Exception;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Tests\Support\IntegrationTestCase;
 use Yiisoft\Db\Transaction\TransactionInterface;
 
 use function date;
@@ -37,8 +38,10 @@ use function unlink;
 /**
  * @group mysql
  */
-final class DeadLockTest extends TestCase
+final class DeadLockTest extends IntegrationTestCase
 {
+    use IntegrationTestTrait;
+
     private const CHILD_EXIT_CODE_DEADLOCK = 15;
     private string $logFile = '';
 
@@ -172,7 +175,7 @@ final class DeadLockTest extends TestCase
         try {
             $this->log('child 1: connect');
 
-            $first = $this->getConnection();
+            $first = $this->createConnection();
 
             $this->log('child 1: delete');
 
@@ -286,8 +289,8 @@ final class DeadLockTest extends TestCase
 
             $this->log('child 2: connect');
 
-            /* @var ConnectionInteface $second */
-            $second = $this->getConnection(true);
+            $second = $this->createConnection();
+            $this->loadFixture(db: $second);
             $second->open();
 
             /* sleep(1); */
