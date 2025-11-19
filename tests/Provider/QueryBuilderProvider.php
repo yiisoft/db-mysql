@@ -13,7 +13,6 @@ use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
-
 use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 
 use function array_replace;

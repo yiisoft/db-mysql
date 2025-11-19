@@ -21,7 +21,6 @@ use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
 use Yiisoft\Db\Tests\Common\CommonSchemaTest;
-
 use Yiisoft\Db\Tests\Support\TestHelper;
 
 use function version_compare;
