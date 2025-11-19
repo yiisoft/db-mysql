@@ -41,6 +41,7 @@ final class QueryTest extends CommonQueryTest
     public function testQueryIndexHint(): void
     {
         $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $query = (new Query($db))->from([new Expression('{{%customer}} USE INDEX (primary)')]);
 
@@ -56,6 +57,7 @@ final class QueryTest extends CommonQueryTest
     public function testLimitOffsetWithExpression(): void
     {
         $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $query = (new Query($db))->from('customer')->select('id')->orderBy('id');
 
@@ -74,9 +76,7 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQuery(): void
     {
-        $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
-        $db->close();
+        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
 
         if (
             !str_contains($serverVersion, 'MariaDB')
@@ -90,8 +90,7 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQueryRecursive(): void
     {
-        $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
 
         if (
             !str_contains($serverVersion, 'MariaDB')

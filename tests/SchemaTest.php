@@ -35,9 +35,7 @@ final class SchemaTest extends CommonSchemaTest
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
     public function testColumns(array $columns, string $tableName): void
     {
-        $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
-        $db->close();
+        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
 
         if (
             version_compare($serverVersion, '8.0.17', '>')

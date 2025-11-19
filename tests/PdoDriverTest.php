@@ -32,6 +32,8 @@ final class PdoDriverTest extends IntegrationTestCase
         $charset = $pdo->query('SHOW VARIABLES LIKE \'character_set_client\'', PDO::FETCH_ASSOC)->fetch();
 
         $this->assertEqualsIgnoringCase($newCharset, array_values($charset)[1]);
+
+        unset($pdo);
     }
 
     public function testCharsetDefault(): void

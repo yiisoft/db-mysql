@@ -58,8 +58,6 @@ final class ColumnFactoryTest extends CommonColumnFactoryTest
         $column = $columnFactory->fromType(ColumnType::DATETIME, ['defaultValueRaw' => 'now()', 'extra' => 'DEFAULT_GENERATED']);
 
         $this->assertEquals(new Expression('now()'), $column->getDefaultValue());
-
-        $db->close();
     }
 
     protected function getColumnFactoryClass(): string
