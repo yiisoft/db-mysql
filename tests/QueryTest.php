@@ -6,6 +6,7 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonQueryTest;
 
@@ -76,7 +77,7 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQuery(): void
     {
-        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if (
             !str_contains($serverVersion, 'MariaDB')
@@ -90,7 +91,7 @@ final class QueryTest extends CommonQueryTest
 
     public function testWithQueryRecursive(): void
     {
-        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if (
             !str_contains($serverVersion, 'MariaDB')

@@ -35,7 +35,7 @@ final class SchemaTest extends CommonSchemaTest
     #[DataProviderExternal(SchemaProvider::class, 'columns')]
     public function testColumns(array $columns, string $tableName, ?string $dump = null): void
     {
-        $serverVersion = $this->getSharedConnection()->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if (
             version_compare($serverVersion, '8.0.17', '>')
@@ -75,7 +75,7 @@ final class SchemaTest extends CommonSchemaTest
     {
         $tableName = '{{%datetime_test}}';
         $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         $oldMySQL = !(
             version_compare($serverVersion, '8.0.0', '>')
@@ -258,7 +258,7 @@ final class SchemaTest extends CommonSchemaTest
         $schema = $db->getSchema();
         $views = $schema->getViewNames();
 
-        $viewExpected = match (str_contains($db->getServerInfo()->getVersion(), 'MariaDB')) {
+        $viewExpected = match (str_contains(TestConnection::getServerVersion(), 'MariaDB')) {
             true => ['animal_view', 'user'],
             default => ['animal_view'],
         };

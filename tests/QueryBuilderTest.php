@@ -18,6 +18,7 @@ use Yiisoft\Db\Expression\Value\ArrayValue;
 use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Mysql\Tests\Provider\QueryBuilderProvider;
 use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Query\QueryInterface;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
@@ -60,7 +61,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     {
         $db = $this->getSharedConnection();
         $this->loadFixture();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         $qb = $db->getQueryBuilder();
         $sql = <<<SQL
@@ -306,7 +307,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     {
         $db = $this->getSharedConnection();
         $this->loadFixture();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         $qb = $db->getQueryBuilder();
         $sql = <<<SQL
@@ -697,7 +698,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlapsBuilder(): void
     {
         $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
@@ -727,7 +728,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     public function testJsonOverlaps(Closure|iterable|ExpressionInterface $values, int $expectedCount): void
     {
         $db = $this->getSharedConnection();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if ($values instanceof Closure) {
             $values = $values($db);
@@ -760,7 +761,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
             $values = $values($db);
         }
 
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
         if (str_contains($serverVersion, 'MariaDB') && version_compare($serverVersion, '10.9', '<')) {
             $db->close();
             self::markTestSkipped('MariaDB < 10.9 does not support JSON_OVERLAPS() function.');
@@ -861,7 +862,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
     ): void {
         $db = $this->getSharedConnection();
         $qb = $db->getQueryBuilder();
-        $serverVersion = $db->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         $isMariadb = str_contains($serverVersion, 'MariaDB');
 

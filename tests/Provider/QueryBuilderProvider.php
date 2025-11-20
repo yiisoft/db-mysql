@@ -298,7 +298,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
 
         $values[] = ["enum('a','b','c')", ColumnBuilder::string()->dbType("enum('a','b','c')")];
 
-        $serverVersion = TestConnection::getShared()->getServerInfo()->getVersion();
+        $serverVersion = TestConnection::getServerVersion();
 
         if (!str_contains($serverVersion, 'MariaDB')
             && version_compare($serverVersion, '8', '<')
@@ -354,8 +354,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $data['Shortest with 2 operands'][2] = '(SELECT :qp0 AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)';
         $data['Shortest with 3 operands'][2] = "(SELECT :qp0 AS value UNION SELECT (SELECT 'longest') AS value UNION SELECT :qp1 AS value ORDER BY LENGTH(value) ASC LIMIT 1)";
 
-        $serverVersion = TestConnection::getShared()->getServerInfo()->getVersion();
-
+        $serverVersion = TestConnection::getServerVersion();
         $isMariadb = str_contains($serverVersion, 'MariaDB');
 
         if (

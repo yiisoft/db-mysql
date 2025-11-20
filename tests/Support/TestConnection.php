@@ -21,6 +21,11 @@ final class TestConnection
         return $db;
     }
 
+    public static function getServerVersion(): string
+    {
+        return self::getShared()->getServerInfo()->getVersion();
+    }
+
     public static function dsn(): string
     {
         return self::$dsn ??= (string) new Dsn(
