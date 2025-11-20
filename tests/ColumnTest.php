@@ -12,7 +12,7 @@ use Yiisoft\Db\Exception\Exception;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\StringColumn;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
@@ -30,11 +30,11 @@ use function str_repeat;
  */
 final class ColumnTest extends CommonColumnTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     public function testSelectWithPhpTypecasting(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $sql = <<<SQL
             SELECT
@@ -91,7 +91,8 @@ final class ColumnTest extends CommonColumnTest
     #[DataProviderExternal(ColumnProvider::class, 'bigIntValue')]
     public function testColumnBigInt(string $bigint): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $command = $db->createCommand();
         $command->insert('negative_default_values', ['bigint_col' => $bigint]);
@@ -105,7 +106,8 @@ final class ColumnTest extends CommonColumnTest
 
     public function testColumnInstance(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
         $schema = $db->getSchema();
         $tableSchema = $schema->getTableSchema('type');
 
@@ -121,7 +123,7 @@ final class ColumnTest extends CommonColumnTest
 
     public function testLongtextType(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $command = $db->createCommand();
 
         try {
@@ -151,7 +153,7 @@ final class ColumnTest extends CommonColumnTest
 
     public function testTimestampColumnOnDifferentTimezones(): void
     {
-        $db = $this->getConnection();
+        $db = $this->createConnection();
         $schema = $db->getSchema();
         $command = $db->createCommand();
         $tableName = 'timestamp_column_test';

@@ -6,15 +6,15 @@ namespace Yiisoft\Db\Mysql\Tests;
 
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Mysql\Tests\Provider\QuoterProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
-use Yiisoft\Db\Tests\AbstractQuoterTest;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Tests\Common\CommonQuoterTest;
 
 /**
  * @group mysql
  */
-final class QuoterTest extends AbstractQuoterTest
+final class QuoterTest extends CommonQuoterTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     #[DataProviderExternal(QuoterProvider::class, 'tableNameParts')]
     public function testGetTableNameParts(string $tableName, array $expected): void
@@ -45,7 +45,7 @@ final class QuoterTest extends AbstractQuoterTest
 
     public function testQuoteValue(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
 
         $quoter = $db->getQuoter();
 

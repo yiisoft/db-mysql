@@ -4,24 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
 
+use Closure;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Exception\NotSupportedException;
 use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Mysql\Tests\Provider\CommandProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Tests\Common\CommonCommandTest;
 
 /**
  * @group mysql
- *
- * @psalm-suppress PropertyNotSetInConstructor
  */
 final class CommandTest extends CommonCommandTest
 {
-    use TestTrait;
-
-    protected string $upsertTestCharCast = 'CONVERT([[address]], CHAR)';
+    use IntegrationTestTrait;
 
     public function testAddCheck(): void
     {
@@ -41,7 +39,8 @@ final class CommandTest extends CommonCommandTest
 
     public function testAlterColumn(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
 
         $command = $db->createCommand();
         $command->alterColumn('{{customer}}', 'email', 'text')->execute();
@@ -84,7 +83,7 @@ final class CommandTest extends CommonCommandTest
 
     public function testDropTableCascade(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $command = $db->createCommand();
 
         $this->expectException(NotSupportedException::class);
@@ -102,7 +101,9 @@ final class CommandTest extends CommonCommandTest
 
     public function testInsertReturningPksWithSubqueryAndNoAutoincrement(): void
     {
-        $db = $this->getConnection(true);
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
         $command = $db->createCommand();
 
         $query = (new Query($db))->select(['order_id' => 1, 'item_id' => 2, 'quantity' => 3, 'subtotal' => 4]);
@@ -120,7 +121,7 @@ final class CommandTest extends CommonCommandTest
         string $table,
         array $columns,
         array|ExpressionInterface|string $conditions,
-        array|ExpressionInterface|string|null $from,
+        Closure|array|ExpressionInterface|string|null $from,
         array $params,
         array $expectedValues,
         int $expectedCount,
@@ -129,19 +130,26 @@ final class CommandTest extends CommonCommandTest
     }
 
     #[DataProviderExternal(CommandProvider::class, 'upsert')]
-    public function testUpsert(array $firstData, array $secondData): void
+    public function testUpsert(Closure|array $firstData, Closure|array $secondData): void
     {
         parent::testUpsert($firstData, $secondData);
     }
 
     public function testShowDatabases(): void
     {
-        $this->assertSame([self::getDatabaseName()], self::getDb()->createCommand()->showDatabases());
+        $db = $this->getSharedConnection();
+
+        $this->assertSame([TestConnection::databaseName()], $db->createCommand()->showDatabases());
     }
 
     #[DataProviderExternal(CommandProvider::class, 'createIndex')]
     public function testCreateIndex(array $columns, array $indexColumns, ?string $indexType, ?string $indexMethod): void
     {
         parent::testCreateIndex($columns, $indexColumns, $indexType, $indexMethod);
+    }
+
+    protected function getUpsertTestCharCast(): string
+    {
+        return 'CONVERT([[address]], CHAR)';
     }
 }

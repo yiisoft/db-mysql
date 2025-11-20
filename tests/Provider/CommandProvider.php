@@ -7,12 +7,9 @@ namespace Yiisoft\Db\Mysql\Tests\Provider;
 use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\IndexMethod;
 use Yiisoft\Db\Mysql\IndexType;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
 
 final class CommandProvider extends \Yiisoft\Db\Tests\Provider\CommandProvider
 {
-    use TestTrait;
-
     public static function createIndex(): array
     {
         return [

@@ -9,16 +9,16 @@ use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Expression\Expression;
 use Yiisoft\Db\Mysql\Column\ColumnFactory;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnFactoryProvider;
-use Yiisoft\Db\Mysql\Tests\Support\TestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
-use Yiisoft\Db\Tests\AbstractColumnFactoryTest;
+use Yiisoft\Db\Tests\Common\CommonColumnFactoryTest;
 
 /**
  * @group mysql
  */
-final class ColumnFactoryTest extends AbstractColumnFactoryTest
+final class ColumnFactoryTest extends CommonColumnFactoryTest
 {
-    use TestTrait;
+    use IntegrationTestTrait;
 
     #[DataProviderExternal(ColumnFactoryProvider::class, 'dbTypes')]
     public function testFromDbType(string $dbType, string $expectedType, string $expectedInstanceOf): void
@@ -52,14 +52,12 @@ final class ColumnFactoryTest extends AbstractColumnFactoryTest
 
     public function testExpressionDefaultValueRaw(): void
     {
-        $db = $this->getConnection();
+        $db = $this->getSharedConnection();
         $columnFactory = $db->getColumnFactory();
 
         $column = $columnFactory->fromType(ColumnType::DATETIME, ['defaultValueRaw' => 'now()', 'extra' => 'DEFAULT_GENERATED']);
 
         $this->assertEquals(new Expression('now()'), $column->getDefaultValue());
-
-        $db->close();
     }
 
     protected function getColumnFactoryClass(): string
