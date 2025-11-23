@@ -57,6 +57,11 @@ final class TestConnection
         return getenv('YII_MYSQL_DATABASE') ?: 'yiitest';
     }
 
+    public static function isMariadb(): bool
+    {
+        return getenv('YII_MYSQL_TYPE') === 'mariadb';
+    }
+
     private static function host(): string
     {
         if (self::isMariadb()) {
@@ -91,10 +96,5 @@ final class TestConnection
         }
 
         return getenv('YII_MYSQL_PASSWORD') ?: '';
-    }
-
-    private static function isMariadb(): bool
-    {
-        return getenv('YII_MYSQL_TYPE') === 'mariadb';
     }
 }
