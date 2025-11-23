@@ -264,7 +264,10 @@ final class ColumnTest extends CommonColumnTest
         $this->assertFalse($result['bool_col']);
         $this->assertSame(0b0110_0100, $result['bit_col']);
 
-        if ($allTypecasted) {
+        // JSON column is always typecasted after this fix: https://github.com/php/php-src/issues/20122
+        // PHP 8.3.28+, 8.4.15+
+        $isPhpWithFix = PHP_VERSION_ID >= 80328 && PHP_VERSION_ID >= 80415;
+        if ($allTypecasted || $isPhpWithFix) {
             $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
         } else {
             $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
