@@ -13,6 +13,7 @@ use Yiisoft\Db\Mysql\Column\ColumnBuilder;
 use Yiisoft\Db\Mysql\Column\StringColumn;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnProvider;
 use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
+use Yiisoft\Db\Mysql\Tests\Support\TestConnection;
 use Yiisoft\Db\Query\Query;
 use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
@@ -264,10 +265,10 @@ final class ColumnTest extends CommonColumnTest
         $this->assertFalse($result['bool_col']);
         $this->assertSame(0b0110_0100, $result['bit_col']);
 
-        // JSON column is always typecasted after this fix: https://github.com/php/php-src/issues/20122
+        // JSON column is always typecasted in MySQL after this fix: https://github.com/php/php-src/issues/20122
         // PHP 8.3.28+, 8.4.15+
         $isPhpWithFix = (PHP_VERSION_ID >= 80328 && PHP_VERSION_ID < 80400) || PHP_VERSION_ID >= 80415;
-        if ($allTypecasted || $isPhpWithFix) {
+        if ($allTypecasted || (!TestConnection::isMariadb() && $isPhpWithFix)) {
             $this->assertSame([['a' => 1, 'b' => null, 'c' => [1, 3, 5]]], $result['json_col']);
         } else {
             $this->assertJsonStringEqualsJsonString('[{"a":1,"b":null,"c":[1,3,5]}]', $result['json_col']);
