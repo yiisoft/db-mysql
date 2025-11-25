@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Column;
 
+use Yiisoft\Db\Syntax\AbstractColumnDefinitionParser;
+
 /**
  * Parses column definition string. For example, `string(255)` or `int unsigned`.
  *
@@ -19,7 +21,7 @@ namespace Yiisoft\Db\Mysql\Column;
  *     unsigned?: bool
  * }
  */
-final class ColumnDefinitionParser extends \Yiisoft\Db\Syntax\ColumnDefinitionParser
+final class ColumnDefinitionParser extends AbstractColumnDefinitionParser
 {
     /**
      * @psalm-return ExtraInfo
@@ -43,5 +45,41 @@ final class ColumnDefinitionParser extends \Yiisoft\Db\Syntax\ColumnDefinitionPa
         }
 
         return $info;
+    }
+
+    protected function parseTypeParams(string $type, string $params): array
+    {
+        return match ($type) {
+            'bit',
+            'bigint',
+            'binary',
+            'char',
+            'decimal',
+            'double',
+            'float',
+            'int',
+            'integer',
+            'mediumint',
+            'numeric',
+            'real',
+            'smallint',
+            'string',
+            'tinyint',
+            'varbinary',
+            'varchar',
+            'year' => $this->parseSizeInfo($params),
+            'enum' => $this->parseEnumValues($params),
+            default => [],
+        };
+    }
+
+    /**
+     * @psalm-return array{enumValues: list<string>}
+     */
+    protected function parseEnumValues(string $params): array
+    {
+        preg_match_all("/'([^']*)'/", $params, $matches);
+
+        return ['enumValues' => $matches[1]];
     }
 }
