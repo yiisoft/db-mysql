@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql\Tests;
+
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use Yiisoft\Db\Mysql\Column\ColumnDefinitionParser;
 use Yiisoft\Db\Mysql\Tests\Provider\ColumnDefinitionParserProvider;
