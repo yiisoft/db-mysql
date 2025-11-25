@@ -15,4 +15,3 @@ final class ColumnDefinitionParserProvider extends \Yiisoft\Db\Tests\Provider\Co
         ];
     }
 }
-
