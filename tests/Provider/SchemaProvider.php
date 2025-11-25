@@ -16,6 +16,7 @@ use Yiisoft\Db\Schema\Column\BinaryColumn;
 use Yiisoft\Db\Schema\Column\BitColumn;
 use Yiisoft\Db\Schema\Column\BooleanColumn;
 use Yiisoft\Db\Schema\Column\DoubleColumn;
+use Yiisoft\Db\Schema\Column\EnumColumn;
 use Yiisoft\Db\Schema\Column\IntegerColumn;
 use Yiisoft\Db\Schema\Column\JsonColumn;
 use Yiisoft\Db\Tests\Support\Assert;
@@ -82,11 +83,11 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                         collation: 'utf8mb4_general_ci',
                         dbType: 'text',
                     ),
-                    'enum_col' => new StringColumn(
+                    'enum_col' => new EnumColumn(
                         dbType: 'enum',
                         characterSet: 'utf8mb4',
                         collation: 'utf8mb4_general_ci',
-                        enumValues: ['a', 'B', 'c,D'],
+                        values: ['a', 'B', 'c,D'],
                     ),
                     'float_col' => new DoubleColumn(
                         dbType: 'double',
