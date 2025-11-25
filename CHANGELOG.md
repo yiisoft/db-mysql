@@ -55,6 +55,7 @@
 - Chg #428: Update expression namespaces according to changes in `yiisoft/db` package (@Tigrov)
 - Enh #432, #433: Update `DMLQueryBuilder::update()` method to adapt changes in `yiisoft/db` (@rustamwin, @Tigrov)
 - Enh #439: Move "Packets out of order" warning suppression from Yii DB (@vjik)
+- Chg #447: Refactor `ColumnDefinitionParser` (@vjik)
 
 ## 1.2.0 March 21, 2024
 
