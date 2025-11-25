@@ -24,8 +24,8 @@ use Yiisoft\Db\Syntax\AbstractColumnDefinitionParser;
 final class ColumnDefinitionParser extends AbstractColumnDefinitionParser
 {
     /**
-     * @psalm-return ExtraInfo
-     * @psalm-suppress ImplementedReturnTypeMismatch, InvalidReturnType, InvalidReturnStatement
+     * @inheritDoc
+     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
      */
     protected function extraInfo(string $extra): array
     {
