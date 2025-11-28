@@ -66,7 +66,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
     {
         if ($column instanceof EnumColumn) {
             $dbType = $this->getDbType($column);
-            if ($dbType === 'enum') {
+            if (strtolower($dbType) === 'enum') {
                 $values = array_map(
                     $this->queryBuilder->getQuoter()->quoteValue(...),
                     $column->getValues(),
