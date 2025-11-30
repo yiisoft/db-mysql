@@ -7,6 +7,7 @@ namespace Yiisoft\Db\Mysql\Column;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\QueryBuilder\AbstractColumnDefinitionBuilder;
 use Yiisoft\Db\Schema\Column\ColumnInterface;
+use Yiisoft\Db\Schema\Column\EnumColumn;
 
 use function str_contains;
 use function version_compare;
@@ -63,6 +64,17 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
 
     public function buildType(ColumnInterface $column): string
     {
+        if ($column instanceof EnumColumn) {
+            $dbType = $this->getDbType($column);
+            if (strtolower($dbType) === 'enum') {
+                $values = array_map(
+                    $this->queryBuilder->getQuoter()->quoteValue(...),
+                    $column->getValues(),
+                );
+                return $dbType . '(' . implode(',', $values) . ')';
+            }
+        }
+
         $dbType = parent::buildType($column);
 
         if (!$column instanceof StringColumn || empty($column->getCharacterSet())) {
@@ -70,6 +82,20 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
         }
 
         return "$dbType CHARACTER SET " . $column->getCharacterSet();
+    }
+
+    protected function buildCheck(ColumnInterface $column): string
+    {
+        $check = $column->getCheck();
+
+        if ($column instanceof EnumColumn && $column->getDbType() === null && empty($check)) {
+            $dbType = $this->getDbType($column);
+            if ($dbType === 'enum') {
+                return '';
+            }
+        }
+
+        return parent::buildCheck($column);
     }
 
     protected function buildComment(ColumnInterface $column): string
@@ -107,6 +133,7 @@ final class ColumnDefinitionBuilder extends AbstractColumnDefinitionBuilder
             ColumnType::ARRAY => 'json',
             ColumnType::STRUCTURED => 'json',
             ColumnType::JSON => 'json',
+            ColumnType::ENUM => 'enum',
             default => 'varchar',
         };
 
