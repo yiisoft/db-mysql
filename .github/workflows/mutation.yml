@@ -34,7 +34,7 @@ jobs:
           - ubuntu-latest
 
         php:
-          - 8.4
+          - 8.5
 
     services:
       mysql:
