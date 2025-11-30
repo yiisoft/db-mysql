@@ -59,8 +59,8 @@ jobs:
           ini-values: memory_limit=-1
           coverage: pcov
 
-      - name: Update composer.
-        run: composer self-update
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
 
       - name: Install db.
         uses: yiisoft/actions/install-packages@master
