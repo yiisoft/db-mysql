@@ -28,7 +28,7 @@
 - New #374: Add `IndexType` and `IndexMethod` classes (@Tigrov)
 - Enh #376: Move `JsonExpressionBuilder` and JSON type tests to `yiisoft/db` package (@Tigrov)
 - Bug #377: Explicitly mark nullable parameters (@vjik)
-- Chg #378: Change supported PHP versions to `8.1 - 8.4` (@Tigrov)
+- Chg #378, #451: Change supported PHP versions to `8.1 - 8.5` (@Tigrov, @vjik)
 - Enh #378: Minor refactoring (@Tigrov)
 - New #379: Add parameters `$ifExists` and `$cascade` to `CommandInterface::dropTable()` and
   `DDLQueryBuilderInterface::dropTable()` methods (@vjik)

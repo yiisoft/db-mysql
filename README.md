@@ -26,7 +26,7 @@ Driver supports MySQL 5.7 or higher, and MariaDB 10.4 or higher.
 
 ## Requirements
 
-- PHP 8.1 - 8.4.
+- PHP 8.1 - 8.5.
 - `pdo_mysql` PHP extension.
 - `ctype` PHP extension.
 
