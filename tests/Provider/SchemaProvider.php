@@ -102,12 +102,12 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                     'blob_col' => new BinaryColumn(
                         dbType: 'blob',
                     ),
-                    'numeric_col' => new DoubleColumn(
+                    'numeric_col' => new StringColumn(
                         ColumnType::DECIMAL,
                         dbType: 'decimal',
-                        size: 5,
                         scale: 2,
-                        defaultValue: 33.22,
+                        size: 5,
+                        defaultValue: '33.22',
                     ),
                     'timestamp_col' => new DateTimeColumn(
                         ColumnType::TIMESTAMP,
@@ -358,7 +358,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => 4,
                 'precision' => 3,
             ]],
-            [new DoubleColumn(ColumnType::DECIMAL, dbType: 'decimal', name: 'numeric_col', notNull: false, size: 5, scale: 2), [
+            [new StringColumn(ColumnType::DECIMAL, dbType: 'decimal', name: 'numeric_col', notNull: false, scale: 2, size: 5), [
                 'native_type' => 'NEWDECIMAL',
                 'pdo_type' => 2,
                 'flags' => [],
@@ -412,7 +412,7 @@ final class SchemaProvider extends \Yiisoft\Db\Tests\Provider\SchemaProvider
                 'len' => 1,
                 'precision' => 0,
             ]],
-            [new DoubleColumn(ColumnType::DECIMAL, dbType: 'decimal', name: '2.5', notNull: true, size: 2, scale: 1), [
+            [new StringColumn(ColumnType::DECIMAL, dbType: 'decimal', name: '2.5', notNull: true, scale: 1, size: 2), [
                 'native_type' => 'NEWDECIMAL',
                 'pdo_type' => 2,
                 'flags' => ['not_null'],

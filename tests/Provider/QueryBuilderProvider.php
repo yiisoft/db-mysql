@@ -178,9 +178,9 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
                 true,
                 ['id_1', 'id_2'],
                 'INSERT INTO `notauto_pk` (`id_1`, `id_2`, `type`) SELECT `id_1`, `id_2`, `type`'
-                . ' FROM (SELECT 1 AS `id_1`, 2.5 AS `id_2`, :qp0 AS `type`) AS EXCLUDED'
+                . ' FROM (SELECT 1 AS `id_1`, :qp0 AS `id_2`, :qp1 AS `type`) AS EXCLUDED'
                 . ' ON DUPLICATE KEY UPDATE `type`=EXCLUDED.`type`;SELECT 1 AS `id_1`, 2.5 AS `id_2`',
-                [':qp0' => new Param('Test', DataType::STRING)],
+                [':qp0' => new Param('2.5', DataType::STRING), ':qp1' => new Param('Test', DataType::STRING)],
             ],
             'no return columns' => [
                 'type',

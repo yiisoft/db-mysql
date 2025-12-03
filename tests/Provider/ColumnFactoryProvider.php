@@ -32,8 +32,8 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
             ['float', ColumnType::FLOAT, DoubleColumn::class],
             ['real', ColumnType::FLOAT, DoubleColumn::class],
             ['double', ColumnType::DOUBLE, DoubleColumn::class],
-            ['decimal', ColumnType::DECIMAL, DoubleColumn::class],
-            ['numeric', ColumnType::DECIMAL, DoubleColumn::class],
+            ['decimal', ColumnType::DECIMAL, StringColumn::class],
+            ['numeric', ColumnType::DECIMAL, StringColumn::class],
             ['char', ColumnType::CHAR, StringColumn::class],
             ['varchar', ColumnType::STRING, StringColumn::class],
             ['string', ColumnType::STRING, StringColumn::class],
@@ -63,7 +63,7 @@ final class ColumnFactoryProvider extends \Yiisoft\Db\Tests\Provider\ColumnFacto
         $definitions['text NOT NULL'][1] = new StringColumn(ColumnType::TEXT, dbType: 'text', notNull: true);
         $definitions['char(1)'][1] = new StringColumn(ColumnType::CHAR, dbType: 'char', size: 1);
         $definitions['string(126)[][]'][1] = new ArrayColumn(size: 126, dimension: 2, column: new StringColumn(size: 126));
-
+        $definitions['decimal(10,2)'][1] = new StringColumn(ColumnType::DECIMAL, dbType: 'decimal', scale: 2, size: 10);
         $definitions[] = ['bit(1)', new BooleanColumn(dbType: 'bit', size: 1)];
 
         return $definitions;
