@@ -75,6 +75,7 @@ final class ColumnFactory extends AbstractColumnFactory
             ColumnType::TIME => DateTimeColumn::class,
             ColumnType::TIMETZ => DateTimeColumn::class,
             ColumnType::DATE => DateTimeColumn::class,
+            ColumnType::DECIMAL => StringColumn::class,
             default => parent::getColumnClass($type, $info),
         };
     }
