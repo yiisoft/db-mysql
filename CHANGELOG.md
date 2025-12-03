@@ -9,7 +9,7 @@
 - Chg #339: Replace call of `SchemaInterface::getRawTableName()` to `QuoterInterface::getRawTableName()` (@Tigrov)
 - New #342, #430: Add JSON overlaps condition builder (@Tigrov)
 - Enh #344: Update `bit` type according to main PR yiisoft/db#860 (@Tigrov)
-- New #346, #361: Implement `ColumnFactory` class (@Tigrov)
+- New #346, #361, #454: Implement `ColumnFactory` class (@Tigrov, @vjik)
 - Enh #347, #353: Raise minimum PHP version to `^8.1` with minor refactoring (@Tigrov)
 - Bug #349, #352: Restore connection if closed by connection timeout (@Tigrov)
 - Enh #354: Separate column type constants (@Tigrov)
