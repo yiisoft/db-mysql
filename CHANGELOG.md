@@ -56,6 +56,7 @@
 - Enh #432, #433: Update `DMLQueryBuilder::update()` method to adapt changes in `yiisoft/db` (@rustamwin, @Tigrov)
 - Enh #439: Move "Packets out of order" warning suppression from Yii DB (@vjik)
 - New #448: Add enumeration column type support (@vjik)
+- New #453: Add source of column information (@Tigrov)
 
 ## 1.2.0 March 21, 2024
 
