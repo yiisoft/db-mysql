@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Mysql;
 
+use Yiisoft\Db\Constant\ColumnInfoSource;
 use Yiisoft\Db\Constant\ColumnType;
 use Yiisoft\Db\Constant\ReferentialAction;
 use Yiisoft\Db\Constraint\ForeignKey;
@@ -269,7 +270,7 @@ final class Schema extends AbstractPdoSchema
             default => strtolower($metadata['native_type']),
         };
 
-        $columnInfo = [];
+        $columnInfo = ['source' => ColumnInfoSource::QUERY_RESULT];
 
         if (!empty($metadata['table'])) {
             $columnInfo['table'] = $metadata['table'];
@@ -456,6 +457,7 @@ final class Schema extends AbstractPdoSchema
             'notNull' => $info['is_nullable'] !== 'YES',
             'primaryKey' => $info['column_key'] === 'PRI',
             'schema' => $info['schema'],
+            'source' => ColumnInfoSource::TABLE_SCHEMA,
             'table' => $info['table'],
             'unique' => $info['column_key'] === 'UNI',
         ];
