@@ -26,6 +26,8 @@ use Yiisoft\Db\Tests\Common\CommonColumnTest;
 use function iterator_to_array;
 use function str_repeat;
 
+use const PHP_VERSION_ID;
+
 /**
  * @group mysql
  */

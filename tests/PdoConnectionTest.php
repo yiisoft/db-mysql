@@ -9,6 +9,8 @@ use Yiisoft\Db\Mysql\ServerInfo;
 use Yiisoft\Db\Mysql\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Common\CommonPdoConnectionTest;
 
+use function strlen;
+
 /**
  * @group mysql
  */

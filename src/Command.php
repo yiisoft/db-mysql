@@ -17,6 +17,8 @@ use function set_error_handler;
 use function str_starts_with;
 use function substr;
 
+use const E_WARNING;
+
 /**
  * Implements a database command that can be executed with a PDO (PHP Data Object) database connection for MySQL,
  * MariaDB.
