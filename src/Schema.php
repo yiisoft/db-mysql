@@ -34,6 +34,7 @@ use function substr_compare;
 use function trim;
 
 use const PHP_INT_SIZE;
+use const PREG_SET_ORDER;
 
 /**
  * Implements MySQL, MariaDB specific schema, supporting MySQL Server 5.7, MariaDB Server 10.4 and higher.

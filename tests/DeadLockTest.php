@@ -35,6 +35,10 @@ use function sleep;
 use function sys_get_temp_dir;
 use function unlink;
 
+use const FILE_APPEND;
+use const LOCK_EX;
+use const SIGUSR1;
+
 /**
  * @group mysql
  */
