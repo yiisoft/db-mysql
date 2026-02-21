@@ -283,22 +283,22 @@ final class DeadLockTest extends IntegrationTestCase
             return 1;
         }
 
+        /* at first, parent should do 1st select */
+        $this->log('child 2: wait signal from child 1');
+
+        if (pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
+            $this->log('child 2: wait timeout exceeded');
+
+            return 1;
+        }
+
+        $this->log('child 2: connect');
+
+        $second = $this->createConnection();
+        $this->loadFixture(db: $second);
+        $second->open();
+
         try {
-            /* at first, parent should do 1st select */
-            $this->log('child 2: wait signal from child 1');
-
-            if (pcntl_sigtimedwait([SIGUSR1], $info, 10) <= 0) {
-                $this->log('child 2: wait timeout exceeded');
-
-                return 1;
-            }
-
-            $this->log('child 2: connect');
-
-            $second = $this->createConnection();
-            $this->loadFixture(db: $second);
-            $second->open();
-
             /* sleep(1); */
             $this->log('child 2: transaction');
 
