@@ -35,7 +35,7 @@ Driver supports MySQL 5.7 or higher, and MariaDB 10.4 or higher.
 The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
-composer require yiisoft/db-mysql
+composer require yiisoft/db-mysql:2.*
 ```
 
 > [!IMPORTANT]
