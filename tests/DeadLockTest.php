@@ -296,9 +296,10 @@ final class DeadLockTest extends IntegrationTestCase
 
         $second = $this->createConnection();
         $this->loadFixture(db: $second);
-        $second->open();
 
         try {
+            $second->open();
+
             /* sleep(1); */
             $this->log('child 2: transaction');
 
