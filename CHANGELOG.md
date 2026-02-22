@@ -4,6 +4,7 @@
 
 - Enh #459: Explicitly import constants in "use" section (@mspirkov)
 - Enh #460: Remove unnecessary files from Composer package (@mspirkov)
+- Enh #461: Add `ext-pdo_mysql` to `require` section of `composer.json` (@Tigrov)
 
 ## 2.0.0 December 05, 2025
 
