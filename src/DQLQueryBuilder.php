@@ -18,8 +18,6 @@ use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
 use Yiisoft\Db\QueryBuilder\Condition\NotLike;
 
-use function ctype_digit;
-
 /**
  * Implements a DQL (Data Query Language) SQL statements for MySQL, MariaDB.
  */
@@ -27,54 +25,31 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
 {
     public function buildLimit(ExpressionInterface|int|null $limit, ExpressionInterface|int|null $offset): string
     {
-        $sql = '';
-
-        if ($this->hasLimit($limit)) {
-            $sql = 'LIMIT ' . ($limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string) $limit);
-
-            if ($this->hasOffset($offset)) {
-                $sql .= ' OFFSET ' . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset);
-            }
-        } elseif ($this->hasOffset($offset)) {
+        if (!empty($offset)) {
             /**
              * Limit isn't optional in MySQL.
              *
              * @link https://stackoverflow.com/a/271650/1106908
              * @link https://dev.mysql.com/doc/refman/5.0/en/select.html#idm47619502796240
              */
-            $sql = 'LIMIT '
-                . ($offset instanceof ExpressionInterface ? $this->buildExpression($offset) : (string) $offset)
-                . ', 18446744073709551615'; // 2^64-1
+            $limit = $limit instanceof ExpressionInterface
+                ? $this->buildExpression($limit)
+                : $limit ?? '18446744073709551615'; // 2^64-1
+
+            $offset = $offset instanceof ExpressionInterface
+                ? $this->buildExpression($offset)
+                : (string) $offset;
+
+            return "LIMIT $limit OFFSET $offset";
         }
 
-        return $sql;
-    }
+        if ($limit !== null) {
+            $limit = $limit instanceof ExpressionInterface ? $this->buildExpression($limit) : (string) $limit;
 
-    /**
-     * Checks to see if the given limit is effective.
-     *
-     * @param mixed $limit The given limit.
-     *
-     * @return bool Whether the limit is effective.
-     */
-    protected function hasLimit(mixed $limit): bool
-    {
-        /** In MySQL limit argument must be a non-negative integer constant */
-        return ctype_digit((string) $limit);
-    }
+            return "LIMIT $limit";
+        }
 
-    /**
-     * Checks to see if the given offset is effective.
-     *
-     * @param mixed $offset The given offset.
-     *
-     * @return bool Whether the offset is effective.
-     */
-    protected function hasOffset(mixed $offset): bool
-    {
-        /** In MySQL offset argument must be a non-negative integer constant */
-        $offset = (string) $offset;
-        return ctype_digit($offset) && $offset !== '0';
+        return '';
     }
 
     protected function defaultExpressionBuilders(): array

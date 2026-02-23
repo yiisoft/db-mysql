@@ -192,7 +192,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->assertSame(
             <<<SQL
-            SELECT * LIMIT 10, 18446744073709551615
+            SELECT * LIMIT 18446744073709551615 OFFSET 10
             SQL,
             $sql,
         );
