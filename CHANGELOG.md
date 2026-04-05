@@ -6,6 +6,7 @@
 - Enh #460: Remove unnecessary files from Composer package (@mspirkov)
 - Enh #461: Add `ext-pdo_mysql` to `require` section of `composer.json` (@Tigrov)
 - Enh #462: Remove `ext-ctype` from `require` section of `composer.json` (@Tigrov)
+- Bug #463: Fix SQL injection in Schema::findViewNames() (@darkspock)
 
 ## 2.0.0 December 05, 2025
 
