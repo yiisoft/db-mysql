@@ -187,17 +187,20 @@ final class Schema extends AbstractPdoSchema
 
     protected function findViewNames(string $schema = ''): array
     {
-        $sql = match ($schema) {
-            '' => <<<SQL
+        if ($schema === '') {
+            $sql = <<<SQL
             SELECT table_name FROM information_schema.tables WHERE table_type = 'VIEW' AND table_schema != 'sys' order by table_name
-            SQL,
-            default => <<<SQL
-            SELECT table_name FROM information_schema.tables WHERE table_type = 'VIEW' AND table_schema = '$schema' order by table_name
-            SQL,
-        };
+            SQL;
+            $params = [];
+        } else {
+            $sql = <<<SQL
+            SELECT table_name FROM information_schema.tables WHERE table_type = 'VIEW' AND table_schema = :schemaName order by table_name
+            SQL;
+            $params = [':schemaName' => $schema];
+        }
 
         /** @var string[] */
-        return $this->db->createCommand($sql)->queryColumn();
+        return $this->db->createCommand($sql, $params)->queryColumn();
     }
 
     /**

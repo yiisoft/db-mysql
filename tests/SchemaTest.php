@@ -264,8 +264,43 @@ final class SchemaTest extends CommonSchemaTest
         };
 
         $this->assertSame($viewExpected, $views);
+    }
 
-        $db->close();
+    public function testGetViewNamesWithSchema(): void
+    {
+        $db = TestConnection::create();
+
+        $schema1 = 'test_get_view_names_with_schema1';
+        $schema2 = 'test_get_view_names_with_schema2';
+
+        try {
+            $db->createCommand("CREATE DATABASE IF NOT EXISTS `$schema1`")->execute();
+            $db->createCommand("CREATE DATABASE IF NOT EXISTS `$schema2`")->execute();
+
+            $db->createCommand("CREATE OR REPLACE VIEW `$schema1`.`view_a` AS SELECT 1")->execute();
+            $db->createCommand("CREATE OR REPLACE VIEW `$schema1`.`view_b` AS SELECT 1")->execute();
+            $db->createCommand("CREATE OR REPLACE VIEW `$schema2`.`view_c` AS SELECT 1")->execute();
+
+            $schema = $db->getSchema();
+
+            $this->assertSame(['view_a', 'view_b'], $schema->getViewNames($schema1));
+            $this->assertSame(['view_c'], $schema->getViewNames($schema2));
+        } finally {
+            $db->createCommand("DROP DATABASE IF EXISTS `$schema1`")->execute();
+            $db->createCommand("DROP DATABASE IF EXISTS `$schema2`")->execute();
+            $db->close();
+        }
+    }
+
+    public function testGetViewNamesSqlInjection(): void
+    {
+        $db = $this->getSharedConnection();
+        $this->loadFixture();
+
+        $schema = $db->getSchema();
+        $views = $schema->getViewNames("' OR ''='");
+
+        $this->assertSame([], $views);
     }
 
     #[DataProviderExternal(SchemaProvider::class, 'constraints')]
