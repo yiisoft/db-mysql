@@ -45,7 +45,7 @@
         "rector/rector": "^2.0.10",
         "spatie/phpunit-watcher": "^1.24",
         "vlucas/phpdotenv": "^5.6.1",
-        "yiisoft/aliases": "^2.0",
+        "yiisoft/aliases": "^3.1",
         "yiisoft/log-target-file": "^2.0.1",
         "yiisoft/psr-dummy-provider": "^1.0",
         "yiisoft/test-support": "^3.0",
