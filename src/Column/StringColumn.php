@@ -33,3 +33,4 @@ final class StringColumn extends \Yiisoft\Db\Schema\Column\StringColumn
         return $this->characterSet;
     }
 }
+<<<<<<< SEARCH
