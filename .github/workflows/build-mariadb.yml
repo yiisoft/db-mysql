@@ -22,6 +22,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
 jobs:
   tests:
     name: PHP ${{ matrix.php }}-${{ matrix.mariadb }}
@@ -45,17 +47,17 @@ jobs:
           - mariadb:10.7
           - mariadb:10.8
           - mariadb:10.9
-          - mariadb:latest
+          - mariadb:12
 
         include:
           - php: 8.1
-            mariadb: mariadb:latest
+            mariadb: mariadb:12
           - php: 8.2
-            mariadb: mariadb:latest
+            mariadb: mariadb:12
           - php: 8.3
-            mariadb: mariadb:latest
+            mariadb: mariadb:12
           - php: 8.4
-            mariadb: mariadb:latest
+            mariadb: mariadb:12
 
     services:
       mysql:
@@ -70,10 +72,12 @@ jobs:
 
     steps:
       - name: Checkout.
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
 
       - name: Install PHP with extensions.
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
         with:
           php-version: ${{ matrix.php }}
           extensions: ${{ env.EXTENSIONS }}
@@ -84,7 +88,7 @@ jobs:
         run: composer self-update
 
       - name: Install db.
-        uses: yiisoft/actions/install-packages@master
+        uses: yiisoft/actions/install-packages@ab62d6b3b0e0cff6c9724ec5a395bedb41c639a2
         with:
           packages: >-
             ['db']
@@ -93,7 +97,7 @@ jobs:
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always --display-warnings --display-deprecations
 
       - name: Upload coverage to Codecov.
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@04b047e8bb82a0c002c8312c1c880fbc6a999d45
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml

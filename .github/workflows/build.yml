@@ -22,6 +22,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
 jobs:
   tests:
     name: PHP ${{ matrix.php }}-${{ matrix.mysql }}
@@ -39,17 +41,17 @@ jobs:
 
         mysql:
           - mysql:5.7
-          - mysql:latest
+          - mysql:9
 
         include:
           - php: 8.1
-            mysql: mysql:latest
+            mysql: mysql:9
           - php: 8.2
-            mysql: mysql:latest
+            mysql: mysql:9
           - php: 8.3
-            mysql: mysql:latest
+            mysql: mysql:9
           - php: 8.4
-            mysql: mysql:latest
+            mysql: mysql:9
 
     services:
       mysql:
@@ -64,10 +66,12 @@ jobs:
 
     steps:
       - name: Checkout.
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
 
       - name: Install PHP with extensions.
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
         with:
           php-version: ${{ matrix.php }}
           extensions: ${{ env.EXTENSIONS }}
@@ -78,7 +82,7 @@ jobs:
         run: composer self-update
 
       - name: Install db.
-        uses: yiisoft/actions/install-packages@master
+        uses: yiisoft/actions/install-packages@ab62d6b3b0e0cff6c9724ec5a395bedb41c639a2
         with:
           packages: >-
             ['db']
@@ -87,7 +91,7 @@ jobs:
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always --display-warnings --display-deprecations
 
       - name: Upload coverage to Codecov.
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
