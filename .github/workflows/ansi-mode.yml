@@ -44,10 +44,13 @@ jobs:
 
         mysql:
           - mysql:9
+        include:
+          - mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
 
     services:
       mysql:
-        image: ${{ matrix.mysql }}
+        image: ${{ matrix.mysql_image }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_PASSWORD: ''

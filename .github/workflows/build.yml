@@ -44,18 +44,28 @@ jobs:
           - mysql:9
 
         include:
+          - php: 8.5
+            mysql: mysql:5.7
+            mysql_image: mysql:5.7@sha256:4bc6bc963e6d8443453676cae56536f4b8156d78bae03c0145cbe47c2aad73bb
+          - php: 8.5
+            mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
           - php: 8.1
             mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
           - php: 8.2
             mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
           - php: 8.3
             mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
           - php: 8.4
             mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
 
     services:
       mysql:
-        image: ${{ matrix.mysql }}
+        image: ${{ matrix.mysql_image }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_PASSWORD: ''

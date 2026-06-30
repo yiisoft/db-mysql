@@ -40,7 +40,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9
+        image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_PASSWORD: ''
@@ -59,7 +59,7 @@ jobs:
         uses: shivammathur/setup-php@b604ade2a87db23f8871b7182e69ec5e75effb45
         with:
           php-version: ${{ matrix.php }}
-          extensions: ${{ env.extensions }}
+          extensions: ${{ env.EXTENSIONS }}
           ini-values: memory_limit=-1
           coverage: pcov
 

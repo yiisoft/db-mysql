@@ -50,18 +50,43 @@ jobs:
           - mariadb:12
 
         include:
+          - php: 8.5
+            mariadb: mariadb:10.4
+            mariadb_image: mariadb:10.4@sha256:22edfe1c78349f8cae88bbb5c2873b7e6c515be767c91c691308ce57445806f3
+          - php: 8.5
+            mariadb: mariadb:10.5
+            mariadb_image: mariadb:10.5@sha256:a530aeeefd82f4fa5150f391b6c75462140904780338766f6b03acecb1cca3ce
+          - php: 8.5
+            mariadb: mariadb:10.6
+            mariadb_image: mariadb:10.6@sha256:daacc2f260f8ec999daa5e03a017a23a7e6fa3fb982aaf26e8b72f24daf03bc9
+          - php: 8.5
+            mariadb: mariadb:10.7
+            mariadb_image: mariadb:10.7@sha256:9a48ac9f196f3d4fd6fea2cab59a49df9e7ca459bf14b2f7b85a0e38a5454571
+          - php: 8.5
+            mariadb: mariadb:10.8
+            mariadb_image: mariadb:10.8@sha256:456709ab146585d6189da05669b84384518baecd83670c9e5221f8c20a47cf1e
+          - php: 8.5
+            mariadb: mariadb:10.9
+            mariadb_image: mariadb:10.9@sha256:56710811b0b96233ef84f4982d3337d88d3aa46a68f3fcb2853b94e1d04ea25c
+          - php: 8.5
+            mariadb: mariadb:12
+            mariadb_image: mariadb:12@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
           - php: 8.1
             mariadb: mariadb:12
+            mariadb_image: mariadb:12@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
           - php: 8.2
             mariadb: mariadb:12
+            mariadb_image: mariadb:12@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
           - php: 8.3
             mariadb: mariadb:12
+            mariadb_image: mariadb:12@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
           - php: 8.4
             mariadb: mariadb:12
+            mariadb_image: mariadb:12@sha256:b1c7bf836e64ed9406a8984af29509f40089d55cea14b32f12c4726a1f17104b
 
     services:
       mysql:
-        image: ${{ matrix.mariadb }}
+        image: ${{ matrix.mariadb_image }}
         env:
           MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: true
           MARIADB_ROOT_PASSWORD: ''
