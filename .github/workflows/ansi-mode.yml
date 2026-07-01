@@ -22,6 +22,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
 jobs:
   tests:
     name: PHP ${{ matrix.php }}-${{ matrix.mysql }}
@@ -41,11 +43,14 @@ jobs:
           - 8.5
 
         mysql:
-          - mysql:latest
+          - mysql:9
+        include:
+          - mysql: mysql:9
+            mysql_image: mysql:9@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3
 
     services:
       mysql:
-        image: ${{ matrix.mysql }}
+        image: ${{ matrix.mysql_image }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_PASSWORD: ''
@@ -59,10 +64,12 @@ jobs:
         run: docker exec mysql_ansi mysql -u root -e "SET GLOBAL sql_mode = 'ANSI';"
 
       - name: Checkout.
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install PHP with extensions.
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: ${{ matrix.php }}
           extensions: ${{ env.EXTENSIONS }}
@@ -82,7 +89,7 @@ jobs:
         run: vendor/bin/phpunit --coverage-clover=coverage.xml --colors=always --display-warnings --display-deprecations
 
       - name: Upload coverage to Codecov.
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
