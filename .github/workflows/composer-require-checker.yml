@@ -1,27 +1,22 @@
+name: Composer require checker
+
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'src/**'
       - '.github/workflows/composer-require-checker.yml'
       - 'composer.json'
-      - 'composer-require-checker.json'
-
   push:
     branches: ['master']
-    paths:
-      - 'src/**'
-      - '.github/workflows/composer-require-checker.yml'
-      - 'composer.json'
-      - 'composer-require-checker.json'
+    paths: *paths
 
-name: Composer require checker
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
 jobs:
   composer-require-checker:
     uses: yiisoft/actions/.github/workflows/composer-require-checker.yml@master
