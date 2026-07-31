@@ -1,29 +1,24 @@
+name: build
+
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'src/**'
       - 'tests/**'
       - '.github/workflows/build.yml'
       - 'composer.json'
       - 'phpunit.xml.dist'
-
   push:
     branches: ['master']
-    paths:
-      - 'src/**'
-      - 'tests/**'
-      - '.github/workflows/build.yml'
-      - 'composer.json'
-      - 'phpunit.xml.dist'
+    paths: *paths
 
-name: build
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
 jobs:
   tests:
     name: PHP ${{ matrix.php }}-${{ matrix.mysql }}
