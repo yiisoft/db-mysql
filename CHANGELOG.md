@@ -7,6 +7,8 @@
 - Enh #461: Add `ext-pdo_mysql` to `require` section of `composer.json` (@Tigrov)
 - Enh #462: Remove `ext-ctype` from `require` section of `composer.json` (@Tigrov)
 - Bug #463: Fix SQL injection in `Schema::findViewNames()` (@darkspock, @vjik)
+- Bug #458: Fix "SQLSTATE[HY093]: Invalid parameter number" in `Schema::loadTableForeignKeys()` when
+  `PDO::ATTR_EMULATE_PREPARES` is disabled (@KalimeroMK)
 
 ## 2.0.0 December 05, 2025
 
