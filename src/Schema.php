@@ -316,7 +316,7 @@ final class Schema extends AbstractPdoSchema
             `kcu`.`CONSTRAINT_NAME` AS `name`,
             `kcu`.`COLUMN_NAME` AS `column_name`,
         CASE
-            WHEN :schemaName IS NULL AND `kcu`.`REFERENCED_TABLE_SCHEMA` = DATABASE() THEN ''
+            WHEN :schemaName1 IS NULL AND `kcu`.`REFERENCED_TABLE_SCHEMA` = DATABASE() THEN ''
         ELSE `kcu`.`REFERENCED_TABLE_SCHEMA`
         END AS `foreign_table_schema`,
             `kcu`.`REFERENCED_TABLE_NAME` AS `foreign_table_name`,
@@ -330,14 +330,16 @@ final class Schema extends AbstractPdoSchema
             `rc`.`TABLE_NAME` = `kcu`.`TABLE_NAME` AND
             `rc`.`CONSTRAINT_NAME` = `kcu`.`CONSTRAINT_NAME`
         WHERE
-            `kcu`.`TABLE_SCHEMA` = COALESCE(:schemaName, DATABASE()) AND
+            `kcu`.`TABLE_SCHEMA` = COALESCE(:schemaName2, DATABASE()) AND
             `kcu`.`TABLE_NAME` = :tableName
         ORDER BY `position` ASC
         SQL;
 
         $nameParts = $this->db->getQuoter()->getTableNameParts($tableName);
+        $schemaName = $nameParts['schemaName'] ?? null;
         $foreignKeys = $this->db->createCommand($sql, [
-            ':schemaName' => $nameParts['schemaName'] ?? null,
+            ':schemaName1' => $schemaName,
+            ':schemaName2' => $schemaName,
             ':tableName' => $nameParts['name'],
         ])->queryAll();
 

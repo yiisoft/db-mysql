@@ -200,6 +200,26 @@ final class SchemaTest extends CommonSchemaTest
         parent::testGetTableChecks();
     }
 
+    /**
+     * @link https://github.com/yiisoft/db-mysql/issues/458
+     */
+    public function testGetTableForeignKeysWithoutEmulatedPrepares(): void
+    {
+        $this->loadFixture();
+
+        $db = $this->createConnection();
+        $db->setEmulatePrepare(false);
+        $db->open();
+
+        $foreignKeys = $db->getSchema()->getTableForeignKeys('order_item');
+
+        $this->assertArrayHasKey('FK_order_item_order_id', $foreignKeys);
+        $this->assertSame('order', $foreignKeys['FK_order_item_order_id']->foreignTableName);
+        $this->assertSame(['id'], $foreignKeys['FK_order_item_order_id']->foreignColumnNames);
+
+        $db->close();
+    }
+
     public function testGetTableNamesWithSchema(): void
     {
         $db = $this->getSharedConnection();
