@@ -311,11 +311,6 @@ final class Schema extends AbstractPdoSchema
 
     protected function loadTableForeignKeys(string $tableName): array
     {
-        /**
-         * The schema name is bound twice under different placeholders on purpose. With
-         * `PDO::ATTR_EMULATE_PREPARES` disabled, reusing one named placeholder makes the driver bind a single
-         * value for two markers, and MySQL rejects the statement with "SQLSTATE[HY093]: Invalid parameter number".
-         */
         $sql = <<<SQL
         SELECT
             `kcu`.`CONSTRAINT_NAME` AS `name`,
