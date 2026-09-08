@@ -49,6 +49,7 @@ final class UuidValueBuilderTest extends IntegrationTestCase
 
         $bytes = $db->createCommand('SELECT [[id]] FROM [[uuid_value]]')->queryScalar();
 
+        $this->assertIsString($bytes);
         $this->assertSame(16, strlen($bytes));
         $this->assertSame(self::UUID, DbUuidHelper::toUuid($bytes));
 
