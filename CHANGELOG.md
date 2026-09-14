@@ -7,6 +7,7 @@
 - Enh #461: Add `ext-pdo_mysql` to `require` section of `composer.json` (@Tigrov)
 - Enh #462: Remove `ext-ctype` from `require` section of `composer.json` (@Tigrov)
 - Bug #463: Fix SQL injection in `Schema::findViewNames()` (@darkspock, @vjik)
+- New #482: Add MySQL/MariaDB implementation of `UuidValue` expression (@KalimeroMK)
 
 ## 2.0.0 December 05, 2025
 

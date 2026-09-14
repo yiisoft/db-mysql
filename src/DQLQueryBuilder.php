@@ -8,11 +8,13 @@ use Yiisoft\Db\Expression\ExpressionInterface;
 use Yiisoft\Db\Expression\Function\ArrayMerge;
 use Yiisoft\Db\Expression\Function\Longest;
 use Yiisoft\Db\Expression\Function\Shortest;
+use Yiisoft\Db\Expression\Value\UuidValue;
 use Yiisoft\Db\Mysql\Builder\ArrayMergeBuilder;
 use Yiisoft\Db\Mysql\Builder\JsonOverlapsBuilder;
 use Yiisoft\Db\Mysql\Builder\LikeBuilder;
 use Yiisoft\Db\Mysql\Builder\LongestBuilder;
 use Yiisoft\Db\Mysql\Builder\ShortestBuilder;
+use Yiisoft\Db\Mysql\Builder\UuidValueBuilder;
 use Yiisoft\Db\QueryBuilder\AbstractDQLQueryBuilder;
 use Yiisoft\Db\QueryBuilder\Condition\JsonOverlaps;
 use Yiisoft\Db\QueryBuilder\Condition\Like;
@@ -62,6 +64,7 @@ final class DQLQueryBuilder extends AbstractDQLQueryBuilder
             ArrayMerge::class => ArrayMergeBuilder::class,
             Longest::class => LongestBuilder::class,
             Shortest::class => ShortestBuilder::class,
+            UuidValue::class => UuidValueBuilder::class,
         ];
     }
 }
