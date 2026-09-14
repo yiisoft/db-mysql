@@ -159,26 +159,6 @@ final class SchemaTest extends CommonSchemaTest
         $db->close();
     }
 
-    public function testGetSchemaChecks(): void
-    {
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Schema::loadTableChecks is not supported by MySQL.',
-        );
-
-        parent::testGetSchemaChecks();
-    }
-
-    public function testGetSchemaDefaultValues(): void
-    {
-        $this->expectException(NotSupportedException::class);
-        $this->expectExceptionMessage(
-            'Yiisoft\Db\Mysql\Schema::loadTableDefaultValues is not supported by MySQL.',
-        );
-
-        parent::testGetSchemaDefaultValues();
-    }
-
     public function testGetSchemaNames(): void
     {
         $db = $this->getSharedConnection();
