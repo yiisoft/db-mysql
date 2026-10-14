@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Db\Mysql\Tests;
 
 use Closure;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -923,8 +924,6 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         yield ['s.t.name', '`s`.`t`.`name`'];
         yield [['t', 'na.me'], '`t`.`na.me`'];
         yield ['LOWER(name)', '`LOWER(name)`'];
-        yield ['[[name]]', '`[[name]]`'];
-        yield ['{{%t}}.name', '`{{%t}}`.`name`'];
         yield ['*', '`*`'];
         yield ['arr[1]', '`arr[1]`'];
         yield ['a`b', '`a``b`'];
@@ -937,5 +936,24 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
         $qb = $this->getSharedConnection()->getQueryBuilder();
 
         $this->assertSame($expected, $qb->buildExpression(new Identifier($name)));
+    }
+
+    public static function dataBuildIdentifierWithQuoteSqlSequences(): iterable
+    {
+        yield ['[[name]]', '`[[name]]`'];
+        yield ['{{%t}}.name', '`{{%t}}`.`name`'];
+    }
+
+    #[DataProvider('dataBuildIdentifierWithQuoteSqlSequences')]
+    public function testBuildIdentifierWithQuoteSqlSequences(string|array $name, string $expected): void
+    {
+        $qb = $this->getSharedConnection()->getQueryBuilder();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Identifier "' . $expected . '" must not contain sequences processed by '
+            . '"Yiisoft\\Db\\Schema\\QuoterInterface::quoteSql()", such as "[[...]]" or "{{...}}".',
+        );
+        $qb->buildExpression(new Identifier($name));
     }
 }
