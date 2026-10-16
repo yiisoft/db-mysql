@@ -951,7 +951,7 @@ final class QueryBuilderTest extends CommonQueryBuilderTest
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Identifier "' . $expected . '" must not contain sequences processed by '
+            'Identifier ' . $expected . ' must not contain sequences processed by '
             . '"Yiisoft\\Db\\Schema\\QuoterInterface::quoteSql()", such as "[[...]]" or "{{...}}".',
         );
         $qb->buildExpression(new Identifier($name));
