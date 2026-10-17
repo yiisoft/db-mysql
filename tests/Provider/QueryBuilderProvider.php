@@ -297,6 +297,7 @@ final class QueryBuilderProvider extends \Yiisoft\Db\Tests\Provider\QueryBuilder
         $values['reference($referenceWithSchema)'][0] = 'int REFERENCES `ref_schema`.`ref_table` (`id`) ON DELETE SET NULL ON UPDATE CASCADE';
 
         $values[] = ["enum('a','b','c')", ColumnBuilder::string()->dbType("enum('a','b','c')")];
+        $values['int DEFAULT NULL'] = ['int DEFAULT NULL', 'int DEFAULT NULL'];
 
         $serverVersion = TestConnection::getServerVersion();
 

@@ -12,7 +12,7 @@ namespace Yiisoft\Db\Mysql\Column;
  *     check?: string,
  *     collate?: string,
  *     comment?: string,
- *     defaultValueRaw?: string,
+ *     defaultValueRaw?: string|null,
  *     extra?: string,
  *     notNull?: bool,
  *     unique?: bool,
